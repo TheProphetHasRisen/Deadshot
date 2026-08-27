@@ -676,7 +676,7 @@ a{color:var(--brass)}
   font-variant-numeric:tabular-nums}
 .fact span{font-size:9.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--mast-sub);opacity:.8;font-family:"IBM Plex Mono",monospace}
 @media(max-width:640px){.scope{width:88px;height:88px}.facts{gap:14px}.fact b{font-size:17px}}
-.navmark{flex:0 0 auto;display:flex;align-items:center;padding:0 10px 0 4px}
+.navmark{flex:0 0 auto;display:flex;align-items:center;padding:0 10px 0 4px;position:sticky;left:0;z-index:5;background:linear-gradient(var(--nav-bg),var(--nav-bg)),linear-gradient(var(--nav-bg),var(--nav-bg));box-shadow:-16px 0 0 var(--nav-bg),-16px 0 0 var(--nav-bg)}
 .navmark svg{width:18px;height:18px;opacity:.9}
 nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
 .nav-row{position:relative;max-width:var(--max);margin:0 auto}
@@ -685,14 +685,14 @@ nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:bl
 .nav-in::-webkit-scrollbar{display:none}
 .nav-row::before,.nav-row::after{content:"";position:absolute;top:0;bottom:0;width:46px;pointer-events:none;
   z-index:3;opacity:0;transition:opacity .22s}
-.nav-row::before{left:0;background:linear-gradient(90deg,var(--nav-bg) 12%,transparent)}
+.nav-row::before{left:46px;background:linear-gradient(90deg,var(--nav-bg) 12%,transparent)}
 .nav-row::after{right:0;background:linear-gradient(270deg,var(--nav-bg) 12%,transparent)}
 .nav-row.sL::before{opacity:1}.nav-row.sR::after{opacity:1}
 .nav-ar{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:26px;height:26px;
   display:none;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;
   background:var(--surface);border:1px solid var(--rule);color:var(--ink-2);font-size:12px;line-height:1;padding:0}
 .nav-row.sL .nav-ar.l{display:flex}.nav-row.sR .nav-ar.r{display:flex}
-.nav-ar.l{left:2px}.nav-ar.r{right:2px}
+.nav-ar.l{left:50px}.nav-ar.r{right:2px}
 .nav-ar:hover{color:var(--brass);border-color:var(--brass-2)}
 @media(max-width:760px){.nav-ar{display:none!important}}
 nav a{flex:0 0 auto;padding:11px 13px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;font-family:"IBM Plex Mono",monospace}
@@ -755,6 +755,10 @@ tbody tr:hover{background:var(--hover)}
 td.nm{font-weight:600}
 td.tm{color:var(--ink-2);font-style:italic}
 .rk{color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:11.5px;width:26px;text-align:right}
+/* records: the team column absorbs the slack and ellipsizes, so the value never scrolls out of reach */
+#recs .scroll table{width:100%}
+#recs td.nm,#recs td.tm,#recs td.dim{white-space:normal;overflow-wrap:break-word}
+#recs td.num{white-space:normal}
 tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6px;font-size:9px;vertical-align:2px}
 .dim{color:var(--ink-3)}
 .mlink{cursor:pointer;border-bottom:1px dotted var(--brass-2)}
