@@ -144,7 +144,18 @@
 @keyframes redactPulse{0%,88%{opacity:.86}92%{opacity:.3}96%{opacity:.86}100%{opacity:.86}}
 .dossier .wipe{fill:#000;opacity:.92;animation:redactWipe 13s ease-in-out infinite}
 @keyframes redactWipe{0%,42%{transform:scaleX(1)}50%{transform:scaleX(0)}58%,100%{transform:scaleX(1)}}
-@media (prefers-reduced-motion:reduce){.dossier *{animation:none!important}}
+/* the stamp and file marks sit outside the stretched SVG: preserveAspectRatio="none" skewed
+   them 7:1 on a phone. As real elements they scale with the viewport instead of the viewBox. */
+.dossier .dz-stamp{position:absolute;right:clamp(6px,2.2vw,24px);top:clamp(8px,2vw,12px);
+  transform:rotate(-11deg);transform-origin:100% 0;border:3px solid #B0271F;border-radius:2px;
+  color:#B0271F;opacity:.86;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(16px,4.6vw,27px);letter-spacing:.14em;padding:4px 11px;line-height:1}
+.dossier .dz-meta{position:absolute;right:clamp(8px,3vw,42px);bottom:clamp(6px,1.6vw,13px);
+  text-align:right;color:#8E8779;font-family:"IBM Plex Mono",monospace;
+  font-size:clamp(7px,1.7vw,9px);letter-spacing:.17em;line-height:1.9}
+/* the facts row wraps on a phone and would sit under the file marks, so give them their own band */
+@media(max-width:900px){[data-skin="redact"] .mast-in{padding-bottom:52px}}
+@media (prefers-reduced-motion:reduce){.dossier *,.wr-blob{animation:none!important}}
 :root[data-skin="leather"]{
   --ground:#35190F; --surface:#452213; --surface-2:#552C1A;
   --ink:#F6E7D8; --ink-2:#C5A791; --ink-3:#C2A691;
@@ -453,6 +464,7 @@
 .hlc .fig{position:absolute;right:14px;top:12px;font-family:"IBM Plex Mono",monospace;font-size:11px;
   color:var(--ink-3);font-variant-numeric:tabular-nums}
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);z-index:200;
+  width:max-content;max-width:min(92vw,460px);
   background:#000;color:#DCD7C9;border:1px solid var(--brass-2);border-radius:2px;
   padding:11px 18px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.06em;
   box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
@@ -759,6 +771,10 @@ td.tm{color:var(--ink-2);font-style:italic}
 #recs .scroll table{width:100%}
 #recs td.nm,#recs td.tm,#recs td.dim{white-space:normal;overflow-wrap:break-word}
 #recs td.num{white-space:normal}
+/* narrow phones: tighten the cells first, and only then allow a word to break, so the
+   value column is never pushed out of reach on a 320px screen */
+@media(max-width:430px){#recs th,#recs td{padding:6px 5px}}
+@media(max-width:345px){#recs td.nm,#recs td.tm,#recs td.dim{overflow-wrap:anywhere}}
 tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6px;font-size:9px;vertical-align:2px}
 .dim{color:var(--ink-3)}
 .mlink{cursor:pointer;border-bottom:1px dotted var(--brass-2)}
@@ -1052,12 +1068,9 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <rect class="bar" x="632" y="26" width="86" height="15"/>
       <rect class="bar wipe" x="470" y="128" width="228" height="15" style="transform-origin:470px 0"/>
       <rect class="bar" x="712" y="128" width="104" height="15"/>
-      <g transform="translate(1148 42) rotate(-11)">
-        <rect class="stamp blink" x="0" y="0" width="200" height="46" rx="2"/>
-        <text class="stampt blink" x="15" y="33">CLASSIFIED</text>
-      </g>
-      <text class="meta" x="940" y="142">FILE NO. DS-2015/2025 &#183; CLEARANCE: LEAGUE MEMBERS ONLY</text>
-      <text class="meta" x="940" y="158">DISTRIBUTION LIST WITHHELD UNDER SECTION 4(b)</text>
+      </svg>
+      <div class="dz-stamp blink">CLASSIFIED</div>
+      <div class="dz-meta">FILE NO. DS-2015/2025 &#183; CLEARANCE: LEAGUE MEMBERS ONLY<br>DISTRIBUTION LIST WITHHELD UNDER SECTION 4(b)</div>
     </div>
     <div class="deco pigskin" aria-hidden="true"><svg class="chalk" viewBox="0 0 1400 170" preserveAspectRatio="none">
       <g class="yl" stroke-width="1.6"><path d="M500 128v42M560 132v38M620 128v42M680 132v38M740 128v42M800 132v38M860 128v42M920 132v38M980 128v42M1040 132v38M1100 128v42M1160 132v38M1220 128v42M1280 132v38"/></g>
@@ -2719,7 +2732,7 @@ function drawSeason(y){
     <div class="card"><div class="card-h"><h3>${y} bracket</h3>
       <span class="sub">${c.co?'Final voided — title split':'Hover a team to trace its run · click to lock it'}</span>
       <span class="sub" id="brkTrace" style="color:var(--brass)"></span></div>
-      <div class="card-b"><div class="brk"><svg class="conn" id="conn"></svg><div class="brk-in" id="brkIn">${cols}</div></div></div></div>`;
+      <div class="card-b"><div class="brk"><svg class="conn" id="conn" aria-hidden="true"></svg><div class="brk-in" id="brkIn">${cols}</div></div></div></div>`;
   table($('#tS'),[
    {h:'Seed',f:r=>r.seed,c:'num',k:r=>r.seed,asc:1},
    {h:'Team',f:r=>esc(r.team),c:'nm',k:r=>r.team,asc:1},
