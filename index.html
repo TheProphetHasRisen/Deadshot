@@ -3069,9 +3069,18 @@ function drawWeekly(YR){
     c.addEventListener('mousemove',moveTip);
     c.addEventListener('mouseleave',()=>{paint(null);hideTip();});
     c.addEventListener('click',e=>{e.stopPropagation();rtoggle(c.dataset.t);});});
-  $$('#race .hit, #race .rt').forEach(p=>{
+  $$('#race .hit').forEach(p=>{
     p.addEventListener('mouseenter',e=>{paint(p.dataset.t);showTip(e,weekTip(p.dataset.t,nearestWeek(e.clientX)));});
     p.addEventListener('mousemove',e=>{tip.innerHTML=weekTip(p.dataset.t,nearestWeek(e.clientX));moveTip(e);});
+    p.addEventListener('mouseleave',()=>{paint(null);hideTip();});
+    p.addEventListener('click',()=>rtoggle(p.dataset.t));});
+  /* the team-name label always sits past the last week, in the FIN/medal column --
+     it's a fixed end-of-line marker like the medal dot, never a mid-line position,
+     so it must show the same final-placing tooltip the medal shows, not a weekly one
+     computed from mouse X (which was clamping to the last real week, e.g. "week 14"). */
+  $$('#race .rt').forEach(p=>{
+    p.addEventListener('mouseenter',e=>{paint(p.dataset.t);showTip(e,finTip(p.dataset.t));});
+    p.addEventListener('mousemove',moveTip);
     p.addEventListener('mouseleave',()=>{paint(null);hideTip();});
     p.addEventListener('click',()=>rtoggle(p.dataset.t));});
   $$('#raceLeg button[data-t]').forEach(b=>{
