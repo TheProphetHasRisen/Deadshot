@@ -447,7 +447,7 @@
 .lad-tier{display:flex;align-items:center;gap:8px;font-family:"IBM Plex Mono",monospace;font-size:9px;
   letter-spacing:.16em;text-transform:uppercase;margin:9px 6px 3px;opacity:.85}
 .lad-tier span{flex:1;height:1px;background:currentColor;opacity:.3}
-@media(max-width:720px){.lad-head,.lad{grid-template-columns:22px minmax(72px,1fr) 0 46px 52px 38px 0}
+@media(max-width:720px){.lad-head,.lad{grid-template-columns:22px minmax(72px,1fr) 46px 52px 38px}
   .lad-ev{display:none}
   .lad-track,.lad-track-h{display:none}}
 .hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,268px),1fr));gap:1px;
@@ -1181,10 +1181,10 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="card">
       <div class="card-h"><h3 id="balTitle">Competitive balance</h3>
         <div class="right pills">
-          <button data-m="sd" class="on">Scoring spread</button>
-          <button data-m="wsd">Record spread</button>
-          <button data-m="rng">Power index range</button>
-          <button data-m="lg">League avg PPG</button>
+          <button data-bal="sd" class="on">Scoring spread</button>
+          <button data-bal="wsd">Record spread</button>
+          <button data-bal="rng">Power index range</button>
+          <button data-bal="lg">League avg PPG</button>
         </div></div>
       <div class="card-b"><div class="chart" id="bal"></div>
         <p class="sub" id="balNote" style="margin:12px 0 0;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink-2)"></p></div>
@@ -1512,7 +1512,22 @@ function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const
   return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');}
 function diverge(v,span){const s=cssv('--surface'),t=Math.max(-1,Math.min(1,v/span));
   return t>=0?mix(s,cssv('--pos'),Math.pow(t,.72)*.82):mix(s,cssv('--neg'),Math.pow(-t,.72)*.82);}
-const inkOn=(v,span)=>Math.abs(v)/span>0.62?'#fff':'var(--ink)';
+/* WCAG relative luminance -> real contrast, not a guessed threshold on the input value.
+   A flat cutoff on v/span drifted out of sync with the actual mixed colour per theme and
+   left some heat cells under 3:1 -- e.g. white on rgb(112,170,207) measured 2.52:1. */
+function relLum(hex){const c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4));
+  return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];}
+function contrastHex(a,b){const L1=relLum(a),L2=relLum(b);return (Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05);}
+function pickInk(bg){
+  const white=contrastHex(bg,'#ffffff'), ink=contrastHex(bg,cssv('--ink'));
+  if(Math.max(white,ink)>=4.5) return white>=ink?'#fff':'var(--ink)';
+  /* neither the theme's own ink token nor plain white clears 4.5:1 against this
+     particular mixed background -- max(contrast-to-white, contrast-to-black) is
+     mathematically >=~4.58 for ANY background (the two curves cross there), so
+     falling back to true black/white is a guaranteed last resort, not a guess. */
+  return contrastHex(bg,'#ffffff')>=contrastHex(bg,'#000000')?'#fff':'#000';
+}
+const inkOn=(v,span)=>pickInk(diverge(v,span));
 
 $('#f1').textContent=SEA.length;$('#f2').textContent=M.length;$('#f3').textContent=ROWS.length;$('#f4').textContent=D.games.length+(D.wkYears||[]).reduce((n,y)=>n+D.wk[y].games.filter(g=>g.br==='').length,0);
 $('#nextYr').textContent=LAST+1;
@@ -2447,10 +2462,10 @@ function drawBal(k){
   lineChart($('#bal'),SEAMETA.map(m=>({y:m.y,v:b.get(m)})),b.fmt,b.lab,
     `${b.lab} by season, ${SEA[0]} to ${LAST}`);
 }
-$$('#balTitle').length; $$('.card-h .pills button[data-m]').forEach(b=>b.onclick=()=>{
-  $$('.card-h .pills button[data-m]').forEach(x=>x.classList.toggle('on',x===b)); drawBal(b.dataset.m);});
+$$('#balTitle').length; $$('.card-h .pills button[data-bal]').forEach(b=>b.onclick=()=>{
+  $$('.card-h .pills button[data-bal]').forEach(x=>x.classList.toggle('on',x===b)); drawBal(b.dataset.bal);});
 drawBal('sd');
-REDRAW.push(()=>{const b=$$('.card-h .pills button[data-m].on')[0]; drawBal(b?b.dataset.m:'sd');});
+REDRAW.push(()=>{const b=$$('.card-h .pills button[data-bal].on')[0]; drawBal(b?b.dataset.bal:'sd');});
 
 /* dot strip */
 function drawStrip(){
@@ -2723,7 +2738,7 @@ function drawSeason(y){
     cols+=`<div class="round" data-wk="${wk}"><h4>Week ${wk}</h4>${inner}</div>`;});
   const champT=c.teams.map(esc).join(' &amp; ');
   cols+=`<div class="round" style="flex:0 0 176px"><h4>Champion</h4><div class="brk-champ">
-    <div class="s">${c.co?'Co-champions':'Champion'}</div><div class="t">${champT}</div>
+    <div class="s" style="color:${pickInk(cssv('--brass-wash'))}">${c.co?'Co-champions':'Champion'}</div><div class="t">${champT}</div>
     <div style="font-size:11.5px;color:var(--ink-2);margin-top:5px">${c.mgrs.map(esc).join(' &amp; ')}</div></div></div>`;
   $('#seasonPane').innerHTML=`
     <div class="card"><div class="card-h"><h3>${y} standings</h3>
@@ -3232,8 +3247,8 @@ syncFilter();
         if(a===b){h+='<td class="self"><span>—</span></td>';return;}
         const n=PAIR[key(a,b)]||0; if(!n){h+='<td><span></span></td>';return;}
         tot+=n;
-        const t=Math.min(1,n/MXP);
-        h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85)};color:${t>.6?'#fff':'var(--ink)'}">${n}</span></td>`;});
+        const t=Math.min(1,n/MXP), bg=mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85);
+        h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${bg};color:${pickInk(bg)}">${n}</span></td>`;});
       h+=`<td><span style="font-weight:600">${tot||''}</span></td></tr>`;});
     $('#tTrMtx').innerHTML=h+'</tbody>';
     $$('#tTrMtx td[data-a]').forEach(td=>{
@@ -3259,7 +3274,8 @@ syncFilter();
         const n=cell(m,y); tot+=n;
         if(!n){h+='<td><span style="color:var(--ink-3)">0</span></td>';return;}
         const t=Math.min(1,n/MXY);
-        h+=`<td data-m="${esc(m)}" data-y="${y}"><span style="background:${mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85)};color:${t>.6?'#fff':'var(--ink)'}">${n}</span></td>`;});
+        const bg3=mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85);
+        h+=`<td data-m="${esc(m)}" data-y="${y}"><span style="background:${bg3};color:${pickInk(bg3)}">${n}</span></td>`;});
       h+=`<td><span style="font-weight:600">${tot||''}</span></td></tr>`;});
     $('#tTrYr').innerHTML=h+'</tbody>';
     $$('#tTrYr td[data-m]').forEach(td=>{
