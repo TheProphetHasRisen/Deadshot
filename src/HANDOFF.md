@@ -167,12 +167,12 @@ champions · alltime · power · rankings · shape · weekly · luck · advanced
 fivehundred · records · seasons · h2h · trades-sec · method
 ```
 
-### The two bump charts in `weekly`
+### The two bump charts
 
-`#race` ("The race") is **season-scoped** — `drawWeekly(YR)` rebuilds it from the season
+`#race` ("The race", in `weekly`) is **season-scoped** — `drawWeekly(YR)` rebuilds it from the season
 pills, one line per team.
 
-`#crace` ("Career races") is **manager-scoped and cross-season** — one line per season
+`#crace` ("Career races", in `rankings` &mdash; it is manager-centric and cross-season, so it does not belong under the Week by Week season picker) is **manager-scoped and cross-season** — one line per season
 for a single manager, drawn by `drawCareerRace()`, registered in `REDRAW` only (never
 `WKREDRAW`), so the season pills do not touch it. It reads `D.wkYears`, so it can only
 ever show 2021–2025; the caption says so rather than silently drawing a short career.
@@ -181,9 +181,17 @@ Seasons are told apart three ways at once, deliberately — several managers reu
 team name for years (Shane Kaiper was "Stegostompem" all five), so the team name alone
 identifies nothing:
 
-1. a recency colour ramp, `mix(--mid, --brass, …)`, newest brightest;
+1. a recency colour ramp from a faint neutral to the full accent, plus stroke weight
+   rising with it (1.7px oldest to 3.3px newest). A plain `--mid -> --brass` ramp was
+   NOT enough &mdash; on several skins those sit close together and the middle years
+   blurred. Measured: every skin now clears CIE76 deltaE 12 between adjacent seasons;
 2. a year label at the end of every line;
 3. a clickable season legend.
+
+Medals on the end labels are positioned **after render, off `getBBox()`** &mdash;
+`getComputedTextLength()` ignores the `dx` between the year and team-name tspans and
+put the medal on top of the last letter. Three seasons can finish in the same place
+(Wesley Alpert finished 2nd three times), so labels are fanned 16px apart.
 
 Both charts bake colours into markup, so both must stay in `REDRAW` or a theme switch
 leaves them stale. Both use a 980-unit `viewBox` scaled to the container, which means
