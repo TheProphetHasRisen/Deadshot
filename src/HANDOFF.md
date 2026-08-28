@@ -1,0 +1,375 @@
+# Deadshot Record Book — handoff
+
+A single-page, self-contained fantasy football history site for the Deadshot league
+(2015–2025, 10 managers active, 20 all-time). Everything ships as one `index.html`
+with no images and no CDN scripts. ~500 KB.
+
+> **One exception, verified 2026-08-27:** the `<head>` links
+> `fonts.googleapis.com`, which pulls six `.woff2` files from `fonts.gstatic.com`.
+> The page is *not* fully offline-capable — with that host blocked it renders in
+> fallback faces. Inline them as data URIs if the no-external-requests claim ever
+> needs to be true.
+
+Live: deployed on Vercel from a GitHub repo whose only meaningful file is `index.html`.
+
+---
+
+## 1. Build pipeline
+
+```
+data.py  +  weekly*.py          ← hand-transcribed source of truth
+        │
+        ├── export.py           → site_data.json    (all aggregation / analytics)
+        │
+        └── mksite.py           → index.html        (CSS + markup + JS + embedded JSON)
+```
+
+Two commands, in this order, from this directory:
+
+```bash
+python3 export.py     # writes site_data.json
+python3 mksite.py     # reads site_data.json, writes index.html
+```
+
+`mksite.py` prints the byte count on success. Nothing else is generated.
+
+### Test
+
+```bash
+npm i playwright                      # once
+node test.js                          # headless structural audit, desktop + mobile
+CHROMIUM_PATH=/path/to/chromium node test.js   # if you need to point at a specific binary
+```
+
+`test.js` asserts row counts for every table/chart on the page and reports any
+`pageerror` / console error. A `net::ERR_TUNNEL_CONNECTION_FAILED` line is
+expected noise from the sandbox and is not a real failure.
+
+Also worth running after any JS edit:
+
+```bash
+python3 - <<'PY'
+import re,io
+h=io.open('index.html',encoding='utf-8').read()
+io.open('/tmp/site.js','w',encoding='utf-8').write(max(re.findall(r'<script>(.*?)</script>',h,re.S),key=len))
+PY
+node --check /tmp/site.js
+```
+
+---
+
+## 2. File map
+
+| File | What it is |
+|---|---|
+| `data.py` | Canonical dataset. `SEASON_META` (teams / reg games / playoff spots per year), `STANDINGS`, `FINAL_PLACE`, `MANAGERS` (team name → manager, per year), `CHAINED` (team names that persist across years), `CO_CHAMPS`, `PLAYOFF_GAMES`, `MANAGER_ORDER`. |
+| `weekly.py` | 2025 week-by-week: `W2025`, `BYES2025`, `TRADES2025` |
+| `weekly2024.py` … `weekly2021.py` | Same shape for 2024, 2023, 2022, 2021 |
+| `export.py` | All analytics. Reads the above, writes `site_data.json`. |
+| `mksite.py` | The whole site. Four raw strings: `HEAD` (all CSS, line ~4), `BODY` (markup + the `__DATA__` placeholder, ~932), `JS` (~1395), `SHELL_TOP` (doctype/meta, ~3536). |
+| `site_data.json` | Build artifact. Do not edit by hand. |
+| `index.html` | Build artifact. Do not edit by hand — every change goes in `mksite.py`. |
+| `CLAUDE.md` | Standing working rules — Claude Code loads this automatically each session |
+| `test.js` | Playwright audit |
+| `verify.py` | Data integrity checks (HANDOFF section 3 invariants). Exit 1 on any failure. |
+| `writer.py` | Renders league data back into `data.py` / `weekly*.py` format. Freezes finished seasons; refuses to write anything that fails `verify.py`. |
+| `test_writer.py` | Round-trip and guard-rail tests for `writer.py`. |
+| `YAHOO_PLAN.md` | Plan for replacing hand transcription with the Yahoo API. |
+| `league_rules_2026.md` | League settings reference |
+| `yahoo_scrape_status.md` | Notes from an attempt to pull live Yahoo data |
+
+### Data row shapes
+
+```python
+# weekly*.py
+W2025 = [(week, teamA, actualA, projA, teamB, actualB, projB, bracket), ...]
+#   bracket: '' regular season, 'C' championship bracket, 'S' consolation
+BYES2025  = [(week, team, actual, proj, bracket), ...]      # bye weeks still score
+TRADES2025 = [("Nov 7", [players...], teamA, [players...], teamB), ...]
+
+# data.py
+STANDINGS[year] = [(rank, team, W, L, T, PF, PA, moves), ...]   # moves may be None
+PLAYOFF_GAMES   = [(year, week, round, teamA, ptsA, teamB, ptsB, void), ...]
+SEASON_META[year] = (teams, reg_games, playoff_spots, spots_confirmed)
+```
+
+---
+
+## 3. Verification invariants
+
+These caught real data errors more than once. Run them after adding any season:
+
+- League-wide **PF must equal PA to the cent**.
+- Every team's **W + L + T == season length**.
+- **Total W == total L** across the league.
+- Weekly game log must reconcile against `STANDINGS` for every team.
+
+A 2022 transcription error (five wrong records) was found exactly this way.
+
+These are now automated. `python3 verify.py` runs 517 checks across all seasons and
+exits non-zero on any failure, so it can gate a build or an automated fetch. It also
+checks team counts, duplicate names, manager/team coverage, `FINAL_PLACE` membership
+and playoff-game team names. Confirmed to actually catch things: corrupting one score
+by 100 points and flipping one team's record from 5-9 to 6-8 were each caught twice
+over, naming the exact team.
+
+### The build is not bit-reproducible across machines
+
+`pythW`, `luck` and `expOverAvg` derive from `pf**K / (pf**K + pa**K)` with a
+non-integer `K = 2.37` ([export.py](export.py) line 24). A fractional exponent goes to the C
+library's `pow()`, which CPython does not implement, so the last 1-2 bits depend on
+whichever libm the build machine links. **A rebuild that changes only these three
+fields inside the embedded JSON is expected and is not a regression.**
+
+Observed in practice: rebuilding a checked-in `site_data.json` on a different machine
+moved exactly 4 of ~14,000 numbers — one team-season's `pythW` and `luck`, plus that
+manager's career `luck` and `expOverAvg` — by ~1e-15 relative. Everything else in
+`index.html`, including all CSS, markup and JS, was byte-identical.
+
+Before blaming float noise, confirm that is all it is: `md5` alone will not tell you.
+Parse both files and compare structurally. Key *order* changing, a differing value
+count in the thousands, or any non-float field moving is a real bug, not libm. Python
+version and CPU architecture are **not** the cause — 3.9 and 3.11, arm64 and x86_64,
+all agree with each other.
+
+If you ever need the artifacts to hash-match across machines, round these three fields
+in `export.py` before serialising; ~1e-10 is far below anything the UI displays.
+
+---
+
+## 4. Analytics glossary (all computed in `export.py`)
+
+- **Power Index** — 100 = that season's league-average PPG. Re-based every year, so a
+  110 in 2015 and a 110 in 2025 mean the same thing despite scoring inflation.
+- **Z-score** — standard deviations from that season's mean PPG.
+- **Pythagorean expectation** — exponent `K = 2.37`.
+- **Luck** — actual wins minus Pythagorean wins.
+- **All-play** — record if you played every team every week (`apW/apL/apPct`).
+- **Expected titles** — bye-aware: `neutral_title_odds(seed, spots)` pads the bracket to
+  the next power of two; top `byes` seeds need one fewer win. Verified to sum to exactly
+  1.0 per season.
+- **Power Rankings** — recency-weighted: each season weighted `λ^(LAST − year)` applied to
+  *games played*, then shrunk toward 100 by `N/(N+25)`. λ is a live slider (0.45–1.00).
+- **SOS** — `sos`, `sosRel`, `sosAp`, `sosBase` per team-season.
+- **Volatility** — `sd` and `cv` (coefficient of variation) of weekly scores.
+- **.500 metrics** — `gAbove`, `sznAbove/Below/Even`, `wkAbove/At/Below`, `wkStreak`,
+  `expOverAvg`, plus `vsWinW/L`, `vsSubW/L`.
+
+---
+
+## 5. Page structure
+
+Sections, in DOM order (the nav array `SECS` in the JS **must** match this order —
+a mismatch between the two was a real reported bug):
+
+```
+champions · alltime · power · rankings · shape · weekly · luck · advanced
+fivehundred · records · seasons · h2h · trades-sec · method
+```
+
+### The two bump charts in `weekly`
+
+`#race` ("The race") is **season-scoped** — `drawWeekly(YR)` rebuilds it from the season
+pills, one line per team.
+
+`#crace` ("Career races") is **manager-scoped and cross-season** — one line per season
+for a single manager, drawn by `drawCareerRace()`, registered in `REDRAW` only (never
+`WKREDRAW`), so the season pills do not touch it. It reads `D.wkYears`, so it can only
+ever show 2021–2025; the caption says so rather than silently drawing a short career.
+
+Seasons are told apart three ways at once, deliberately — several managers reused one
+team name for years (Shane Kaiper was "Stegostompem" all five), so the team name alone
+identifies nothing:
+
+1. a recency colour ramp, `mix(--mid, --brass, …)`, newest brightest;
+2. a year label at the end of every line;
+3. a clickable season legend.
+
+Both charts bake colours into markup, so both must stay in `REDRAW` or a theme switch
+leaves them stale. Both use a 980-unit `viewBox` scaled to the container, which means
+**both become very small on a phone** (~312px wide at 390px viewport). That is
+pre-existing behaviour shared by the whole chart family, not specific to either one.
+
+### Themes
+
+Six, set via `data-skin` on `<html>` and persisted to `localStorage['deadshot.skin']`:
+`og` (Classic — always the default for first-time visitors), `scope`, `red` (Crimson),
+`leather` (Pigskin), `arcade`, and `redact` — hidden, only selectable once
+`localStorage['deadshot.clearance'] === '1'`.
+
+All colors are CSS custom properties per skin (`--brass`, `--surface`, `--ink`,
+`--pos`, `--neg`, …). **Never hardcode a color in a component** — every one of the six
+skins has to survive it.
+
+### Easter eggs
+
+- **6 clicks on the masthead reticle** (`.mast .scope`) — escalating warnings, a klaxon
+  that builds, and a sniper shot that cracks the page open into the Redacted theme.
+- Type **`commish`** or **`commissioner`** — the Pharaoh.
+- Type **`cossu`** — "Cossu is a bot".
+- Type **`chaos`** — scrambles every number on screen and knocks the charts out of
+  alignment, then restores exactly.
+
+All audio is synthesized with the Web Audio API. There are zero audio assets.
+
+---
+
+## 6. Conventions and traps (learned the hard way — please keep)
+
+> `CLAUDE.md` in this directory carries these as standing rules and is loaded
+> automatically every session. Keep the two in sync if you change one.
+
+0. **`mksite.py` is ~250 KB / 3,550 lines — about 65k tokens. Never read it in
+   full.** One such read eats most of a context window. `grep -n` for the anchor,
+   then read a narrow window around it.
+1. **Never edit `index.html`.** It is generated. Edit `mksite.py` and rebuild.
+2. **Assert before you write.** When patching `mksite.py` with a script, assert the
+   anchor string matches exactly once *before* opening the file for write. Several
+   edits were silently lost to a script that threw on a stale anchor after having
+   already made other changes in memory. Then `grep` to confirm.
+3. **Class name collisions.** `mksite.py` is one giant stylesheet. A new `.brand` class
+   silently inherited the masthead's `.brand`; a new `.totop.on` inherited the global
+   `button.on` styling. Grep for a class name before you introduce it.
+4. **`@keyframes` collisions too** — `sweep` was defined twice and the wrong one won.
+5. **`position:fixed` under a transformed ancestor** does not anchor to the viewport.
+   `<body>` is transformed during some effects; a fixed overlay stretched to the full
+   20,000px document and smeared off-screen. Shake `.mast, nav, .wrap` instead of `body`.
+6. **Circular CSS variables** (`--x: var(--x)`) are invalid and fail silently.
+7. **Duplicate `id`s** — an inner element reusing `id="method"` meant
+   `$('#method').innerHTML =` wiped the entire section.
+8. **Apostrophes in single-quoted JS strings** — `2021's` broke the whole page.
+9. `$` and `$$` are `querySelector` / `[...querySelectorAll]` helpers, defined once.
+10. Per-season sections show that year's actual field; they are deliberately **not**
+    filtered by the global Active-10 manager filter.
+
+---
+
+## 7. Deploy
+
+Repo: **TheProphetHasRisen/Deadshot** (public, default branch `main`). Vercel serves it
+at <https://deadshot-iota.vercel.app>. The repo holds `README.md` and `index.html` only.
+
+```bash
+./deploy.sh              # build + verify, no push (safe default)
+DEADSHOT_REPO=TheProphetHasRisen/Deadshot ./deploy.sh --push
+```
+
+`deploy.sh` runs `export.py` + `mksite.py`, `node --check`s the inline script, runs
+`test.js`, refuses to push if `node` is missing or the file looks truncated, then commits
+`index.html` to `main` in one commit. Auth is `gh` (`gh auth login --web`); the token
+lives in the macOS keyring. **Never ask for or accept a personal access token.**
+
+### The old way, and why it went
+
+Dragging the file onto GitHub in the browser still works, but Chrome saves it as
+`index_36.html` when a copy is already in the downloads folder, so each deploy became
+three commits — *Delete index.html*, *Add files via upload*, *Rename index_35.html to
+index.html* — and once took the site down with a 404. If you do deploy by hand: the
+filename must end up exactly `index.html`, and do not delete the old file first.
+
+---
+
+## 8. Fixed issues
+
+### Wrapped story player — final-card buttons were unclickable (fixed 2026-08-26)
+
+**Symptom:** on the final Wrapped card, "Back to career" did nothing and "Play again"
+went back exactly one card instead of restarting.
+
+**Cause:** the invisible tap zones sat above the buttons. `.wr-nav.l` (left 34%) and
+`.wr-nav.r` (right 66%) are `z-index:5`. The buttons live in `.wr-btns` inside
+`.wr-card`, which was `z-index:4` — and because `.wr-card` establishes a stacking
+context, the `z-index:7` on `.wr-btns` could not escape it. Every click landed on a nav
+zone: "Play again" fell in the left third -> `wrGo(-1)` -> back one card; "Back to
+career" fell in the right two-thirds -> `wrGo(1)` -> no-op on the last card.
+
+Both symptoms were the one bug. `wrPaint()` had always reset the bars correctly when
+`WR.i===0`; "Play again" only looked like a one-card rewind because the click was
+reaching `#wrPrev` and never reaching the button.
+
+**Fix**, in the `HEAD` string of `mksite.py`:
+
+```css
+.wr-card{ z-index:6; pointer-events:none; }   /* was z-index:4 */
+.wr-btns{ pointer-events:auto; }
+```
+
+**Note for future edits:** `.wr-card` is now click-through by design, so taps on card
+text intentionally fall through to the nav zones underneath — that is what makes
+tap-to-advance work. Any new interactive element added inside `.wr-card` needs its own
+`pointer-events:auto` or it will be dead to the mouse.
+
+**How it was verified** — the same script was run against a pre-fix build to prove it
+discriminates. Pre-fix, `document.elementFromPoint` at each button's centre returned
+`wrPrev` / `wrNext` and Playwright refused to click at all ("`wrNext` intercepts pointer
+events"); post-fix both return themselves. Confirmed on the last card that both buttons
+respond, "Play again" resets to card 1 with every progress bar cleared, and "Back to
+career" closes only the story overlay with the manager modal still open underneath —
+across all six themes on desktop and mobile, 0 `pageerror`. Tap-to-advance, the X button
+and Escape were re-checked for regressions.
+
+---
+
+### Later fixes in the same session (2026-08-26/27)
+
+All verified headless across six themes and 320-2560px, 0 `pageerror`.
+
+| Fix | Was | Now |
+|---|---|---|
+| Wrapped card content looked clickable | `.wr-nav` carried `cursor:pointer`, and since `.wr-card` is click-through the pills and headline inherited it | `.wr-nav{cursor:default}` — only the real buttons show a pointer |
+| Records tables needed sideways scrolling to see the number | global `th,td{white-space:nowrap}` pushed the value past the card edge; **8/21 cards clipped at 1400px, 9/21 at 390px** | `#recs` lets the manager/team columns wrap and the `/14g` suffix drop a line; 0/21 clip at every width tested |
+| Masthead reticle scrolled away | `.navmark` sits inside `.nav-in`, which is `overflow-x:auto` | `position:sticky;left:0`, backdrop layered twice to ~99.6% opacity; `.nav-ar.l` moved to `left:50px` and the fade to `left:46px` so they clear it |
+| Easter-egg toasts crushed on phones | `.toast` is `position:fixed;left:50%` with no width, so shrink-to-fit capped at **half the viewport** — 195px on a 390px screen | `width:max-content;max-width:min(92vw,460px)` |
+| Redacted dossier text unreadable on phones | the dossier SVG is `preserveAspectRatio="none"`, so on a phone the stamp and file marks were scaled **7.2:1** (0.279 x vs 2.009 y) | stamp and meta are real HTML elements over the SVG, sized in CSS px; the SVG keeps only the bars, which stretch fine |
+| Bracket connector SVG exposed to screen readers | no `aria-hidden` | `aria-hidden="true"` — it is decorative, the bracket content is in sibling divs |
+| Wrapped blobs animated under `prefers-reduced-motion` | only `.dossier *` was covered | `.dossier *,.wr-blob` |
+
+**Two latent hazards found and left alone** — both are currently harmless, but they are
+traps for the next edit:
+
+1. `data-m` is overloaded. It is the manager-link attribute, and the global handler is
+   `closest('[data-m]') -> openMgr(...)`. Four buttons in Season Shape reuse it as a
+   *metric* key: `data-m="sd" | "wsd" | "rng" | "lg"`. Nothing breaks today only because
+   `openMgr` bails on an unknown name. Do not make `openMgr` less defensive, and prefer a
+   different attribute for new controls.
+2. The masthead `.dossier` SVG had no closing `</svg>`; the browser recovered because the
+   following `</div>` implicitly closed it. Now closed properly. Anything added after
+   those elements would otherwise have landed *inside* the SVG.
+
+## 9. Backlog
+
+- **2026 live section** — standings, weekly matchups, rolling power rankings, playoff
+  odds. Blocked on a live data source.
+- **Yahoo API** — the intended replacement for hand transcription. Plan of record: the
+  league owner registers the app and stores the refresh token in GitHub repo secrets; the
+  fetcher runs as a scheduled job and never exposes the token to a coding agent. Scraping
+  the HTML was tried and abandoned (see `yahoo_scrape_status.md`): grouped two-row
+  `<thead>` shifts column indices, team defenses live under `/nfl/teams/` not
+  `/nfl/players/` so DEF was silently dropped, and Yahoo rate-limits to a 16-byte
+  "Request denied" after roughly 120 rapid fetches.
+- **Split `data.json` out of the HTML** — worth doing once something other than a human
+  writes the data file. Not before.
+- **2015–2020 weekly logs** — only season totals exist for those years; every week-by-week
+  feature is dark for them.
+- **Trade grading** — score each side of a trade by what the pieces actually produced
+  afterwards, plus the manager's W-L in the weeks following.
+
+---
+
+## 10. Owner preferences
+
+Brian owns the league and built this site with AI help. **He is not an engineer.**
+`CLAUDE.md` carries the full rules under "Who you are talking to" — keep the two in
+sync. The short version:
+
+- Lead with what changed and whether it worked. Plain English.
+- No file paths, line numbers, function names, or jargon unless he asks.
+- Short. No reasoning unless he asks for it.
+- Say plainly when something is broken, and what it means for the site.
+- **Claude makes the technical decisions.** Never ask which library, which approach,
+  or how to structure something — pick, then say what you picked. Bring him a
+  decision only when it is his: look and feel, what to build next, anything that
+  costs money, anything that cannot be undone.
+- When he has to do something himself, walk him through every click and screen and
+  say what he should see when it worked.
+- Deploy without asking. Do not ask for or accept a GitHub personal access token.

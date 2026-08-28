@@ -1,0 +1,7 @@
+# Playwright audit screenshots written by test.js — regenerated on every run
+shot-*.png
+
+# Node test toolchain — the deploy repo contains index.html only
+node_modules/
+package.json
+package-lock.json
