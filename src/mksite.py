@@ -734,6 +734,12 @@ tr.off{opacity:.3}
 .card+.card{margin-top:20px}
 .card-h{display:flex;align-items:baseline;gap:12px;padding:13px 16px;border-bottom:1px solid var(--rule);background:var(--surface-2);flex-wrap:wrap}
 .card-h h3{font-size:15px;font-weight:700;font-variation-settings:"opsz" 20}
+/* trade cards are titled "TeamA <-> TeamB". A long team name with no spaces in it
+   cannot wrap, and pushed the heading straight out of the card on a phone. Let it
+   break mid-word rather than overflow; min-width:0 so the flex child may shrink. */
+#trades .card-h{min-width:0}
+#trades .card-h h3{overflow-wrap:anywhere;min-width:0}
+#trades .sub-h{overflow-wrap:anywhere;min-width:0}
 .card-h .sub{font-size:11.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
 .card-h .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .card-b{padding:16px}
@@ -3376,7 +3382,7 @@ function drawWeekly(YR){
   $('#trades').innerHTML=K5.trades.map(t=>`<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(t.ta)} &harr; ${esc(t.tb)}</h3><span class="sub">${esc(t.d)}</span>
       <div class="right sub">${esc(MG[t.ta]||'')} &harr; ${esc(MG[t.tb]||'')}</div></div>
-    <div class="card-b" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card-b" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
       <div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t.ta)}</div>${t.pa.map(p=>`<div style="font-size:13px">${esc(p)}</div>`).join('')}</div>
       <div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t.tb)}</div>${t.pb.map(p=>`<div style="font-size:13px">${esc(p)}</div>`).join('')}</div>
     </div></div>`).join('');
