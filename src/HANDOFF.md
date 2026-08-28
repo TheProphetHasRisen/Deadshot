@@ -113,6 +113,18 @@ and playoff-game team names. Confirmed to actually catch things: corrupting one 
 by 100 points and flipping one team's record from 5-9 to 6-8 were each caught twice
 over, naming the exact team.
 
+**The postseason is recorded twice** -- in `PLAYOFF_GAMES` and again in the weekly
+logs -- and until 2026-08-28 nothing checked the two agreed. `inv_playoffs_match_log`
+now does: every playoff-table game must exist in that season's weekly log, and the
+scores must match to the cent. Verified by typing a digit-swap into the 2025 Final
+(142.92 -> 142.29), which it caught. The weekly log legitimately holds four more
+postseason games per season than the playoff table: the consolation ladder (`'S'`
+bracket) is logged but deliberately left out of `PLAYOFF_GAMES`.
+
+`H2H_SEED` was removed from `data.py` on 2026-08-28. It duplicated the 2024/2025 rows
+of `PLAYOFF_GAMES` exactly, nothing referenced it, and it could only ever drift out of
+step. Removing it left `index.html` byte-identical, confirming it was dead.
+
 ### The build is not bit-reproducible across machines
 
 `pythW`, `luck` and `expOverAvg` derive from `pf**K / (pf**K + pa**K)` with a

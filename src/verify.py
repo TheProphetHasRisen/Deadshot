@@ -169,12 +169,39 @@ def inv_playoff_games():
         check(tb in names, f"{y} {rnd}: unknown team", tb)
 
 
+def inv_playoffs_match_log():
+    """The postseason is recorded twice -- in PLAYOFF_GAMES and again in the weekly
+    log -- and nothing used to check the two agreed.
+
+    Two rules. Every game in the playoff table must exist in that season's weekly
+    log, and wherever both record the same matchup the scores must be identical.
+    The weekly log legitimately holds more: the consolation ladder ('S' bracket)
+    is logged but deliberately kept out of the playoff table.
+    """
+    for y, (games, byes) in sorted(weekly_sources().items()):
+        log = {}
+        for (wk, ta, aa, pja, tb, ab, pjb, br) in games:
+            if br:
+                log[(wk, frozenset((ta, tb)))] = {(ta, round(aa, 2)), (tb, round(ab, 2))}
+        for (yy, wk, rnd, ta, pa_, tb, pb, void) in D.PLAYOFF_GAMES:
+            if yy != y:
+                continue
+            key = (wk, frozenset((ta, tb)))
+            if not check(key in log, f"{y} {rnd}: not in the week-by-week log",
+                         f"week {wk}, {ta} vs {tb}"):
+                continue
+            want = {(ta, round(pa_, 2)), (tb, round(pb, 2))}
+            check(log[key] == want, f"{y} {rnd}: score disagrees with the game log",
+                  f"log {sorted(log[key])} vs playoff table {sorted(want)}")
+
+
 # ---------------------------------------------------------------------- main
 def main():
     quiet = "--quiet" in sys.argv
     for fn in (inv_pf_equals_pa, inv_games_played, inv_wins_equal_losses,
                inv_standings_rows, inv_managers_cover_standings, inv_final_place,
-               inv_weekly_reconciles, inv_weekly_shape, inv_playoff_games):
+               inv_weekly_reconciles, inv_weekly_shape, inv_playoff_games,
+               inv_playoffs_match_log):
         fn()
 
     if FAILS:

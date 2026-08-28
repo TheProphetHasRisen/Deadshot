@@ -247,22 +247,10 @@ PLAYOFF_GAMES = [
  (2025,17,"3rd Place Game","U gotta BO-lieve",157.24,"Poe's Palace",99.08,False),
 ]
 
-H2H_SEED = [
- (2024,15,"Quarterfinal","Hench",163.38,"Poe's Palace",100.44),
- (2024,15,"Quarterfinal","It's a Love Story",146.86,"Kabul Gearing Bombers",131.72),
- (2024,16,"Semifinal","U gotta BO-lieve",150.54,"Hench",127.16),
- (2024,16,"Semifinal","It's a Love Story",128.88,"Free Diddy",127.08),
- (2024,16,"5th Place Game","Poe's Palace",205.42,"Kabul Gearing Bombers",109.72),
- (2024,17,"Final","It's a Love Story",164.50,"U gotta BO-lieve",115.66),
- (2024,17,"3rd Place Game","Hench",137.38,"Free Diddy",98.78),
- (2025,15,"Quarterfinal","SNIPES",165.00,"A Storm Is Coming",119.50),
- (2025,15,"Quarterfinal","U gotta BO-lieve",159.90,"Kabul Gearing Bombers",93.90),
- (2025,16,"Semifinal","SNIPES",157.80,"Poe's Palace",105.82),
- (2025,16,"Semifinal","Hench",201.36,"U gotta BO-lieve",180.80),
- (2025,16,"5th Place Game","A Storm Is Coming",155.26,"Kabul Gearing Bombers",100.40),
- (2025,17,"Final","Hench",142.92,"SNIPES",111.32),
- (2025,17,"3rd Place Game","U gotta BO-lieve",157.24,"Poe's Palace",99.08),
-]
+# H2H_SEED was removed 2026-08-28: it duplicated the 2024/2025 rows of
+# PLAYOFF_GAMES exactly, was referenced by nothing, and could only ever drift
+# out of step with the real table. verify.py now cross-checks PLAYOFF_GAMES
+# against the weekly game logs instead.
 
 MANAGER_ORDER = ["Brian Berger","Brian Burke","Shane Kaiper","Chris Cossu","Niko Contreras","Walter Bremer",
  "Nathan Wu","Giacomo Watson","Peter Modlin","Jonathan Campbell","Kevin Krueger","Wesley Alpert",
