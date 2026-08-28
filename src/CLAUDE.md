@@ -110,6 +110,12 @@ Grep before you add, and check the fix on a phone as well as a desktop.
   `.navmark`, its scroll arrow and its fade gradient all wanted the same 46px.
 - **`--nav-bg` and friends are translucent** (94-96%). Layering the token twice gets to
   ~99.6% without hardcoding a colour.
+- **A long team name with no spaces cannot wrap.** Trade cards are titled
+  "TeamA <-> TeamB" with a two-column body; a 40-character unbroken name pushed both out
+  of the card on a phone. A plain `1fr` grid column will not shrink below its longest
+  word — `minmax(0,1fr)` will. Fixed with that plus `overflow-wrap:anywhere` on
+  `#trades .card-h h3` and `#trades .sub-h`. Names with quotes, ampersands, raw HTML,
+  emoji and Arabic were all stress-tested: they render as text and nothing injects.
 - **`data-m` is the manager-link attribute** and a global handler turns any click on one
   into `openMgr()`. Four Season Shape buttons already overload it as a metric key. Use a
   different attribute for new controls.
