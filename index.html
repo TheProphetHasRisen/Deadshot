@@ -1168,6 +1168,15 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
         <p style="margin:0;font-size:13px;color:var(--ink-2)">Each season a manager played gets weight <span class="mono">&lambda;<sup>(2025&nbsp;&minus;&nbsp;year)</sup></span>, so at &lambda;&nbsp;=&nbsp;0.72 the 2025 season counts 1.00, 2024 counts 0.72, 2023 counts 0.52 and so on. Those weights are applied to <em>games played</em>, and the weighted mean of Power Index is then pulled toward 100 by <span class="mono">N&nbsp;/&nbsp;(N&nbsp;+&nbsp;25)</span>, where N is the weighted game count — so a manager with one loud season cannot leapfrog a decade of evidence. Projected win rate converts the score through the same Pythagorean exponent used everywhere else, against a 100-rated opponent.</p>
         </details>
     </div>
+
+    <div class="card">
+      <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
+        <span class="sub">Every season with a game log &middot; one line per season, brightest is most recent</span></div>
+      <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
+      <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
+      <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>brightest is most recent</strong>. Each line is labelled with its year and the team name that year &mdash; the names change, the manager does not. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+    </div>
   </section>
 
 
@@ -1202,15 +1211,6 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="card-b" style="padding-bottom:6px"><div class="pills" id="raceLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="race"></div>
         <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for — the same tiebreak the league uses. The shaded band is that season's playoff field &mdash; <span id="raceSpots"></span>. Every dot is a distinct position, so hovering one is never ambiguous even where lines cross. The dashed tail past the divider is the postseason: where each team actually finished.</p></div>
-    </div>
-
-    <div class="card">
-      <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
-        <span class="sub">Every season with a game log &middot; not tied to the season buttons above</span></div>
-      <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
-      <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
-      <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>brightest is most recent</strong>. Each line is labelled with its year and the team name that year &mdash; the names change, the manager does not. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
     </div>
 
     <div class="card">
@@ -2977,8 +2977,17 @@ function drawCareerRace(){
   const ys=r=>P.t+(r-1)*(H-P.t-P.b)/(NT-1);
   const PLACE={}; ROWS.forEach(r=>{PLACE[r.y+'|'+r.team]=r.place;});
   const MEDAL={1:{f:'#D9A82B',s:'#8A6710',i:'#3A2A05'},2:{f:'#AEB6BD',s:'#6E767D',i:'#2B3035'},3:{f:'#B9793F',s:'#7A4B20',i:'#2E1A08'}};
-  const MID=cssv('--mid'), BR=cssv('--brass');
-  const col=i=>S.length<2?BR:mix(MID,BR,0.18+0.82*i/(S.length-1));
+  /* Seasons have to be told apart at a glance. A --mid -> --brass ramp alone was too
+     subtle: on several skins those two sit close together and the middle years blurred.
+     Ramp from a faint neutral all the way to the full accent (a much wider lightness
+     span, which survives every skin including redact where --brass is pure white), and
+     vary stroke weight with it as a second, colour-blind-safe cue. */
+  const BR=cssv('--brass');
+  const FAR=mix(cssv('--surface'),cssv('--ink-3'),0.62);
+  const tOf=i=>S.length<2?1:i/(S.length-1);
+  const col=i=>S.length<2?BR:mix(FAR,BR,tOf(i));
+  const wid=i=>1.7+1.6*tOf(i);
+  const rad=i=>3.4+1.2*tOf(i);
 
   let grid='';
   for(let r=1;r<=NT;r++){
@@ -2995,7 +3004,7 @@ function drawCareerRace(){
     const R=crRank(s.K)[s.team];
     const d=R.map((p,k)=>(k?'L':'M')+xs(k)+','+ys(p.rank)).join(' ');
     const endRank=R[R.length-1].rank, fp=PLACE[s.y+'|'+s.team]||endRank;
-    return {y:s.y,team:s.team,K:s.K,R,d,c:col(i),seedRank:endRank,fin:fp,moved:endRank-fp,
+    return {y:s.y,team:s.team,K:s.K,R,d,c:col(i),w:wid(i),r:rad(i),seedRank:endRank,fin:fp,moved:endRank-fp,
             fx:FINX,fy:ys(fp),
             tail:`M${xs(R.length-1)},${ys(endRank)} L${FINX},${ys(fp)}`};});
   /* two seasons can finish in the same place; fan those apart like the season chart does */
@@ -3006,28 +3015,44 @@ function drawCareerRace(){
     l.tail=`M${xs(l.R.length-1)},${ys(l.seedRank)} L${l.fx},${l.fy}`;}));
 
   const paths=lines.map(l=>
-    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
-    `<path class="crl" d="${l.tail}" fill="none" stroke="${l.c}" stroke-width="2.2" stroke-dasharray="4 3" stroke-linecap="round" data-cy="${l.y}"/>`).join('');
+    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
+    `<path class="crl" d="${l.tail}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-dasharray="4 3" stroke-linecap="round" data-cy="${l.y}"/>`).join('');
   const hits=lines.map(l=>`<path class="crhit" d="${l.d}" fill="none" stroke="transparent" stroke-width="15" data-cy="${l.y}" style="cursor:pointer;pointer-events:stroke"/>`).join('');
   let dots='';
   lines.forEach(l=>{l.R.forEach((p,k)=>{
-      dots+=`<circle class="crd" cx="${xs(k)}" cy="${ys(p.rank)}" r="4.2" fill="var(--surface)" stroke="${l.c}" stroke-width="2" data-cy="${l.y}" data-i="${k}" style="cursor:pointer"/>`;});
-    dots+=`<circle class="crd" cx="${l.fx}" cy="${l.fy}" r="5.6" fill="var(--surface)" stroke="${l.c}" stroke-width="2.4" data-cy="${l.y}" data-fin="1" style="cursor:pointer"/>`;});
+      dots+=`<circle class="crd" cx="${xs(k)}" cy="${ys(p.rank)}" r="${l.r}" fill="var(--surface)" stroke="${l.c}" stroke-width="${Math.max(1.6,l.w-0.5)}" data-cy="${l.y}" data-i="${k}" style="cursor:pointer"/>`;});
+    dots+=`<circle class="crd" cx="${l.fx}" cy="${l.fy}" r="${l.r+1.3}" fill="var(--surface)" stroke="${l.c}" stroke-width="${l.w}" data-cy="${l.y}" data-fin="1" style="cursor:pointer"/>`;});
   /* labels: keep one line-height apart, in finishing order */
   const ordered=lines.slice().sort((a,b)=>a.fy-b.fy);
-  const LY=[]; ordered.forEach((l,i)=>{let y=l.fy+3.5; if(i&&y-LY[i-1]<14)y=LY[i-1]+14; LY.push(y); l.ly=y;});
+  const LY=[]; ordered.forEach((l,i)=>{let y=l.fy+3.5; if(i&&y-LY[i-1]<16)y=LY[i-1]+16; LY.push(y); l.ly=y;});
   const labs=ordered.map(l=>{
-    const nm=l.team.length>17?l.team.slice(0,16)+'…':l.team;
-    return `<text class="crt" x="${W-P.r+13}" y="${l.ly}" font-size="11.5" font-family="IBM Plex Sans,sans-serif" data-cy="${l.y}" style="cursor:pointer">`+
+    const nm=l.team.length>15?l.team.slice(0,14)+'…':l.team;
+    return `<text class="crt" x="${W-P.r+13}" y="${l.ly}" font-size="11.5" font-family="IBM Plex Sans,sans-serif" data-cy="${l.y}" data-medal="${MEDAL[l.fin]?l.fin:''}" style="cursor:pointer">`+
       `<tspan font-weight="700" fill="${l.c}" font-family="IBM Plex Mono,monospace">${l.y}</tspan>`+
       `<tspan fill="var(--ink-3)" font-size="10.5" dx="5">${esc(nm)}</tspan></text>`;}).join('');
-  let medals='';
-  ordered.forEach(l=>{const md=MEDAL[l.fin]; if(!md)return;
-    const mx=W-P.r+2, my=l.ly-3.6;
-    medals+=`<g class="crmed" style="pointer-events:none"><circle cx="${mx}" cy="${my}" r="6.4" fill="${md.f}" stroke="${md.s}" stroke-width="1.5"/>`+
-      `<text x="${mx}" y="${my+3.1}" text-anchor="middle" font-size="8.4" font-weight="700" fill="${md.i}" font-family="IBM Plex Mono,monospace">${l.fin}</text></g>`;});
 
-  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="Season-by-season league position for ${esc(CRMGR)}">${grid}${paths}${dots}${labs}${medals}${hits}</svg>`;
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="Season-by-season league position for ${esc(CRMGR)}">${grid}${paths}${dots}${labs}${hits}</svg>`;
+  /* medals ride to the right of the label, measured after render so they never sit on
+     top of the text or on each other -- three seasons can finish in the same place */
+  (function(){
+    const svg=$('#crace svg'); if(!svg)return;
+    const NS='http://www.w3.org/2000/svg';
+    $$('#crace .crt').forEach(t=>{
+      const rk=t.dataset.medal; if(!rk)return;
+      const md=MEDAL[+rk]; const R=6.4;
+      let right; try{const bb=t.getBBox(); right=bb.x+bb.width;}
+      catch(e){right=+t.getAttribute('x')+t.textContent.length*6.2;}
+      const x=right+9+R, y=+t.getAttribute('y')-3.6;
+      const g=document.createElementNS(NS,'g'); g.setAttribute('class','crmed'); g.style.pointerEvents='none';
+      const c=document.createElementNS(NS,'circle');
+      c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r',R);
+      c.setAttribute('fill',md.f);c.setAttribute('stroke',md.s);c.setAttribute('stroke-width',1.5);
+      const n=document.createElementNS(NS,'text');
+      n.setAttribute('x',x);n.setAttribute('y',y+3.1);n.setAttribute('text-anchor','middle');
+      n.setAttribute('font-size',8.4);n.setAttribute('font-weight',700);n.setAttribute('fill',md.i);
+      n.setAttribute('font-family','IBM Plex Mono,monospace');n.textContent=rk;
+      g.appendChild(c);g.appendChild(n);svg.appendChild(g);});
+  })();
 
   $('#crLeg').innerHTML=`<span class="fb-lab" style="margin-right:4px">Seasons</span>`+
     S.map((s,i)=>`<button data-cy="${s.y}" style="padding:4px 9px"><b style="color:${col(i)}">${s.y}</b> <span class="dim">${esc(s.team)}</span></button>`).join('')+
@@ -3036,9 +3061,9 @@ function drawCareerRace(){
   function paint(hov){
     if(hov!==undefined)CRHOV=hov;
     const on=CRLOCK.size?CRLOCK:(CRHOV?new Set([CRHOV]):new Set()), any=on.size>0;
-    $$('#crace .crl').forEach(p=>{const sel=on.has(p.dataset.cy);
+    $$('#crace .crl').forEach(p=>{const sel=on.has(p.dataset.cy), l=byY[p.dataset.cy];
       p.setAttribute('opacity',!any||sel?1:.13);
-      p.setAttribute('stroke-width',sel?3.4:2.2);});
+      p.setAttribute('stroke-width',sel?(l?l.w+1.2:3.4):(l?l.w:2.2));});
     $$('#crace .crd').forEach(c=>{const sel=on.has(c.dataset.cy);
       c.setAttribute('opacity',!any||sel?1:.13);});
     $$('#crace .crt').forEach(t=>{const sel=on.has(t.dataset.cy);
