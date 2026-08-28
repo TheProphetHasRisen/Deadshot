@@ -1297,6 +1297,14 @@ BODY = r"""
     <div class="pills" id="yrPills" style="margin:16px 0 18px"></div>
     <div id="seasonPane"></div>
     <div id="schedPane"></div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-b" style="padding-top:13px">
+        <details class="expl"><summary>Every team name in league history</summary>
+        <p class="plain" style="margin:0 0 10px"><b>In plain English:</b> the section above shows one season at a time, so a team from a year you are not looking at cannot be found with your browser's search. This list holds every name the league has ever had, so searching for one always works.</p>
+        <div id="teamIndex" style="font-size:13px;color:var(--ink-2)"></div>
+        </details>
+      </div>
+    </div>
   </section>
 
   <section id="h2h">
@@ -3128,6 +3136,23 @@ function drawCareerRace(){
   paint();
 }
 drawCareerRace(); REDRAW.push(drawCareerRace);
+/* every team name ever, alphabetical -- exists so the browser's find can reach names
+   from seasons that are not currently on screen. Sits inside a closed <details>, which
+   Chrome opens automatically when a search matches inside it. */
+function drawTeamIndex(){
+  const host=$('#teamIndex'); if(!host)return;
+  const by={};
+  ROWS.forEach(r=>{(by[r.team]=by[r.team]||{yrs:[],mgrs:new Set()});
+    by[r.team].yrs.push(r.y); by[r.team].mgrs.add(r.mgr);});
+  const names=Object.keys(by).sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase()));
+  host.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:4px 18px">`+
+    names.map(t=>{const o=by[t]; const ys=o.yrs.sort((a,b)=>a-b);
+      const span=ys.length>1?`${ys[0]}\u2013${ys[ys.length-1]}`:`${ys[0]}`;
+      return `<div style="padding:2px 0"><b style="color:var(--ink)">${esc(t)}</b> `+
+        `<span class="dim">${esc([...o.mgrs].join(', '))} &middot; ${span}</span></div>`;}).join('')+
+    `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
+}
+drawTeamIndex(); REDRAW.push(drawTeamIndex);
 
 function drawWeekly(YR){
   $$('#wkYears button[data-wy]').forEach(b=>b.classList.toggle('on',+b.dataset.wy===YR));

@@ -179,6 +179,24 @@ champions · alltime · power · rankings · shape · weekly · luck · advanced
 fivehundred · records · seasons · h2h · trades-sec · method
 ```
 
+### Browser find (Cmd+F)
+
+Most of the page is rendered one view at a time, which the browser's find cannot see
+into. Audited 2026-08-28:
+
+- **Managers: 20/20 findable.** Names appear in the always-rendered All-Time table.
+- **Teams: was 37/73.** The Seasons section renders a single year, so 36 historic team
+  names were unreachable. Fixed by adding `#teamIndex` — every team name ever, with its
+  manager and years, inside a closed `<details>` in `seasons`. Chrome opens a collapsed
+  `<details>` automatically when find matches inside it, so this costs nothing visually
+  and makes all 73 reachable.
+- **The 18 weekly scoreboards** are closed `<details>` and are already findable for the
+  same reason. Do not "fix" them by forcing them open.
+- **Still not findable, and cannot reasonably be:** text drawn inside charts (SVG
+  `<text>` is not matched by browser find) and the three `hidden` panels (`#fChips`,
+  `#rankTbl`, `#advYrChips`). All three only duplicate content that is findable
+  elsewhere. `hidden="until-found"` would work if that ever stops being true.
+
 ### The two bump charts
 
 `#race` ("The race", in `weekly`) is **season-scoped** — `drawWeekly(YR)` rebuilds it from the season
