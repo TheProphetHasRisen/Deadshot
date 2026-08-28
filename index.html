@@ -1205,6 +1205,15 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     </div>
 
     <div class="card">
+      <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
+        <span class="sub">Every season with a game log &middot; not tied to the season buttons above</span></div>
+      <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
+      <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
+      <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>brightest is most recent</strong>. Each line is labelled with its year and the team name that year &mdash; the names change, the manager does not. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+    </div>
+
+    <div class="card">
       <div class="card-h"><h3>All-play &mdash; the record with the schedule removed</h3><span class="gl" data-gl="allplay" tabindex="0">?</span>
         <span class="sub" id="apSub">Sorted: all-play win %</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week, count how many of the other nine teams you outscored. Every week, versus everyone.</p></div>
@@ -2919,6 +2928,179 @@ $('#wkYears').innerHTML='<span class="fb-lab" style="margin-right:4px">Season</s
     : `<button disabled title="no game log loaded" style="opacity:.32;cursor:not-allowed">${y}</button>`).join('')
   +'<span class="now" id="wkNow"></span>';
 let WKREDRAW=[];
+/* ---- career races: the bump chart re-cut by manager, one line per season ----
+   Weekly logs only exist for D.wkYears (2021-2025), so this can never show a
+   manager's full career -- the picker counts and the caption both say so rather
+   than silently drawing a shorter line. Seasons are told apart three ways at once:
+   a recency colour ramp (--mid -> --brass, newest brightest), a year label at the
+   end of every line, and a legend you can click to isolate one season. */
+let CRMGR=null; const CRLOCK=new Set(); let CRHOV=null;
+function crSeasons(name){
+  return (D.wkYears||[]).slice().sort((a,b)=>a-b).map(y=>{
+    const K=D.wk[y]; if(!K)return null;
+    const team=K.teams.find(t=>K.mgr[t]===name);
+    return team?{y:+y,team,K}:null;}).filter(Boolean);
+}
+function crRank(K){
+  const T=K.teams, R={}; T.forEach(t=>R[t]=[]);
+  K.weeks.forEach((w,i)=>{
+    const snap=T.map(t=>{const seq=K.race[t];
+      return {t,wins:seq[i].wins,pf:seq.slice(0,i+1).reduce((s,x)=>s+x.pts,0)};});
+    snap.sort((x,y)=>y.wins-x.wins||y.pf-x.pf);
+    snap.forEach((o,k)=>R[o.t].push({w,rank:k+1,wins:o.wins,pf:o.pf}));});
+  return R;
+}
+function drawCareerRace(){
+  const host=$('#crace'); if(!host)return;
+  const YRS=(D.wkYears||[]).slice().sort((a,b)=>a-b);
+  if(!YRS.length){host.innerHTML='';return;}
+  {const sp=$('#crSpan'); if(sp)sp.textContent=YRS[0]+'–'+YRS[YRS.length-1];}
+  /* everyone who appears in at least one logged season, most seasons first */
+  const tally={};
+  YRS.forEach(y=>Object.values(D.wk[y].mgr).forEach(m=>{tally[m]=(tally[m]||0)+1;}));
+  const names=Object.keys(tally).sort((a,b)=>tally[b]-tally[a]||a.localeCompare(b));
+  if(!CRMGR||!tally[CRMGR])CRMGR=names[0];
+  $('#crPick').innerHTML=`<span class="fb-lab" style="margin-right:4px">Manager</span>`+
+    names.map(n=>`<button data-cm="${esc(n)}" style="padding:4px 9px">${esc(n)} <span class="dim">${tally[n]}</span></button>`).join('');
+  $$('#crPick button[data-cm]').forEach(b=>{
+    b.classList.toggle('on',b.dataset.cm===CRMGR);
+    b.onclick=()=>{CRMGR=b.dataset.cm;CRLOCK.clear();CRHOV=null;drawCareerRace();};});
+
+  const S=crSeasons(CRMGR);
+  if(!S.length){host.innerHTML='<p style="margin:0;color:var(--ink-3);font-size:13px">No game log for this manager yet.</p>';$('#crLeg').innerHTML='';return;}
+  const MAXW=Math.max(...S.map(s=>s.K.weeks.length));
+  const NT=Math.max(...S.map(s=>s.K.teams.length));
+  const W=980,H=392,P={t:22,r:172,b:34,l:46};
+  const NCOL=MAXW+1;
+  const xs=i=>P.l+i*(W-P.l-P.r)/(NCOL-1);
+  const FINX=xs(NCOL-1);
+  const ys=r=>P.t+(r-1)*(H-P.t-P.b)/(NT-1);
+  const PLACE={}; ROWS.forEach(r=>{PLACE[r.y+'|'+r.team]=r.place;});
+  const MEDAL={1:{f:'#D9A82B',s:'#8A6710',i:'#3A2A05'},2:{f:'#AEB6BD',s:'#6E767D',i:'#2B3035'},3:{f:'#B9793F',s:'#7A4B20',i:'#2E1A08'}};
+  const MID=cssv('--mid'), BR=cssv('--brass');
+  const col=i=>S.length<2?BR:mix(MID,BR,0.18+0.82*i/(S.length-1));
+
+  let grid='';
+  for(let r=1;r<=NT;r++){
+    grid+=`<line x1="${P.l}" x2="${W-P.r}" y1="${ys(r)}" y2="${ys(r)}" stroke="var(--rule-2)"/>`+
+      `<text x="${P.l-11}" y="${ys(r)+4}" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${r}</text>`;}
+  const GAPX=(xs(MAXW-1)+FINX)/2;
+  grid+=`<line x1="${GAPX}" x2="${GAPX}" y1="${P.t-14}" y2="${H-P.b+4}" stroke="var(--rule)" stroke-dasharray="3 4"/>`+
+    `<text x="${GAPX}" y="${P.t-19}" text-anchor="middle" font-size="9" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace" letter-spacing="1.6">FINISH</text>`;
+  for(let i=0;i<MAXW;i++){
+    grid+=`<text x="${xs(i)}" y="${H-P.b+18}" text-anchor="middle" font-size="9.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${i+1}</text>`;}
+  grid+=`<text x="${P.l-11}" y="${H-P.b+18}" text-anchor="end" font-size="9" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">WK</text>`;
+
+  const lines=S.map((s,i)=>{
+    const R=crRank(s.K)[s.team];
+    const d=R.map((p,k)=>(k?'L':'M')+xs(k)+','+ys(p.rank)).join(' ');
+    const endRank=R[R.length-1].rank, fp=PLACE[s.y+'|'+s.team]||endRank;
+    return {y:s.y,team:s.team,K:s.K,R,d,c:col(i),seedRank:endRank,fin:fp,moved:endRank-fp,
+            fx:FINX,fy:ys(fp),
+            tail:`M${xs(R.length-1)},${ys(endRank)} L${FINX},${ys(fp)}`};});
+  /* two seasons can finish in the same place; fan those apart like the season chart does */
+  const tie={}; lines.forEach(l=>{(tie[l.fin]=tie[l.fin]||[]).push(l);});
+  Object.values(tie).forEach(g=>g.forEach((l,j)=>{
+    const k=g.length, off=k>1?(j-(k-1)/2):0;
+    l.fy=ys(l.fin)+off*11; l.fx=FINX+(k>1?off*8:0);
+    l.tail=`M${xs(l.R.length-1)},${ys(l.seedRank)} L${l.fx},${l.fy}`;}));
+
+  const paths=lines.map(l=>
+    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
+    `<path class="crl" d="${l.tail}" fill="none" stroke="${l.c}" stroke-width="2.2" stroke-dasharray="4 3" stroke-linecap="round" data-cy="${l.y}"/>`).join('');
+  const hits=lines.map(l=>`<path class="crhit" d="${l.d}" fill="none" stroke="transparent" stroke-width="15" data-cy="${l.y}" style="cursor:pointer;pointer-events:stroke"/>`).join('');
+  let dots='';
+  lines.forEach(l=>{l.R.forEach((p,k)=>{
+      dots+=`<circle class="crd" cx="${xs(k)}" cy="${ys(p.rank)}" r="4.2" fill="var(--surface)" stroke="${l.c}" stroke-width="2" data-cy="${l.y}" data-i="${k}" style="cursor:pointer"/>`;});
+    dots+=`<circle class="crd" cx="${l.fx}" cy="${l.fy}" r="5.6" fill="var(--surface)" stroke="${l.c}" stroke-width="2.4" data-cy="${l.y}" data-fin="1" style="cursor:pointer"/>`;});
+  /* labels: keep one line-height apart, in finishing order */
+  const ordered=lines.slice().sort((a,b)=>a.fy-b.fy);
+  const LY=[]; ordered.forEach((l,i)=>{let y=l.fy+3.5; if(i&&y-LY[i-1]<14)y=LY[i-1]+14; LY.push(y); l.ly=y;});
+  const labs=ordered.map(l=>{
+    const nm=l.team.length>17?l.team.slice(0,16)+'…':l.team;
+    return `<text class="crt" x="${W-P.r+13}" y="${l.ly}" font-size="11.5" font-family="IBM Plex Sans,sans-serif" data-cy="${l.y}" style="cursor:pointer">`+
+      `<tspan font-weight="700" fill="${l.c}" font-family="IBM Plex Mono,monospace">${l.y}</tspan>`+
+      `<tspan fill="var(--ink-3)" font-size="10.5" dx="5">${esc(nm)}</tspan></text>`;}).join('');
+  let medals='';
+  ordered.forEach(l=>{const md=MEDAL[l.fin]; if(!md)return;
+    const mx=W-P.r+2, my=l.ly-3.6;
+    medals+=`<g class="crmed" style="pointer-events:none"><circle cx="${mx}" cy="${my}" r="6.4" fill="${md.f}" stroke="${md.s}" stroke-width="1.5"/>`+
+      `<text x="${mx}" y="${my+3.1}" text-anchor="middle" font-size="8.4" font-weight="700" fill="${md.i}" font-family="IBM Plex Mono,monospace">${l.fin}</text></g>`;});
+
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img" aria-label="Season-by-season league position for ${esc(CRMGR)}">${grid}${paths}${dots}${labs}${medals}${hits}</svg>`;
+
+  $('#crLeg').innerHTML=`<span class="fb-lab" style="margin-right:4px">Seasons</span>`+
+    S.map((s,i)=>`<button data-cy="${s.y}" style="padding:4px 9px"><b style="color:${col(i)}">${s.y}</b> <span class="dim">${esc(s.team)}</span></button>`).join('')+
+    (S.length>1?`<button id="crClear" style="padding:4px 9px">Clear</button>`:'');
+
+  function paint(hov){
+    if(hov!==undefined)CRHOV=hov;
+    const on=CRLOCK.size?CRLOCK:(CRHOV?new Set([CRHOV]):new Set()), any=on.size>0;
+    $$('#crace .crl').forEach(p=>{const sel=on.has(p.dataset.cy);
+      p.setAttribute('opacity',!any||sel?1:.13);
+      p.setAttribute('stroke-width',sel?3.4:2.2);});
+    $$('#crace .crd').forEach(c=>{const sel=on.has(c.dataset.cy);
+      c.setAttribute('opacity',!any||sel?1:.13);});
+    $$('#crace .crt').forEach(t=>{const sel=on.has(t.dataset.cy);
+      t.setAttribute('opacity',!any||sel?1:.32);});
+    $$('#crace .crmed').forEach(g=>g.setAttribute('opacity',!any?1:.32));
+    $$('#crLeg button[data-cy]').forEach(b=>b.classList.toggle('on',CRLOCK.has(b.dataset.cy)));
+  }
+  const crToggle=y=>{CRLOCK.has(y)?CRLOCK.delete(y):CRLOCK.add(y);paint();};
+  function crWeekTip(l,i){
+    const seq=l.K.race[l.team], s=seq[i], p=l.R[i];
+    const vsProj=s.pts-s.proj;
+    return `<b style="color:${l.c}">${l.y}</b> &middot; ${esc(l.team)}
+      <br><span style="opacity:.7">After week ${s.w}</span>
+      <br>Position <b>${ord(p.rank)}</b> of ${l.K.teams.length} &middot; record <b>${p.wins}-${s.w-p.wins}</b>
+      <br>${s.win?'<b style="color:var(--brass)">WON</b>':'<span style="color:var(--neg)">lost</span>'} ${s.pts.toFixed(2)}&ndash;${s.oppPts.toFixed(2)} vs ${esc(s.opp)}
+      <br>Proj ${s.proj.toFixed(1)} (${vsProj>=0?'+':''}${vsProj.toFixed(1)}) &middot; PF ${p.pf.toFixed(1)}`;
+  }
+  function crFinTip(l){
+    const last=l.R[l.R.length-1];
+    return `<b style="color:${l.c}">${l.y}</b> &middot; ${esc(l.team)}
+      <br><span style="opacity:.7">Final placing</span>
+      <br>Regular season <b>${last.wins}-${l.R.length-last.wins}</b> &middot; ${last.pf.toFixed(2)} PF
+      <br>Finished <b>${ord(l.fin)}</b> from the ${ord(l.seedRank)} seed
+      <br>${l.moved>0?'<b style="color:var(--brass)">+'+l.moved+' in the postseason</b>':l.moved<0?'<span style="color:var(--neg)">'+l.moved+' in the postseason</span>':'held its seed'}`;
+  }
+  const byY={}; lines.forEach(l=>byY[l.y]=l);
+  function nearestWeek(clientX,l){
+    const r=$('#crace svg').getBoundingClientRect();
+    const vx=(clientX-r.left)/r.width*W;
+    const step=(W-P.l-P.r)/(NCOL-1);
+    return Math.max(0,Math.min(l.R.length-1,Math.round((vx-P.l)/step)));
+  }
+  $$('#crace .crd').forEach(c=>{
+    const l=byY[c.dataset.cy];
+    c.addEventListener('mouseenter',e=>{paint(c.dataset.cy);
+      showTip(e,c.dataset.fin?crFinTip(l):crWeekTip(l,+c.dataset.i));});
+    c.addEventListener('mousemove',moveTip);
+    c.addEventListener('mouseleave',()=>{paint(null);hideTip();});
+    c.addEventListener('click',e=>{e.stopPropagation();crToggle(c.dataset.cy);});});
+  $$('#crace .crhit').forEach(p=>{
+    const l=byY[p.dataset.cy];
+    p.addEventListener('mouseenter',e=>{paint(p.dataset.cy);showTip(e,crWeekTip(l,nearestWeek(e.clientX,l)));});
+    p.addEventListener('mousemove',e=>{tip.innerHTML=crWeekTip(l,nearestWeek(e.clientX,l));moveTip(e);});
+    p.addEventListener('mouseleave',()=>{paint(null);hideTip();});
+    p.addEventListener('click',()=>crToggle(p.dataset.cy));});
+  /* the year label sits past the last week, in the FINISH column -- same rule as the
+     season chart: it is an end-of-line marker, so it shows the final placing. */
+  $$('#crace .crt').forEach(t=>{
+    const l=byY[t.dataset.cy];
+    t.addEventListener('mouseenter',e=>{paint(t.dataset.cy);showTip(e,crFinTip(l));});
+    t.addEventListener('mousemove',moveTip);
+    t.addEventListener('mouseleave',()=>{paint(null);hideTip();});
+    t.addEventListener('click',()=>crToggle(t.dataset.cy));});
+  $$('#crLeg button[data-cy]').forEach(b=>{
+    b.addEventListener('mouseenter',()=>paint(b.dataset.cy));
+    b.addEventListener('mouseleave',()=>paint(null));
+    b.addEventListener('click',()=>crToggle(b.dataset.cy));});
+  {const cc=$('#crClear'); if(cc)cc.onclick=()=>{CRLOCK.clear();paint();};}
+  paint();
+}
+drawCareerRace(); REDRAW.push(drawCareerRace);
+
 function drawWeekly(YR){
   $$('#wkYears button[data-wy]').forEach(b=>b.classList.toggle('on',+b.dataset.wy===YR));
   const nowEl=$('#wkNow'); if(nowEl)nowEl.textContent='viewing '+YR;
