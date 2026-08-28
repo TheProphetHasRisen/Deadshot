@@ -344,14 +344,12 @@ All verified headless across six themes and 320-2560px, 0 `pageerror`.
 | Bracket connector SVG exposed to screen readers | no `aria-hidden` | `aria-hidden="true"` — it is decorative, the bracket content is in sibling divs |
 | Wrapped blobs animated under `prefers-reduced-motion` | only `.dossier *` was covered | `.dossier *,.wr-blob` |
 
-**Two latent hazards found and left alone** — both are currently harmless, but they are
-traps for the next edit:
+**Both latent hazards from that audit have since been fixed (2026-08-28):**
 
-1. `data-m` is overloaded. It is the manager-link attribute, and the global handler is
-   `closest('[data-m]') -> openMgr(...)`. Four buttons in Season Shape reuse it as a
-   *metric* key: `data-m="sd" | "wsd" | "rng" | "lg"`. Nothing breaks today only because
-   `openMgr` bails on an unknown name. Do not make `openMgr` less defensive, and prefer a
-   different attribute for new controls.
+1. `data-m` was overloaded — the manager-link attribute (`closest('[data-m]') ->
+   openMgr(...)`) was reused by four Season Shape buttons as a *metric* key. It only ever
+   worked because `openMgr` bails on an unknown name. Those four now use `data-bal`.
+   Keep `openMgr` defensive anyway, and use a different attribute for new controls.
 2. The masthead `.dossier` SVG had no closing `</svg>`; the browser recovered because the
    following `</div>` implicitly closed it. Now closed properly. Anything added after
    those elements would otherwise have landed *inside* the SVG.
