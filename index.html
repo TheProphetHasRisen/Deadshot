@@ -6,6 +6,23 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%2312161B'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23C8A24A' stroke-width='9'/%3E%3Cg stroke='%23C8A24A' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23C8A24A'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%2312161B'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23C8A24A' stroke-width='9'/%3E%3Cg stroke='%23C8A24A' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23C8A24A'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#12161B">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Deadshot Record Book">
+<meta property="og:title" content="Deadshot Record Book">
+<meta property="og:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades — the whole league record book, in one place.">
+<meta property="og:url" content="https://deadshot-iota.vercel.app/">
+<meta property="og:image" content="https://deadshot-iota.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Deadshot Archives — ten seasons, twenty managers, 410 games logged.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Deadshot Record Book">
+<meta name="twitter:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades.">
+<meta name="twitter:image" content="https://deadshot-iota.vercel.app/og.png">
+<script>if(location.protocol==='http:'||location.protocol==='https:'){var _va=document.createElement('script');_va.defer=true;_va.src='/_vercel/insights/script.js';document.head.appendChild(_va);}</script>
 <title>Deadshot Record Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2135,6 +2152,23 @@ function closeMgr(){ov.classList.remove('on');document.body.style.overflow='';hi
 $('#mX').onclick=closeMgr;
 ov.addEventListener('click',e=>{if(e.target===ov)closeMgr();});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('on'))closeMgr();});
+/* Keep Tab inside an open overlay. Without this, tabbing walks straight out of the
+   dialog and into the page behind it, which for a keyboard user means the modal is
+   still covering the screen while focus is somewhere they cannot see. */
+const FOCUSABLE='a[href],button:not([disabled]),input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
+function trapTab(e,box){
+  if(e.key!=='Tab')return;
+  const f=[...box.querySelectorAll(FOCUSABLE)].filter(el=>el.offsetWidth||el.offsetHeight||el===document.activeElement);
+  if(!f.length)return;
+  const first=f[0], last=f[f.length-1];
+  if(!box.contains(document.activeElement)){e.preventDefault();first.focus();return;}
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+}
+addEventListener('keydown',e=>{
+  if(wrOv&&wrOv.classList.contains('on')){trapTab(e,wrOv);return;}
+  if(ov.classList.contains('on'))trapTab(e,ov.querySelector('.modal')||ov);
+},true);
 document.addEventListener('click',e=>{const t=e.target.closest('[data-m]'); if(t){openMgr(t.dataset.m);}});
 const mlink=n=>`<span class="mlink" data-m="${esc(n)}" tabindex="0" role="button">${esc(n)}</span>`;
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.m)openMgr(e.target.dataset.m);});
@@ -3156,6 +3190,50 @@ function drawTeamIndex(){
     `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
+/* ---- shareable links ----------------------------------------------------------
+   Every view used to live at the same address, so nobody could send "look at my 2021
+   season" -- the link always opened on the newest year. The address bar now mirrors
+   the season and manager on screen, and a fresh visit restores what the link asked for.
+   replaceState, not pushState, so picking years does not stack up back-button steps. */
+function setUrlParam(k,v){
+  try{
+    const q=new URLSearchParams(location.search);
+    v?q.set(k,String(v)):q.delete(k);
+    const qs=q.toString();
+    history.replaceState(null,'',(qs?'?'+qs:location.pathname)+location.hash);
+  }catch(e){}
+}
+function applyUrlState(){
+  try{
+    const q=new URLSearchParams(location.search);
+    const y=parseInt(q.get('y'),10);
+    if(y){
+      /* a shared year means both year-driven sections, so the whole page reads as
+         that season no matter which one the reader scrolls to first */
+      const wy=$$(`#wkYears button[data-wy="${y}"]`)[0];
+      if(wy&&!wy.disabled&&typeof drawWeekly==='function')drawWeekly(y);
+      const sy=$$(`#yrPills button[data-y="${y}"]`)[0];
+      if(sy&&typeof drawSeason==='function')drawSeason(y);
+    }
+    const m=q.get('m');
+    if(m){const b=$$('#crPick button[data-cm]').filter(x=>x.dataset.cm===m)[0];
+      if(b){CRMGR=m;CRLOCK.clear();drawCareerRace();}}
+    if(location.hash){const t=document.querySelector(location.hash);
+      if(t)setTimeout(()=>t.scrollIntoView(),60);}
+  }catch(e){}
+}
+/* the rest of the page still has initial draws to run; go last so nothing overwrites us */
+setTimeout(applyUrlState,0);
+/* record whichever picker the reader actually touched -- reading it back off the DOM
+   picked up the other section's year instead */
+(function(){
+  const wire=(sel,attr,key)=>{const host=$(sel); if(!host)return;
+    host.addEventListener('click',e=>{const b=e.target.closest('button['+attr+']');
+      if(b)setTimeout(()=>setUrlParam(key,b.getAttribute(attr)),0);});};
+  wire('#wkYears','data-wy','y');
+  wire('#yrPills','data-y','y');
+  wire('#crPick','data-cm','m');
+})();
 
 function drawWeekly(YR){
   $$('#wkYears button[data-wy]').forEach(b=>b.classList.toggle('on',+b.dataset.wy===YR));
