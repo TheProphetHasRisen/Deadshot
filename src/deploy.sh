@@ -50,7 +50,8 @@ git -C "$CLONE" fetch --quiet origin
 BR="$(git -C "$CLONE" symbolic-ref --short HEAD)"
 git -C "$CLONE" reset --hard --quiet "origin/$BR"
 cp index.html "$CLONE/index.html"          # same name, overwrite in place; never delete first
-git -C "$CLONE" add index.html
+[ -f og.png ] && cp og.png "$CLONE/og.png"   # link-preview card, served from the site root
+git -C "$CLONE" add index.html og.png
 if git -C "$CLONE" diff --cached --quiet; then
   echo "  index.html unchanged — nothing to deploy"; exit 0
 fi
