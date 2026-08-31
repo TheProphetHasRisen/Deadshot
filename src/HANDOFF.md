@@ -179,6 +179,20 @@ champions · alltime · power · rankings · shape · weekly · luck · advanced
 fivehundred · records · seasons · h2h · trades-sec · method
 ```
 
+### site_data.json is stored readable, the page is not
+
+`export.py` writes `site_data.json` with `indent=1` — 21,471 short lines instead of one
+249KB line — so a change to it is legible by eye and in a diff. That matters once the
+Yahoo fetcher is writing it: "one score changed" needs to be visible, not "a quarter of
+a megabyte changed".
+
+**`mksite.py` re-compacts it on the way into the page** (`json.dumps(..., separators=(',',':'))`).
+Do not remove that: embedding the indented form would add roughly 100KB to every
+visitor's download for no benefit. `index.html` is byte-identical either way — verified.
+
+`site_data.json` is gitignored. It is generated, so committing it invites drift from
+`data.py`, which is the actual source of record.
+
 ### Sharing, links and analytics (added 2026-08-28)
 
 - **`og.png` lives at the repo root**, not in `src/`, because the share tags point at

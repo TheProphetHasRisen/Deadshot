@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-DATA=open('site_data.json').read()
+import json as _json
+# site_data.json is stored readable (one field per line) so changes to it are
+# legible in git and by eye. The page gets the compact form -- pretty-printing
+# inside index.html would add ~100KB to every visitor's download for no benefit.
+DATA=_json.dumps(_json.load(open('site_data.json')),separators=(',',':'))
 
 HEAD = r"""<title>Deadshot Record Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">

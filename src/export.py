@@ -74,7 +74,7 @@ for y in seasons:
         co=bool(co)))
 out=dict(seasons=seasons,last=LAST,rows=rows,mgrs=sorted(mgrs,key=lambda m:(-m['titles'],-m['podium'],-m['winpct'])),
     champs=champs,games=games,h2h={f"{a}|{b}":v for (a,b),v in h2h.items()})
-json.dump(out,open('site_data.json','w'),separators=(',',':'),default=lambda o:round(o,4) if isinstance(o,float) else o)
+json.dump(out,open('site_data.json','w'),indent=1,separators=(',',': '),default=lambda o:round(o,4) if isinstance(o,float) else o)
 print("rows",len(rows),"mgrs",len(mgrs),"games",len(games),"h2h pairs",len(h2h))
 print("bytes",len(open('site_data.json').read()))
 
@@ -243,7 +243,7 @@ for m in mgrs:
     else:
         m['apLuck']=None; m['apGames']=0
 out.update(wk=WKALL, wkYears=sorted(WKALL))
-json.dump(out,open('site_data.json','w'),separators=(',',':'),default=lambda o:round(o,4) if isinstance(o,float) else o)
+json.dump(out,open('site_data.json','w'),indent=1,separators=(',',': '),default=lambda o:round(o,4) if isinstance(o,float) else o)
 print("weekly seasons:",sorted(WKALL),"| bytes",len(open('site_data.json').read()))
 for y in sorted(WKALL):
     ap=WKALL[y]['allplay']

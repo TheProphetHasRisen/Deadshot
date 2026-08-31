@@ -5,3 +5,6 @@ shot-*.png
 node_modules/
 package.json
 package-lock.json
+
+# Generated from data.py + weekly*.py by export.py — rebuildable, never edited by hand
+site_data.json
