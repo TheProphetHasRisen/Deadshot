@@ -2171,9 +2171,12 @@ function openMgr(name){
       <thead><tr><th>Year</th><th>Round</th><th></th><th class="num">For</th><th class="num">Against</th><th>Opponent</th></tr></thead><tbody>${pg}</tbody></table></div>`:''}
     ${wrapAvail(name)?`<div style="margin:20px 0 0"><button class="wrapBtn on" data-w="${esc(name)}" style="padding:9px 16px">&#9733; ${LAST} Wrapped</button>
       <span class="sub" style="margin-left:9px">the season, one card at a time</span></div>`:''}
+    <div style="margin:14px 0 0"><button class="shareBtn" data-s="${esc(name)}" style="padding:9px 16px">&#8593; Share card</button>
+      <span class="sub" style="margin-left:9px">a picture for the group chat</span></div>
     ${rivals.length?`<div class="sub-h">Playoff head-to-head</div><div style="display:flex;flex-wrap:wrap;gap:7px">${
       rivals.map(r=>`<span class="chip" style="cursor:pointer" data-m="${esc(r.o)}"><b>${r.w}–${r.l}</b> vs ${esc(r.o)}</span>`).join('')}</div>`:''}`;
   const wb=$('#mBody .wrapBtn'); if(wb)wb.onclick=()=>openWrapped(wb.dataset.w);
+  const sb=$('#mBody .shareBtn'); if(sb)sb.onclick=()=>shareCard(sb.dataset.s,sb);
   ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
 }
 function closeMgr(){ov.classList.remove('on');document.body.style.overflow='';hideTip();
@@ -2477,6 +2480,31 @@ $$('[data-yr]').forEach(b=>b.onclick=()=>{
 REDRAW.push(()=>buildAll());
 
 /* ============ heat grid ============ */
+/* One line of character, not a second stat table. Thresholds are set from the real
+   spread of this league (cpi 78-107, luck -12.3 to +9.1, trend -8.0 to +3.0), so each
+   rule actually catches somebody rather than being a guess. First match wins. */
+function mgrVibe(m){
+  const t=m.titles||0, pod=m.podium||0, ap=m.apps||0, sz=m.seasons||0;
+  const cpi=m.cpi, luck=m.luck||0, tr=m.trend||0, rate=sz?ap/sz:0;
+  if(sz===1&&cpi<90)   return 'One season, and it went badly enough that nobody brings it up.';
+  if(sz===1&&pod>=1)   return 'One season, one trip to the podium, then gone.';
+  if(sz===1)           return 'A single season on the books, too brief to judge.';
+  if(t>=2)             return 'As decorated as this league gets.';
+  if(luck<=-8)         return 'The scoring deserved far better than the record ever showed.';
+  if(luck>=8.5)        return 'Has had the schedule on his side more than anyone.';
+  if(t>=1&&tr>=2.5)    return 'Holds the newest trophy and is still climbing.';
+  if(t>=1&&rate>=0.7)  return 'A permanent fixture in the bracket, with a title to prove it.';
+  if(tr<=-5)           return 'Used to be a problem. Not lately.';
+  if(pod>=3&&t<1)      return 'Always in the last room of the season, never the one leaving with it.';
+  if(t>0&&t<1)         return 'Owns a share of a title, and will mention it.';
+  if(t>=1)             return 'Has a ring, which settles most arguments.';
+  if(cpi>=103)         return 'Scores like a contender without the trophies to match.';
+  if(ap===0&&sz>=2)    return 'Still waiting on a first playoff appearance.';
+  if(cpi<=95)          return 'Has spent most of league history playing catch-up.';
+  if(tr>=2)            return 'Trending up sharply enough that people have noticed.';
+  return 'Steady, mid-table, rarely the story.';
+}
+
 function drawHeat(){
   const order=[...M].filter(m=>vis(m.name)).sort(bySeasons);
   const pi={}; ROWS.forEach(r=>pi[r.y+'|'+r.mgr]=r);
@@ -2497,30 +2525,6 @@ function drawHeat(){
   $$('#tHeat td.h[data-k]').forEach(td=>{const r=pi[td.dataset.k];
     bindTip(td,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b> · ${r.ppg.toFixed(2)} PPG vs league ${r.lg.toFixed(2)}<br>${r.w}-${r.l}${r.t?'-'+r.t:''} · finished ${ord(r.place)}<br><i>click to open ${r.y}</i>`);
     td.onclick=()=>{LOCKTEAM=r.team;drawSeason(+td.dataset.y);$('#seasons').scrollIntoView({behavior:'smooth'});};});
-  /* One line of character, not a second stat table. Thresholds are set from the real
-     spread of this league (cpi 78-107, luck -12.3 to +9.1, trend -8.0 to +3.0), so each
-     rule actually catches somebody rather than being a guess. First match wins. */
-  function mgrVibe(m){
-    const t=m.titles||0, pod=m.podium||0, ap=m.apps||0, sz=m.seasons||0;
-    const cpi=m.cpi, luck=m.luck||0, tr=m.trend||0, rate=sz?ap/sz:0;
-    if(sz===1&&cpi<90)   return 'One season, and it went badly enough that nobody brings it up.';
-    if(sz===1&&pod>=1)   return 'One season, one trip to the podium, then gone.';
-    if(sz===1)           return 'A single season on the books, too brief to judge.';
-    if(t>=2)             return 'As decorated as this league gets.';
-    if(luck<=-8)         return 'The scoring deserved far better than the record ever showed.';
-    if(luck>=8.5)        return 'Has had the schedule on his side more than anyone.';
-    if(t>=1&&tr>=2.5)    return 'Holds the newest trophy and is still climbing.';
-    if(t>=1&&rate>=0.7)  return 'A permanent fixture in the bracket, with a title to prove it.';
-    if(tr<=-5)           return 'Used to be a problem. Not lately.';
-    if(pod>=3&&t<1)      return 'Always in the last room of the season, never the one leaving with it.';
-    if(t>0&&t<1)         return 'Owns a share of a title, and will mention it.';
-    if(t>=1)             return 'Has a ring, which settles most arguments.';
-    if(cpi>=103)         return 'Scores like a contender without the trophies to match.';
-    if(ap===0&&sz>=2)    return 'Still waiting on a first playoff appearance.';
-    if(cpi<=95)          return 'Has spent most of league history playing catch-up.';
-    if(tr>=2)            return 'Trending up sharply enough that people have noticed.';
-    return 'Steady, mid-table, rarely the story.';
-  }
   $$('#tHeat tbody tr[data-mgr] td.nm').forEach(td=>{
     const name=td.closest('tr').dataset.mgr, m=M.filter(x=>x.name===name)[0];
     if(m)bindTip(td,`<b>${esc(name)}</b><br>${mgrVibe(m)}`);});
@@ -3246,6 +3250,110 @@ function drawTeamIndex(){
     `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
+/* ---- Shareable manager card -------------------------------------------------
+   Draws a square PNG on a canvas and hands it to the phone's share sheet, which on
+   iOS puts it straight into iMessage. Falls back to a download on desktop browsers
+   that have no share sheet. Everything is drawn here: no image files, no libraries,
+   so it keeps the "one self-contained page" property. */
+function cardWrap(ctx,text,maxW){
+  const words=String(text).split(' '); const lines=[]; let cur='';
+  words.forEach(w=>{const t=cur?cur+' '+w:w;
+    if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;} else cur=t;});
+  if(cur)lines.push(cur); return lines;
+}
+async function makeShareCard(name){
+  const m=M.filter(x=>x.name===name)[0]; if(!m)return null;
+  const mine=ROWS.filter(r=>r.mgr===name);
+  const S=1080, c=document.createElement('canvas'); c.width=S; c.height=S;
+  const x=c.getContext('2d');
+  try{ if(document.fonts&&document.fonts.ready)await document.fonts.ready; }catch(e){}
+
+  const GOLD='#C8A24A', INK='#F6F1E6', DIM='#8C97A3', BG='#12161B';
+  x.fillStyle=BG; x.fillRect(0,0,S,S);
+  const g=x.createRadialGradient(180,120,10,180,120,760);
+  g.addColorStop(0,'rgba(200,162,74,.20)'); g.addColorStop(1,'rgba(200,162,74,0)');
+  x.fillStyle=g; x.fillRect(0,0,S,S);
+
+  /* reticle, drawn rather than loaded */
+  const cx=S-176, cy=170, R=78;
+  x.strokeStyle=GOLD; x.lineCap='round';
+  x.lineWidth=11; x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.stroke();
+  x.lineWidth=15;
+  [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{
+    x.beginPath(); x.moveTo(cx+dx*R*1.28,cy+dy*R*1.28); x.lineTo(cx+dx*R*0.46,cy+dy*R*0.46); x.stroke();});
+  x.fillStyle=GOLD; x.beginPath(); x.arc(cx,cy,10,0,Math.PI*2); x.fill();
+
+  x.textBaseline='alphabetic';
+  x.fillStyle=GOLD; x.font='600 25px "IBM Plex Mono",monospace';
+  x.fillText('DEADSHOT  ·  EST. 2015'.split('').join(' '),84,138);
+
+  /* name, shrunk to fit rather than clipped */
+  let fs=118;
+  x.font=`900 ${fs}px "Big Shoulders Display",sans-serif`;
+  while(x.measureText(name.toUpperCase()).width>S-300&&fs>52){fs-=4;x.font=`900 ${fs}px "Big Shoulders Display",sans-serif`;}
+  x.fillStyle=INK; x.fillText(name.toUpperCase(),84,268);
+
+  x.fillStyle=DIM; x.font='400 30px "IBM Plex Sans",sans-serif';
+  x.fillText(`${m.seasons} season${m.seasons>1?'s':''}  ·  ${m.first===m.last?m.first:m.first+'–'+m.last}`,86,316);
+
+  /* the one-line verdict, same sentence the site shows on hover */
+  x.fillStyle=INK; x.font='italic 400 40px "IBM Plex Sans",sans-serif';
+  const vibe=cardWrap(x,mgrVibe(m),S-170);
+  vibe.slice(0,3).forEach((l,i)=>x.fillText(l,84,404+i*54));
+
+  /* stat row */
+  const tiles=[
+    ['RECORD',`${m.w}-${m.l}${m.t?'-'+m.t:''}`],
+    ['WIN %',pct(m.winpct).replace('%','')],
+    ['POWER IDX',m.cpi.toFixed(1)],
+    ['TITLES',String(m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):0)]
+  ];
+  const top=650;
+  x.strokeStyle='rgba(255,255,255,.10)'; x.lineWidth=1;
+  x.beginPath(); x.moveTo(84,top-46); x.lineTo(S-84,top-46); x.stroke();
+  tiles.forEach((t,i)=>{
+    const px=84+i*((S-168)/4);
+    x.fillStyle=GOLD; x.font='600 62px "IBM Plex Mono",monospace'; x.fillText(t[1],px,top+24);
+    x.fillStyle=DIM;  x.font='500 22px "IBM Plex Mono",monospace';
+    x.fillText(t[0].split('').join(' '),px,top+62);
+  });
+
+  /* best and worst season, the two facts people argue about */
+  if(mine.length){
+    const hi=mine.reduce((a,b)=>b.pi>a.pi?b:a), lo=mine.reduce((a,b)=>b.pi<a.pi?b:a);
+    x.strokeStyle='rgba(255,255,255,.10)';
+    x.beginPath(); x.moveTo(84,top+120); x.lineTo(S-84,top+120); x.stroke();
+    x.fillStyle=DIM; x.font='400 28px "IBM Plex Sans",sans-serif';
+    x.fillText(hi.y===lo.y?`Power index ${hi.pi.toFixed(1)} in ${hi.y}`
+      :`Best year ${hi.y} at ${hi.pi.toFixed(1)}   ·   Worst ${lo.y} at ${lo.pi.toFixed(1)}`,84,top+172);
+    x.fillText(`Playoffs ${m.apps} of ${m.seasons}   ·   ${m.podium} podium${m.podium===1?'':'s'}   ·   ${m.ppg.toFixed(1)} PPG`,84,top+218);
+  }
+
+  x.fillStyle=GOLD; x.font='600 26px "IBM Plex Mono",monospace';
+  x.fillText('deadshotleague.com',84,S-72);
+  return new Promise(res=>c.toBlob(res,'image/png'));
+}
+async function shareCard(name,btn){
+  const label=btn?btn.innerHTML:null;
+  if(btn){btn.disabled=true;btn.innerHTML='Building…';}
+  try{
+    const blob=await makeShareCard(name);
+    if(!blob)throw new Error('no card');
+    const file=new File([blob],`deadshot-${name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:`${name} — Deadshot`,text:`${name} · ${mgrVibe(M.filter(x=>x.name===name)[0])}`});
+    }else{
+      const u=URL.createObjectURL(blob), a=document.createElement('a');
+      a.href=u; a.download=file.name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),4000);
+      toast('Card saved to your downloads');
+    }
+  }catch(e){
+    if(e&&e.name==='AbortError'){/* the share sheet was dismissed, not an error */}
+    else toast('Could not build the card');
+  }finally{ if(btn){btn.disabled=false;btn.innerHTML=label;} }
+}
+
 /* ---- From the archive -------------------------------------------------------
    A rotating moment pulled from the record. Seeded by the calendar day, so it is
    stable all day and different tomorrow, and never random on reload. During the NFL
