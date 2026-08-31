@@ -226,6 +226,65 @@ def _is_num(v):
     return isinstance(v, (int, float)) and not isinstance(v, bool)
 
 
+def inv_vs_buckets_balance():
+    """The 'vs winners' / 'vs the rest' split has to add up.
+
+    Sorting each side of a game by how good the OPPONENT was is easy to get subtly
+    wrong. The identity: wins-vs-winners minus losses-to-the-rest must equal the
+    number of winner-vs-winner games minus loser-vs-loser games, because those are
+    the only games that put both sides in the same bucket.
+
+    This also documents why nearly every manager is under .500 in that column: a
+    mixed game puts the stronger team in 'vs the rest' and the weaker one in
+    'vs winners', so the winners bucket is loaded with games played by losing teams.
+    That is expected and is not a data error.
+    """
+    winner = {}
+    for y, rows in D.STANDINGS.items():
+        for (rk, t, W, L, T, pf, pa, mv) in rows:
+            winner[(y, t)] = W > L
+
+    ww = nn = 0
+    vs_win_w = vs_win_l = vs_sub_w = vs_sub_l = 0
+
+    def tally(y, ta, pa_, tb, pb):
+        nonlocal ww, nn, vs_win_w, vs_win_l, vs_sub_w, vs_sub_l
+        if pa_ == pb:
+            return
+        if (y, ta) not in winner or (y, tb) not in winner:
+            return
+        a_, b_ = winner[(y, ta)], winner[(y, tb)]
+        if a_ and b_:
+            ww += 1
+        elif not a_ and not b_:
+            nn += 1
+        for me, mine, opp, theirs in ((ta, pa_, tb, pb), (tb, pb, ta, pa_)):
+            strong = winner[(y, opp)]
+            if mine > theirs:
+                if strong: vs_win_w += 1
+                else:      vs_sub_w += 1
+            else:
+                if strong: vs_win_l += 1
+                else:      vs_sub_l += 1
+
+    for year, mod in weekly_modules().items():
+        for g in getattr(mod, f"W{year}", []):
+            if len(g) == 8 and not g[7]:
+                tally(year, g[1], g[2], g[4], g[5])
+    for (y, wk, rnd, ta, pa_, tb, pb, void) in D.PLAYOFF_GAMES:
+        if not void:
+            tally(y, ta, pa_, tb, pb)
+
+    check(vs_win_w - vs_sub_l == ww - nn,
+          "vs-winners bucket does not balance",
+          f"winsVsWinners {vs_win_w} - lossesToRest {vs_sub_l} = {vs_win_w - vs_sub_l}, "
+          f"expected WW {ww} - NN {nn} = {ww - nn}")
+    check(vs_win_l - vs_sub_w == ww - nn,
+          "vs-the-rest bucket does not balance",
+          f"lossesToWinners {vs_win_l} - winsVsRest {vs_sub_w} = {vs_win_l - vs_sub_w}, "
+          f"expected {ww - nn}")
+
+
 def inv_types_standings():
     """Every standings field is the type and range it claims to be."""
     for y, rows in D.STANDINGS.items():
@@ -318,7 +377,7 @@ def main():
                inv_weekly_reconciles, inv_weekly_shape, inv_playoff_games,
                inv_playoffs_match_log,
                inv_types_standings, inv_types_meta, inv_types_weekly,
-               inv_no_duplicate_matchups, inv_trades_shape):
+               inv_no_duplicate_matchups, inv_trades_shape, inv_vs_buckets_balance):
         fn()
 
     if FAILS:

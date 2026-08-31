@@ -670,6 +670,10 @@ a{color:var(--brass)}
 .mast-in{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:16px 32px;
   padding:26px 22px 24px;max-width:var(--max);margin:0 auto}
 .scope{flex:0 0 auto;width:126px;height:126px;filter:drop-shadow(0 0 11px var(--mast-glow))}
+/* the reticle grid becomes a football field on Pigskin: yard lines, sidelines, hashes */
+.scope .rt-grid-field{display:none}
+[data-skin="leather"] .scope .rt-grid-plain{display:none}
+[data-skin="leather"] .scope .rt-grid-field{display:block}
 .scope .sweep{animation:scopeSpin 5.5s linear infinite;transform-origin:60px 60px}
 @keyframes scopeSpin{to{transform:rotate(360deg)}}
 /* the contact only exists on the redacted file: the sweep passes it once per rotation
@@ -677,9 +681,9 @@ a{color:var(--brass)}
 .scope .blip{opacity:0}
 [data-skin="redact"] .scope .blip{animation:blipPing 5.5s linear infinite}
 [data-skin="redact"] .scope .blip-ring{animation:blipRing 5.5s linear infinite;transform-origin:84px 41px}
-@keyframes blipPing{0%,2%{opacity:0}4.5%{opacity:1}14%{opacity:.7}30%,100%{opacity:0}}
-@keyframes blipRing{0%,2%{transform:scale(1);opacity:0}4.5%{transform:scale(1);opacity:.85}
-  36%,100%{transform:scale(3.4);opacity:0}}
+@keyframes blipPing{0%,6%{opacity:0}9%{opacity:1}17%{opacity:.7}32%,100%{opacity:0}}
+@keyframes blipRing{0%,6%{transform:scale(1);opacity:0}9%{transform:scale(1);opacity:.85}
+  38%,100%{transform:scale(3.4);opacity:0}}
 [data-skin="redact"] .scope{filter:drop-shadow(0 0 13px var(--mast-glow)) drop-shadow(0 0 2px rgba(200,162,74,.35))}
 @media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}
   [data-skin="redact"] .scope .blip,[data-skin="redact"] .scope .blip-ring{animation:none}
@@ -1037,9 +1041,21 @@ BODY = r"""
       </defs>
       <circle cx="60" cy="60" r="55" fill="none" stroke="var(--rt-ring)" stroke-width="6"/>
       <circle cx="60" cy="60" r="52" fill="url(#glass)"/>
-      <g clip-path="url(#ck)" stroke="var(--rt-grid)" stroke-width=".7" opacity=".65">
+      <g clip-path="url(#ck)" class="rt-grid-plain" stroke="var(--rt-grid)" stroke-width=".7" opacity=".65">
         <path d="M12 24H108M12 36H108M12 48H108M12 60H108M12 72H108M12 84H108M12 96H108"/>
         <path d="M24 12V108M36 12V108M48 12V108M60 12V108M72 12V108M84 12V108M96 12V108"/>
+      </g>
+      <g clip-path="url(#ck)" class="rt-grid-field" aria-hidden="true">
+        <g stroke="var(--rt-grid)" stroke-width=".7" opacity=".8">
+          <path d="M20 4V116M32 4V116M44 4V116M56 4V116M68 4V116M80 4V116M92 4V116M104 4V116"/>
+        </g>
+        <g stroke="var(--rt-grid)" stroke-width="1.5" opacity=".95">
+          <path d="M8 4V116M116 4V116"/>
+        </g>
+        <g stroke="var(--rt-grid)" stroke-width=".55" opacity=".62">
+          <path d="M14 40h6M26 40h6M38 40h6M50 40h6M62 40h6M74 40h6M86 40h6M98 40h6M110 40h6"/>
+          <path d="M14 80h6M26 80h6M38 80h6M50 80h6M62 80h6M74 80h6M86 80h6M98 80h6M110 80h6"/>
+        </g>
       </g>
       <g clip-path="url(#ck)" class="sweep">
         <path d="M60 60 L60 4 A56 56 0 0 1 96 20 Z" fill="url(#swp)"/>
@@ -1345,7 +1361,8 @@ BODY = r"""
     <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all ten seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
-        <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select></div></div>
+        <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select>
+        <button id="cmpShare" style="padding:7px 13px;margin-left:6px">&#8593; Share</button></div></div>
       <div class="card-b" id="cmpOut"></div>
     </div>
     <div class="card">
@@ -2762,7 +2779,7 @@ function drawFive(){
    {h:'',f:r=>r.wkAbovePct==null?'':dbar(r.wkAbovePct-.5,.5,pol(r.wkAbovePct-.5)),k:r=>r.wkAbovePct},
    {h:'Best run',f:r=>r.wkStreak||'—',c:'num',k:r=>r.wkStreak,t:'Longest unbroken run of weeks spent above .500'},
    {h:'vs winners',f:r=>(r.vsWinW+r.vsWinL)?`<span class="mono">${r.vsWinW}-${r.vsWinL}</span>`:'—',c:'num',k:r=>r.vsWinPct,
-    t:'Record against opponents who finished that season above .500. Every game on record — all ten seasons of playoffs plus the 2021–2025 regular seasons.'},
+    t:'Record against opponents who finished that season above .500. Almost nobody is above .500 here and that is arithmetic, not weakness: when a winning team plays a losing one, that game counts as "vs the rest" for the winner and "vs a winner" for the loser, so this column is loaded with the games losing teams played. League-wide it sits at .383 while "vs the rest" sits at .620. Compare managers against each other, not against .500. Covers every playoff game in league history plus the 2021 to 2025 regular seasons; earlier regular seasons have no game log.'},
    {h:'vs win %',f:r=>r.vsWinPct==null?'—':pct(r.vsWinPct),c:'num',k:r=>r.vsWinPct},
    {h:'vs the rest',f:r=>(r.vsSubW+r.vsSubL)?`<span class="mono">${r.vsSubW}-${r.vsSubL}</span>`:'—',c:'num',k:r=>r.vsSubPct,
     t:'Record against opponents who finished .500 or worse.'},
@@ -3013,6 +3030,7 @@ drawMtx(); REDRAW.push(drawMtx);
       ['Luck','luck',2],['Playoff W','poW',0]];
     const cell=(m,k,d)=>k==='winpct'?pct(m[k]):(d?(+m[k]).toFixed(d):m[k]);
     const better=(k,x,y)=>k==='avgPlace'?x<y:x>y;
+    {const sh=$('#cmpShare'); if(sh)sh.onclick=()=>shareH2H($('#cmpA').value,$('#cmpB').value,sh);}
     $('#cmpOut').innerHTML=`<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;max-width:100%">
       <table style="flex:1 1 300px;min-width:0"><thead><tr><th></th><th class="num">${esc(a.name)}</th><th class="num">${esc(b.name)}</th></tr></thead><tbody>${
       rows.map(([lab,k,d])=>{const x=a[k],y=b[k];
@@ -3276,10 +3294,11 @@ async function makeShareCard(name){
   const x=c.getContext('2d');
   try{ if(document.fonts&&document.fonts.ready)await document.fonts.ready; }catch(e){}
 
-  const GOLD='#C8A24A', INK='#F6F1E6', DIM='#8C97A3', BG='#12161B';
+  const P=cardPalette();
+  const GOLD=P.accent, INK=P.ink, DIM=P.dim, BG=P.bg;
   x.fillStyle=BG; x.fillRect(0,0,S,S);
   const g=x.createRadialGradient(180,120,10,180,120,760);
-  g.addColorStop(0,'rgba(200,162,74,.20)'); g.addColorStop(1,'rgba(200,162,74,0)');
+  g.addColorStop(0,P.glow); g.addColorStop(1,P.glow0);
   x.fillStyle=g; x.fillRect(0,0,S,S);
 
   /* reticle, drawn rather than loaded */
@@ -3340,6 +3359,101 @@ async function makeShareCard(name){
   x.fillStyle=GOLD; x.font='600 26px "IBM Plex Mono",monospace';
   x.fillText('deadshotleague.com',84,S-72);
   return new Promise(res=>c.toBlob(res,'image/png'));
+}
+/* Cards are drawn in whatever theme the reader is currently looking at, so the picture
+   that lands in the group chat matches the site they were just on. The masthead tokens
+   are used because those six are already designed to sit together in every skin. */
+function cardPalette(){
+  const hex=v=>{v=(v||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:null;};
+  const bg=hex(cssv('--mast-bg'))||'#12161B';
+  const ink=hex(cssv('--mast-ink'))||'#F6F1E6';
+  const dim=hex(cssv('--mast-sub'))||'#8C97A3';
+  const accent=hex(cssv('--brass'))||'#C8A24A';
+  const rr=parseInt(accent.slice(1,3),16), gg=parseInt(accent.slice(3,5),16), bb=parseInt(accent.slice(5,7),16);
+  /* a light masthead needs a far gentler wash than a near-black one */
+  const lum=(0.2126*rr+0.7152*gg+0.0722*bb)/255;
+  const bl=(parseInt(bg.slice(1,3),16)*0.2126+parseInt(bg.slice(3,5),16)*0.7152+parseInt(bg.slice(5,7),16)*0.0722)/255;
+  const strength=bl>0.6?0.10:0.20;
+  return {bg,ink,dim,accent,rule:bl>0.6?'rgba(0,0,0,.12)':'rgba(255,255,255,.10)',
+          glow:`rgba(${rr},${gg},${bb},${strength})`, glow0:`rgba(${rr},${gg},${bb},0)`};
+}
+async function makeH2HCard(an,bn){
+  const a=byName[an], b=byName[bn]; if(!a||!b||an===bn)return null;
+  const S=1080, c=document.createElement('canvas'); c.width=S; c.height=S;
+  const x=c.getContext('2d');
+  try{ if(document.fonts&&document.fonts.ready)await document.fonts.ready; }catch(e){}
+  const P=cardPalette();
+  x.fillStyle=P.bg; x.fillRect(0,0,S,S);
+  const g=x.createRadialGradient(S/2,140,10,S/2,140,780);
+  g.addColorStop(0,P.glow); g.addColorStop(1,P.glow0); x.fillStyle=g; x.fillRect(0,0,S,S);
+
+  x.textAlign='center';
+  x.fillStyle=P.accent; x.font='600 25px "IBM Plex Mono",monospace';
+  x.fillText('H E A D   T O   H E A D',S/2,108);
+
+  const rec=MX.all.t[an+'|'+bn];
+  const fit=(t,max,start)=>{let f=start;x.font=`900 ${f}px "Big Shoulders Display",sans-serif`;
+    while(x.measureText(t).width>max&&f>40){f-=3;x.font=`900 ${f}px "Big Shoulders Display",sans-serif`;}return f;};
+  fit(an.toUpperCase(),S-140,86); x.fillStyle=P.ink; x.fillText(an.toUpperCase(),S/2,206);
+  x.fillStyle=P.dim; x.font='500 30px "IBM Plex Mono",monospace'; x.fillText('versus',S/2,258);
+  fit(bn.toUpperCase(),S-140,86); x.fillStyle=P.ink; x.fillText(bn.toUpperCase(),S/2,340);
+
+  if(rec){
+    x.fillStyle=P.accent; x.font='900 176px "Big Shoulders Display",sans-serif';
+    x.fillText(`${rec[0]}\u2013${rec[1]}`,S/2,510);
+    x.fillStyle=P.dim; x.font='400 27px "IBM Plex Sans",sans-serif';
+    x.fillText(`all-time, from ${esc(an)}'s side`,S/2,556);
+  }else{
+    x.fillStyle=P.dim; x.font='400 40px "IBM Plex Sans",sans-serif';
+    x.fillText('They have never met.',S/2,500);
+  }
+
+  /* four stats side by side, winner picked out in the accent */
+  const cmp=[['SEASONS','seasons',0],['TITLES','titles',1],['WIN %','winpct',3],['POWER IDX','cpi',1]];
+  const lowerWins={};
+  x.textAlign='left';
+  x.strokeStyle=P.rule; x.lineWidth=1;
+  x.beginPath(); x.moveTo(84,markY(0)); x.lineTo(S-84,markY(0)); x.stroke();
+  function markY(){return 626;}
+  cmp.forEach((row,i)=>{
+    const [lab,k,d]=row, y=700+i*82;
+    const av=a[k], bv=b[k];
+    const fmt=v=>k==='winpct'?pct(v):(d?(+v).toFixed(d):String(v));
+    x.fillStyle=P.dim; x.font='500 21px "IBM Plex Mono",monospace';
+    x.textAlign='center'; x.fillText(lab.split('').join(' '),S/2,y-6);
+    x.font='600 46px "IBM Plex Mono",monospace';
+    x.textAlign='left';  x.fillStyle=(av>bv)?P.accent:P.dim; x.fillText(fmt(av),84,y);
+    x.textAlign='right'; x.fillStyle=(bv>av)?P.accent:P.dim; x.fillText(fmt(bv),S-84,y);
+    x.textAlign='left';
+    if(i<cmp.length-1){x.strokeStyle=P.rule;x.beginPath();x.moveTo(84,y+26);x.lineTo(S-84,y+26);x.stroke();}
+  });
+  x.textAlign='center';
+  x.fillStyle=P.accent; x.font='600 26px "IBM Plex Mono",monospace';
+  x.fillText('deadshotleague.com',S/2,S-58);
+  return new Promise(res=>c.toBlob(res,'image/png'));
+}
+async function shareBlob(blob,fname,title,text,btn,label){
+  const file=new File([blob],fname,{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    await navigator.share({files:[file],title,text});
+  }else{
+    const u=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=u; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),4000);
+    toast('Card saved to your downloads');
+  }
+}
+async function shareH2H(an,bn,btn){
+  const label=btn?btn.innerHTML:null;
+  if(btn){btn.disabled=true;btn.innerHTML='Building…';}
+  try{
+    const blob=await makeH2HCard(an,bn);
+    if(!blob){toast('Pick two different managers first');return;}
+    const rec=MX.all.t[an+'|'+bn];
+    await shareBlob(blob,`deadshot-${an.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-v-${bn.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`,
+      `${an} vs ${bn}`, rec?`${an} leads ${rec[0]}–${rec[1]} all-time.`:`${an} and ${bn} have never met.`);
+  }catch(e){ if(!(e&&e.name==='AbortError'))toast('Could not build the card'); }
+  finally{ if(btn){btn.disabled=false;btn.innerHTML=label;} }
 }
 async function shareCard(name,btn){
   const label=btn?btn.innerHTML:null;

@@ -179,6 +179,44 @@ champions · alltime · power · rankings · shape · weekly · luck · advanced
 fivehundred · records · seasons · h2h · trades-sec · method
 ```
 
+### Shareable cards
+
+Two canvas-drawn PNGs, both 1080x1080, both handed to the phone's share sheet
+(`navigator.share` with a file) and falling back to a download on desktop:
+
+- **Manager card** — button in the manager modal.
+- **Head to head** — Share button next to the two pickers in the Head to Head section.
+
+Both take their colours from `cardPalette()`, which reads the live theme's masthead
+tokens, so the picture matches the site the reader was just looking at.
+
+**Do not use Fraunces on the canvas.** It is a variable font and canvas cannot set its
+optical-size axis, so its numerals render in the wrong forms at display sizes. Big
+Shoulders Display has no such axis and is what both cards use for large numbers.
+
+### Why almost nobody is above .500 against winning teams
+
+Not a bug, and it gets asked. When a winning team plays a losing one, that game lands
+in "vs the rest" for the winner and "vs a winner" for the loser, so the vs-winners
+bucket is loaded with games played by losing teams. League-wide it sits at .383 while
+"vs the rest" sits at .620. Compare managers to each other, not to .500.
+`inv_vs_buckets_balance` in `verify.py` pins the arithmetic: wins-vs-winners minus
+losses-to-the-rest must equal (winner-vs-winner games) minus (loser-vs-loser games).
+
+Note the coverage too: this stat sees every playoff game plus the 2021-2025 regular
+seasons only, because earlier years have no game log.
+
+### The masthead reticle
+
+- The sweep is a gradient wedge spanning 42 degrees, rotating clockwise from twelve
+  o'clock over 5.5s. It was originally a flat 9% fill, invisible on dark skins. Do not
+  widen it and do not add a stroked leading edge; both were tried and rejected.
+- **Redacted only** gets a radar contact at (84,41), which is 51.6 degrees round. The
+  wedge covers it between 2.7% and 14.3% of the cycle, so `blipPing` peaks at 9%.
+  If the sweep geometry changes, that timing has to move with it.
+- **Pigskin only** swaps the square grid for a football field: yard lines, heavier
+  sidelines, hash marks. `.rt-grid-plain` and `.rt-grid-field` toggle by skin.
+
 ### Automatic checks, snapshots and shape validation (2026-08-31)
 
 - **`.github/workflows/checks.yml`** runs on every push, weekly on a schedule, and on
