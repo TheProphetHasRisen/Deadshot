@@ -1129,6 +1129,10 @@ BODY = r"""
   <section id="champions">
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner's run traced</div></div>
     <div class="board" id="board"></div>
+    <div class="card" id="arcCard" style="margin-top:18px"><div class="card-b" style="padding:15px 18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin-bottom:7px" id="arcLabel">From the archive</div>
+      <div id="arcMoment" style="font-size:15px;line-height:1.55;color:var(--ink)"></div>
+    </div></div>
     <div style="margin-top:14px"><button id="storiesBtn" class="on" style="padding:8px 15px">&#9733; The story of each season</button>
       <span class="sub" style="margin-left:9px">One headline per year, pulled from the record</span></div>
   </section>
@@ -1294,6 +1298,10 @@ BODY = r"""
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
     <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
     <div id="recs"></div>
+    <div class="card" style="margin-top:22px">
+      <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
+      <div class="card-b" id="mileWatch"></div>
+    </div>
   </section>
 
   <section id="seasons">
@@ -3201,6 +3209,128 @@ function drawTeamIndex(){
     `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
+/* ---- From the archive -------------------------------------------------------
+   A rotating moment pulled from the record. Seeded by the calendar day, so it is
+   stable all day and different tomorrow, and never random on reload. During the NFL
+   season it prefers moments from the matching week; out of season it draws from
+   anything. Nothing here is written by hand: every line is generated from the data,
+   so it stays true when the numbers change. */
+function nflWeek(d){
+  /* NFL week 1 lands in the first full week of September. Good enough to match a
+     moment to roughly the right part of the season; it is decoration, not a fixture list. */
+  const y=d.getFullYear();
+  const sep=new Date(y,8,1);
+  const firstThu=new Date(y,8,1+((4-sep.getDay())+7)%7);
+  const diff=Math.floor((d-firstThu)/(7*24*3600*1000))+1;
+  return (diff>=1&&diff<=17)?diff:null;
+}
+function archiveMoments(){
+  const out=[];
+  const S2=v=>v.toFixed(2);
+  /* every title game */
+  D.champs.forEach(c=>{
+    const fin=D.games.filter(g=>g.y===c.y&&g.rnd==='Final'&&!g.void)[0];
+    if(fin){
+      const win=fin.pa>fin.pb?fin:{ta:fin.tb,ma:fin.mb,pa:fin.pb,tb:fin.ta,mb:fin.ma,pb:fin.pa};
+      out.push({wk:fin.wk,y:c.y,html:`In <b>${c.y}</b>, ${esc(win.ta)} (${esc(win.ma)}) beat ${esc(win.tb)} `+
+        `<b>${S2(win.pa)}&ndash;${S2(win.pb)}</b> to take the title.`});
+    } else if(c.co){
+      out.push({wk:17,y:c.y,html:`The <b>${c.y}</b> final was never resolved. ${esc(c.mgrs.join(' and '))} `+
+        `split the title and the winnings.`});
+    }
+  });
+  /* every playoff game, framed by how it went */
+  D.games.filter(g=>!g.void).forEach(g=>{
+    const m=Math.abs(g.pa-g.pb), hi=g.pa>g.pb?g:{ta:g.tb,ma:g.mb,pa:g.pb,tb:g.ta,mb:g.ma,pb:g.pa};
+    if(m<6) out.push({wk:g.wk,y:g.y,html:`<b>${g.y}</b> ${esc(g.rnd.toLowerCase())}: ${esc(hi.ta)} survived `+
+      `${esc(hi.tb)} by <b>${S2(m)}</b>, ${S2(hi.pa)} to ${S2(hi.pb)}.`});
+    else if(m>55) out.push({wk:g.wk,y:g.y,html:`<b>${g.y}</b> ${esc(g.rnd.toLowerCase())}: ${esc(hi.ta)} `+
+      `buried ${esc(hi.tb)} by <b>${S2(m)}</b>, ${S2(hi.pa)} to ${S2(hi.pb)}.`});
+  });
+  /* regular season extremes, from the seasons with a game log */
+  (D.wkYears||[]).forEach(y=>{
+    const K=D.wk[y]; if(!K)return;
+    const flat=[];
+    K.games.forEach(g=>{flat.push({wk:g.wk,t:g.ta,p:g.aa,o:g.tb,op:g.ab,br:g.br});
+                        flat.push({wk:g.wk,t:g.tb,p:g.ab,o:g.ta,op:g.aa,br:g.br});});
+    const reg=flat.filter(x=>!x.br);
+    if(!reg.length)return;
+    const top=reg.reduce((a,b)=>b.p>a.p?b:a);
+    out.push({wk:top.wk,y:+y,html:`Week ${top.wk} of <b>${y}</b>: ${esc(top.t)} hung `+
+      `<b>${S2(top.p)}</b> on ${esc(top.o)}, the biggest score of that regular season.`});
+    const low=reg.reduce((a,b)=>b.p<a.p?b:a);
+    out.push({wk:low.wk,y:+y,html:`Week ${low.wk} of <b>${y}</b>: ${esc(low.t)} managed `+
+      `<b>${S2(low.p)}</b>, the quietest week anyone had that year.`});
+    /* best score that still lost */
+    const robbed=reg.filter(x=>x.p<x.op).reduce((a,b)=>(!a||b.p>a.p)?b:a,null);
+    if(robbed) out.push({wk:robbed.wk,y:+y,html:`Week ${robbed.wk} of <b>${y}</b>: ${esc(robbed.t)} scored `+
+      `<b>${S2(robbed.p)}</b> and still lost, because ${esc(robbed.o)} answered with ${S2(robbed.op)}.`});
+    /* worst score that still won */
+    const gifted=reg.filter(x=>x.p>x.op).reduce((a,b)=>(!a||b.p<a.p)?b:a,null);
+    if(gifted) out.push({wk:gifted.wk,y:+y,html:`Week ${gifted.wk} of <b>${y}</b>: ${esc(gifted.t)} won with just `+
+      `<b>${S2(gifted.p)}</b>, because ${esc(gifted.o)} could only find ${S2(gifted.op)}.`});
+    /* the biggest trade of that year */
+    const big=(K.trades||[]).reduce((a,b)=>(!a||(b.pa.length+b.pb.length)>(a.pa.length+a.pb.length))?b:a,null);
+    if(big&&(big.pa.length+big.pb.length)>=5)
+      out.push({wk:null,y:+y,html:`<b>${y}</b>, ${esc(big.d)}: ${esc(big.ta)} and ${esc(big.tb)} swapped `+
+        `<b>${big.pa.length+big.pb.length} players</b> in one deal.`});
+  });
+  /* season-level oddities */
+  ROWS.forEach(r=>{
+    if(r.luck<=-3.2) out.push({wk:null,y:r.y,html:`${esc(r.team)} finished <b>${r.w}-${r.l}</b> in ${r.y} `+
+      `while the scoring earned about <b>${r.pythW.toFixed(1)}</b> wins. The schedule took the rest.`});
+    if(r.luck>=3.2) out.push({wk:null,y:r.y,html:`${esc(r.team)} banked <b>${r.w}-${r.l}</b> in ${r.y} `+
+      `on scoring worth about <b>${r.pythW.toFixed(1)}</b> wins. Nobody gave it back.`});
+    if(r.place===1&&r.seed>=4) out.push({wk:null,y:r.y,html:`${esc(r.team)} went into the ${r.y} playoffs `+
+      `as the <b>${ord(r.seed)} seed</b> and came out with the title.`});
+  });
+  return out;
+}
+function drawArchive(){
+  const host=$('#arcMoment'); if(!host)return;
+  const all=archiveMoments(); if(!all.length)return;
+  const now=new Date();
+  const wk=nflWeek(now);
+  const pool=wk?all.filter(m=>m.wk!=null&&Math.abs(m.wk-wk)<=1):[];
+  const use=pool.length?pool:all;
+  /* day number as the seed: same moment all day, a new one tomorrow */
+  const day=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000)+now.getFullYear()*372;
+  const pick=use[day%use.length];
+  host.innerHTML=pick.html;
+  const lab=$('#arcLabel');
+  if(lab)lab.textContent=wk&&pool.length?('From the archive · week '+wk):'From the archive';
+}
+
+/* ---- Milestone watch --------------------------------------------------------
+   Round numbers each manager is closest to. Everyone is shown: it is a ten-person
+   league where everybody already knows everybody's business. */
+function drawMilestones(){
+  const host=$('#mileWatch'); if(!host)return;
+  const people=[...M].filter(m=>vis(m.name));
+  const rows=[];
+  people.forEach(m=>{
+    const near=[];
+    const step=(v,size,label,unit)=>{
+      const next=Math.ceil((v+0.0001)/size)*size;
+      near.push({gap:next-v,txt:`<b>${Math.round(next-v).toLocaleString()}</b> ${unit} from ${next.toLocaleString()} ${label}`,pct:v/next});
+    };
+    step(m.pf,1000,'career points','pts');
+    step(m.w,10,'career wins','wins');
+    if(m.poG) step(m.poW,5,'playoff wins','wins');
+    step(m.g,25,'games played','games');
+    near.sort((a,b)=>a.pct===b.pct?a.gap-b.gap:b.pct-a.pct);
+    rows.push({m,best:near[0]});
+  });
+  rows.sort((a,b)=>b.best.pct-a.best.pct);
+  host.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px 20px">`+
+    rows.map(r=>`<div style="display:flex;gap:9px;align-items:baseline;padding:3px 0">`+
+      `<span style="flex:0 0 auto">${mlink(r.m.name)}</span>`+
+      `<span class="dim" style="font-size:12.5px;min-width:0">${r.best.txt}</span></div>`).join('')+
+    `</div><p style="margin:12px 0 0;font-size:12px;color:var(--ink-3)">Closest target first. Career totals only, so these move once a new season is loaded.</p>`;
+}
+drawArchive(); REDRAW.push(drawArchive);
+drawMilestones(); REDRAW.push(drawMilestones);
+
 /* ---- shareable links ----------------------------------------------------------
    Every view used to live at the same address, so nobody could send "look at my 2021
    season" -- the link always opened on the newest year. The address bar now mirrors
