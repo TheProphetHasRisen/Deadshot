@@ -690,7 +690,18 @@ a{color:var(--brass)}
 .scope{flex:0 0 auto;width:126px;height:126px;filter:drop-shadow(0 0 11px var(--mast-glow))}
 .scope .sweep{animation:scopeSpin 5.5s linear infinite;transform-origin:60px 60px}
 @keyframes scopeSpin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}}
+/* the contact only exists on the redacted file: the sweep passes it once per rotation
+   and it answers. Hidden everywhere else so the other five skins are untouched. */
+.scope .blip{opacity:0}
+[data-skin="redact"] .scope .blip{animation:blipPing 5.5s linear infinite}
+[data-skin="redact"] .scope .blip-ring{animation:blipRing 5.5s linear infinite;transform-origin:84px 41px}
+@keyframes blipPing{0%,24%{opacity:0}30%{opacity:1}62%{opacity:.55}100%{opacity:0}}
+@keyframes blipRing{0%,24%{transform:scale(1);opacity:0}30%{transform:scale(1);opacity:.9}
+  70%,100%{transform:scale(3.4);opacity:0}}
+[data-skin="redact"] .scope{filter:drop-shadow(0 0 13px var(--mast-glow)) drop-shadow(0 0 2px rgba(200,162,74,.35))}
+@media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}
+  [data-skin="redact"] .scope .blip,[data-skin="redact"] .scope .blip-ring{animation:none}
+  [data-skin="redact"] .scope .blip{opacity:.9}}
 .brand{display:flex;flex-direction:column;gap:1px;min-width:0;position:relative;z-index:2}
 .kicker{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.34em;text-transform:uppercase;
   color:var(--mast-kick);opacity:.9}
@@ -1036,6 +1047,11 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
         <radialGradient id="glass" cx="38%" cy="32%">
           <stop offset="0" stop-color="var(--rt-g1)"/><stop offset="1" stop-color="var(--rt-g2)"/>
         </radialGradient>
+        <linearGradient id="swp" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="var(--rt)" stop-opacity="0"/>
+          <stop offset=".55" stop-color="var(--rt)" stop-opacity=".30"/>
+          <stop offset="1" stop-color="var(--rt)" stop-opacity=".75"/>
+        </linearGradient>
       </defs>
       <circle cx="60" cy="60" r="55" fill="none" stroke="var(--rt-ring)" stroke-width="6"/>
       <circle cx="60" cy="60" r="52" fill="url(#glass)"/>
@@ -1044,7 +1060,12 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
         <path d="M24 12V108M36 12V108M48 12V108M60 12V108M72 12V108M84 12V108M96 12V108"/>
       </g>
       <g clip-path="url(#ck)" class="sweep">
-        <path d="M60 60 L60 4 A56 56 0 0 1 96 20 Z" fill="var(--rt)" opacity=".09"/>
+        <path d="M60 60 L60 4 A56 56 0 0 1 106 34 Z" fill="url(#swp)"/>
+        <path class="swp-edge" d="M60 60 L60 4" stroke="var(--rt)" stroke-width="1.6" opacity=".85" fill="none"/>
+      </g>
+      <g clip-path="url(#ck)" class="blip" aria-hidden="true">
+        <circle cx="84" cy="41" r="3.1" fill="var(--rt)"/>
+        <circle cx="84" cy="41" r="3.1" fill="none" stroke="var(--rt)" stroke-width="1.2" class="blip-ring"/>
       </g>
       <g stroke="var(--rt)" stroke-linecap="round">
         <path d="M60 9V44" stroke-width="6"/><path d="M60 76V111" stroke-width="6"/>
