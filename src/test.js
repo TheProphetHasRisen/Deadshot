@@ -36,8 +36,20 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
       cmp:document.querySelectorAll('#cmpOut table tr').length,
       hscroll:document.documentElement.scrollWidth>document.documentElement.clientWidth,
       bodyBg:getComputedStyle(document.body).backgroundColor,
+      // every manager still playing must get their own one-line verdict. Three of them
+      // collided once and it read like a bug. Retired one-season managers may share.
+      vibeDupes:(()=>{
+        try{
+          const seen={},bad=[];
+          DATA.mgrs.filter(m=>m.last===DATA.last).forEach(m=>{
+            const v=mgrVibe(m);
+            if(seen[v])bad.push(seen[v]+' / '+m.name); else seen[v]=m.name;});
+          return bad;
+        }catch(e){return ['mgrVibe unavailable: '+e.message];}
+      })(),
     }));
     console.log(name, JSON.stringify(r));
+    if(r.vibeDupes.length)errs.push(name+' DUPLICATE manager verdicts: '+r.vibeDupes.join(', '));
     if(name==='desktop'){
       await p.screenshot({path:'shot-top.png',clip:{x:0,y:0,width:1400,height:1000}});
       await p.evaluate(()=>document.querySelector('#power').scrollIntoView());

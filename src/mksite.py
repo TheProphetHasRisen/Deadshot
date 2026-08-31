@@ -677,9 +677,9 @@ a{color:var(--brass)}
 .scope .blip{opacity:0}
 [data-skin="redact"] .scope .blip{animation:blipPing 5.5s linear infinite}
 [data-skin="redact"] .scope .blip-ring{animation:blipRing 5.5s linear infinite;transform-origin:84px 41px}
-@keyframes blipPing{0%,24%{opacity:0}30%{opacity:1}62%{opacity:.55}100%{opacity:0}}
-@keyframes blipRing{0%,24%{transform:scale(1);opacity:0}30%{transform:scale(1);opacity:.9}
-  70%,100%{transform:scale(3.4);opacity:0}}
+@keyframes blipPing{0%,2%{opacity:0}4.5%{opacity:1}14%{opacity:.7}30%,100%{opacity:0}}
+@keyframes blipRing{0%,2%{transform:scale(1);opacity:0}4.5%{transform:scale(1);opacity:.85}
+  36%,100%{transform:scale(3.4);opacity:0}}
 [data-skin="redact"] .scope{filter:drop-shadow(0 0 13px var(--mast-glow)) drop-shadow(0 0 2px rgba(200,162,74,.35))}
 @media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}
   [data-skin="redact"] .scope .blip,[data-skin="redact"] .scope .blip-ring{animation:none}
@@ -1031,8 +1031,8 @@ BODY = r"""
         </radialGradient>
         <linearGradient id="swp" x1="0" y1="1" x2="1" y2="0">
           <stop offset="0" stop-color="var(--rt)" stop-opacity="0"/>
-          <stop offset=".55" stop-color="var(--rt)" stop-opacity=".30"/>
-          <stop offset="1" stop-color="var(--rt)" stop-opacity=".75"/>
+          <stop offset=".5" stop-color="var(--rt)" stop-opacity=".26"/>
+          <stop offset="1" stop-color="var(--rt)" stop-opacity=".62"/>
         </linearGradient>
       </defs>
       <circle cx="60" cy="60" r="55" fill="none" stroke="var(--rt-ring)" stroke-width="6"/>
@@ -1042,8 +1042,7 @@ BODY = r"""
         <path d="M24 12V108M36 12V108M48 12V108M60 12V108M72 12V108M84 12V108M96 12V108"/>
       </g>
       <g clip-path="url(#ck)" class="sweep">
-        <path d="M60 60 L60 4 A56 56 0 0 1 106 34 Z" fill="url(#swp)"/>
-        <path class="swp-edge" d="M60 60 L60 4" stroke="var(--rt)" stroke-width="1.6" opacity=".85" fill="none"/>
+        <path d="M60 60 L60 4 A56 56 0 0 1 96 20 Z" fill="url(#swp)"/>
       </g>
       <g clip-path="url(#ck)" class="blip" aria-hidden="true">
         <circle cx="84" cy="41" r="3.1" fill="var(--rt)"/>
@@ -1151,7 +1150,8 @@ BODY = r"""
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner's run traced</div></div>
     <div class="board" id="board"></div>
     <div class="card" id="arcCard" style="margin-top:18px"><div class="card-b" style="padding:15px 18px">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass);margin-bottom:7px" id="arcLabel">From the archive</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)">This week in league history</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:3px 0 8px" id="arcLabel">From the archive</div>
       <div id="arcMoment" style="font-size:15px;line-height:1.55;color:var(--ink)"></div>
     </div></div>
     <div style="margin-top:14px"><button id="storiesBtn" class="on" style="padding:8px 15px">&#9733; The story of each season</button>
@@ -2464,26 +2464,50 @@ $$('[data-yr]').forEach(b=>b.onclick=()=>{
 REDRAW.push(()=>buildAll());
 
 /* ============ heat grid ============ */
-/* One line of character, not a second stat table. Thresholds are set from the real
-   spread of this league (cpi 78-107, luck -12.3 to +9.1, trend -8.0 to +3.0), so each
-   rule actually catches somebody rather than being a guess. First match wins. */
+/* One line of character, not a second stat table. Thresholds come from the real spread
+   of this league (cpi 78-107, luck -12.3 to +9.1, trend -8.0 to +3.0), so every rule
+   catches somebody. First match wins.
+
+   Two things the rules must respect. Managers who stopped playing are described in the
+   past tense, because "trending up" about someone who left in 2023 is just wrong. And
+   no two active managers may land on the same line -- test.js checks that, because
+   three of them collided the first time round. */
+const MGR_YEARS={}; ROWS.forEach(r=>{(MGR_YEARS[r.mgr]=MGR_YEARS[r.mgr]||[]).push(r.y);});
+function mgrGaps(m){
+  const ys=(MGR_YEARS[m.name]||[]).slice().sort((a,b)=>a-b);
+  if(ys.length<2)return 0;
+  /* seasons the league actually ran between their first and last, that they sat out */
+  return SEA.filter(y=>y>ys[0]&&y<ys[ys.length-1]&&ys.indexOf(y)<0).length;
+}
 function mgrVibe(m){
   const t=m.titles||0, pod=m.podium||0, ap=m.apps||0, sz=m.seasons||0;
   const cpi=m.cpi, luck=m.luck||0, tr=m.trend||0, rate=sz?ap/sz:0;
-  if(sz===1&&cpi<90)   return 'One season, and it went badly enough that nobody brings it up.';
+  const active=m.last===LAST, gaps=mgrGaps(m);
+
+  /* one-and-done */
+  if(sz===1&&cpi<90)   return 'One season, and it went badly enough that he never came back.';
   if(sz===1&&pod>=1)   return 'One season, one trip to the podium, then gone.';
   if(sz===1)           return 'A single season on the books, too brief to judge.';
+
+  /* gone from the league: everything here is past tense */
+  if(!active&&t>=2)    return 'Won twice, then left with the league still owing him a rematch.';
+  if(!active&&t>=1)    return 'Left holding a ring, after the years stopped going his way.';
+  if(!active&&ap===0)  return 'Never once made the bracket, and eventually stopped turning up.';
+  if(!active&&gaps>0)  return 'Drifted in and out, and was gone before the record settled.';
+  if(!active)          return 'Played, faded, and has not been back since.';
+
+  /* still playing */
   if(t>=2)             return 'As decorated as this league gets.';
   if(luck<=-8)         return 'The scoring deserved far better than the record ever showed.';
   if(luck>=8.5)        return 'Has had the schedule on his side more than anyone.';
   if(t>=1&&tr>=2.5)    return 'Holds the newest trophy and is still climbing.';
+  if(t>=1&&gaps>=3)    return 'Keeps disappearing for years at a time and keeps coming back with silverware.';
+  if(t>=1&&gaps>=1)    return 'Has left and returned more than once, and still found a ring in between.';
   if(t>=1&&rate>=0.7)  return 'A permanent fixture in the bracket, with a title to prove it.';
-  if(tr<=-5)           return 'Used to be a problem. Not lately.';
-  if(pod>=3&&t<1)      return 'Always in the last room of the season, never the one leaving with it.';
   if(t>0&&t<1)         return 'Owns a share of a title, and will mention it.';
-  if(t>=1)             return 'Has a ring, which settles most arguments.';
-  if(cpi>=103)         return 'Scores like a contender without the trophies to match.';
+  if(pod>=3&&t<1)      return 'Always in the last room of the season, never the one leaving with it.';
   if(ap===0&&sz>=2)    return 'Still waiting on a first playoff appearance.';
+  if(cpi>=103)         return 'Scores like a contender without the trophies to match.';
   if(cpi<=95)          return 'Has spent most of league history playing catch-up.';
   if(tr>=2)            return 'Trending up sharply enough that people have noticed.';
   return 'Steady, mid-table, rarely the story.';
