@@ -175,9 +175,27 @@ Sections, in DOM order (the nav array `SECS` in the JS **must** match this order
 a mismatch between the two was a real reported bug):
 
 ```
-champions · alltime · power · rankings · shape · weekly · luck · advanced
-fivehundred · records · seasons · h2h · trades-sec · method
+champions · alltime · power · shape · weekly · luck · advanced
+records · seasons · h2h · trades-sec · method
 ```
+
+Twelve, not fourteen. **Power Rankings was merged into Power Index** and **The .500 Line
+into Advanced** (2026-08-31): same content, same order, no separate heading or nav entry.
+Both now appear under a `.sub-h` divider inside the host section. Do not assert an exact
+section count in tests; assert the page rendered.
+
+### Default theme is Crimson
+
+First-time visitors get `red`, not `og`. That is set in **two** places and both must
+agree: the inline script in `SHELL_TOP` that runs before paint (so there is no flash of
+the wrong theme), and the fallback in the skin restore near the bottom of `JS`.
+The favicon is drawn in Crimson to match.
+
+### The Record Book starts collapsed
+
+21 tables plus the milestone list made everything below it a long scroll. `#recsWrap`
+is `hidden` by default with a toggle above it. The tables are still built on load, so
+`test.js` still counts them and nothing about the data changes.
 
 ### Shareable cards
 
@@ -189,6 +207,12 @@ Two canvas-drawn PNGs, both 1080x1080, both handed to the phone's share sheet
 
 Both take their colours from `cardPalette()`, which reads the live theme's masthead
 tokens, so the picture matches the site the reader was just looking at.
+
+**Crimson needs a guard and has one.** That skin defines `--brass` and `--mast-bg` as
+the same `#8E1520`, so the accent would be drawn in exactly the background colour and
+vanish. `cardPalette()` checks the contrast and falls back to `--mast-kick`, then
+`--mast-sub`, then the ink. Any new skin that reuses its accent as a background gets
+the same protection for free.
 
 **Do not use Fraunces on the canvas.** It is a variable font and canvas cannot set its
 optical-size axis, so its numerals render in the wrong forms at display sizes. Big

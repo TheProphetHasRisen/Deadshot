@@ -681,9 +681,11 @@ a{color:var(--brass)}
 .scope .blip{opacity:0}
 [data-skin="redact"] .scope .blip{animation:blipPing 5.5s linear infinite}
 [data-skin="redact"] .scope .blip-ring{animation:blipRing 5.5s linear infinite;transform-origin:84px 41px}
-@keyframes blipPing{0%,6%{opacity:0}9%{opacity:1}17%{opacity:.7}32%,100%{opacity:0}}
-@keyframes blipRing{0%,6%{transform:scale(1);opacity:0}9%{transform:scale(1);opacity:.85}
-  38%,100%{transform:scale(3.4);opacity:0}}
+/* the wedge is bright at its LEADING edge, which sits at rot+42 and crosses the blip
+   at rot 9.6deg = 2.7% of the cycle. Ping there, sharply, then fade out. */
+@keyframes blipPing{0%,2.4%{opacity:0}3.4%{opacity:1}9%{opacity:.5}17%,100%{opacity:0}}
+@keyframes blipRing{0%,2.4%{transform:scale(1);opacity:0}3.4%{transform:scale(1);opacity:.9}
+  19%,100%{transform:scale(3.6);opacity:0}}
 [data-skin="redact"] .scope{filter:drop-shadow(0 0 13px var(--mast-glow)) drop-shadow(0 0 2px rgba(200,162,74,.35))}
 @media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}
   [data-skin="redact"] .scope .blip,[data-skin="redact"] .scope .blip-ring{animation:none}
@@ -975,7 +977,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 """
 
 BODY = r"""
-<script>(function(){try{var k=localStorage.getItem("deadshot.skin");var ok=["scope","og","red","leather","arcade"];if(k==="redact"&&localStorage.getItem("deadshot.clearance")==="1")ok.push("redact");document.documentElement.setAttribute("data-skin",ok.indexOf(k)>-1?k:"og");}catch(e){document.documentElement.setAttribute("data-skin","og");}})();</script>
+<script>(function(){try{var k=localStorage.getItem("deadshot.skin");var ok=["scope","og","red","leather","arcade"];if(k==="redact"&&localStorage.getItem("deadshot.clearance")==="1")ok.push("redact");document.documentElement.setAttribute("data-skin",ok.indexOf(k)>-1?k:"red");}catch(e){document.documentElement.setAttribute("data-skin","red");}})();</script>
 <div class="deco field" aria-hidden="true">
   <div class="stars s1"></div><div class="stars s2"></div><div class="stars s3"></div>
   <svg class="sky" viewBox="0 0 1600 900" preserveAspectRatio="none">
@@ -1193,9 +1195,7 @@ BODY = r"""
       <div class="card-h"><h3>Power Index by manager and season</h3><span class="sub" id="piLegend"></span></div>
       <div class="card-b scroll"><table class="heat" id="tHeat"></table></div>
     </div>
-  </section>
-  <section id="rankings">
-    <div class="sec-head"><h2>Power Rankings</h2><div class="rule-note">The ten active managers · live model</div></div>
+  <div class="sub-h" style="margin-top:34px">Power Rankings &middot; the ten active managers, live model</div>
     <p class="lede">Not a career table, a <strong>forward-looking</strong> one. It weights recent seasons above old ones, shrinks small samples toward the league mean, and ignores win-loss record entirely in favour of scoring, because record carries luck and scoring does not. Drag the slider to change how hard the model discounts the past and watch the order move.</p>
     <div class="card">
       <div class="card-h"><h3>Going into <span id="nextYr"></span></h3>
@@ -1318,10 +1318,7 @@ BODY = r"""
       <div class="card-h"><h3>Playoff résumé</h3><span class="gl" data-gl="expT" tabindex="0">?</span><span class="sub" id="poSub">Sorted: playoff wins</span></div>
       <div class="scroll"><table id="tPO"></table></div>
     </div>
-  </section>
-
-  <section id="fivehundred">
-    <div class="sec-head"><h2>The .500 Line</h2><div class="rule-note">Who lives above it, who lives under it<br>Sorted: games clear of even</div></div>
+  <div class="sub-h" style="margin-top:34px">The .500 Line &middot; who lives above it, who lives under it</div>
     <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager's record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
     <div class="card">
       <div class="card-h"><h3>Above and below</h3><span class="gl" data-gl="five" tabindex="0">?</span>
@@ -1334,10 +1331,14 @@ BODY = r"""
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
     <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
-    <div id="recs"></div>
-    <div class="card" style="margin-top:22px">
-      <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
-      <div class="card-b" id="mileWatch"></div>
+    <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
+      <span class="sub" style="margin-left:9px" id="recsCount"></span></div>
+    <div id="recsWrap" hidden>
+      <div id="recs"></div>
+      <div class="card" style="margin-top:22px">
+        <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
+        <div class="card-b" id="mileWatch"></div>
+      </div>
     </div>
   </section>
 
@@ -1362,7 +1363,7 @@ BODY = r"""
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
         <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select>
-        <button id="cmpShare" style="padding:7px 13px;margin-left:6px">&#8593; Share</button></div></div>
+        <button id="cmpShare" class="on" style="padding:7px 14px;margin-left:8px">&#8593; Share this matchup</button></div></div>
       <div class="card-b" id="cmpOut"></div>
     </div>
     <div class="card">
@@ -1603,8 +1604,8 @@ $('#f1').textContent=SEA.length;$('#f2').textContent=M.length;$('#f3').textConte
 $('#nextYr').textContent=LAST+1;
 
 /* nav */
-const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],['rankings','Power Rankings'],
- ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],['fivehundred','.500 Line'],
+const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
+ ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],
  ['records','Records'],['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],['method','Method']];
 $('#nav').innerHTML=SECS.map(([i,t])=>`<a href="#${i}" data-id="${i}">${t}</a>`).join('');
 /* the nav scrolls on every width; it just should not look like it does */
@@ -1942,7 +1943,7 @@ function botCall(){
       if(n>=5){document.body.classList.remove('quake');void document.body.offsetWidth;document.body.classList.add('quake');}
     }});})();
 $$('[data-skin-btn]').forEach(b=>b.onclick=()=>setSkin(b.dataset.skinBtn,true));
-(function(){let k='og';try{k=localStorage.getItem('deadshot.skin')||'og';}catch(e){}
+(function(){let k='red';try{k=localStorage.getItem('deadshot.skin')||'red';}catch(e){}
   if(k===SECRET&&!unlocked())k='og';
   const use=SKINS.includes(k)?k:'og';
   document.documentElement.setAttribute('data-skin',use);
@@ -2839,6 +2840,18 @@ function drawRecords(){
   glossify($('#recs'));
 }
 drawRecords(); REDRAW.push(drawRecords);
+/* The record book is 21 tables and the milestone list. Collapsed by default so the
+   sections below it are reachable without a long scroll. */
+(function(){
+  const t=$('#recsToggle'), w=$('#recsWrap'), c=$('#recsCount');
+  if(!t||!w)return;
+  const sync=()=>{const open=!w.hidden;
+    t.innerHTML=open?'Hide the record book &#9652;':'Show the record book &#9662;';
+    t.classList.toggle('on',open);
+    if(c)c.textContent=open?'':`${$$('#recs .card').length||21} tables`;};
+  t.onclick=()=>{w.hidden=!w.hidden;sync();};
+  sync();
+})();
 
 /* ============ seasons + real bracket ============ */
 const ORD=['Quarterfinal','Semifinal','5th Place Game','Final','3rd Place Game'];
@@ -3368,7 +3381,11 @@ function cardPalette(){
   const bg=hex(cssv('--mast-bg'))||'#12161B';
   const ink=hex(cssv('--mast-ink'))||'#F6F1E6';
   const dim=hex(cssv('--mast-sub'))||'#8C97A3';
-  const accent=hex(cssv('--brass'))||'#C8A24A';
+  let accent=hex(cssv('--brass'))||'#C8A24A';
+  /* Crimson defines --brass and --mast-bg as the same #8E1520, so the accent would be
+     drawn in exactly the background colour. Fall back to the masthead's own highlight. */
+  if(contrastHex(accent,bg)<2.4) accent=hex(cssv('--mast-kick'))||hex(cssv('--mast-sub'))||ink;
+  if(contrastHex(accent,bg)<2.4) accent=ink;
   const rr=parseInt(accent.slice(1,3),16), gg=parseInt(accent.slice(3,5),16), bb=parseInt(accent.slice(5,7),16);
   /* a light masthead needs a far gentler wash than a near-black one */
   const lum=(0.2126*rr+0.7152*gg+0.0722*bb)/255;
@@ -4310,8 +4327,8 @@ SHELL_TOP = '''<!doctype html>
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%2312161B'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23C8A24A' stroke-width='9'/%3E%3Cg stroke='%23C8A24A' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23C8A24A'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%2312161B'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23C8A24A' stroke-width='9'/%3E%3Cg stroke='%23C8A24A' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23C8A24A'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%238E1520'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23FFFFFF' stroke-width='9'/%3E%3Cg stroke='%23FFFFFF' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23FFFFFF'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%238E1520'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23FFFFFF' stroke-width='9'/%3E%3Cg stroke='%23FFFFFF' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23FFFFFF'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#12161B">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
