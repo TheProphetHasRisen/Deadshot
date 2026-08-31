@@ -1147,7 +1147,7 @@ BODY = r"""
   </section>
   <section id="power">
     <div class="sec-head"><h2>Power Index<span class="gl" data-gl="pi" tabindex="0">?</span></h2><div class="rule-note">Sorted: seasons played, then surname<br>Click a row to lock it — stacks with others</div></div>
-    <p class="lede"><strong>100 is exactly average for that season.</strong> 112 means you scored 12% more than the typical team that year. Because it is re-based every season it survives scoring inflation — a 110 in 2015 and a 110 in 2025 are the same achievement, even though the league scored 12% more points in 2025.</p>
+    <p class="lede"><strong>100 is exactly average for that season.</strong> 112 means you scored 12% more than the typical team that year. Because it is re-based every season it survives scoring inflation: a 110 in 2015 and a 110 in 2025 are the same achievement, even though the league scored 12% more points in 2025.</p>
     <div class="card">
       <div class="card-h"><h3>Power Index by manager and season</h3><span class="sub" id="piLegend"></span></div>
       <div class="card-b scroll"><table class="heat" id="tHeat"></table></div>
@@ -1155,7 +1155,7 @@ BODY = r"""
   </section>
   <section id="rankings">
     <div class="sec-head"><h2>Power Rankings</h2><div class="rule-note">The ten active managers · live model</div></div>
-    <p class="lede">Not a career table — a <strong>forward-looking</strong> one. It weights recent seasons above old ones, shrinks small samples toward the league mean, and ignores win-loss record entirely in favour of scoring, because record carries luck and scoring does not. Drag the slider to change how hard the model discounts the past and watch the order move.</p>
+    <p class="lede">Not a career table, a <strong>forward-looking</strong> one. It weights recent seasons above old ones, shrinks small samples toward the league mean, and ignores win-loss record entirely in favour of scoring, because record carries luck and scoring does not. Drag the slider to change how hard the model discounts the past and watch the order move.</p>
     <div class="card">
       <div class="card-h"><h3>Going into <span id="nextYr"></span></h3>
         <div class="right">
@@ -1180,14 +1180,14 @@ BODY = r"""
       <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
       <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>brightest is most recent</strong>. Each line is labelled with its year and the team name that year &mdash; the names change, the manager does not. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>brightest is most recent</strong>. Each line is labelled with its year and the team name that year. The names change, the manager does not. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
     </div>
   </section>
 
 
   <section id="shape">
     <div class="sec-head"><h2>Season Shape</h2><div class="rule-note">Was it a dogfight or a walkover?</div></div>
-    <p class="lede">A league average hides the interesting part. These show <strong>how spread out</strong> the league was each year — whether everyone was bunched together or three teams ran away with it.</p>
+    <p class="lede">A league average hides the interesting part. These show <strong>how spread out</strong> the league was each year, whether everyone was bunched together or three teams ran away with it.</p>
     <div class="card">
       <div class="card-h"><h3>Every team, every season</h3><span class="sub">Each dot is one team's Power Index · champions in gold · hover to preview, click to lock — as many as you like</span><div class="right"><button id="spotClear" style="display:none">Clear selection</button></div></div>
       <div class="card-b"><div class="chart" id="strip"></div></div>
@@ -1207,7 +1207,7 @@ BODY = r"""
 
   <section id="weekly">
     <div class="sec-head"><h2>Week by Week</h2><div class="rule-note">Every matchup · every projection · every trade</div></div>
-    <p class="lede">Season totals can only ever <em>estimate</em> luck; <strong>weekly scores measure it directly.</strong> Pick a season — the whole section below re-reads. Greyed years have no game log loaded yet. This section always shows <strong>every manager who played that year</strong>; the manager filter above governs the all-time sections only.</p>
+    <p class="lede">Season totals estimate luck. <strong>Weekly scores measure it.</strong> Choose a season below and every card in this section follows it. Greyed years have no game log yet. These cards always show everyone who played that season, so the manager filter at the top does not apply here.</p>
     <div class="pills" id="wkYears"></div>
 
     <div class="card">
@@ -1215,7 +1215,7 @@ BODY = r"""
         <span class="sub">Rank 1 at the top · click any number of teams to lock them</span></div>
       <div class="card-b" style="padding-bottom:6px"><div class="pills" id="raceLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="race"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for — the same tiebreak the league uses. The shaded band is that season's playoff field &mdash; <span id="raceSpots"></span>. Every dot is a distinct position, so hovering one is never ambiguous even where lines cross. The dashed tail past the divider is the postseason: where each team actually finished.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, the same tiebreak the league uses. The shaded band is that season's playoff field: <span id="raceSpots"></span>.</p></div>
     </div>
 
     <div class="card">
@@ -1227,7 +1227,7 @@ BODY = r"""
 
     <div class="card">
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
-      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">The grey number under every score is what the site projected. Consistently clearing it means your start/sit calls and waiver pickups were working &mdash; though a good chunk of this is noise, so read the per-week column, not the season total.</p></div>
+      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week's score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
@@ -1261,7 +1261,7 @@ BODY = r"""
 
   <section id="advanced">
     <div class="sec-head"><h2>Advanced</h2><div class="rule-note">Consistency · Z-score · Playoffs</div></div>
-    <p class="lede">Everything here comes from season totals and the playoff game log, so it spans all ten seasons. The Week by Week section goes deeper but only for the years whose game logs are loaded.</p>
+    <p class="lede">These measures are built from season totals and the playoff game log, so they cover all ten seasons. The Week by Week section examines the same ground in more detail, but only for the years with a game log loaded.</p>
     <div class="card">
       <div class="card-h"><h3>Consistency, form and Z-score</h3><span class="gl" data-gl="z" tabindex="0">?</span><span class="sub" id="advSub"></span>
         <div class="right">
@@ -1281,7 +1281,7 @@ BODY = r"""
 
   <section id="fivehundred">
     <div class="sec-head"><h2>The .500 Line</h2><div class="rule-note">Who lives above it, who lives under it<br>Sorted: games clear of even</div></div>
-    <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career &mdash; the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager's record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
+    <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager's record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
     <div class="card">
       <div class="card-h"><h3>Above and below</h3><span class="gl" data-gl="five" tabindex="0">?</span>
         <span class="sub">Career &middot; every manager</span>
@@ -1292,7 +1292,7 @@ BODY = r"""
 
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong> &mdash; one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
     <div id="recs"></div>
   </section>
 
@@ -1333,7 +1333,7 @@ BODY = r"""
 
   <section id="trades-sec">
     <div class="sec-head"><h2>Trade Market</h2><div class="rule-note">Who deals, and who they deal with<br>2021&ndash;2025 &middot; the years with logs</div></div>
-    <p class="lede">Every trade in the five seasons whose transaction logs are loaded. A trade counts once for each side, so the two managers in a deal each get credit for it. <em>In</em> and <em>out</em> count players, not deals &mdash; a three-for-one shows up as 3 in and 1 out for the side receiving three.</p>
+    <p class="lede">Every trade in the five seasons whose transaction logs are loaded. A trade counts once for each side, so the two managers in a deal each get credit for it. In and out count players, not deals: a three-for-one shows up as 3 in and 1 out for the side receiving three.</p>
     <div class="card">
       <div class="card-h"><h3>Trade ledger</h3><span class="gl" data-gl="trade" tabindex="0">?</span><span class="sub" id="trLedSub"></span></div>
       <div class="scroll"><table id="tTrLed"></table></div>
@@ -1357,7 +1357,7 @@ BODY = r"""
     <div class="card" style="margin-bottom:18px">
       <div class="card-h"><h3>League rules</h3><span class="sub">Read from Yahoo &middot; league 526001 &middot; 26 Aug 2026</span></div>
       <div class="card-b">
-        <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: <strong>Deadshot is full PPR</strong> &mdash; a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
+        <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
         <div class="rules">
           <div><h4>Format</h4><ul>
             <li>10 teams &middot; head-to-head &middot; scoring from week 1</li>
@@ -2452,6 +2452,25 @@ function drawHeat(){
   $$('#tHeat td.h[data-k]').forEach(td=>{const r=pi[td.dataset.k];
     bindTip(td,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b> · ${r.ppg.toFixed(2)} PPG vs league ${r.lg.toFixed(2)}<br>${r.w}-${r.l}${r.t?'-'+r.t:''} · finished ${ord(r.place)}<br><i>click to open ${r.y}</i>`);
     td.onclick=()=>{LOCKTEAM=r.team;drawSeason(+td.dataset.y);$('#seasons').scrollIntoView({behavior:'smooth'});};});
+  /* hovering the name gives the whole career at once, so the row reads as a story
+     rather than ten separate numbers */
+  const rank={}; [...order].sort((a,b)=>b.cpi-a.cpi).forEach((m,i)=>rank[m.name]=i+1);
+  $$('#tHeat tbody tr[data-mgr] td.nm').forEach(td=>{
+    const name=td.closest('tr').dataset.mgr, m=M.filter(x=>x.name===name)[0];
+    if(!m)return;
+    const mine=ROWS.filter(r=>r.mgr===name);
+    const hi=mine.reduce((a,b)=>b.pi>a.pi?b:a), lo=mine.reduce((a,b)=>b.pi<a.pi?b:a);
+    const tit=m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):0;
+    const lines=[
+      `<b>${esc(name)}</b> &middot; ${m.seasons} season${m.seasons>1?'s':''}, ${m.first} to ${m.last}`,
+      `Record <b>${m.w}-${m.l}${m.t?'-'+m.t:''}</b> &middot; ${pct(m.winpct)} &middot; ${m.ppg.toFixed(1)} PPG`,
+      `Career power index <b>${m.cpi.toFixed(1)}</b> &middot; ${ord(rank[name])} of ${order.length} shown`,
+      `${tit?`<b>${tit} title${tit==1?'':'s'}</b> &middot; `:''}${m.podium} podium${m.podium===1?'':'s'} &middot; playoffs ${m.apps} of ${m.seasons}`,
+      `Best year ${hi.y} at ${hi.pi.toFixed(1)} &middot; worst ${lo.y} at ${lo.pi.toFixed(1)}`,
+      m.luck==null?'':(Math.abs(m.luck)<0.05?'Record matched the scoring almost exactly'
+        :`Record ${m.luck>0?'beat':'fell short of'} the scoring by <b>${Math.abs(m.luck).toFixed(1)}</b> win${Math.abs(m.luck)<1.05?'':'s'} across the career`)
+    ].filter(Boolean);
+    bindTip(td,lines.join('<br>')+'<br><i>click the name for the full card</i>');});
 }
 drawHeat(); REDRAW.push(drawHeat);
 
@@ -3446,7 +3465,7 @@ function drawWeekly(YR){
   ],K5.rivals,{rank:1,sort:4});}
   drawRiv(); push(drawRiv);
   const top=K5.rivals[0];
-  $('#rivPick').innerHTML=`<b>${esc(top.a)}</b> vs <b>${esc(top.b)}</b> — ${top.g} meeting${top.g>1?'s':''}, split ${top.aw}–${top.bw}, decided by an average of <b>${top.marg.toFixed(2)}</b> points. That is the rivalry-week fixture on the numbers.`;
+  $('#rivPick').innerHTML=`<b>${esc(top.a)}</b> vs <b>${esc(top.b)}</b>: ${top.g} meeting${top.g>1?'s':''}, split ${top.aw}–${top.bw}, decided by an average of <b>${top.marg.toFixed(2)}</b> points. That is the rivalry-week fixture on the numbers.`;
 
   /* weekly scoreboard */
   const wsel=$('#wkSel');
