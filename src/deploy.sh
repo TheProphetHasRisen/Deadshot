@@ -55,6 +55,16 @@ git -C "$CLONE" add index.html og.png
 if git -C "$CLONE" diff --cached --quiet; then
   echo "  index.html unchanged — nothing to deploy"; exit 0
 fi
+say "snapshot the page being replaced"
+mkdir -p "$CLONE/past"
+if [ -f "$CLONE/index.html" ]; then
+  PREV="$CLONE/past/index-$(git -C "$CLONE" log -1 --format=%cd --date=format:%Y-%m-%d-%H%M -- index.html 2>/dev/null || date +%Y-%m-%d-%H%M).html"
+  cp "$CLONE/index.html" "$PREV" 2>/dev/null || true
+fi
+# keep the ten most recent, drop the rest
+ls -1t "$CLONE/past"/index-*.html 2>/dev/null | tail -n +11 | while read -r old; do rm -f "$old"; done
+printf '  %s snapshots kept\n' "$(ls -1 "$CLONE/past"/index-*.html 2>/dev/null | wc -l | tr -d ' ')"
+git -C "$CLONE" add past
 git -C "$CLONE" commit -qm "Update index.html ($(date +%Y-%m-%d))"
 git -C "$CLONE" push -q origin "$BR"
 echo "  pushed to $REPO@$BR — Vercel will redeploy"

@@ -41,6 +41,18 @@ def weekly_sources():
     }
 
 
+def weekly_modules():
+    """The weekly modules themselves, for checks that need more than games+byes.
+
+    weekly_sources() deliberately returns only (games, byes); reaching for a module
+    attribute on that tuple silently yields nothing, which once made three shape
+    checks below into no-ops that always passed.
+    """
+    import weekly, weekly2024, weekly2023, weekly2022, weekly2021
+    return {2025: weekly, 2024: weekly2024, 2023: weekly2023,
+            2022: weekly2022, 2021: weekly2021}
+
+
 # ---------------------------------------------------------------- invariants
 def inv_pf_equals_pa():
     """League-wide points for must equal points against, to the cent.
@@ -196,12 +208,117 @@ def inv_playoffs_match_log():
 
 
 # ---------------------------------------------------------------------- main
+# ---------------------------------------------------------------------------
+# Shape checks.
+#
+# Everything above tests whether the numbers agree with each other. These test
+# whether the data is the right SHAPE: correct types, sane ranges, no blanks.
+# The arithmetic checks assume they can do arithmetic; a string where a float
+# belongs would blow up with a TypeError rather than a clear message, and a
+# silently negative or absurd value would pass every sum while still being wrong.
+#
+# This matters most for the Yahoo fetcher. A human transcribing a screenshot
+# makes plausible-looking mistakes that the arithmetic catches. A parser reading
+# someone else's JSON makes structural ones: a null where a number should be, a
+# string "12" instead of 12, a score of 0 for a week that was never played.
+
+def _is_num(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def inv_types_standings():
+    """Every standings field is the type and range it claims to be."""
+    for y, rows in D.STANDINGS.items():
+        for r in rows:
+            rank, team, W, L, T, pf, pa, mv = r
+            tag = f"{y} {team!r}"
+            check(isinstance(rank, int) and rank >= 1, f"{tag}: rank must be a positive whole number", repr(rank))
+            check(isinstance(team, str) and team.strip() != "", f"{tag}: team name must be a non-empty string")
+            for nm, v in (("W", W), ("L", L), ("T", T)):
+                check(isinstance(v, int) and v >= 0, f"{tag}: {nm} must be a whole number, zero or more", repr(v))
+            for nm, v in (("PF", pf), ("PA", pa)):
+                check(_is_num(v) and v > 0, f"{tag}: {nm} must be a positive number", repr(v))
+                # a full-PPR fantasy season sits far inside this range; anything outside
+                # it is a decimal-point or units error, not a real result
+                check(_is_num(v) and 400 <= v <= 4000, f"{tag}: {nm} is outside any plausible season total", repr(v))
+            check(mv is None or (isinstance(mv, int) and 0 <= mv <= 500),
+                  f"{tag}: roster moves must be a whole number or None", repr(mv))
+
+
+def inv_types_meta():
+    """SEASON_META describes a league that could actually exist."""
+    for y, meta in D.SEASON_META.items():
+        check(isinstance(y, int) and 1990 <= y <= 2100, f"SEASON_META key {y!r} is not a plausible year")
+        check(isinstance(meta, tuple) and len(meta) == 4,
+              f"SEASON_META[{y}] must be (teams, reg_games, playoff_spots, confirmed)", repr(meta))
+        if not (isinstance(meta, tuple) and len(meta) == 4):
+            continue
+        teams, g, spots, confirmed = meta
+        check(isinstance(teams, int) and 2 <= teams <= 32, f"SEASON_META[{y}]: team count out of range", repr(teams))
+        check(isinstance(g, int) and 1 <= g <= 20, f"SEASON_META[{y}]: regular season length out of range", repr(g))
+        check(isinstance(spots, int) and 1 <= spots <= teams,
+              f"SEASON_META[{y}]: playoff spots must be between 1 and the team count", repr(spots))
+        check(isinstance(confirmed, bool), f"SEASON_META[{y}]: confirmed flag must be True or False", repr(confirmed))
+
+
+def inv_types_weekly():
+    """Weekly rows are numbers, and nobody scored a negative or impossible total."""
+    for year, mod in weekly_modules().items():
+        games = getattr(mod, f"W{year}", [])
+        for g in games:
+            check(len(g) == 8, f"{year} weekly row has {len(g)} fields, expected 8", repr(g)[:90])
+            if len(g) != 8:
+                continue
+            wk, ta, aa, pa_, tb, ab, pb, br = g
+            tag = f"{year} wk{wk} {ta} vs {tb}"
+            check(isinstance(wk, int) and 1 <= wk <= 20, f"{tag}: week number out of range", repr(wk))
+            for nm, v in (("actual A", aa), ("projected A", pa_), ("actual B", ab), ("projected B", pb)):
+                check(_is_num(v), f"{tag}: {nm} must be a number", repr(v))
+                check(_is_num(v) and 0 < v < 400, f"{tag}: {nm} is outside any plausible weekly score", repr(v))
+            check(br in ("", "C", "S"), f"{tag}: bracket flag must be '', 'C' or 'S'", repr(br))
+            check(ta != tb, f"{tag}: a team cannot play itself")
+
+
+def inv_no_duplicate_matchups():
+    """The same two teams cannot appear twice in one week."""
+    for year, mod in weekly_modules().items():
+        seen = {}
+        for g in getattr(mod, f"W{year}", []):
+            if len(g) != 8:
+                continue
+            key = (g[0], frozenset((g[1], g[4])))
+            check(key not in seen, f"{year} week {g[0]}: {g[1]} vs {g[4]} appears more than once")
+            seen[key] = True
+
+
+def inv_trades_shape():
+    """Trades name two different teams and move at least one player each way."""
+    for year, mod in weekly_modules().items():
+        for t in getattr(mod, f"TRADES{year}", []):
+            check(len(t) == 5, f"{year} trade row has {len(t)} fields, expected 5", repr(t)[:80])
+            if len(t) != 5:
+                continue
+            date, pa_, ta, pb, tb = t
+            tag = f"{year} trade {date!r}"
+            check(isinstance(date, str) and date.strip() != "", f"{tag}: needs a date")
+            check(ta != tb, f"{tag}: both sides are the same team ({ta!r})")
+            for nm, side in (("first", pa_), ("second", pb)):
+                check(isinstance(side, list) and len(side) > 0, f"{tag}: {nm} side has no players", repr(side)[:60])
+                check(all(isinstance(x, str) and x.strip() for x in side),
+                      f"{tag}: {nm} side has a blank or non-text player name", repr(side)[:60])
+            known = {r[1] for r in D.STANDINGS.get(year, [])}
+            for team in (ta, tb):
+                check(team in known, f"{tag}: {team!r} did not play in {year}")
+
+
 def main():
     quiet = "--quiet" in sys.argv
     for fn in (inv_pf_equals_pa, inv_games_played, inv_wins_equal_losses,
                inv_standings_rows, inv_managers_cover_standings, inv_final_place,
                inv_weekly_reconciles, inv_weekly_shape, inv_playoff_games,
-               inv_playoffs_match_log):
+               inv_playoffs_match_log,
+               inv_types_standings, inv_types_meta, inv_types_weekly,
+               inv_no_duplicate_matchups, inv_trades_shape):
         fn()
 
     if FAILS:

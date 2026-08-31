@@ -179,6 +179,29 @@ champions · alltime · power · rankings · shape · weekly · luck · advanced
 fivehundred · records · seasons · h2h · trades-sec · method
 ```
 
+### Automatic checks, snapshots and shape validation (2026-08-31)
+
+- **`.github/workflows/checks.yml`** runs on every push, weekly on a schedule, and on
+  demand from the Actions tab. It runs `verify.py`, `test_writer.py`, rebuilds the site
+  from `src/`, confirms the rebuilt page matches the published one (ignoring the libm
+  float noise documented above), `node --check`s the inline script, and runs `test.js`
+  in a real browser. GitHub emails the owner on failure. This exists so the safety net
+  works when nobody is holding it, which matters most once the Yahoo fetcher is writing
+  data unattended.
+- **`verify.py` now also checks shape, not just arithmetic** — types, ranges, bracket
+  flags, duplicate matchups, trade structure. 517 checks became 7,468. The arithmetic
+  invariants catch the mistakes a human transcriber makes; these catch the ones a parser
+  makes (a null, a string where a float belongs, a score of 0 for a week never played).
+  Verified by injecting eleven faults and confirming every one is caught.
+- **A caution learned the hard way here:** `weekly_sources()` returns `(games, byes)`
+  tuples, not modules. Three of the new shape checks originally did
+  `getattr(mod, "W2025")` on that tuple, which silently returns nothing, so they ran
+  zero assertions and always passed. `weekly_modules()` now exists for checks that need
+  the module. **A check that cannot fail is worse than no check**, because it reads as
+  coverage. Test new invariants by breaking the data on purpose.
+- **`deploy.sh` snapshots the page it replaces** into `past/`, keeping the last ten.
+  Rolling back is copying one file, not reconstructing a build.
+
 ### site_data.json is stored readable, the page is not
 
 `export.py` writes `site_data.json` with `indent=1` — 21,471 short lines instead of one

@@ -1,0 +1,67 @@
+name: Data and build checks
+
+# Runs on every push, and once a week on its own so a problem gets noticed even
+# if nobody has touched the repo. GitHub emails the owner when a run fails.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 13 * * 1"     # Mondays, 13:00 UTC
+  workflow_dispatch:          # and a "Run workflow" button in the Actions tab
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+
+      - name: Check the league data
+        working-directory: src
+        run: python3 verify.py
+
+      - name: Check the writer round-trips
+        working-directory: src
+        run: python3 test_writer.py
+
+      - name: Rebuild the site from source
+        working-directory: src
+        run: |
+          python3 export.py > /dev/null
+          python3 mksite.py
+
+      - name: The rebuilt page must match the published one
+        run: |
+          python3 - <<'PY'
+          import io, sys, re
+          def body(p):
+              s = io.open(p, encoding='utf-8').read()
+              # the embedded data carries libm float noise that differs per machine;
+              # HANDOFF section 3 documents why that is expected and not a regression
+              return re.sub(r'<script>const DATA = .*?</script>', '<script>DATA</script>', s, flags=re.S)
+          a, b = body('index.html'), body('src/index.html')
+          if a != b:
+              print("The published index.html does not match a rebuild from src/.")
+              print("Someone edited the built file directly, or forgot to run deploy.sh.")
+              sys.exit(1)
+          print("published page matches a fresh rebuild (ignoring float noise)")
+          PY
+
+      - name: Check the page's JavaScript parses
+        run: |
+          python3 - <<'PY'
+          import re, io
+          h = io.open('src/index.html', encoding='utf-8').read()
+          io.open('/tmp/site.js','w',encoding='utf-8').write(max(re.findall(r'<script>(.*?)</script>', h, re.S), key=len))
+          PY
+          node --check /tmp/site.js
+
+      - name: Structural audit in a real browser
+        working-directory: src
+        run: |
+          npm i --no-save playwright >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+          node test.js
