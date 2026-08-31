@@ -2452,25 +2452,33 @@ function drawHeat(){
   $$('#tHeat td.h[data-k]').forEach(td=>{const r=pi[td.dataset.k];
     bindTip(td,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b> · ${r.ppg.toFixed(2)} PPG vs league ${r.lg.toFixed(2)}<br>${r.w}-${r.l}${r.t?'-'+r.t:''} · finished ${ord(r.place)}<br><i>click to open ${r.y}</i>`);
     td.onclick=()=>{LOCKTEAM=r.team;drawSeason(+td.dataset.y);$('#seasons').scrollIntoView({behavior:'smooth'});};});
-  /* hovering the name gives the whole career at once, so the row reads as a story
-     rather than ten separate numbers */
-  const rank={}; [...order].sort((a,b)=>b.cpi-a.cpi).forEach((m,i)=>rank[m.name]=i+1);
+  /* One line of character, not a second stat table. Thresholds are set from the real
+     spread of this league (cpi 78-107, luck -12.3 to +9.1, trend -8.0 to +3.0), so each
+     rule actually catches somebody rather than being a guess. First match wins. */
+  function mgrVibe(m){
+    const t=m.titles||0, pod=m.podium||0, ap=m.apps||0, sz=m.seasons||0;
+    const cpi=m.cpi, luck=m.luck||0, tr=m.trend||0, rate=sz?ap/sz:0;
+    if(sz===1&&cpi<90)   return 'One season, and it went badly enough that nobody brings it up.';
+    if(sz===1&&pod>=1)   return 'One season, one trip to the podium, then gone.';
+    if(sz===1)           return 'A single season on the books, too brief to judge.';
+    if(t>=2)             return 'As decorated as this league gets.';
+    if(luck<=-8)         return 'The scoring deserved far better than the record ever showed.';
+    if(luck>=8.5)        return 'Has had the schedule on his side more than anyone.';
+    if(t>=1&&tr>=2.5)    return 'Holds the newest trophy and is still climbing.';
+    if(t>=1&&rate>=0.7)  return 'A permanent fixture in the bracket, with a title to prove it.';
+    if(tr<=-5)           return 'Used to be a problem. Not lately.';
+    if(pod>=3&&t<1)      return 'Always in the last room of the season, never the one leaving with it.';
+    if(t>0&&t<1)         return 'Owns a share of a title, and will mention it.';
+    if(t>=1)             return 'Has a ring, which settles most arguments.';
+    if(cpi>=103)         return 'Scores like a contender without the trophies to match.';
+    if(ap===0&&sz>=2)    return 'Still waiting on a first playoff appearance.';
+    if(cpi<=95)          return 'Has spent most of league history playing catch-up.';
+    if(tr>=2)            return 'Trending up sharply enough that people have noticed.';
+    return 'Steady, mid-table, rarely the story.';
+  }
   $$('#tHeat tbody tr[data-mgr] td.nm').forEach(td=>{
     const name=td.closest('tr').dataset.mgr, m=M.filter(x=>x.name===name)[0];
-    if(!m)return;
-    const mine=ROWS.filter(r=>r.mgr===name);
-    const hi=mine.reduce((a,b)=>b.pi>a.pi?b:a), lo=mine.reduce((a,b)=>b.pi<a.pi?b:a);
-    const tit=m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):0;
-    const lines=[
-      `<b>${esc(name)}</b> &middot; ${m.seasons} season${m.seasons>1?'s':''}, ${m.first} to ${m.last}`,
-      `Record <b>${m.w}-${m.l}${m.t?'-'+m.t:''}</b> &middot; ${pct(m.winpct)} &middot; ${m.ppg.toFixed(1)} PPG`,
-      `Career power index <b>${m.cpi.toFixed(1)}</b> &middot; ${ord(rank[name])} of ${order.length} shown`,
-      `${tit?`<b>${tit} title${tit==1?'':'s'}</b> &middot; `:''}${m.podium} podium${m.podium===1?'':'s'} &middot; playoffs ${m.apps} of ${m.seasons}`,
-      `Best year ${hi.y} at ${hi.pi.toFixed(1)} &middot; worst ${lo.y} at ${lo.pi.toFixed(1)}`,
-      m.luck==null?'':(Math.abs(m.luck)<0.05?'Record matched the scoring almost exactly'
-        :`Record ${m.luck>0?'beat':'fell short of'} the scoring by <b>${Math.abs(m.luck).toFixed(1)}</b> win${Math.abs(m.luck)<1.05?'':'s'} across the career`)
-    ].filter(Boolean);
-    bindTip(td,lines.join('<br>')+'<br><i>click the name for the full card</i>');});
+    if(m)bindTip(td,`<b>${esc(name)}</b><br>${mgrVibe(m)}`);});
 }
 drawHeat(); REDRAW.push(drawHeat);
 
