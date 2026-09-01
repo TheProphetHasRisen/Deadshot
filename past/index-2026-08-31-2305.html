@@ -6,9 +6,11 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%2312161B'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23C8A24A' stroke-width='9'/%3E%3Cg stroke='%23C8A24A' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23C8A24A'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%2312161B'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23C8A24A' stroke-width='9'/%3E%3Cg stroke='%23C8A24A' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23C8A24A'/%3E%3C/svg%3E">
-<meta name="theme-color" content="#12161B">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#8E1520">
+<link rel="canonical" href="https://deadshot-iota.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
 <meta property="og:title" content="Deadshot Record Book">
@@ -72,7 +74,7 @@
   --mast-rule:#6E0F18; --mast-glow:rgba(0,0,0,.28); --mast-glow2:transparent;
   --head-ink:#1A1210; --hover:#FBF4F3; --nav-bg:rgba(255,255,255,.94); --ov:rgba(26,18,16,.62);
   --band:rgba(142,21,32,.055); --glow:rgba(142,21,32,.5);
-  --rt:#FFFFFF; --rt-grid:#B8434C; --rt-ring:#6E0F18; --rt-g1:#7A1119; --rt-g2:#5C0B12;
+  --rt:#FFFFFF; --rt-sweep:.30; --rt-grid:#B8434C; --rt-ring:#6E0F18; --rt-g1:#7A1119; --rt-g2:#5C0B12;
   --grid-h:transparent; --grid-v:transparent; --mast-grid:#A32732; --mast-vig:transparent; --tex:none;
   --card-r:3px; --tex-size:auto; --rule-style:solid;
 }
@@ -184,7 +186,7 @@
   --mast-rule:#6B4028; --mast-glow:rgba(0,0,0,.5); --mast-glow2:rgba(255,255,255,.12);
   --head-ink:#FFFFFF; --hover:#552C1A; --nav-bg:rgba(53,25,15,.95); --ov:rgba(20,9,5,.84);
   --band:rgba(255,255,255,.05); --glow:rgba(255,255,255,.55);
-  --rt:#FFFFFF; --rt-grid:#7A5238; --rt-ring:#2A1209; --rt-g1:#4A2614; --rt-g2:#2A1209;
+  --rt:#FFFFFF; --rt-sweep:.34; --rt-grid:#7A5238; --rt-ring:#2A1209; --rt-g1:#4A2614; --rt-g2:#2A1209;
   --grid-h:transparent; --grid-v:transparent; --mast-grid:transparent; --mast-vig:rgba(20,9,5,.5);
   --tex:radial-gradient(circle at 30% 30%,rgba(255,232,214,.05) .9px,transparent 1.4px),
         radial-gradient(circle at 70% 70%,rgba(0,0,0,.16) 1px,transparent 1.5px);
@@ -246,6 +248,11 @@
 [data-skin="leather"] .laces{display:none}
 @media(max-width:1080px){[data-skin="leather"] .deco{display:none}
 .laces{display:none}}
+/* Every masthead decoration is a 1400x170 SVG drawn with preserveAspectRatio="none".
+   On a phone that squashes it about 3.6:1, which distorts its shapes and drags them
+   across the stat line. They are decoration only, so drop them on small screens.
+   Same trap the redacted dossier hit at 7.2:1. */
+@media(max-width:700px){.mast .deco{display:none!important}}
 /* ================= ARCADE: full-page background field ================= */
 [data-skin="arcade"] .field{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .field .stars{position:absolute;top:-8%;left:0;width:200%;height:116%;background-repeat:repeat;will-change:transform}
@@ -688,6 +695,13 @@ a{color:var(--brass)}
 .mast-in{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:16px 32px;
   padding:26px 22px 24px;max-width:var(--max);margin:0 auto}
 .scope{flex:0 0 auto;width:126px;height:126px;filter:drop-shadow(0 0 11px var(--mast-glow))}
+/* the reticle grid becomes a football field on Pigskin: yard lines, sidelines, hashes */
+.scope .sw0{stop-opacity:0}
+.scope .sw1{stop-opacity:calc(var(--rt-sweep,.62) * .42)}
+.scope .sw2{stop-opacity:var(--rt-sweep,.62)}
+.scope .rt-grid-field{display:none}
+[data-skin="leather"] .scope .rt-grid-plain{display:none}
+[data-skin="leather"] .scope .rt-grid-field{display:block}
 .scope .sweep{animation:scopeSpin 5.5s linear infinite;transform-origin:60px 60px}
 @keyframes scopeSpin{to{transform:rotate(360deg)}}
 /* the contact only exists on the redacted file: the sweep passes it once per rotation
@@ -695,9 +709,11 @@ a{color:var(--brass)}
 .scope .blip{opacity:0}
 [data-skin="redact"] .scope .blip{animation:blipPing 5.5s linear infinite}
 [data-skin="redact"] .scope .blip-ring{animation:blipRing 5.5s linear infinite;transform-origin:84px 41px}
-@keyframes blipPing{0%,2%{opacity:0}4.5%{opacity:1}14%{opacity:.7}30%,100%{opacity:0}}
-@keyframes blipRing{0%,2%{transform:scale(1);opacity:0}4.5%{transform:scale(1);opacity:.85}
-  36%,100%{transform:scale(3.4);opacity:0}}
+/* the wedge is bright at its LEADING edge, which sits at rot+42 and crosses the blip
+   at rot 9.6deg = 2.7% of the cycle. Ping there, sharply, then fade out. */
+@keyframes blipPing{0%,2.4%{opacity:0}3.4%{opacity:1}9%{opacity:.5}17%,100%{opacity:0}}
+@keyframes blipRing{0%,2.4%{transform:scale(1);opacity:0}3.4%{transform:scale(1);opacity:.9}
+  19%,100%{transform:scale(3.6);opacity:0}}
 [data-skin="redact"] .scope{filter:drop-shadow(0 0 13px var(--mast-glow)) drop-shadow(0 0 2px rgba(200,162,74,.35))}
 @media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}
   [data-skin="redact"] .scope .blip,[data-skin="redact"] .scope .blip-ring{animation:none}
@@ -715,7 +731,14 @@ a{color:var(--brass)}
 .fact b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:21px;line-height:1.15;color:var(--mast-kick);
   font-variant-numeric:tabular-nums}
 .fact span{font-size:9.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--mast-sub);opacity:.8;font-family:"IBM Plex Mono",monospace}
-@media(max-width:640px){.scope{width:88px;height:88px}.facts{gap:14px}.fact b{font-size:17px}}
+@media(max-width:640px){.scope{width:64px;height:64px}
+  .mast-in{padding:15px 16px 14px;gap:10px 18px}
+  .mast h1{font-size:clamp(34px,10.5vw,92px);letter-spacing:.04em}
+  .kicker{font-size:9px;letter-spacing:.26em}
+  .facts{gap:10px 14px;margin-top:2px}
+  .fact{padding-left:9px}
+  .fact b{font-size:15px}.fact span{font-size:8.5px;letter-spacing:.1em}
+  .mast .sub-wm{font-size:19px}}
 .navmark{flex:0 0 auto;display:flex;align-items:center;padding:0 10px 0 4px;position:sticky;left:0;z-index:5;background:linear-gradient(var(--nav-bg),var(--nav-bg)),linear-gradient(var(--nav-bg),var(--nav-bg));box-shadow:-16px 0 0 var(--nav-bg),-16px 0 0 var(--nav-bg)}
 .navmark svg{width:18px;height:18px;opacity:.9}
 nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
@@ -742,6 +765,32 @@ nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visibl
 section{padding:52px 0 6px;scroll-margin-top:96px}
 .fb{border-top:1px solid var(--rule-2);background:var(--surface)}
 .fb-in{display:flex;gap:7px;align-items:center;max-width:var(--max);margin:0 auto;padding:7px 22px;flex-wrap:wrap}
+.skip{position:absolute;left:-9999px;top:0;z-index:500;padding:12px 18px;
+  background:var(--brass);color:var(--surface);font-family:"IBM Plex Mono",monospace;
+  font-size:13px;font-weight:600;text-decoration:none;border-radius:0 0 4px 0}
+.skip:focus{left:0}
+@media(pointer:coarse){
+  /* WCAG asks for roughly 44px of touch target. These controls were 25-27px, which is
+     a lot of mis-taps on a phone. Grow the hit area, not the visual weight. */
+  nav a{padding-top:15px;padding-bottom:15px}
+  .fb-in button,.fb-in select,.pills button,.card-h button,.card-h .right button{
+    min-height:40px;padding-top:9px;padding-bottom:9px}
+  .chip{min-height:38px;display:inline-flex;align-items:center}
+  .fb-sum{min-height:46px}
+  #recsToggle,#toTop,.wrapBtn{min-height:44px}
+}
+.fb-sum{display:none}
+@media(max-width:760px){
+  .fb-sum{display:flex;width:100%;align-items:center;gap:8px;padding:9px 16px;
+    background:none;border:0;border-radius:0;cursor:pointer;text-align:left;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-2)}
+  .fb-sum b{color:var(--brass);font-weight:600}
+  .fb-sum .ar{margin-left:auto;transition:transform .18s}
+  .fb.open .fb-sum .ar{transform:rotate(180deg)}
+  .fb .fb-in{display:none}
+  .fb.open .fb-in{display:flex;padding-top:0;padding-bottom:10px}
+}
 .fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
 .fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}
 .fb-in [data-skin-btn]{padding:4px 9px}
@@ -777,7 +826,7 @@ tr.off{opacity:.3}
 .card-h .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .card-b{padding:16px}
 .scroll{overflow-x:auto}
-.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,196px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
 .plate{background:var(--surface);color:var(--ink);padding:15px 16px 14px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:background .12s;border:0;text-align:left;font-family:inherit;font-size:inherit;color:inherit}
 .plate:hover{background:var(--surface-2)}
 .plate{position:relative}
@@ -824,7 +873,7 @@ tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6p
 .chip.y{background:var(--brass-wash);border-color:var(--brass-2);color:var(--brass)}
 table.heat td.h{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:0;width:52px;border:1px solid var(--surface)}
 table.heat td.h span{display:block;padding:7px 0;border-radius:2px;cursor:pointer}
-table.heat td.h.e span{color:var(--ink-3);opacity:.35;cursor:default}
+table.heat td.h.e span{color:var(--ink-2);opacity:.85;cursor:default}
 button,select,input{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:2px;padding:5px 10px;cursor:pointer}
 input{cursor:text}
 button:hover,select:hover{border-color:var(--brass-2)}
@@ -885,7 +934,7 @@ footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 46px;colo
 table.mtx th.v{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;padding:8px 3px;text-align:left;height:118px;white-space:nowrap;position:static}
 table.mtx td{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:0;border:1px solid var(--surface);width:42px}
 table.mtx td span{display:block;padding:6px 0;border-radius:2px}
-table.mtx td.self span{background:var(--rule-2);color:var(--ink-3)}
+table.mtx td.self span{background:var(--rule-2);color:var(--ink-2)}
 table.mtx th.rw{font-size:12px;text-align:left;font-family:"IBM Plex Sans",sans-serif;font-weight:600;
   position:sticky;left:0;z-index:4;background:var(--surface);text-transform:none;letter-spacing:0;
   box-shadow:1px 0 0 var(--rule)}
@@ -909,9 +958,9 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 .modal-h .sub{font-size:11.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
 .xbtn{margin-left:auto;font-size:16px;line-height:1;padding:6px 11px}
 .modal-b{padding:20px 22px 26px;overflow-x:hidden}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,104px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:20px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:20px}
 .tile{background:var(--surface);color:var(--ink);padding:11px 13px}
-.tile b{display:block;font-family:Fraunces,serif;font-weight:700;font-size:22px;line-height:1.15;font-variation-settings:"opsz" 40}
+.tile b{display:block;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-weight:600;font-size:19.5px;line-height:1.2;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tile span{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
 .sub-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--brass);font-family:"IBM Plex Mono",monospace;font-weight:600;margin:22px 0 9px}
 .sub-h:first-child{margin-top:0}
@@ -989,7 +1038,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 </head>
 <body>
 
-<script>(function(){try{var k=localStorage.getItem("deadshot.skin");var ok=["scope","og","red","leather","arcade"];if(k==="redact"&&localStorage.getItem("deadshot.clearance")==="1")ok.push("redact");document.documentElement.setAttribute("data-skin",ok.indexOf(k)>-1?k:"og");}catch(e){document.documentElement.setAttribute("data-skin","og");}})();</script>
+<script>(function(){try{var k=localStorage.getItem("deadshot.skin");var ok=["scope","og","red","leather","arcade"];if(k==="redact"&&localStorage.getItem("deadshot.clearance")==="1")ok.push("redact");document.documentElement.setAttribute("data-skin",ok.indexOf(k)>-1?k:"red");}catch(e){document.documentElement.setAttribute("data-skin","red");}})();</script>
 <div class="deco field" aria-hidden="true">
   <div class="stars s1"></div><div class="stars s2"></div><div class="stars s3"></div>
   <svg class="sky" viewBox="0 0 1600 900" preserveAspectRatio="none">
@@ -1040,7 +1089,8 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
   <div class="rng"></div>
   <div class="hud"><b>DEADSHOT</b> &middot; OPTIC LIVE<br>MIL-DOT &middot; 10&times;<br>HOLD CENTRE</div>
 </div>
-<div class="mast"><div class="mast-in">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="mast"><div class="mast-in">
     <svg class="scope" viewBox="0 0 120 120" role="img" aria-label="Deadshot crosshair">
       <defs>
         <clipPath id="ck"><circle cx="60" cy="60" r="52"/></clipPath>
@@ -1048,16 +1098,28 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
           <stop offset="0" stop-color="var(--rt-g1)"/><stop offset="1" stop-color="var(--rt-g2)"/>
         </radialGradient>
         <linearGradient id="swp" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stop-color="var(--rt)" stop-opacity="0"/>
-          <stop offset=".5" stop-color="var(--rt)" stop-opacity=".26"/>
-          <stop offset="1" stop-color="var(--rt)" stop-opacity=".62"/>
+          <stop class="sw0" offset="0" stop-color="var(--rt)"/>
+          <stop class="sw1" offset=".5" stop-color="var(--rt)"/>
+          <stop class="sw2" offset="1" stop-color="var(--rt)"/>
         </linearGradient>
       </defs>
       <circle cx="60" cy="60" r="55" fill="none" stroke="var(--rt-ring)" stroke-width="6"/>
       <circle cx="60" cy="60" r="52" fill="url(#glass)"/>
-      <g clip-path="url(#ck)" stroke="var(--rt-grid)" stroke-width=".7" opacity=".65">
+      <g clip-path="url(#ck)" class="rt-grid-plain" stroke="var(--rt-grid)" stroke-width=".7" opacity=".65">
         <path d="M12 24H108M12 36H108M12 48H108M12 60H108M12 72H108M12 84H108M12 96H108"/>
         <path d="M24 12V108M36 12V108M48 12V108M60 12V108M72 12V108M84 12V108M96 12V108"/>
+      </g>
+      <g clip-path="url(#ck)" class="rt-grid-field" aria-hidden="true">
+        <g stroke="var(--rt-grid)" stroke-width=".7" opacity=".8">
+          <path d="M20 4V116M32 4V116M44 4V116M56 4V116M68 4V116M80 4V116M92 4V116M104 4V116"/>
+        </g>
+        <g stroke="var(--rt-grid)" stroke-width="1.5" opacity=".95">
+          <path d="M8 4V116M116 4V116"/>
+        </g>
+        <g stroke="var(--rt-grid)" stroke-width=".55" opacity=".62">
+          <path d="M14 40h6M26 40h6M38 40h6M50 40h6M62 40h6M74 40h6M86 40h6M98 40h6M110 40h6"/>
+          <path d="M14 80h6M26 80h6M38 80h6M50 80h6M62 80h6M74 80h6M86 80h6M98 80h6M110 80h6"/>
+        </g>
       </g>
       <g clip-path="url(#ck)" class="sweep">
         <path d="M60 60 L60 4 A56 56 0 0 1 96 20 Z" fill="url(#swp)"/>
@@ -1151,9 +1213,9 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="fact"><b id="f3">&mdash;</b><span>Team-seasons</span></div>
       <div class="fact"><b id="f4">&mdash;</b><span>Games logged</span></div>
     </div>
-  </div></div>
+  </div></header>
 <nav><div class="nav-row" id="navRow"><div class="nav-in"><a class="navmark" href="#champions" aria-label="Top"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--brass)" stroke-width="9"/><g stroke="var(--brass)" stroke-width="13" stroke-linecap="round"><path d="M60 6V40"/><path d="M60 80V114"/><path d="M6 60H40"/><path d="M80 60H114"/></g><circle cx="60" cy="60" r="7" fill="var(--brass)"/></svg></a><span id="nav" style="display:contents"></span></div></div>
-  <div class="fb"><div class="fb-in">
+  <div class="fb"><button class="fb-sum" id="fbSum" type="button" aria-expanded="false"></button><div class="fb-in">
     <span class="fb-lab">Managers</span>
     <button id="fActive">Active 10</button><button id="fAll">All 20</button><button id="fNone">None</button>
     <button id="fToggle">Choose managers &#9662;</button>
@@ -1162,7 +1224,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <button data-skin-btn="scope">Scope</button><button data-skin-btn="og">Classic</button><button data-skin-btn="red">Crimson</button><button data-skin-btn="leather">Pigskin</button><button data-skin-btn="arcade">Arcade</button>
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
-<div class="wrap">
+<main id="main" class="wrap">
 
   <section id="champions">
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner's run traced</div></div>
@@ -1184,7 +1246,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
           <span class="fb-lab">Seasons</span>
           <button data-yr="3">Last 3</button><button data-yr="5">Last 5</button>
           <button data-yr="10">Last 10</button><button data-yr="0" class="on">All</button>
-          <input id="search" type="search" placeholder="filter managers…" style="width:150px"><span class="sub" id="searchN"></span></div></div>
+          <input id="search" type="search" aria-label="Filter managers by name" placeholder="filter managers…" style="width:150px"><span class="sub" id="searchN"></span></div></div>
       <div class="scroll"><table id="tAll"></table></div>
     </div>
   </section>
@@ -1195,9 +1257,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="card-h"><h3>Power Index by manager and season</h3><span class="sub" id="piLegend"></span></div>
       <div class="card-b scroll"><table class="heat" id="tHeat"></table></div>
     </div>
-  </section>
-  <section id="rankings">
-    <div class="sec-head"><h2>Power Rankings</h2><div class="rule-note">The ten active managers · live model</div></div>
+  <div class="sub-h" style="margin-top:34px">Power Rankings &middot; the ten active managers, live model</div>
     <p class="lede">Not a career table, a <strong>forward-looking</strong> one. It weights recent seasons above old ones, shrinks small samples toward the league mean, and ignores win-loss record entirely in favour of scoring, because record carries luck and scoring does not. Drag the slider to change how hard the model discounts the past and watch the order move.</p>
     <div class="card">
       <div class="card-h"><h3>Going into <span id="nextYr"></span></h3>
@@ -1268,14 +1328,14 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="scroll"><table id="tAP"></table></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-collapse="closed">
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week's score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
-    <div class="card">
-      <div class="card-h"><h3>Rivalry week &mdash; on the numbers</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
+    <div class="card" data-collapse="closed">
+      <div class="card-h"><h3>Biggest rivals this year</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)" id="rivPick"></p></div>
       <div class="scroll"><table id="tRiv"></table></div>
     </div>
@@ -1285,7 +1345,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="card-b" id="wkOut"></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-collapse="closed" data-collapse-also="#trades">
       <div class="card-h"><h3>Trades</h3><span class="sub" id="trSub"></span></div>
       <div class="card-b"><div class="tiles" id="tradeStat" style="margin-bottom:0"></div></div>
     </div>
@@ -1320,10 +1380,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="card-h"><h3>Playoff résumé</h3><span class="gl" data-gl="expT" tabindex="0">?</span><span class="sub" id="poSub">Sorted: playoff wins</span></div>
       <div class="scroll"><table id="tPO"></table></div>
     </div>
-  </section>
-
-  <section id="fivehundred">
-    <div class="sec-head"><h2>The .500 Line</h2><div class="rule-note">Who lives above it, who lives under it<br>Sorted: games clear of even</div></div>
+  <div class="sub-h" style="margin-top:34px">The .500 Line &middot; who lives above it, who lives under it</div>
     <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager's record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
     <div class="card">
       <div class="card-h"><h3>Above and below</h3><span class="gl" data-gl="five" tabindex="0">?</span>
@@ -1336,10 +1393,14 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
     <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
-    <div id="recs"></div>
-    <div class="card" style="margin-top:22px">
-      <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
-      <div class="card-b" id="mileWatch"></div>
+    <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
+      <span class="sub" style="margin-left:9px" id="recsCount"></span></div>
+    <div id="recsWrap" hidden>
+      <div id="recs"></div>
+      <div class="card" style="margin-top:22px">
+        <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
+        <div class="card-b" id="mileWatch"></div>
+      </div>
     </div>
   </section>
 
@@ -1363,7 +1424,8 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all ten seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
-        <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select></div></div>
+        <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select>
+        <button id="cmpShare" class="on" style="padding:7px 14px;margin-left:8px">&#8593; Share this matchup</button></div></div>
       <div class="card-b" id="cmpOut"></div>
     </div>
     <div class="card">
@@ -1451,7 +1513,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     Points data is verified: in all ten seasons, league-wide points for equals league-wide points against to the cent.
     One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70–70 and match Yahoo exactly.
   </footer>
-</div>
+</main>
 <div class="deco ball" aria-hidden="true"><svg viewBox="0 0 400 250">
   <ellipse cx="200" cy="125" rx="185" ry="108" fill="none" stroke="currentColor" stroke-width="7"/>
   <path d="M118 125 H282" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
@@ -1602,8 +1664,8 @@ $('#f1').textContent=SEA.length;$('#f2').textContent=M.length;$('#f3').textConte
 $('#nextYr').textContent=LAST+1;
 
 /* nav */
-const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],['rankings','Power Rankings'],
- ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],['fivehundred','.500 Line'],
+const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
+ ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],
  ['records','Records'],['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],['method','Method']];
 $('#nav').innerHTML=SECS.map(([i,t])=>`<a href="#${i}" data-id="${i}">${t}</a>`).join('');
 /* the nav scrolls on every width; it just should not look like it does */
@@ -1941,7 +2003,7 @@ function botCall(){
       if(n>=5){document.body.classList.remove('quake');void document.body.offsetWidth;document.body.classList.add('quake');}
     }});})();
 $$('[data-skin-btn]').forEach(b=>b.onclick=()=>setSkin(b.dataset.skinBtn,true));
-(function(){let k='og';try{k=localStorage.getItem('deadshot.skin')||'og';}catch(e){}
+(function(){let k='red';try{k=localStorage.getItem('deadshot.skin')||'red';}catch(e){}
   if(k===SECRET&&!unlocked())k='og';
   const use=SKINS.includes(k)?k:'og';
   document.documentElement.setAttribute('data-skin',use);
@@ -2778,7 +2840,7 @@ function drawFive(){
    {h:'',f:r=>r.wkAbovePct==null?'':dbar(r.wkAbovePct-.5,.5,pol(r.wkAbovePct-.5)),k:r=>r.wkAbovePct},
    {h:'Best run',f:r=>r.wkStreak||'—',c:'num',k:r=>r.wkStreak,t:'Longest unbroken run of weeks spent above .500'},
    {h:'vs winners',f:r=>(r.vsWinW+r.vsWinL)?`<span class="mono">${r.vsWinW}-${r.vsWinL}</span>`:'—',c:'num',k:r=>r.vsWinPct,
-    t:'Record against opponents who finished that season above .500. Every game on record — all ten seasons of playoffs plus the 2021–2025 regular seasons.'},
+    t:'Record against opponents who finished that season above .500. Almost nobody is above .500 here and that is arithmetic, not weakness: when a winning team plays a losing one, that game counts as "vs the rest" for the winner and "vs a winner" for the loser, so this column is loaded with the games losing teams played. League-wide it sits at .383 while "vs the rest" sits at .620. Compare managers against each other, not against .500. Covers every playoff game in league history plus the 2021 to 2025 regular seasons; earlier regular seasons have no game log.'},
    {h:'vs win %',f:r=>r.vsWinPct==null?'—':pct(r.vsWinPct),c:'num',k:r=>r.vsWinPct},
    {h:'vs the rest',f:r=>(r.vsSubW+r.vsSubL)?`<span class="mono">${r.vsSubW}-${r.vsSubL}</span>`:'—',c:'num',k:r=>r.vsSubPct,
     t:'Record against opponents who finished .500 or worse.'},
@@ -2838,6 +2900,18 @@ function drawRecords(){
   glossify($('#recs'));
 }
 drawRecords(); REDRAW.push(drawRecords);
+/* The record book is 21 tables and the milestone list. Collapsed by default so the
+   sections below it are reachable without a long scroll. */
+(function(){
+  const t=$('#recsToggle'), w=$('#recsWrap'), c=$('#recsCount');
+  if(!t||!w)return;
+  const sync=()=>{const open=!w.hidden;
+    t.innerHTML=open?'Hide the record book &#9652;':'Show the record book &#9662;';
+    t.classList.toggle('on',open);
+    if(c)c.textContent=open?'':`${$$('#recs .card').length||21} tables`;};
+  t.onclick=()=>{w.hidden=!w.hidden;sync();};
+  sync();
+})();
 
 /* ============ seasons + real bracket ============ */
 const ORD=['Quarterfinal','Semifinal','5th Place Game','Final','3rd Place Game'];
@@ -3016,10 +3090,24 @@ $$('.pills button[data-mx]').forEach(b=>b.onclick=()=>{
   $$('.pills button[data-mx]').forEach(x=>x.classList.toggle('on',x===b)); MXK=b.dataset.mx; drawMtx();});
 drawMtx(); REDRAW.push(drawMtx);
 (function(){
-  const names=M.map(m=>m.name).sort();
-  $('#cmpA').innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
-  $('#cmpB').innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
-  $('#cmpA').value='Brian Burke'; $('#cmpB').value='Shane Kaiper';
+  /* the list was built once from every manager, so it ignored the filter at the top
+     and never changed when that filter did. Rebuild it on each redraw, keeping the
+     current pick when that person is still shown. */
+  function fillPickers(){
+    const names=M.filter(m=>vis(m.name)).map(m=>m.name).sort();
+    const set=(sel,fallback)=>{
+      const cur=sel.value;
+      sel.innerHTML=names.map(x=>`<option>${esc(x)}</option>`).join('');
+      sel.value=names.indexOf(cur)>-1?cur:(names.indexOf(fallback)>-1?fallback:(names[0]||''));
+    };
+    set($('#cmpA'),'Brian Burke');
+    set($('#cmpB'),'Shane Kaiper');
+    if(names.length>1&&$('#cmpA').value===$('#cmpB').value){
+      const other=names.filter(x=>x!==$('#cmpA').value)[0];
+      if(other)$('#cmpB').value=other;
+    }
+  }
+  fillPickers();
   function draw(){
     const a=byName[$('#cmpA').value],b=byName[$('#cmpB').value];
     if(!a||!b||a===b){$('#cmpOut').innerHTML='<p class="dim" style="margin:0">Pick two different managers.</p>';return;}
@@ -3029,6 +3117,7 @@ drawMtx(); REDRAW.push(drawMtx);
       ['Luck','luck',2],['Playoff W','poW',0]];
     const cell=(m,k,d)=>k==='winpct'?pct(m[k]):(d?(+m[k]).toFixed(d):m[k]);
     const better=(k,x,y)=>k==='avgPlace'?x<y:x>y;
+    {const sh=$('#cmpShare'); if(sh)sh.onclick=()=>shareH2H($('#cmpA').value,$('#cmpB').value,sh);}
     $('#cmpOut').innerHTML=`<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;max-width:100%">
       <table style="flex:1 1 300px;min-width:0"><thead><tr><th></th><th class="num">${esc(a.name)}</th><th class="num">${esc(b.name)}</th></tr></thead><tbody>${
       rows.map(([lab,k,d])=>{const x=a[k],y=b[k];
@@ -3049,7 +3138,8 @@ drawMtx(); REDRAW.push(drawMtx);
           return o;})()}
       </div></div>`;
   }
-  $('#cmpA').onchange=draw; $('#cmpB').onchange=draw; draw(); REDRAW.push(draw);
+  $('#cmpA').onchange=draw; $('#cmpB').onchange=draw; draw();
+  REDRAW.push(()=>{fillPickers();draw();});
 })();
 
 /* ============ week-by-week, per season ============ */
@@ -3274,6 +3364,99 @@ function drawTeamIndex(){
     `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
+/* Screen-reader and keyboard semantics for tables. Doing this centrally rather than in
+   each of the ~20 table builders means a new table gets it for free, and a redraw can
+   never lose it. Runs last, and again on every redraw. */
+function a11yTables(){
+  $$('table').forEach(t=>{
+    /* name the table from the nearest visible heading */
+    if(!t.getAttribute('aria-label')&&!t.querySelector('caption')){
+      const card=t.closest('.card'), sec=t.closest('section');
+      const h=(card&&card.querySelector('h3'))||(sec&&sec.querySelector('h2'));
+      if(h)t.setAttribute('aria-label',h.textContent.trim().replace(/\s+/g,' '));
+    }
+    $$('th',t).forEach(th=>{
+      if(th.getAttribute('scope'))return;
+      const inHead=!!th.closest('thead');
+      const firstInRow=th.parentElement&&th.parentElement.firstElementChild===th;
+      th.setAttribute('scope',inHead?'col':(firstInRow?'row':'col'));
+    });
+  });
+  /* sortable headers were mouse-only: not focusable, no state announced */
+  $$('th.s').forEach(th=>{
+    if(th.tabIndex<0||th.tabIndex===undefined)th.tabIndex=0;
+    if(!th.getAttribute('role'))th.setAttribute('role','columnheader');
+    th.setAttribute('aria-sort',th.classList.contains('asc')?'ascending'
+      :th.classList.contains('desc')?'descending':'none');
+    if(!th.dataset.kb){
+      th.dataset.kb='1';
+      const refocus=()=>setTimeout(()=>{
+        a11yTables();
+        const host=th.closest('table')||document;
+        const again=host.isConnected
+          ? host.querySelectorAll('th.s')[idxOf(th)]
+          : null;
+        const live=again||document.querySelectorAll('#'+(hostId||'')+' th.s')[idxOf(th)];
+        if(live&&live.focus)live.focus();
+      },0);
+      const hostId=(th.closest('table')||{}).id||'';
+      const idxOf=el=>{const t=el.closest('table');
+        return t?[...t.querySelectorAll('th.s')].indexOf(el):0;};
+      th.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();th.click();refocus();}
+      });
+      th.addEventListener('click',()=>setTimeout(a11yTables,0));
+    }
+  });
+}
+a11yTables(); REDRAW.push(a11yTables);
+setTimeout(a11yTables,0);
+addEventListener('load',()=>setTimeout(a11yTables,80));
+/* On a phone the manager and theme controls wrapped to three rows and pushed the first
+   real content most of a screen down. Collapse them behind a one-line summary that says
+   what is currently selected, so the state is still visible without the bulk. */
+(function(){
+  const sum=$('#fbSum'), fb=sum&&sum.closest('.fb');
+  if(!fb||!sum)return;
+  const SKINNAME={og:'Classic',scope:'Scope',red:'Crimson',leather:'Pigskin',arcade:'Arcade',redact:'Redacted'};
+  function label(){
+    const n=SEL.size, tot=ALLNAMES.length;
+    const who=n===tot?'All '+tot:(n===ACTIVE.length&&ACTIVE.every(a=>SEL.has(a))?'Active '+n:n+' of '+tot);
+    const sk=SKINNAME[document.documentElement.getAttribute('data-skin')]||'Classic';
+    sum.innerHTML=`Managers <b>${esc(who)}</b> &middot; Theme <b>${esc(sk)}</b><span class="ar">&#9662;</span>`;
+  }
+  sum.onclick=()=>{const open=fb.classList.toggle('open');
+    sum.setAttribute('aria-expanded',open?'true':'false');};
+  label();
+  REDRAW.push(label);
+  $$('[data-skin-btn]').forEach(b=>b.addEventListener('click',()=>setTimeout(label,0)));
+})();
+/* Any card marked data-collapse gets a Hide/Show control in its header. Add
+   data-collapse-also="#id" when related content sits outside the card, as the trade
+   grid does. data-collapse="closed" starts it shut; default is open. */
+(function(){
+  $$('.card[data-collapse]').forEach(card=>{
+    const head=card.querySelector('.card-h'); if(!head)return;
+    const wrap=document.createElement('div');
+    [...card.children].filter(c=>c!==head).forEach(c=>wrap.appendChild(c));
+    card.appendChild(wrap);
+    const extraSel=card.getAttribute('data-collapse-also');
+    const extra=extraSel?$(extraSel):null;
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.style.cssText='padding:5px 11px;font-size:11px;white-space:nowrap';
+    const host=head.querySelector('.right')||head;
+    if(host===head)btn.style.marginLeft='auto';
+    host.appendChild(btn);
+    const sync=()=>{const open=!wrap.hidden;
+      btn.innerHTML=open?'Hide &#9652;':'Show &#9662;';
+      btn.classList.toggle('on',open);
+      if(extra)extra.hidden=!open;};
+    btn.onclick=()=>{wrap.hidden=!wrap.hidden;sync();};
+    wrap.hidden=(card.getAttribute('data-collapse')==='closed');
+    sync();
+  });
+})();
 /* ---- Shareable manager card -------------------------------------------------
    Draws a square PNG on a canvas and hands it to the phone's share sheet, which on
    iOS puts it straight into iMessage. Falls back to a download on desktop browsers
@@ -3292,10 +3475,11 @@ async function makeShareCard(name){
   const x=c.getContext('2d');
   try{ if(document.fonts&&document.fonts.ready)await document.fonts.ready; }catch(e){}
 
-  const GOLD='#C8A24A', INK='#F6F1E6', DIM='#8C97A3', BG='#12161B';
+  const P=cardPalette();
+  const GOLD=P.accent, INK=P.ink, DIM=P.dim, BG=P.bg;
   x.fillStyle=BG; x.fillRect(0,0,S,S);
   const g=x.createRadialGradient(180,120,10,180,120,760);
-  g.addColorStop(0,'rgba(200,162,74,.20)'); g.addColorStop(1,'rgba(200,162,74,0)');
+  g.addColorStop(0,P.glow); g.addColorStop(1,P.glow0);
   x.fillStyle=g; x.fillRect(0,0,S,S);
 
   /* reticle, drawn rather than loaded */
@@ -3354,8 +3538,130 @@ async function makeShareCard(name){
   }
 
   x.fillStyle=GOLD; x.font='600 26px "IBM Plex Mono",monospace';
-  x.fillText('deadshotleague.com',84,S-72);
+  x.fillText(cardHost(),84,S-72);
   return new Promise(res=>c.toBlob(res,'image/png'));
+}
+/* Cards are drawn in whatever theme the reader is currently looking at, so the picture
+   that lands in the group chat matches the site they were just on. The masthead tokens
+   are used because those six are already designed to sit together in every skin. */
+function cardHost(){
+  try{const h=location.hostname;
+    if(h&&h!=='localhost'&&location.protocol!=='file:')return h.replace(/^www\./,'');
+  }catch(e){}
+  return 'deadshotleague.com';
+}
+function cardPalette(){
+  const hex=v=>{v=(v||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:null;};
+  const bg=hex(cssv('--mast-bg'))||'#12161B';
+  const ink=hex(cssv('--mast-ink'))||'#F6F1E6';
+  const dim=hex(cssv('--mast-sub'))||'#8C97A3';
+  let accent=hex(cssv('--brass'))||'#C8A24A';
+  /* Crimson defines --brass and --mast-bg as the same #8E1520, so the accent would be
+     drawn in exactly the background colour. Fall back to the masthead's own highlight. */
+  if(contrastHex(accent,bg)<2.4) accent=hex(cssv('--mast-kick'))||hex(cssv('--mast-sub'))||ink;
+  if(contrastHex(accent,bg)<2.4) accent=ink;
+  const rr=parseInt(accent.slice(1,3),16), gg=parseInt(accent.slice(3,5),16), bb=parseInt(accent.slice(5,7),16);
+  /* a light masthead needs a far gentler wash than a near-black one */
+  const lum=(0.2126*rr+0.7152*gg+0.0722*bb)/255;
+  const bl=(parseInt(bg.slice(1,3),16)*0.2126+parseInt(bg.slice(3,5),16)*0.7152+parseInt(bg.slice(5,7),16)*0.0722)/255;
+  const strength=bl>0.6?0.10:0.20;
+  return {bg,ink,dim,accent,rule:bl>0.6?'rgba(0,0,0,.12)':'rgba(255,255,255,.10)',
+          glow:`rgba(${rr},${gg},${bb},${strength})`, glow0:`rgba(${rr},${gg},${bb},0)`};
+}
+async function makeH2HCard(an,bn){
+  const a=byName[an], b=byName[bn]; if(!a||!b||an===bn)return null;
+  const S=1080, c=document.createElement('canvas'); c.width=S; c.height=S;
+  const x=c.getContext('2d');
+  try{ if(document.fonts&&document.fonts.ready)await document.fonts.ready; }catch(e){}
+  const P=cardPalette();
+  x.fillStyle=P.bg; x.fillRect(0,0,S,S);
+  const g=x.createRadialGradient(S/2,140,10,S/2,140,780);
+  g.addColorStop(0,P.glow); g.addColorStop(1,P.glow0); x.fillStyle=g; x.fillRect(0,0,S,S);
+
+  x.textAlign='center';
+  x.fillStyle=P.accent; x.font='600 25px "IBM Plex Mono",monospace';
+  x.fillText('H E A D   T O   H E A D',S/2,108);
+
+  const rec=MX.all.t[an+'|'+bn];
+  const fit=(t,max,start)=>{let f=start;x.font=`900 ${f}px "Big Shoulders Display",sans-serif`;
+    while(x.measureText(t).width>max&&f>40){f-=3;x.font=`900 ${f}px "Big Shoulders Display",sans-serif`;}return f;};
+  const A=an.toUpperCase(), B=bn.toUpperCase();
+  /* The two names can end up at different sizes, so a fixed offset for "versus" only
+     looks centred for one pair. Measure the real ink of each and sit it in the middle
+     of the actual gap. */
+  const yA=206, yB=340;
+  fit(A,S-140,86); const mA=x.measureText(A);
+  x.fillStyle=P.ink; x.fillText(A,S/2,yA);
+  fit(B,S-140,86); const mB=x.measureText(B);
+  x.fillStyle=P.ink; x.fillText(B,S/2,yB);
+  const gapTop=yA+(mA.actualBoundingBoxDescent||0);
+  const gapBot=yB-(mB.actualBoundingBoxAscent||62);
+  x.fillStyle=P.dim; x.font='500 30px "IBM Plex Mono",monospace';
+  const mV=x.measureText('versus');
+  const vAsc=mV.actualBoundingBoxAscent||21, vDesc=mV.actualBoundingBoxDescent||0;
+  x.fillText('versus',S/2,(gapTop+gapBot)/2+(vAsc-vDesc)/2);
+
+  if(rec){
+    x.fillStyle=P.accent; x.font='900 176px "Big Shoulders Display",sans-serif';
+    x.fillText(`${rec[0]}\u2013${rec[1]}`,S/2,510);
+    x.fillStyle=P.dim; x.font='400 27px "IBM Plex Sans",sans-serif';
+    x.fillText(`all-time, from ${esc(an)}'s side`,S/2,556);
+  }else{
+    x.fillStyle=P.dim; x.font='400 40px "IBM Plex Sans",sans-serif';
+    x.fillText('They have never met.',S/2,500);
+  }
+
+  /* four stats side by side, winner picked out in the accent */
+  const meets=MX.all.g.filter(x=>(x.ma===an&&x.mb===bn)||(x.ma===bn&&x.mb===an));
+  const ppgIn=who=>{if(!meets.length)return null;
+    let t=0; meets.forEach(x=>{t+=(x.ma===who?x.pa:x.pb);}); return t/meets.length;};
+  const pA=ppgIn(an), pB=ppgIn(bn);
+  const cmp=[['SEASONS','seasons',0],['PPG v EACH OTHER','__h2hppg',2],['POWER IDX','cpi',1],['PODIUMS','podium',0]];
+  const lowerWins={};
+  x.textAlign='left';
+  x.strokeStyle=P.rule; x.lineWidth=1;
+  x.beginPath(); x.moveTo(84,markY(0)); x.lineTo(S-84,markY(0)); x.stroke();
+  function markY(){return 626;}
+  cmp.forEach((row,i)=>{
+    const [lab,k,d]=row, y=700+i*82;
+    const h2h=k==='__h2hppg';
+    const av=h2h?pA:a[k], bv=h2h?pB:b[k];
+    const fmt=v=>v==null?'\u2014':(k==='winpct'?pct(v):(d?(+v).toFixed(d):String(v)));
+    x.fillStyle=P.dim; x.font='500 21px "IBM Plex Mono",monospace';
+    x.textAlign='center'; x.fillText(lab.split('').join(' '),S/2,y-6);
+    x.font='600 46px "IBM Plex Mono",monospace';
+    x.textAlign='left';  x.fillStyle=(av>bv)?P.accent:P.dim; x.fillText(fmt(av),84,y);
+    x.textAlign='right'; x.fillStyle=(bv>av)?P.accent:P.dim; x.fillText(fmt(bv),S-84,y);
+    x.textAlign='left';
+    if(i<cmp.length-1){x.strokeStyle=P.rule;x.beginPath();x.moveTo(84,y+26);x.lineTo(S-84,y+26);x.stroke();}
+  });
+  x.textAlign='center';
+  x.fillStyle=P.accent; x.font='600 26px "IBM Plex Mono",monospace';
+  x.fillText(cardHost(),S/2,S-58);
+  return new Promise(res=>c.toBlob(res,'image/png'));
+}
+async function shareBlob(blob,fname){
+  const file=new File([blob],fname,{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    /* files only. Passing title/text makes the share sheet prefill a caption into the
+       message, which reads as spam next to the picture. */
+    await navigator.share({files:[file]});
+  }else{
+    const u=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=u; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),4000);
+    toast('Card saved to your downloads');
+  }
+}
+async function shareH2H(an,bn,btn){
+  const label=btn?btn.innerHTML:null;
+  if(btn){btn.disabled=true;btn.innerHTML='Building…';}
+  try{
+    const blob=await makeH2HCard(an,bn);
+    if(!blob){toast('Pick two different managers first');return;}
+    await shareBlob(blob,`deadshot-${an.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-v-${bn.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`);
+  }catch(e){ if(!(e&&e.name==='AbortError'))toast('Could not build the card'); }
+  finally{ if(btn){btn.disabled=false;btn.innerHTML=label;} }
 }
 async function shareCard(name,btn){
   const label=btn?btn.innerHTML:null;
@@ -3365,7 +3671,7 @@ async function shareCard(name,btn){
     if(!blob)throw new Error('no card');
     const file=new File([blob],`deadshot-${name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`,{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:`${name} — Deadshot`,text:`${name} · ${mgrVibe(M.filter(x=>x.name===name)[0])}`});
+      await navigator.share({files:[file]});
     }else{
       const u=URL.createObjectURL(blob), a=document.createElement('a');
       a.href=u; a.download=file.name; document.body.appendChild(a); a.click(); a.remove();
@@ -3907,7 +4213,7 @@ syncFilter();
       TR.years.forEach(y=>{
         if(!played[m+'|'+y]){h+='<td class="self"><span>&middot;</span></td>';return;}
         const n=cell(m,y); tot+=n;
-        if(!n){h+='<td><span style="color:var(--ink-3)">0</span></td>';return;}
+        if(!n){h+='<td><span style="color:var(--ink-2)">0</span></td>';return;}
         const t=Math.min(1,n/MXY);
         const bg3=mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85);
         h+=`<td data-m="${esc(m)}" data-y="${y}"><span style="background:${bg3};color:${pickInk(bg3)}">${n}</span></td>`;});
