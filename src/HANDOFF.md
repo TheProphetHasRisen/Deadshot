@@ -254,6 +254,31 @@ Add `data-collapse` to any `.card` and it gets a Hide/Show control in its header
 `data-collapse="closed"` starts it shut. `data-collapse-also="#id"` also toggles
 related content that sits outside the card, which the Trades card needs for its grid.
 
+### Sound
+
+Everything is synthesised with the Web Audio API. There are no audio files and there
+must not be, or the page stops being self-contained.
+
+- `thunder()` builds a clap in three parts: a sub-10ms tear, the blast, then seven
+  rolling returns that arrive later and darker, because air absorbs high frequencies
+  faster than low ones over distance.
+- `choirAh()` is sawtooth voices through three bandpass filters at roughly 730, 1090
+  and 2440 Hz, which is what spells the vowel "ah". The filters remove most of the
+  energy, so the gain after them is multiplied back up by 7.5 — without that it renders
+  at a peak of 0.013 and is effectively silent.
+- `SFX.shot()` is a rifle report as three separate events, not one noise wash: the
+  supersonic N-wave crack, the muzzle blast a few ms behind it, then discrete spaced
+  returns. Blurring them together is what made the earlier version sound fake.
+- `ping()` / `casing()` are the ejected case. Metal rings on **inharmonic** partials
+  (1, 2.76, 5.40, 8.93, 13.34), which is what reads as brass rather than a tuned note.
+  Bounces converge in time and decay in level, like a dropped coin.
+
+**How to check a change without hearing it.** Render into an `OfflineAudioContext`,
+then measure peak, peak time, RMS, clipped samples and the energy envelope across ten
+slices. That is how the silent choir and an over-loud casing were both caught. Targets:
+peak roughly 0.3-0.9, zero clipped samples, and an envelope whose shape matches the
+intent (the commish cue should read `9311143000`: clap, decay, then the choir rising).
+
 ### The masthead reticle
 
 - The sweep is a gradient wedge spanning 42 degrees, rotating clockwise from twelve

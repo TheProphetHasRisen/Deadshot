@@ -1750,6 +1750,104 @@ function noise(dur,vol,f0,f1,delay,type,curve){
   g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
   src.connect(flt).connect(g).connect(c.destination); src.start(t0);
 }
+/* ---- richer synthesis -------------------------------------------------------
+   Everything is generated. No audio files, so the page stays self-contained. */
+
+/* A metallic strike. Real metal rings on inharmonic partials, which is what makes it
+   read as brass rather than a tuned note, and each partial dies faster than the one
+   below it. Used for the casing hitting the floor. */
+function ping(f, dur, vol, delay, tone2) {
+  const c = ac(); if (!c || quiet()) return;
+  const t0 = c.currentTime + (delay || 0);
+  const PARTIALS = [1, 2.76, 5.40, 8.93, 13.34];
+  PARTIALS.forEach((m, i) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f * m * (tone2 || 1), t0);
+    const v = Math.max(0.0002, (vol || 0.1) * Math.pow(0.52, i));
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(v, t0 + 0.0012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur * Math.pow(0.72, i));
+    o.connect(g).connect(c.destination);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  });
+  noise(0.005, (vol || 0.1) * 0.55, 11000, 4000, delay || 0, 'highpass', 0.4);
+}
+
+/* A brass case ejected onto a hard floor: a first hard hit, then bounces that get
+   closer together and quieter as it loses energy, then a short skitter as it settles. */
+function casing(delay) {
+  const d = delay || 0;
+  let t = d, gap = 0.17, v = 0.085, f = 2400;
+  for (let i = 0; i < 7; i++) {
+    ping(f * (0.9 + Math.random() * 0.25), 0.42 - i * 0.04, v, t, 1);
+    t += gap;
+    gap *= 0.72;                 /* bounces converge, like a dropped coin */
+    v *= 0.74;
+    f *= 1.04;
+  }
+  for (let i = 0; i < 5; i++)    /* the last roll along the ground */
+    noise(0.03, 0.022, 6000, 2600, t + i * 0.05 + Math.random() * 0.03, 'bandpass', 0.6);
+}
+
+/* Thunder directly overhead: the tear, the slam, then rolling returns that arrive
+   late and dark because the far ones travelled further through air. */
+function thunder(delay) {
+  const d = delay || 0;
+  noise(0.007, 1.0, 17000, 6500, d, 'highpass', 0.18);        /* the sky splitting */
+  noise(0.055, 0.95, 9500, 1100, d + 0.004, 'highpass', 0.65);
+  noise(0.55, 0.92, 3200, 80, d + 0.012, 'lowpass', 1.25);    /* the blast */
+  tone(72, 1.3, 'sawtooth', 0.46, 24, d + 0.012);             /* the slam */
+  tone(38, 2.6, 'sine', 0.44, 17, d + 0.02);                  /* the floor of it */
+  [[0.17, 0.5, 950], [0.40, 0.44, 720], [0.72, 0.36, 540],
+   [1.12, 0.29, 430], [1.66, 0.22, 340], [2.35, 0.16, 270], [3.15, 0.11, 210]]
+    .forEach(([t, v, f]) => {
+      noise(1.7, v, f, 45, d + t, 'lowpass', 0.85);
+      tone(50 - t * 6, 1.9, 'sine', v * 0.34, 20, d + t);
+    });
+  noise(6, 0.15, 300, 32, d + 0.45, 'lowpass', 0.65);         /* the long roll away */
+}
+
+/* A choir on "ah", far off and rising. Vowels are made by resonances, so the voices
+   are plain sawtooth run through the three formants that spell "ah" (about 730,
+   1090 and 2440 Hz). Slow swell, slight vibrato, and a drift upward. */
+function choirAh(delay, dur) {
+  const c = ac(); if (!c || quiet()) return;
+  const t0 = c.currentTime + (delay || 0), D = dur || 6;
+  const bus = c.createGain();
+  bus.gain.setValueAtTime(0.0001, t0);
+  bus.gain.exponentialRampToValueAtTime(0.34, t0 + D * 0.5);   /* it arrives slowly */
+  bus.gain.setValueAtTime(0.34, t0 + D * 0.66);
+  bus.gain.exponentialRampToValueAtTime(0.0001, t0 + D);
+  bus.connect(c.destination);
+
+  const formants = [[730, 1.0], [1090, 0.5], [2440, 0.2]].map(([hz, amp]) => {
+    const bp = c.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = hz; bp.Q.value = 3.2;
+    const g = c.createGain(); g.gain.value = amp * 7.5;   /* make up what the filters removed */
+    bp.connect(g).connect(bus);
+    return bp;
+  });
+
+  /* root, octave, fifth: an open chord reads as a crowd rather than a person */
+  const VOICES = [98, 98.7, 147, 196, 196.9, 294, 392];
+  VOICES.forEach((hz, i) => {
+    const o = c.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(hz, t0);
+    o.frequency.linearRampToValueAtTime(hz * 1.055, t0 + D);   /* the rise */
+    const lfo = c.createOscillator(), lg = c.createGain();
+    lfo.frequency.value = 4.3 + i * 0.27;
+    lg.gain.value = hz * 0.007;
+    lfo.connect(lg).connect(o.frequency);
+    lfo.start(t0); lfo.stop(t0 + D + 0.2);
+    const vg = c.createGain(); vg.gain.value = 0.5 / VOICES.length;
+    o.connect(vg);
+    formants.forEach(f => vg.connect(f));
+    o.start(t0); o.stop(t0 + D + 0.2);
+  });
+}
+
 const ALARM={osc:null,lfo:null,g:null,depth:null,
   start(level){
     const c=ac(); if(!c||quiet())return;
@@ -1784,27 +1882,30 @@ const ALARM={osc:null,lfo:null,g:null,depth:null,
   }};
 const SFX={
   warn(level){ ALARM.start(level); },
-  shot(){                            /* the sixth — one round, and the whole valley hears it */
+  shot(){                            /* the sixth: one round, and the whole valley hears it */
     ALARM.stop(true);
-    /* the whip of the round going past: very short, very bright, very loud */
-    noise(.012,.95,16000,9000,0,'highpass',.35);
-    noise(.05,.8,12000,2600,.004,'highpass',.6);
-    /* the muzzle blast behind it */
-    noise(.34,.85,4200,120,.02,'lowpass',1.6);
-    tone(78,.75,'sawtooth',.42,30,.02);
-    tone(44,1.5,'sine',.3,24,.03);
-    /* eight returns off the terrain: later, quieter, and darker each time */
-    [[.19,.34],[.36,.26],[.58,.2],[.86,.15],[1.2,.11],[1.62,.08],[2.1,.055],[2.66,.035]]
-      .forEach(([d,v],i)=>{
-        noise(.3+i*.11,v,2800-i*300,90,d,'lowpass',1.1);
-        tone(150-i*11,.5+i*.1,'sine',v*.4,60,d);
+    /* 1. the crack. A supersonic round makes an N-wave: two transients a hair apart,
+       almost all of it above 4kHz, and over before you can place it. */
+    noise(.0022,1.0,19000,12000,0,'highpass',.12);
+    noise(.0035,.92,15000,7000,.0026,'highpass',.2);
+    /* 2. the muzzle blast, a beat behind, with the low end that makes it feel physical */
+    noise(.018,1.0,7000,2200,.006,'highpass',.35);
+    noise(.16,.9,2600,150,.008,'lowpass',1.1);
+    tone(96,.28,'sawtooth',.5,38,.008);
+    tone(52,.9,'sine',.44,22,.012);
+    /* 3. returns off the terrain. Discrete and spaced, so the ear reads distance
+       rather than a wash of static. Each one is darker: air eats the highs first. */
+    [[.21,.52,2100],[.44,.40,1500],[.79,.30,1050],[1.24,.22,760],
+     [1.83,.155,540],[2.55,.105,400],[3.4,.07,300]]
+      .forEach(([d,v,f])=>{
+        noise(.17,v,f,90,d,'bandpass',.45);
+        tone(120,.38,'sine',v*.34,52,d);
       });
-    /* the long tail hanging in the air */
-    noise(3.6,.13,700,45,.3,'lowpass',.8);
-    tone(38,4,'sine',.11,26,.32);
-    /* glass, once the report is on its way out */
-    for(let i=0;i<24;i++)
-      tone(1500+Math.random()*4400,.06+Math.random()*.11,'triangle',.03,700,.14+Math.random()*.6);
+    /* 4. what is left hanging in the air */
+    noise(3.2,.1,520,40,.35,'lowpass',.7);
+    tone(34,3.6,'sine',.09,24,.36);
+    /* 5. the case hits the floor a moment later */
+    casing(.62);
   }};
 /* the page does not simply change theme — it comes apart */
 function breach(ox,oy,then){
@@ -4452,15 +4553,15 @@ const GLYPHS=[
   '<svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="11" fill="currentColor"/><g stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M25 2v7M25 41v7M2 25h7M41 25h7M9 9l5 5M36 36l5 5M41 9l-5 5M14 36l-5 5"/></g></svg>'];
 function pharaohSFX(){
   const c=ac(); if(!c||quiet())return;
-  tone(62,4.2,'sine',.17,44);               /* the gong */
-  tone(93,3.6,'sine',.09,70,null,.02);
-  noise(1.1,.13,2600,180);
-  tone(48,5.4,'sawtooth',.05,132,null,.15); /* the rising drone */
-  [0,.18,.34,.52,.7,.95,1.2,1.5].forEach((d,i)=>
-    tone(660*Math.pow(1.16,i),1.5,'sine',.028,null,null,1.0+d));  /* shimmer */
-  tone(150,2.4,'sawtooth',.13,36,null,1.05);   /* the hit on the splash */
-  noise(1.8,.1,5200,140,1.05);
-  tone(41,5,'sine',.09,30,null,1.1);
+  /* the sky opens first: a full thunderclap, not a gong */
+  thunder(0);
+  tone(58,5,'sine',.15,40,.02);                 /* the note the clap leaves behind */
+  /* then something rises under it. The choir swells late and slowly, so it reads as
+     arriving rather than being switched on. */
+  choirAh(.85,7.5);
+  [0,.2,.38,.58,.8,1.05,1.35,1.7].forEach((d,i)=>
+    tone(660*Math.pow(1.16,i),1.8,'sine',.022,null,null,1.5+d));  /* shimmer above it */
+  tone(41,6,'sine',.08,28,1.2);                 /* the floor holding it up */
 }
 let PH_BUSY=false;
 function pharaoh(){
