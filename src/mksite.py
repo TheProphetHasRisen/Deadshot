@@ -853,7 +853,7 @@ tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6p
 .chip.y{background:var(--brass-wash);border-color:var(--brass-2);color:var(--brass)}
 table.heat td.h{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:0;width:52px;border:1px solid var(--surface)}
 table.heat td.h span{display:block;padding:7px 0;border-radius:2px;cursor:pointer}
-table.heat td.h.e span{color:var(--ink-3);opacity:.35;cursor:default}
+table.heat td.h.e span{color:var(--ink-2);opacity:.85;cursor:default}
 button,select,input{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:2px;padding:5px 10px;cursor:pointer}
 input{cursor:text}
 button:hover,select:hover{border-color:var(--brass-2)}
@@ -914,7 +914,7 @@ footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 46px;colo
 table.mtx th.v{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;padding:8px 3px;text-align:left;height:118px;white-space:nowrap;position:static}
 table.mtx td{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:0;border:1px solid var(--surface);width:42px}
 table.mtx td span{display:block;padding:6px 0;border-radius:2px}
-table.mtx td.self span{background:var(--rule-2);color:var(--ink-3)}
+table.mtx td.self span{background:var(--rule-2);color:var(--ink-2)}
 table.mtx th.rw{font-size:12px;text-align:left;font-family:"IBM Plex Sans",sans-serif;font-weight:600;
   position:sticky;left:0;z-index:4;background:var(--surface);text-transform:none;letter-spacing:0;
   box-shadow:1px 0 0 var(--rule)}
@@ -4195,7 +4195,7 @@ syncFilter();
       TR.years.forEach(y=>{
         if(!played[m+'|'+y]){h+='<td class="self"><span>&middot;</span></td>';return;}
         const n=cell(m,y); tot+=n;
-        if(!n){h+='<td><span style="color:var(--ink-3)">0</span></td>';return;}
+        if(!n){h+='<td><span style="color:var(--ink-2)">0</span></td>';return;}
         const t=Math.min(1,n/MXY);
         const bg3=mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85);
         h+=`<td data-m="${esc(m)}" data-y="${y}"><span style="background:${bg3};color:${pickInk(bg3)}">${n}</span></td>`;});
