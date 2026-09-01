@@ -3645,7 +3645,7 @@ async function makeShareCard(name){
     ['TITLES',String(m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):0)]
   ];
   const top=650;
-  x.strokeStyle='rgba(255,255,255,.10)'; x.lineWidth=1;
+  x.strokeStyle=P.rule; x.lineWidth=1;
   x.beginPath(); x.moveTo(84,top-46); x.lineTo(S-84,top-46); x.stroke();
   tiles.forEach((t,i)=>{
     const px=84+i*((S-168)/4);
@@ -3657,7 +3657,7 @@ async function makeShareCard(name){
   /* best and worst season, the two facts people argue about */
   if(mine.length){
     const hi=mine.reduce((a,b)=>b.pi>a.pi?b:a), lo=mine.reduce((a,b)=>b.pi<a.pi?b:a);
-    x.strokeStyle='rgba(255,255,255,.10)';
+    x.strokeStyle=P.rule;
     x.beginPath(); x.moveTo(84,top+120); x.lineTo(S-84,top+120); x.stroke();
     x.fillStyle=DIM; x.font='400 28px "IBM Plex Sans",sans-serif';
     x.fillText(hi.y===lo.y?`Power index ${hi.pi.toFixed(1)} in ${hi.y}`
@@ -3680,16 +3680,20 @@ function cardHost(){
 }
 function cardPalette(){
   const hex=v=>{v=(v||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:null;};
-  const bg=hex(cssv('--mast-bg'))||'#12161B';
-  const ink=hex(cssv('--mast-ink'))||'#F6F1E6';
-  const dim=hex(cssv('--mast-sub'))||'#8C97A3';
+  /* The card is a picture of the page the reader is on, so it takes the page's own
+     surface, ink and accent. It used to take the MASTHEAD's colours, which matched on
+     five skins and was badly wrong on Crimson: that masthead is deep red while the page
+     itself is cream, so every Crimson card came out a solid red slab that looked
+     nothing like the site it came from. */
+  const bg=hex(cssv('--surface'))||'#12161B';
+  const ink=hex(cssv('--ink'))||'#F6F1E6';
+  const dim=hex(cssv('--ink-3'))||'#8C97A3';
   let accent=hex(cssv('--brass'))||'#C8A24A';
-  /* Crimson defines --brass and --mast-bg as the same #8E1520, so the accent would be
-     drawn in exactly the background colour. Fall back to the masthead's own highlight. */
-  if(contrastHex(accent,bg)<2.4) accent=hex(cssv('--mast-kick'))||hex(cssv('--mast-sub'))||ink;
+  /* kept as a safety net for any future skin that reuses its accent as a surface */
+  if(contrastHex(accent,bg)<2.4) accent=hex(cssv('--brass-2'))||hex(cssv('--ink-2'))||ink;
   if(contrastHex(accent,bg)<2.4) accent=ink;
   const rr=parseInt(accent.slice(1,3),16), gg=parseInt(accent.slice(3,5),16), bb=parseInt(accent.slice(5,7),16);
-  /* a light masthead needs a far gentler wash than a near-black one */
+  /* a light surface needs a far gentler wash than a near-black one */
   const lum=(0.2126*rr+0.7152*gg+0.0722*bb)/255;
   const bl=(parseInt(bg.slice(1,3),16)*0.2126+parseInt(bg.slice(3,5),16)*0.7152+parseInt(bg.slice(5,7),16)*0.0722)/255;
   const strength=bl>0.6?0.10:0.20;
@@ -4023,23 +4027,23 @@ async function makeGameCard(y,wk,team){
   x.fillStyle=P.dim; x.font='500 24px "IBM Plex Mono",monospace';
   x.fillText(G.tie?'D E A D   H E A T':'P O I N T   M A R G I N',S/2,748);
 
-  cardRule(x,S,P,806);
-  x.fillStyle=P.ink; x.font='400 28px "IBM Plex Sans",sans-serif';
-  /* "the 216th biggest margin of 406" is true and says nothing. The ranking only earns
-     its place when the beating was actually one of the worst ever; otherwise the useful
-     fact is how that winning score held up against the whole league that week. */
-  const l1=G.tie?'A dead heat. It has happened '+
+  cardRule(x,S,P,800);
+  const diff=G.A.p-G.A.pr;
+  const lines=[];
+  lines.push(G.tie?'A dead heat. It has happened '+
       (loggedGames().filter(z=>z.pa===z.pb).length)+' times in '+G.n+' logged games.'
     :G.rank===1?'The biggest beating in '+G.n+' logged games.'
-    :G.rank<=20?'One of the 20 worst beatings on record — '+ord(G.rank)+' of '+G.n+' games.'
-    :G.ap!=null?'That '+G.A.p.toFixed(2)+' would have beaten '+G.ap+' of the other '+
-      G.others+' that week.'
-    :'The '+ord(G.rank)+' biggest margin of '+G.n+' logged games.';
-  x.fillText(cardClip(x,l1,S-140),S/2,860);
-  x.fillStyle=P.dim;
-  const diff=G.A.p-G.A.pr;
-  x.fillText(cardClip(x,G.A.t,S-200)+' was projected '+G.A.pr.toFixed(1)+'  ·  '+
-    (diff>=0?'beat it by ':'missed it by ')+Math.abs(diff).toFixed(1),S/2,906);
+    :'The '+ord(G.rank)+' biggest margin of '+G.n+' logged games.');
+  if(G.ap!=null)lines.push('That '+G.A.p.toFixed(2)+' would have beaten '+G.ap+
+    ' of the other '+G.others+' that week.');
+  lines.push(cardClip(x,G.A.t,S-260)+' was projected '+G.A.pr.toFixed(1)+'  ·  '+
+    (diff>=0?'beat it by ':'missed it by ')+Math.abs(diff).toFixed(1));
+  const lTop=lines.length>2?848:868;
+  lines.forEach((t,k)=>{
+    x.fillStyle=k===0?P.ink:P.dim;
+    x.font='400 '+(k===0?28:26)+'px "IBM Plex Sans",sans-serif';
+    x.fillText(cardClip(x,t,S-140),S/2,lTop+k*44);
+  });
   cardFoot(x,S,P);
   return new Promise(res=>cv.toBlob(res,'image/png'));
 }
@@ -4115,54 +4119,101 @@ async function makeRecordCard(i){
 }
 
 /* ---- 4. a single Wrapped slide ---- */
+/* Wrapped is its own world -- a gradient stage, soft light and white type -- and a card
+   that came out in the site's paper-and-ink palette read as a different product. This one
+   paints the same gradient the slide was on, so the picture matches what was on screen.
+   Big Shoulders, not Fraunces: canvas cannot set a variable font's optical-size axis and
+   Fraunces' numerals come out in the wrong forms at display sizes. */
+function wrGrad(i){
+  const css=WRBG[i%WRBG.length];
+  const stops=[]; const re=/(#[0-9a-fA-F]{6})\s+([\d.]+)%/g; let m;
+  while((m=re.exec(css)))stops.push([m[1],+m[2]/100]);
+  const dm=/^linear-gradient\(\s*([\d.]+)deg/.exec(css);
+  return {deg:dm?+dm[1]:155,stops:stops.length?stops:[['#141a3a',0],['#8e3f76',1]]};
+}
 async function makeWrapCard(name,i){
   const built=wrapCards(name); if(!built)return null;
   const c=built.cards[i]; if(!c)return null;
   await cardFonts();
-  const {cv,x,P,S}=cardBase();
-  cardKick(x,S,P,LAST+' Wrapped');
-  x.textAlign='center';
-  x.fillStyle=P.ink; x.font='700 44px "IBM Plex Sans",sans-serif';
-  x.fillText(cardClip(x,name,S-160),S/2,180);
-  x.fillStyle=P.dim; x.font='400 27px "IBM Plex Sans",sans-serif';
-  x.fillText(cardClip(x,built.team,S-160),S/2,222);
+  const S=CARD_S, cv=document.createElement('canvas'); cv.width=S; cv.height=S;
+  const x=cv.getContext('2d'); x.textBaseline='alphabetic';
 
-  cardRule(x,S,P,272);
-  /* the opening slide's label is the same words as the kicker and its value is the
-     manager's own name, both of which are already at the top of the card */
+  /* the stage: CSS 0deg points up and turns clockwise, so the direction vector is
+     (sin a, -cos a) and the gradient line spans |W sin a| + |H cos a| */
+  const G=wrGrad(i), a=G.deg*Math.PI/180;
+  const dx=Math.sin(a), dy=-Math.cos(a);
+  const L=Math.abs(S*dx)+Math.abs(S*dy);
+  const g=x.createLinearGradient(S/2-dx*L/2,S/2-dy*L/2,S/2+dx*L/2,S/2+dy*L/2);
+  G.stops.forEach(st=>g.addColorStop(Math.min(1,Math.max(0,st[1])),st[0]));
+  x.fillStyle=g; x.fillRect(0,0,S,S);
+
+  /* the two drifting highlights, as soft radial falloffs rather than a blur filter */
+  [[S*0.16,S*0.30,S*0.40,0.26],[S*0.84,S*0.72,S*0.33,0.18]].forEach(b=>{
+    const rg=x.createRadialGradient(b[0],b[1],0,b[0],b[1],b[2]);
+    rg.addColorStop(0,'rgba(255,255,255,'+b[3]+')');
+    rg.addColorStop(1,'rgba(255,255,255,0)');
+    x.fillStyle=rg; x.fillRect(0,0,S,S);
+  });
+  /* the stage's own bottom vignette, so the footer always has something to sit on */
+  const vg=x.createRadialGradient(S/2,S*1.02,S*0.1,S/2,S*1.02,S*0.78);
+  vg.addColorStop(0,'rgba(0,0,0,.46)'); vg.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=vg; x.fillRect(0,0,S,S);
+
+  const W1='rgba(255,255,255,', INK='#FFFFFF';
+  x.textAlign='center';
+  x.fillStyle=W1+'.72)'; x.font='600 25px "IBM Plex Mono",monospace';
+  x.fillText((LAST+' WRAPPED').split('').join(' '),S/2,110);
+  x.fillStyle=INK; x.font='700 46px "IBM Plex Sans",sans-serif';
+  x.fillText(cardClip(x,name,S-160),S/2,184);
+  x.fillStyle=W1+'.78)'; x.font='400 28px "IBM Plex Sans",sans-serif';
+  x.fillText(cardClip(x,built.team,S-160),S/2,228);
+
+  x.strokeStyle=W1+'.22)'; x.lineWidth=1;
+  x.beginPath(); x.moveTo(84,278); x.lineTo(S-84,278); x.stroke();
+
+  /* the opening slide's label repeats the kicker and its value is the manager's own
+     name, both already printed above */
   const lab=cardText(c.k), val=cardText(c.v);
   const dupLab=lab.toLowerCase()===(LAST+' wrapped').toLowerCase();
   const dupVal=val.toLowerCase()===name.toLowerCase();
   if(!dupLab){
-    x.fillStyle=P.dim; x.font='500 25px "IBM Plex Mono",monospace';
-    x.fillText(lab.toUpperCase().split('').join(' '),S/2,332);
+    x.fillStyle=W1+'.72)'; x.font='500 25px "IBM Plex Mono",monospace';
+    x.fillText(lab.toUpperCase().split('').join(' '),S/2,338);
   }
   if(!dupVal){
-    cardFit(x,val,S-150,c.sm?110:190,54,900,'"Big Shoulders Display",sans-serif');
-    x.fillStyle=P.accent; x.fillText(val,S/2,c.sm?466:508);
+    cardFit(x,val,S-150,c.sm?112:194,54,900,'"Big Shoulders Display",sans-serif');
+    x.fillStyle=INK; x.fillText(val,S/2,c.sm?474:516);
   }
 
   const pills=(c.pills||[]).map(cardText).filter(Boolean).slice(0,3);
-  /* the note sits centred in whatever room is left, so a one-line card and a
-     five-line card both look composed instead of top-heavy */
-  const noteBot=pills.length?838:940;
-  const noteTop=(dupLab&&dupVal)?330:566;
+  const noteBot=(dupLab&&dupVal)?(pills.length?700:760):(pills.length?826:918);
+  const noteTop=(dupLab&&dupVal)?326:576;
   x.font='400 36px "IBM Plex Sans",sans-serif';
   const nl=cardWrap(x,cardText(c.n),S-180).slice(0,5);
   const nStart=noteTop+Math.max(0,(noteBot-noteTop-(nl.length-1)*50)/2);
-  x.fillStyle=P.ink;
+  x.fillStyle=W1+'.93)';
   nl.forEach((l,k)=>x.fillText(l,S/2,nStart+k*50));
 
   if(pills.length){
-    cardRule(x,S,P,878);
-    x.font='500 26px "IBM Plex Mono",monospace';
-    const gap=(S-168)/pills.length;
+    /* the same lozenges the slide uses, measured so they never touch */
+    x.font='500 25px "IBM Plex Mono",monospace';
+    const PH=54, py=880, pad=26, gap=14;
+    const ws=pills.map(q=>Math.min(S/pills.length-gap,x.measureText(q).width+pad*2));
+    const tot=ws.reduce((n,w)=>n+w,0)+gap*(pills.length-1);
+    let px=(S-tot)/2;
     pills.forEach((q,k)=>{
-      x.fillStyle=P.accent; x.textAlign='center';
-      x.fillText(cardClip(x,q,gap-24),84+gap*k+gap/2,932);
+      x.fillStyle=W1+'.17)'; x.strokeStyle=W1+'.30)'; x.lineWidth=1.4;
+      x.beginPath();
+      if(x.roundRect)x.roundRect(px,py-PH/2,ws[k],PH,PH/2);
+      else x.rect(px,py-PH/2,ws[k],PH);
+      x.fill(); x.stroke();
+      x.fillStyle=INK; x.textAlign='center';
+      x.fillText(cardClip(x,q,ws[k]-pad),px+ws[k]/2,py+9);
+      px+=ws[k]+gap;
     });
   }
-  cardFoot(x,S,P);
+  x.textAlign='center'; x.fillStyle=W1+'.8)'; x.font='600 26px "IBM Plex Mono",monospace';
+  x.fillText(cardHost(),S/2,S-58);
   return new Promise(res=>cv.toBlob(res,'image/png'));
 }
 
@@ -4189,27 +4240,34 @@ async function makeRivalryCard(an,bn){
   x.fillStyle=P.dim; x.font='400 25px "IBM Plex Sans",sans-serif';
   x.fillText(cardClip(x,'every meeting on record, from '+an+"'s side",S-140),S/2,444);
 
-  const ROWTOP=534;
-  cardRule(x,S,P,486);
-  /* show them all when they fit; otherwise the most recent, and say what was cut */
-  const room=Math.floor((S-150-ROWTOP)/40);
-  const shown=ms.length<=room?ms:ms.slice(-room);
+  /* "every meeting" has to mean every meeting: the rows shrink to fit rather than the
+     list being cut short. The longest rivalry on record runs to 11 games. */
+  const BOT=S-140;
+  let ROWTOP=534, step=40;
+  if(ms.length*step>BOT-ROWTOP){
+    ROWTOP=496;
+    step=(BOT-ROWTOP)/ms.length;
+  }
+  const shown=step>=19?ms:ms.slice(-Math.floor((BOT-ROWTOP)/19));
+  if(step<19)step=19;
   const cut=ms.length-shown.length;
+  const fs=Math.max(14,Math.min(24,step*0.60));
+  cardRule(x,S,P,ROWTOP-48);
   shown.forEach((m,i)=>{
-    const ty=ROWTOP+i*40, win=m.me>m.them;
-    x.textAlign='left'; x.fillStyle=P.dim; x.font='400 23px "IBM Plex Mono",monospace';
+    const ty=ROWTOP+i*step, win=m.me>m.them;
+    x.textAlign='left'; x.fillStyle=P.dim; x.font='400 '+(fs-1)+'px "IBM Plex Mono",monospace';
     x.fillText(String(m.y),84,ty);
-    x.fillStyle=win?P.accent:P.dim; x.font='600 23px "IBM Plex Mono",monospace';
+    x.fillStyle=win?P.accent:P.dim; x.font='600 '+(fs-1)+'px "IBM Plex Mono",monospace';
     x.fillText(win?'W':'L',158,ty);
-    x.fillStyle=P.ink; x.font='400 24px "IBM Plex Sans",sans-serif';
-    x.fillText(cardClip(x,m.rnd,240),200,ty);
-    x.textAlign='right'; x.font='500 25px "IBM Plex Mono",monospace';
+    x.fillStyle=P.ink; x.font='400 '+fs+'px "IBM Plex Sans",sans-serif';
+    x.fillText(cardClip(x,m.rnd,250),200,ty);
+    x.textAlign='right'; x.font='500 '+(fs+1)+'px "IBM Plex Mono",monospace';
     x.fillStyle=win?P.ink:P.dim;
     x.fillText(m.me.toFixed(2)+'  –  '+m.them.toFixed(2),S-84,ty);
   });
   if(cut){
-    x.textAlign='center'; x.fillStyle=P.dim; x.font='italic 400 24px "IBM Plex Sans",sans-serif';
-    x.fillText('and '+cut+' earlier meeting'+(cut===1?'':'s'),S/2,ROWTOP+shown.length*40+16);
+    x.textAlign='center'; x.fillStyle=P.dim; x.font='italic 400 22px "IBM Plex Sans",sans-serif';
+    x.fillText('and '+cut+' earlier meeting'+(cut===1?'':'s'),S/2,ROWTOP+shown.length*step+14);
   }
   cardFoot(x,S,P);
   return new Promise(res=>cv.toBlob(res,'image/png'));
@@ -4262,7 +4320,7 @@ async function makeRoastCard(name){
   x.fillText(name.toUpperCase(),S/2,232);
   x.fillStyle=P.dim; x.font='400 28px "IBM Plex Sans",sans-serif';
   x.fillText(R.m.seasons+' season'+(R.m.seasons===1?'':'s')+'  ·  '+R.m.w+'-'+R.m.l+
-    (R.m.t?'-'+R.m.t:'')+'  ·  every word of this is from the record',S/2,280);
+    (R.m.t?'-'+R.m.t:''),S/2,280);
 
   /* measure first: a fact that runs off the bottom of the card is worth less than one
      fewer fact that fits, so entries are dropped from the end until the stack clears
@@ -4806,7 +4864,12 @@ function drawWeekly(YR){
 
   /* trades */
   function drawTrades(){
-  $('#trades').innerHTML=K5.trades.map(t=>`<div class="card" style="margin-top:0">
+  /* the source list is newest-first; a season reads better in the order it happened */
+  const TMON={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const tdate=t=>{const m=/^([A-Za-z]{3})\s+(\d+)/.exec(t.d||'');
+    return m?(TMON[m[1]]||0)*100+ +m[2]:0;};
+  const TR=K5.trades.slice().sort((a,b)=>tdate(a)-tdate(b));
+  $('#trades').innerHTML=TR.map(t=>`<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(t.ta)} &harr; ${esc(t.tb)}</h3><span class="sub">${esc(t.d)}</span>
       <div class="right sub">${esc(MG[t.ta]||'')} &harr; ${esc(MG[t.tb]||'')}</div></div>
     <div class="card-b" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
