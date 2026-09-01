@@ -1400,21 +1400,6 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     </div>
   </section>
 
-  <section id="records">
-    <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
-    <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
-      <select id="recPick" style="margin-left:8px"></select>
-      <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
-      <span class="sub" style="margin-left:9px" id="recsCount"></span></div>
-    <div id="recsWrap" hidden>
-      <div id="recs"></div>
-      <div class="card" style="margin-top:22px">
-        <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
-        <div class="card-b" id="mileWatch"></div>
-      </div>
-    </div>
-  </section>
 
   <section id="seasons">
     <div class="sec-head"><h2>Seasons</h2><div class="rule-note">Standings and bracket, year by year<br>Everyone who played that season is shown</div></div>
@@ -1472,6 +1457,22 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="card">
       <div class="card-h"><h3>Trades per season</h3><span class="sub">Total deals in the league each year</span></div>
       <div class="card-b" id="trYears"></div>
+    </div>
+  </section>
+
+  <section id="records">
+    <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
+    <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
+      <select id="recPick" style="margin-left:8px"></select>
+      <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
+      <span class="sub" style="margin-left:9px" id="recsCount"></span></div>
+    <div id="recsWrap" hidden>
+      <div id="recs"></div>
+      <div class="card" style="margin-top:22px">
+        <div class="card-h"><h3>Milestone watch</h3><span class="sub">How close each manager is to the next round number</span></div>
+        <div class="card-b" id="mileWatch"></div>
+      </div>
     </div>
   </section>
 
@@ -1679,7 +1680,8 @@ $('#nextYr').textContent=LAST+1;
 /* nav */
 const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
  ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],
- ['records','Records'],['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],['method','Method']];
+ ['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],
+ ['records','Records'],['method','Method']];
 $('#nav').innerHTML=SECS.map(([i,t])=>`<a href="#${i}" data-id="${i}">${t}</a>`).join('');
 /* the nav scrolls on every width; it just should not look like it does */
 (function(){
