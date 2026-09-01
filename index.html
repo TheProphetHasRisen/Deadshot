@@ -439,6 +439,12 @@
   font-size:10px;font-weight:700;font-family:"IBM Plex Mono",monospace;line-height:1;
   cursor:help;vertical-align:middle;margin-left:5px;flex:none;user-select:none}
 .gl:hover,.gl:focus{background:var(--brass);color:var(--surface);outline:none}
+/* the in-header version rides small and low-key, so twelve of them across a stats table
+   read as punctuation rather than as twelve more things to look at */
+th .gl-th{width:14px;height:14px;font-size:8.5px;margin-left:6px;border-color:var(--rule);
+  color:var(--ink-3);opacity:.75;text-transform:none;letter-spacing:0}
+th .gl-th:hover,th .gl-th:focus{opacity:1;border-color:var(--brass-2);background:var(--brass);
+  color:var(--surface)}
 .plain{margin:9px 0 0;font-size:12.5px;color:var(--ink-2);line-height:1.5}
 @media(pointer:coarse){
   button,select,input[type=search]{min-height:36px}
@@ -716,14 +722,14 @@ details.expl>p,details.expl .plain{margin-top:9px}
 @keyframes pnBlink{0%,95%{opacity:1}96%,99%{opacity:.15}100%{opacity:1}}
 .pnda .pn-face .nose{position:absolute;left:50%;transform:translateX(-50%);top:58px;
   width:22px;height:15px;border-radius:50%;background:#141510}
-.pnda .pn-tag{font-size:10px;letter-spacing:.34em;color:#6FA33F;opacity:.9}
+.pnda .pn-tag{font-size:11px;letter-spacing:.32em;color:#B7DA8C}
 .pnda .pn-l1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
   font-size:clamp(44px,9.5vw,100px);line-height:.95;letter-spacing:.03em;margin-top:8px;color:#F4F1E6;
   text-shadow:0 0 30px rgba(244,241,230,.28)}
 .pnda .pn-l2{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
-  font-size:clamp(22px,4.6vw,46px);line-height:1.05;letter-spacing:.1em;margin-top:3px;color:#6FA33F}
-.pnda .pn-sub{margin-top:13px;font-size:11.5px;letter-spacing:.2em;color:#D6D2C2;opacity:.9}
-.pnda .pn-facts{margin-top:7px;font-size:10.5px;letter-spacing:.24em;color:#6FA33F;opacity:.6}
+  font-size:clamp(22px,4.6vw,46px);line-height:1.05;letter-spacing:.1em;margin-top:3px;color:#9FD063}
+.pnda .pn-sub{margin-top:13px;font-size:12px;letter-spacing:.2em;color:#EAE6D6}
+.pnda .pn-facts{margin-top:8px;font-size:11px;letter-spacing:.22em;color:#BFDD96}
 @media (prefers-reduced-motion:reduce){.pnda *{animation:none!important}}
 
 /* Kaiper: ten seasons of it, seven of them under the same prehistoric name. Amber,
@@ -742,7 +748,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .jrsc .jr-rip:nth-of-type(2){animation-delay:1s}
 .jrsc .jr-rip:nth-of-type(3){animation-delay:2s}
 @keyframes jrRip{from{transform:scale(.3);opacity:.75}to{transform:scale(15);opacity:0}}
-.jrsc .jr-tag{position:relative;font-size:10px;letter-spacing:.34em;color:#C4402B}
+.jrsc .jr-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F0906A}
 .jrsc .jr-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   font-weight:900;font-size:clamp(40px,9vw,96px);line-height:.95;letter-spacing:.03em;margin-top:8px;
   color:#E8A33D;text-shadow:0 0 34px rgba(232,163,61,.6),0 3px 0 rgba(60,30,6,.9);
@@ -752,9 +758,67 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .jrsc .jr-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.05;letter-spacing:.1em;margin-top:3px;
   color:#F3E2C4}
-.jrsc .jr-sub{position:relative;margin-top:13px;font-size:11.5px;letter-spacing:.2em;color:#E4C89A;opacity:.92}
-.jrsc .jr-facts{position:relative;margin-top:7px;font-size:10.5px;letter-spacing:.24em;color:#C4402B;opacity:.75}
+.jrsc .jr-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F2DDBB}
+.jrsc .jr-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#EFAE86}
 @media (prefers-reduced-motion:reduce){.jrsc *{animation:none!important}}
+
+/* Wu: lacquer red and gold leaf, and a carver's seal. The seal carries the number of
+   seasons he has played, in Chinese numerals, because that is a fact rather than a
+   decoration. */
+.nwu{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(74,8,10,.95),rgba(12,3,3,.98));
+  animation:wuIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.nwu.out{animation:wuOut .7s ease-in forwards}
+@keyframes wuIn{from{opacity:0}to{opacity:1}}
+@keyframes wuOut{to{opacity:0}}
+.nwu .wu-in{position:relative;text-align:center;padding:34px 56px;max-width:min(92vw,740px);
+  border:1px solid #E8C46A;background:rgba(28,5,6,.93);
+  box-shadow:0 0 0 1px rgba(232,196,106,.24),0 0 74px rgba(176,26,32,.62);overflow:hidden}
+.nwu .wu-in::before,.nwu .wu-in::after{content:"";position:absolute;width:26px;height:26px;
+  border:2px solid #E8C46A;opacity:.55}
+.nwu .wu-in::before{left:12px;top:12px;border-right:0;border-bottom:0}
+.nwu .wu-in::after{right:12px;bottom:12px;border-left:0;border-top:0}
+.nwu .wu-seal{position:relative;width:82px;height:82px;margin:0 auto 14px;border-radius:5px;
+  background:#B01A20;border:3px solid #E8C46A;display:grid;place-items:center;
+  transform:rotate(-4deg);box-shadow:0 0 34px rgba(176,26,32,.75)}
+.nwu .wu-seal span{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:44px;
+  line-height:1;color:#FFF3D6;font-weight:700}
+.nwu .wu-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F0CE84}
+.nwu .wu-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(44px,9.5vw,102px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#F7E3AE;text-shadow:0 0 32px rgba(232,196,106,.6),0 3px 0 rgba(96,10,12,.9)}
+.nwu .wu-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(22px,4.6vw,46px);line-height:1.05;letter-spacing:.09em;margin-top:3px;
+  color:#F26B62}
+.nwu .wu-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F6E2C4}
+.nwu .wu-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#F0CE84}
+@media (prefers-reduced-motion:reduce){.nwu *{animation:none!important}}
+
+/* Gearing: scarlet and gold, and the yard lines you get to look along when your seat
+   is one of the twenty at pitch level. */
+.gr49{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 42%,rgba(126,4,4,.95),rgba(14,3,3,.98));
+  animation:grIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.gr49.out{animation:grOut .7s ease-in forwards}
+@keyframes grIn{from{opacity:0}to{opacity:1}}
+@keyframes grOut{to{opacity:0}}
+.gr49 .gr-in{position:relative;text-align:center;padding:34px 56px 30px;max-width:min(92vw,760px);
+  border:1px solid #C9AE72;background:linear-gradient(180deg,rgba(122,6,6,.96),rgba(74,4,4,.97));
+  box-shadow:0 0 0 1px rgba(201,174,114,.3),0 0 84px rgba(170,0,0,.75);overflow:hidden}
+.gr49 .gr-turf{position:absolute;left:0;right:0;bottom:0;height:96px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.30) 46px 49px);
+  mask-image:linear-gradient(180deg,transparent,#000);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000)}
+.gr49 .gr-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#EBD6A2}
+.gr49 .gr-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(42px,9vw,98px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#F4E7C4;text-shadow:0 0 30px rgba(179,153,93,.55),0 3px 0 rgba(120,0,0,.95)}
+.gr49 .gr-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(20px,4.2vw,42px);line-height:1.06;letter-spacing:.08em;margin-top:3px;
+  color:#F2D89C}
+.gr49 .gr-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F3E3C6}
+.gr49 .gr-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E8D3A0}
+@media (prefers-reduced-motion:reduce){.gr49 *{animation:none!important}}
 .chaosov{position:fixed;inset:0;z-index:180;pointer-events:none;
   background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);
   animation:chFlick .09s steps(1) infinite}
@@ -2117,6 +2181,8 @@ if(unlocked())revealSecret();
     if(CHAMP_KEYS.some(k=>buf.endsWith(k))){buf='';titleDefense();}
     if(buf.endsWith('burke')){buf='';pandaWatch();}
     if(buf.endsWith('kaiper')){buf='';stillStomping();}
+    if(buf.endsWith('wu')){buf='';wuSeal();}
+    if(buf.endsWith('gearing')){buf='';fieldLevel();}
   });
 })();
 /* Typing the reigning champion's surname wakes him up. The trigger comes from the data
@@ -2142,16 +2208,108 @@ function titleDefense(){
   document.body.appendChild(el);
   const c=ac();
   if(c&&!quiet()){
-    /* a low brass swell, then two struck-gold notes on top of it */
-    tone(58,1.5,'sawtooth',.20,44,0);
-    tone(87,1.4,'triangle',.15,72,.05);
-    noise(.5,.10,1400,180,0,'lowpass',.9);
-    ping(1244,.9,.085,.34,1);
-    ping(1661,1.1,.075,.62,1);
+    /* a low brass swell, two struck-gold notes, and the champion enjoying himself */
+    tone(58,1.5,'sawtooth',.18,44,0);
+    tone(87,1.4,'triangle',.13,72,.05);
+    noise(.5,.09,1400,180,0,'lowpass',.9);
+    ping(1244,.9,.075,.30,1);
+    ping(1661,1.1,.065,.54,1);
+    evilLaugh(1.0);
   }
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
+}
+
+
+/* ---- four voices, all synthesised ------------------------------------------- */
+
+/* A pterosaur cry: a thin, raspy call that leaps up and falls away. Two sawtooths a
+   fifth apart give the harshness, a fast vibrato gives the flutter, and a bandpass
+   noise layer on top is the air in it. */
+function screech(delay){
+  const c=ac(); if(!c||quiet())return;
+  const t0=c.currentTime+(delay||0), D=0.9;
+  const bus=c.createGain();
+  bus.gain.setValueAtTime(0.0001,t0);
+  bus.gain.exponentialRampToValueAtTime(0.16,t0+0.06);
+  bus.gain.setValueAtTime(0.16,t0+0.34);
+  bus.gain.exponentialRampToValueAtTime(0.0001,t0+D);
+  const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2100; bp.Q.value=1.5;
+  bp.connect(bus).connect(c.destination);
+  [1,1.5].forEach((m,i)=>{
+    const o=c.createOscillator(); o.type='sawtooth';
+    o.frequency.setValueAtTime(760*m,t0);
+    o.frequency.exponentialRampToValueAtTime(2450*m,t0+0.13);   /* the leap up */
+    o.frequency.exponentialRampToValueAtTime(2100*m,t0+0.34);
+    o.frequency.exponentialRampToValueAtTime(430*m,t0+D);       /* and the fall away */
+    const lfo=c.createOscillator(), lg=c.createGain();
+    lfo.frequency.value=27+i*6; lg.gain.value=90;               /* the flutter in it */
+    lfo.connect(lg).connect(o.frequency); lfo.start(t0); lfo.stop(t0+D+0.1);
+    const g=c.createGain(); g.gain.value=i?0.35:1;
+    o.connect(g).connect(bp); o.start(t0); o.stop(t0+D+0.1);
+  });
+  noise(0.5,0.05,5200,1200,(delay||0)+0.02,'bandpass',0.7);
+}
+
+/* A low laugh. Voices are resonances, so a pulse train run through the formants of
+   "uh" reads as a throat rather than a synth, and a gain envelope chopped at the rate
+   of the syllables does the rest. It steps down in pitch, because a laugh settles. */
+function evilLaugh(delay){
+  const c=ac(); if(!c||quiet())return;
+  const t0=c.currentTime+(delay||0);
+  const HA=[[0,0.19,104],[0.30,0.19,96],[0.60,0.20,88],[0.92,0.30,78]];
+  const bus=c.createGain(); bus.gain.value=0.9; bus.connect(c.destination);
+  const forms=[[570,1.0],[840,0.6],[2410,0.14]].map(([hz,amp])=>{
+    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=hz; bp.Q.value=6;
+    const g=c.createGain(); g.gain.value=amp; bp.connect(g).connect(bus); return bp;});
+  HA.forEach(([off,dur,hz])=>{
+    const s=t0+off;
+    const o=c.createOscillator(); o.type='sawtooth';
+    o.frequency.setValueAtTime(hz,s);
+    o.frequency.linearRampToValueAtTime(hz*0.88,s+dur);
+    const g=c.createGain();
+    g.gain.setValueAtTime(0.0001,s);
+    g.gain.exponentialRampToValueAtTime(0.30,s+0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001,s+dur);
+    o.connect(g); forms.forEach(f=>g.connect(f));
+    o.start(s); o.stop(s+dur+0.05);
+    noise(dur*0.7,0.018,900,300,off+(delay||0),'bandpass',1.2);   /* the breath */
+  });
+  tone(41,1.5,'sine',0.13,33,delay||0);                            /* the room under it */
+}
+
+/* A struck gong: a heavy inharmonic wash that blooms after the strike rather than at
+   it, and takes a long time to go. */
+function gong(delay){
+  const c=ac(); if(!c||quiet())return;
+  const t0=c.currentTime+(delay||0), D=4.2;
+  const PART=[1,1.52,2.14,2.71,3.46,4.35,5.62,7.11];
+  PART.forEach((m,i)=>{
+    const o=c.createOscillator(), g=c.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(78*m,t0);
+    o.frequency.linearRampToValueAtTime(78*m*0.985,t0+D);   /* metal drifts flat as it rings */
+    const v=0.13*Math.pow(0.72,i), bloom=0.05+i*0.03;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0004,v),t0+bloom);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+D*Math.pow(0.86,i));
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0+D+0.1);
+  });
+  noise(0.10,0.14,6000,900,delay||0,'bandpass',0.5);        /* the mallet on the face of it */
+  noise(2.2,0.05,1800,200,(delay||0)+0.04,'lowpass',1.4);   /* the shimmer after */
+}
+
+/* Sixty thousand people, from field level: a swell that arrives late and takes its
+   time leaving, with a whistle cutting over the top of it. */
+function crowdRoar(delay){
+  const c=ac(); if(!c||quiet())return;
+  const d=delay||0;
+  noise(2.6,0.21,900,300,d,'bandpass',0.35);
+  noise(2.2,0.14,420,160,d+0.15,'lowpass',0.5);
+  tone(58,2.0,'sawtooth',0.08,44,d+0.1);
+  /* a two-tone whistle over the noise, the way a real one beats against itself */
+  [3180,3320].forEach((f,i)=>tone(f,0.42,'triangle',0.07,f*0.97,d+0.5+i*0.005));
+  noise(0.4,0.045,4200,3000,d+0.5,'bandpass',0.4);
 }
 
 /* ---- the two men who have never missed a season -------------------------------
@@ -2175,10 +2333,10 @@ function pandaWatch(){
     +'<div class="pn-face"><span class="ear l"></span><span class="ear r"></span>'
     +'<span class="head"><span class="eye l"><i></i></span><span class="eye r"><i></i></span>'
     +'<span class="nose"></span></span></div>'
-    +'<div class="pn-tag">A T T E N D A N C E &nbsp; R E C O R D</div>'
+    +'<div class="pn-tag">Q U O T H &nbsp; T H E &nbsp; P A N D A</div>'
     +'<div class="pn-l1">BRIAN BURKE</div>'
     +'<div class="pn-l2">'+F.m.seasons+' SEASONS OF '+SEA.length+'</div>'
-    +'<div class="pn-sub">never missed a year, never missed by much</div>'
+    +'<div class="pn-sub">nevermore absent, and never missed by much</div>'
     +'<div class="pn-facts">'+F.first+'&ndash;'+F.last+' &middot; '+F.m.apps+' OF '+F.m.seasons
       +' IN THE BRACKET &middot; INDEX '+F.m.cpi.toFixed(1)+' &middot; SWING &plusmn;'
       +(F.m.sd==null?'—':F.m.sd.toFixed(1))+'</div></div>';
@@ -2188,6 +2346,46 @@ function pandaWatch(){
     ping(392,.55,.075,0,1); ping(330,.7,.065,.20,1);
     tone(98,.7,'triangle',.10,80,0);
   }
+  const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
+  el.addEventListener('click',off);
+  setTimeout(off,5250);
+}
+/* Chinese numerals for the seal. Only ever fed a season count, so ten covers it. */
+const CN_NUM=['','\u4E00','\u4E8C','\u4E09','\u56DB','\u4E94','\u516D','\u4E03','\u516B','\u4E5D','\u5341'];
+function wuSeal(){
+  const F=loyalFacts('Nathan Wu'); if(!F||$('.nwu'))return;
+  const m=F.m, n=m.seasons;
+  const el=document.createElement('div'); el.className='nwu';
+  el.innerHTML='<div class="wu-in">'
+    +'<div class="wu-seal"><span>'+(CN_NUM[n]||n)+'</span></div>'
+    +'<div class="wu-tag">S E A L E D &nbsp; A N D &nbsp; S T A M P E D</div>'
+    +'<div class="wu-l1">NATHAN WU</div>'
+    +'<div class="wu-l2">'+m.podium+' TIMES ON THE PODIUM, '+(m.titles?m.titles:'NONE')+' ON THE TOP STEP</div>'
+    +'<div class="wu-sub">'+n+' seasons, '+m.apps+' of them in the bracket, and still no ring to show for it</div>'
+    +'<div class="wu-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
+      +' &middot; INDEX '+m.cpi.toFixed(1)+' &middot; PEAK '+m.peak.toFixed(1)+'</div></div>';
+  document.body.appendChild(el);
+  if(ac()&&!quiet()){ gong(0); ping(1568,1.4,.05,.55,1); }
+  const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
+  el.addEventListener('click',off);
+  setTimeout(off,5250);
+}
+/* Nick keeps a seat at pitch level at Levi's, one of twenty the 49ers put down there in
+   the 2026 rebuild, so his card is scarlet and gold and standing on the grass. */
+function fieldLevel(){
+  const F=loyalFacts('Nick Gearing'); if(!F||$('.gr49'))return;
+  const m=F.m, ty=ROWS.filter(r=>r.mgr==='Nick Gearing'&&r.place===1).map(r=>r.y);
+  const el=document.createElement('div'); el.className='gr49';
+  el.innerHTML='<div class="gr-in"><div class="gr-turf"></div>'
+    +'<div class="gr-tag">F I E L D &nbsp; L E V E L &nbsp;&middot;&nbsp; L E V I &rsquo; S</div>'
+    +'<div class="gr-l1">NICK GEARING</div>'
+    +'<div class="gr-l2">CLOSE ENOUGH TO HEAR THE SNAP COUNT</div>'
+    +'<div class="gr-sub">a seat on the grass in Santa Clara, and '
+      +(ty.length?'a ring from '+ty.join(' and '):'still chasing a ring')+' in this one</div>'
+    +'<div class="gr-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.seasons+' SEASONS &middot; '
+      +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.apps+' OF '+m.seasons+' IN THE BRACKET</div></div>';
+  document.body.appendChild(el);
+  if(ac()&&!quiet())crowdRoar(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2205,9 +2403,10 @@ function stillStomping(){
       +F.m.w+'&ndash;'+F.m.l+(F.m.t?'&ndash;'+F.m.t:'')+' &middot; NEVER ONCE ABSENT</div></div>';
   document.body.appendChild(el);
   const c=ac();
-  if(c&&!quiet()){                       /* two footfalls, getting closer */
+  if(c&&!quiet()){          /* two footfalls, then the thing that made them */
     tone(41,.55,'sine',.34,30,0);   noise(.30,.13,240,40,0,'lowpass',.9);
-    tone(44,.6,'sine',.38,31,.72);  noise(.34,.16,260,42,.72,'lowpass',.9);
+    tone(44,.6,'sine',.38,31,.62);  noise(.34,.16,260,42,.62,'lowpass',.9);
+    screech(1.05);
   }
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
@@ -2648,10 +2847,18 @@ function table(el,cols,data,opts={}){
       cols.map(c=>`<td class="${c.c||''}">${c.f(r)}</td>`).join('')+'</tr>').join('')+'</tbody>';
     $$('th.s',el).forEach(th=>th.onclick=()=>{const i=+th.dataset.i;
       if(st.i===i)st.dir=st.dir==='desc'?'asc':'desc'; else{st.i=i;st.dir=cols[i].asc?'asc':'desc';} render();});
-    /* a column heading that carries an explanation gets the site's own tooltip. It used
-       to be a plain title="" attribute, which the browser draws in its own style after a
-       long delay and which a phone can never show at all. */
-    $$('th[data-th-tip]',el).forEach(th=>{th.style.cursor='help';bindTip(th,th.dataset.thTip);});
+    /* An explanation hangs off its own "?", never off the heading. Making the whole
+       heading the hover target fought with its real job, which is to sort the table:
+       you went to read what a column meant and re-sorted the page instead. */
+    $$('th[data-th-tip]',el).forEach(th=>{
+      const q=document.createElement('span');
+      q.className='gl gl-th'; q.tabIndex=0; q.textContent='?';
+      q.setAttribute('role','button');
+      q.setAttribute('aria-label','What '+th.textContent.trim()+' means');
+      q.addEventListener('click',e=>e.stopPropagation());
+      q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.preventDefault();});
+      bindTip(q,th.dataset.thTip);
+      th.appendChild(document.createTextNode(' ')); th.appendChild(q);});
     if(opts.after)opts.after(d);
   }
   render(); return {render};
@@ -2972,31 +3179,45 @@ function drawPiHelp(){
   const lgA=(D.champs.find(c=>c.y===first)||{}).lg, lgB=chL.lg;
   const infl=lgA?((lgB/lgA-1)*100):null;
   const hi=ROWS.reduce((a,b)=>b.pi>a.pi?b:a), lo=ROWS.reduce((a,b)=>b.pi<a.pi?b:a);
-  /* The bands used to carry written labels like "a contender's year" for 110-120, which
-     was simply untrue: the median champion scored 107.4 and one has won at 93.9. Both the
-     verdict and the evidence are now derived from what actually happened at each level,
-     so neither can overclaim. */
-  const BANDS=[[120,999],[110,120],[103,110],[97,103],[90,97],[0,90]];
+  /* The written labels say what the level is; the four counts beside them say what it has
+     actually been worth. That split matters: a label on its own once claimed 110-120 was
+     "a contender's year" when the median champion scored 107.4 and one has won at 93.9.
+     Every count is read off ROWS, so the words can describe and the numbers can judge. */
+  const BANDS=[
+    [120,999,'The best seasons this league has produced'],
+    [110,120,'A contender&rsquo;s year'],
+    [103,110,'Clearly above the field'],
+    [97,103,'The middle of the pack'],
+    [90,97,'Below the field'],
+    [0,90,'A season to forget']];
+  /* no "x of y" here: the seasons column is already sitting right beside it */
+  const bandCell=(v,hi)=>`<span style="flex:0 0 84px;text-align:right;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    color:${v?(hi?'var(--brass)':'var(--ink)'):'var(--ink-3)'};
+    font-weight:${v&&hi?600:400}">${v}</span>`;
   const bandRows=BANDS.map(b=>{
     const rs=ROWS.filter(r=>r.pi>=b[0]&&r.pi<b[1]);
-    const n=rs.length, t=rs.filter(r=>r.place===1).length, pl=rs.filter(r=>r.po).length;
-    const rate=n?pl/n:0;
-    /* a 100% rate off a single season is not a rate, so say the count instead */
-    const tag=!n?'Never happened':n===1?'Once, ever':rate===1?'Always enough'
-      :rate>=0.7?'Usually enough':rate>=0.45?'A coin flip':rate>=0.2?'Rarely enough':'Not enough';
-    const ev=!n?'No season has ever landed here.'
-      :n===1?'One season in league history'+(t?', and it won the title.':(pl?', and it made the playoffs.':', and it missed the playoffs.'))
-      :(pl===n?'All '+n+' made the playoffs':pl+' of '+n+' made the playoffs')+
-        (t?', and '+(t===1?'one won':t+' won')+' the title.':', none won the title.');
+    const n=rs.length;
+    const pl=rs.filter(r=>r.po).length;
+    const pod=rs.filter(r=>r.place<=3).length;
+    const t=rs.filter(r=>r.place===1).length;
     const mid=Math.min(130,Math.max(70,(b[1]>900?126:(b[0]+b[1])/2)));
     const lab=b[1]>900?b[0]+' and up':(b[0]===0?'under '+b[1]:b[0]+'&ndash;'+b[1]);
-    return `<div style="display:flex;align-items:baseline;gap:11px;padding:8px 0;border-top:1px solid var(--rule-2);flex-wrap:wrap">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--rule-2)">
       <span style="flex:0 0 78px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
         background:${diverge(mid-100,16)};color:${inkOn(mid-100,16)};text-align:center;
         padding:3px 0;border-radius:3px">${lab}</span>
-      <span style="flex:0 0 118px;font-size:13.5px;font-weight:600;color:var(--ink)">${tag}</span>
-      <span style="flex:1 1 240px;font-size:13.5px;color:var(--ink-2)">${ev}</span>
+      <span style="flex:1 1 auto;min-width:0;font-size:13.5px;color:var(--ink-2)">${b[2]}</span>
+      <span style="flex:0 0 84px;text-align:right;font-family:'IBM Plex Mono',monospace;
+        font-size:12.5px;color:var(--ink-3)">${n}</span>
+      ${bandCell(pl,false)}${bandCell(pod,false)}${bandCell(t,true)}
     </div>`;}).join('');
+  const bandHead=`<div style="display:flex;align-items:flex-end;gap:10px;padding:0 0 5px">
+    <span style="flex:0 0 78px"></span><span style="flex:1 1 auto"></span>
+    ${['SEASONS','MADE PLAYOFFS','PODIUMS','TITLES'].map(h=>
+      `<span style="flex:0 0 84px;text-align:right;font-family:'IBM Plex Mono',monospace;
+        font-size:9.5px;letter-spacing:.11em;color:var(--ink-3);line-height:1.25">${h}</span>`).join('')}
+  </div>`;
 
   host.innerHTML=`
   <p style="margin:0 0 12px;font-size:14px;color:var(--ink-2)"><b>The whole calculation:</b>
@@ -3009,10 +3230,9 @@ function drawPiHelp(){
     <b class="mono" style="color:var(--brass)">${ex.pi.toFixed(1)}</b> &mdash; they scored
     <b>${(ex.pi-100).toFixed(1)}% ${ex.pi>=100?'more':'less'}</b> than the typical team that year.</p>
   <div class="sub-h" style="margin:0 0 2px">What the number means</div>
-  <p style="margin:0 0 4px;font-size:13px;color:var(--ink-3)">Read across: whether a season
-    at that level was enough to reach the playoffs, and what actually happened to the
-    ${ROWS.length} seasons on record that landed there.</p>
-  ${bandRows}
+  <p style="margin:0 0 8px;font-size:13px;color:var(--ink-3)">Read across: what has actually
+    become of the ${ROWS.length} seasons on record that landed in each band.</p>
+  <div style="overflow-x:auto"><div style="min-width:560px">${bandHead}${bandRows}</div></div>
   <p style="margin:16px 0 0;font-size:14px;color:var(--ink-2)"><b>Why it travels.</b>
     Raw points do not. The league averaged <b class="mono">${lgA?lgA.toFixed(2):'&mdash;'}</b> a game in
     ${first} and <b class="mono">${lgB.toFixed(2)}</b> in ${last}${infl!=null?', '+Math.abs(infl).toFixed(0)+'% '+(infl>=0?'higher':'lower'):''},
