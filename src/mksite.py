@@ -3057,10 +3057,24 @@ $$('.pills button[data-mx]').forEach(b=>b.onclick=()=>{
   $$('.pills button[data-mx]').forEach(x=>x.classList.toggle('on',x===b)); MXK=b.dataset.mx; drawMtx();});
 drawMtx(); REDRAW.push(drawMtx);
 (function(){
-  const names=M.map(m=>m.name).sort();
-  $('#cmpA').innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
-  $('#cmpB').innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');
-  $('#cmpA').value='Brian Burke'; $('#cmpB').value='Shane Kaiper';
+  /* the list was built once from every manager, so it ignored the filter at the top
+     and never changed when that filter did. Rebuild it on each redraw, keeping the
+     current pick when that person is still shown. */
+  function fillPickers(){
+    const names=M.filter(m=>vis(m.name)).map(m=>m.name).sort();
+    const set=(sel,fallback)=>{
+      const cur=sel.value;
+      sel.innerHTML=names.map(x=>`<option>${esc(x)}</option>`).join('');
+      sel.value=names.indexOf(cur)>-1?cur:(names.indexOf(fallback)>-1?fallback:(names[0]||''));
+    };
+    set($('#cmpA'),'Brian Burke');
+    set($('#cmpB'),'Shane Kaiper');
+    if(names.length>1&&$('#cmpA').value===$('#cmpB').value){
+      const other=names.filter(x=>x!==$('#cmpA').value)[0];
+      if(other)$('#cmpB').value=other;
+    }
+  }
+  fillPickers();
   function draw(){
     const a=byName[$('#cmpA').value],b=byName[$('#cmpB').value];
     if(!a||!b||a===b){$('#cmpOut').innerHTML='<p class="dim" style="margin:0">Pick two different managers.</p>';return;}
@@ -3091,7 +3105,8 @@ drawMtx(); REDRAW.push(drawMtx);
           return o;})()}
       </div></div>`;
   }
-  $('#cmpA').onchange=draw; $('#cmpB').onchange=draw; draw(); REDRAW.push(draw);
+  $('#cmpA').onchange=draw; $('#cmpB').onchange=draw; draw();
+  REDRAW.push(()=>{fillPickers();draw();});
 })();
 
 /* ============ week-by-week, per season ============ */
@@ -3483,9 +3498,21 @@ async function makeH2HCard(an,bn){
   const rec=MX.all.t[an+'|'+bn];
   const fit=(t,max,start)=>{let f=start;x.font=`900 ${f}px "Big Shoulders Display",sans-serif`;
     while(x.measureText(t).width>max&&f>40){f-=3;x.font=`900 ${f}px "Big Shoulders Display",sans-serif`;}return f;};
-  fit(an.toUpperCase(),S-140,86); x.fillStyle=P.ink; x.fillText(an.toUpperCase(),S/2,206);
-  x.fillStyle=P.dim; x.font='500 30px "IBM Plex Mono",monospace'; x.fillText('versus',S/2,258);
-  fit(bn.toUpperCase(),S-140,86); x.fillStyle=P.ink; x.fillText(bn.toUpperCase(),S/2,340);
+  const A=an.toUpperCase(), B=bn.toUpperCase();
+  /* The two names can end up at different sizes, so a fixed offset for "versus" only
+     looks centred for one pair. Measure the real ink of each and sit it in the middle
+     of the actual gap. */
+  const yA=206, yB=340;
+  fit(A,S-140,86); const mA=x.measureText(A);
+  x.fillStyle=P.ink; x.fillText(A,S/2,yA);
+  fit(B,S-140,86); const mB=x.measureText(B);
+  x.fillStyle=P.ink; x.fillText(B,S/2,yB);
+  const gapTop=yA+(mA.actualBoundingBoxDescent||0);
+  const gapBot=yB-(mB.actualBoundingBoxAscent||62);
+  x.fillStyle=P.dim; x.font='500 30px "IBM Plex Mono",monospace';
+  const mV=x.measureText('versus');
+  const vAsc=mV.actualBoundingBoxAscent||21, vDesc=mV.actualBoundingBoxDescent||0;
+  x.fillText('versus',S/2,(gapTop+gapBot)/2+(vAsc-vDesc)/2);
 
   if(rec){
     x.fillStyle=P.accent; x.font='900 176px "Big Shoulders Display",sans-serif';
