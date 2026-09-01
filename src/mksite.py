@@ -3457,12 +3457,18 @@ async function makeShareCard(name){
   }
 
   x.fillStyle=GOLD; x.font='600 26px "IBM Plex Mono",monospace';
-  x.fillText('deadshotleague.com',84,S-72);
+  x.fillText(cardHost(),84,S-72);
   return new Promise(res=>c.toBlob(res,'image/png'));
 }
 /* Cards are drawn in whatever theme the reader is currently looking at, so the picture
    that lands in the group chat matches the site they were just on. The masthead tokens
    are used because those six are already designed to sit together in every skin. */
+function cardHost(){
+  try{const h=location.hostname;
+    if(h&&h!=='localhost'&&location.protocol!=='file:')return h.replace(/^www\./,'');
+  }catch(e){}
+  return 'deadshotleague.com';
+}
 function cardPalette(){
   const hex=v=>{v=(v||'').trim(); return /^#[0-9a-fA-F]{6}$/.test(v)?v:null;};
   const bg=hex(cssv('--mast-bg'))||'#12161B';
@@ -3550,7 +3556,7 @@ async function makeH2HCard(an,bn){
   });
   x.textAlign='center';
   x.fillStyle=P.accent; x.font='600 26px "IBM Plex Mono",monospace';
-  x.fillText('deadshotleague.com',S/2,S-58);
+  x.fillText(cardHost(),S/2,S-58);
   return new Promise(res=>c.toBlob(res,'image/png'));
 }
 async function shareBlob(blob,fname){
