@@ -819,6 +819,98 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .gr49 .gr-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F3E3C6}
 .gr49 .gr-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E8D3A0}
 @media (prefers-reduced-motion:reduce){.gr49 *{animation:none!important}}
+
+/* Niko: two titles running, the second with a worse team than the first. A marquee. */
+.mrqe{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(28,20,10,.95),rgba(6,5,4,.98));
+  animation:mqIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.mrqe.out{animation:mqOut .7s ease-in forwards}
+@keyframes mqIn{from{opacity:0}to{opacity:1}}
+@keyframes mqOut{to{opacity:0}}
+.mrqe .mq-in{position:relative;text-align:center;padding:40px 56px;max-width:min(92vw,760px);
+  border:2px solid #F2C75C;background:linear-gradient(180deg,rgba(24,16,8,.96),rgba(46,10,12,.95));
+  box-shadow:0 0 0 1px rgba(242,199,92,.22),0 0 80px rgba(242,199,92,.34)}
+.mrqe .mq-bulbs{position:absolute;left:14px;right:14px;display:flex;justify-content:space-between}
+.mrqe .mq-bulbs.t{top:11px}.mrqe .mq-bulbs.b{bottom:11px}
+.mrqe .mq-bulbs i{width:8px;height:8px;border-radius:50%;background:#F2C75C;
+  box-shadow:0 0 9px #F2C75C;animation:mqBulb 1.1s ease-in-out infinite}
+.mrqe .mq-bulbs i:nth-child(3n+2){animation-delay:.37s}
+.mrqe .mq-bulbs i:nth-child(3n+3){animation-delay:.73s}
+@keyframes mqBulb{0%,100%{opacity:1}50%{opacity:.22}}
+.mrqe .mq-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F2C75C}
+.mrqe .mq-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(42px,9vw,98px);line-height:.95;letter-spacing:.03em;margin-top:9px;
+  color:#FFF4DA;text-shadow:0 0 34px rgba(242,199,92,.6),0 3px 0 rgba(110,18,22,.95)}
+.mrqe .mq-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
+  color:#F2C75C}
+.mrqe .mq-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#F7E7C6}
+.mrqe .mq-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E9BE72}
+@media (prefers-reduced-motion:reduce){.mrqe *{animation:none!important}}
+
+/* Wesley: the best win rate on record, and a rating that has fallen every single year.
+   His own five seasons are drawn as the line they make. */
+.tkr{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(6,14,12,.96),rgba(2,4,4,.98));
+  animation:tkIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.tkr.out{animation:tkOut .7s ease-in forwards}
+@keyframes tkIn{from{opacity:0}to{opacity:1}}
+@keyframes tkOut{to{opacity:0}}
+.tkr .tk-in{position:relative;text-align:center;padding:32px 54px 30px;max-width:min(92vw,760px);
+  border:1px solid #2E7D5B;background:rgba(4,10,9,.95);
+  box-shadow:0 0 0 1px rgba(63,208,122,.16),0 0 70px rgba(228,69,60,.3)}
+.tkr .tk-chart{position:relative;width:min(100%,420px);margin:2px auto 14px}
+.tkr .tk-chart svg{display:block;width:100%;height:auto}
+.tkr .tk-dot{animation:tkPulse 1.6s ease-in-out infinite}
+@keyframes tkPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tkr .tk-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#E4453C}
+.tkr .tk-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(40px,8.6vw,94px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#E9F5EC;text-shadow:0 0 30px rgba(63,208,122,.35)}
+.tkr .tk-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
+  color:#E4453C}
+.tkr .tk-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#CFE7D8}
+.tkr .tk-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#5FD497}
+@media (prefers-reduced-motion:reduce){.tkr *{animation:none!important}}
+
+/* McMahon: league lore says he is unguardable on a court. The record says the rim was
+   never his problem. */
+.hoop{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 42%,rgba(58,32,12,.96),rgba(8,5,3,.98));
+  animation:hpIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.hoop.out{animation:hpOut .7s ease-in forwards}
+@keyframes hpIn{from{opacity:0}to{opacity:1}}
+@keyframes hpOut{to{opacity:0}}
+.hoop .hp-in{position:relative;text-align:center;padding:30px 56px 34px;max-width:min(92vw,760px);
+  border:1px solid #E07B2C;background:linear-gradient(180deg,rgba(46,26,10,.96),rgba(24,13,5,.97));
+  box-shadow:0 0 0 1px rgba(224,123,44,.24),0 0 76px rgba(224,123,44,.34);overflow:hidden}
+.hoop .hp-court{position:absolute;left:50%;bottom:-118px;transform:translateX(-50%);
+  width:236px;height:236px;border:2px solid rgba(244,233,214,.28);border-radius:50%;pointer-events:none}
+.hoop .hp-ball{position:relative;width:86px;height:86px;margin:0 auto 14px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#F09A4E,#C9631E 68%);
+  box-shadow:0 0 30px rgba(224,123,44,.5);animation:hpBounce 1.9s cubic-bezier(.5,0,.6,1) infinite}
+@keyframes hpBounce{0%,100%{transform:translateY(0) scaleY(1)}
+  42%{transform:translateY(-16px) scaleY(1.03)}52%{transform:translateY(0) scaleY(.93)}62%{transform:translateY(0) scaleY(1)}}
+.hoop .hp-ball{overflow:hidden}
+/* the two curved seams: an ellipse narrower than the ball, showing only its sides */
+.hoop .hp-ball::before{content:"";position:absolute;top:-1px;bottom:-1px;left:50%;width:58%;
+  margin-left:-29%;border-radius:50%;border:3px solid rgba(60,26,8,.72);border-top:0;border-bottom:0}
+/* and the horizontal seam */
+.hoop .hp-ball::after{content:"";position:absolute;left:0;right:0;top:50%;height:3px;
+  margin-top:-1.5px;background:rgba(60,26,8,.72)}
+.hoop .hp-seam{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;
+  background:rgba(60,26,8,.72)}
+.hoop .hp-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F2B071}
+.hoop .hp-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(40px,8.6vw,94px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#FBEEDA;text-shadow:0 0 30px rgba(224,123,44,.5),0 3px 0 rgba(70,32,8,.9)}
+.hoop .hp-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
+  color:#F09A4E}
+.hoop .hp-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#F7E3C8}
+.hoop .hp-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#F2B071}
+@media (prefers-reduced-motion:reduce){.hoop *{animation:none!important}}
 .chaosov{position:fixed;inset:0;z-index:180;pointer-events:none;
   background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);
   animation:chFlick .09s steps(1) infinite}
@@ -2183,6 +2275,9 @@ if(unlocked())revealSecret();
     if(buf.endsWith('kaiper')){buf='';stillStomping();}
     if(buf.endsWith('wu')){buf='';wuSeal();}
     if(buf.endsWith('gearing')){buf='';fieldLevel();}
+    if(buf.endsWith('niko')){buf='';marquee();}
+    if(buf.endsWith('alpert')){buf='';marketClose();}
+    if(buf.endsWith('mcmahon')){buf='';wrongSport();}
   });
 })();
 /* Typing the reigning champion's surname wakes him up. The trigger comes from the data
@@ -2352,6 +2447,142 @@ function pandaWatch(){
 }
 /* Chinese numerals for the seal. Only ever fed a season count, so ten covers it. */
 const CN_NUM=['','\u4E00','\u4E8C','\u4E09','\u56DB','\u4E94','\u516D','\u4E03','\u516B','\u4E5D','\u5341'];
+/* ---- three more, all argued straight out of the record ---------------------- */
+
+/* A projector: the shutter clatter of a reel running, then a room applauding. */
+function projector(delay){
+  const d=delay||0;
+  for(let i=0;i<26;i++)noise(0.018,0.12,2600,900,d+i*0.055,'bandpass',0.6);
+  tone(52,1.5,'sawtooth',0.09,46,d);
+  for(let i=0;i<70;i++)                       /* the applause, uneven on purpose */
+    noise(0.05,0.06,3400,1400,d+0.9+Math.random()*1.5,'bandpass',0.5);
+  noise(1.6,0.11,1800,600,d+0.9,'bandpass',0.9);
+}
+/* A closing bell, then the number falling away under it. */
+function closeBell(delay){
+  const d=delay||0;
+  ping(1976,1.7,0.10,d,1); ping(2637,1.4,0.07,d+0.02,1);
+  [0,1,2,3].forEach(i=>tone(330*Math.pow(0.84,i),0.34,'triangle',0.055,
+    280*Math.pow(0.84,i),d+0.75+i*0.16));
+  tone(48,1.8,'sine',0.11,36,d+0.75);
+}
+/* Three bounces closing up, then the net. */
+function swish(delay){
+  const d=delay||0;
+  let t=d, gap=0.30;
+  for(let i=0;i<4;i++){
+    tone(96-i*6,0.16,'sine',0.16*Math.pow(0.82,i),58,t);
+    noise(0.07,0.07*Math.pow(0.8,i),900,220,t,'lowpass',0.8);
+    t+=gap; gap*=0.72;
+  }
+  noise(0.26,0.075,5600,2200,t+0.10,'bandpass',0.55);   /* through the net */
+  noise(0.16,0.04,3000,1200,t+0.16,'bandpass',0.7);
+}
+
+/* Niko has two titles back to back, and the second came with a worse team than the
+   first -- which is a film joke that happens to be true, so the card checks it. */
+function marquee(){
+  const F=loyalFacts('Niko Contreras'); if(!F||$('.mrqe'))return;
+  const m=F.m;
+  const wins=F.rs.filter(r=>r.place===1).sort((a,b)=>a.y-b.y);
+  const backToBack=wins.length>1&&SEA.indexOf(wins[1].y)===SEA.indexOf(wins[0].y)+1;
+  const worseSequel=wins.length>1&&wins[1].pi<wins[0].pi;
+  const last=F.rs[F.rs.length-1];
+  const l2=backToBack?('BACK TO BACK, '+wins[0].y+' AND '+wins[1].y)
+    :(wins.length?wins.length+(wins.length===1?' TITLE':' TITLES')+' ON THE SHELF':'NINE SEASONS, NO STATUE');
+  const sub=worseSequel
+    ? 'the sequel scored worse than the original — '+wins[0].pi.toFixed(1)+' then '+
+      wins[1].pi.toFixed(1)+' — and still took the trophy'
+    : 'nobody in this league has more of them';
+  const el=document.createElement('div'); el.className='mrqe';
+  const bulbs='<i></i>'.repeat(11);
+  el.innerHTML='<div class="mq-in">'
+    +'<div class="mq-bulbs t">'+bulbs+'</div><div class="mq-bulbs b">'+bulbs+'</div>'
+    +'<div class="mq-tag">N O W &nbsp; S H O W I N G</div>'
+    +'<div class="mq-l1">NIKO CONTRERAS</div>'
+    +'<div class="mq-l2">'+l2+'</div>'
+    +'<div class="mq-sub">'+sub+'</div>'
+    +'<div class="mq-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.seasons+' SEASONS &middot; '
+      +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.podium+' PODIUMS &middot; LAST ACT '
+      +last.y+', '+ord(last.place)+' OF '+last.teams+'</div></div>';
+  document.body.appendChild(el);
+  if(ac()&&!quiet())projector(0);
+  const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
+  el.addEventListener('click',off);
+  setTimeout(off,5250);
+}
+
+/* Wesley's five seasons make a straight line down, and he has never once won. The card
+   plots the line rather than describing it. Every superlative is checked against the
+   field first, because he is the best of the active managers and not of all of them. */
+function marketClose(){
+  const F=loyalFacts('Wesley Alpert'); if(!F||$('.tkr'))return;
+  const m=F.m, rs=F.rs, pis=rs.map(r=>r.pi);
+  const W=420,H=118,P=14;
+  const lo=Math.min(...pis)-3, hi=Math.max(...pis)+3;
+  const xs=i=>P+i*(W-P*2)/Math.max(1,pis.length-1);
+  const ys=v=>P+(hi-v)*(H-P*2)/(hi-lo);
+  const d=pis.map((v,i)=>(i?'L':'M')+xs(i).toFixed(1)+','+ys(v).toFixed(1)).join(' ');
+  const dots=pis.map((v,i)=>`<circle cx="${xs(i).toFixed(1)}" cy="${ys(v).toFixed(1)}" r="${i===pis.length-1?5:3.4}"
+    fill="#06100D" stroke="${i===pis.length-1?'#E4453C':'#3FD07A'}" stroke-width="2.4"
+    ${i===pis.length-1?'class="tk-dot"':''}/>`).join('');
+  const labs=`<text x="${xs(0)}" y="${ys(pis[0])-11}" font-size="11" fill="#5FD497"
+      font-family="IBM Plex Mono,monospace">${pis[0].toFixed(1)}</text>
+    <text x="${xs(pis.length-1)}" y="${ys(pis[pis.length-1])+20}" text-anchor="end" font-size="11"
+      fill="#E4453C" font-family="IBM Plex Mono,monospace">${pis[pis.length-1].toFixed(1)}</text>`;
+  const active=M.filter(x=>x.last===LAST&&x.seasons>=3);
+  const topActive=active.length&&active.slice().sort((a,b)=>b.cpi-a.cpi)[0].name===m.name;
+  const qual=M.filter(x=>x.g>=40);
+  const bestRate=qual.length&&qual.slice().sort((a,b)=>b.winpct-a.winpct)[0].name===m.name;
+  const claim=bestRate?'the best win rate in league history'
+    :topActive?'the highest rating of anyone still playing':'a rating near the top of the league';
+  const el=document.createElement('div'); el.className='tkr';
+  el.innerHTML='<div class="tk-in">'
+    +'<div class="tk-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Wesley Alpert\'s power index, falling every season">'
+      +'<path d="'+d+'" fill="none" stroke="#E4453C" stroke-width="2.6" stroke-linejoin="round"/>'
+      +dots+labs+'</svg></div>'
+    +'<div class="tk-tag">M A R K E T &nbsp; C L O S E</div>'
+    +'<div class="tk-l1">WESLEY ALPERT</div>'
+    +'<div class="tk-l2">DOWN '+(['','ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT'][rs.length]||rs.length)+' STRAIGHT</div>'
+    +'<div class="tk-sub">'+claim+', and it has fallen every year he has played</div>'
+    +'<div class="tk-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
+      +' ('+pct(m.winpct)+') &middot; '+m.second+' SECOND PLACES &middot; '
+      +(m.titles?m.titles+' TITLES':'NO TITLE')+'</div></div>';
+  document.body.appendChild(el);
+  if(ac()&&!quiet())closeBell(0);
+  const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
+  el.addEventListener('click',off);
+  setTimeout(off,5250);
+}
+
+/* League lore says McMahon is unguardable on a court. The record says the scoring was
+   never his problem either -- he cleared the league average and still lost. */
+function wrongSport(){
+  const F=loyalFacts('Dylan McMahon'); if(!F||$('.hoop'))return;
+  const m=F.m, rs=F.rs;
+  const best=rs.reduce((a,b)=>b.pi>a.pi?b:a);
+  const above=best.pi>100;
+  const rank=M.slice().sort((a,b)=>a.luck-b.luck).findIndex(x=>x.name===m.name)+1;
+  const el=document.createElement('div'); el.className='hoop';
+  el.innerHTML='<div class="hp-in"><div class="hp-court"></div>'
+    +'<div class="hp-ball"><span class="hp-seam"></span></div>'
+    +'<div class="hp-tag">W R O N G &nbsp; S P O R T</div>'
+    +'<div class="hp-l1">DYLAN McMAHON</div>'
+    +'<div class="hp-l2">UNGUARDABLE ON A COURT</div>'
+    +'<div class="hp-sub">'+(above
+        ? 'cleared the league average in '+best.y+' and still finished '+best.w+'&ndash;'+best.l+'. The rim was never the problem.'
+        : 'the rim has never been the problem. Sunday has.')+'</div>'
+    +'<div class="hp-facts">'+m.seasons+' SEASONS &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
+      +' &middot; LUCK '+(m.luck>=0?'+':'&minus;')+Math.abs(m.luck).toFixed(2)
+      +(rank<=3?' &middot; '+ord(rank)+' UNLUCKIEST':'')
+      +' &middot; '+(m.apps?m.apps+' IN THE BRACKET':'NO BRACKET YET')+'</div></div>';
+  document.body.appendChild(el);
+  if(ac()&&!quiet())swish(0);
+  const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
+  el.addEventListener('click',off);
+  setTimeout(off,5250);
+}
+
 function wuSeal(){
   const F=loyalFacts('Nathan Wu'); if(!F||$('.nwu'))return;
   const m=F.m, n=m.seasons;
