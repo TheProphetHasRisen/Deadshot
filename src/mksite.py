@@ -3426,7 +3426,11 @@ async function makeH2HCard(an,bn){
   }
 
   /* four stats side by side, winner picked out in the accent */
-  const cmp=[['SEASONS','seasons',0],['TITLES','titles',1],['WIN %','winpct',3],['POWER IDX','cpi',1]];
+  const meets=MX.all.g.filter(x=>(x.ma===an&&x.mb===bn)||(x.ma===bn&&x.mb===an));
+  const ppgIn=who=>{if(!meets.length)return null;
+    let t=0; meets.forEach(x=>{t+=(x.ma===who?x.pa:x.pb);}); return t/meets.length;};
+  const pA=ppgIn(an), pB=ppgIn(bn);
+  const cmp=[['SEASONS','seasons',0],['PPG v EACH OTHER','__h2hppg',2],['WIN %','winpct',3],['POWER IDX','cpi',1]];
   const lowerWins={};
   x.textAlign='left';
   x.strokeStyle=P.rule; x.lineWidth=1;
@@ -3434,8 +3438,9 @@ async function makeH2HCard(an,bn){
   function markY(){return 626;}
   cmp.forEach((row,i)=>{
     const [lab,k,d]=row, y=700+i*82;
-    const av=a[k], bv=b[k];
-    const fmt=v=>k==='winpct'?pct(v):(d?(+v).toFixed(d):String(v));
+    const h2h=k==='__h2hppg';
+    const av=h2h?pA:a[k], bv=h2h?pB:b[k];
+    const fmt=v=>v==null?'\u2014':(k==='winpct'?pct(v):(d?(+v).toFixed(d):String(v)));
     x.fillStyle=P.dim; x.font='500 21px "IBM Plex Mono",monospace';
     x.textAlign='center'; x.fillText(lab.split('').join(' '),S/2,y-6);
     x.font='600 46px "IBM Plex Mono",monospace';
@@ -3449,10 +3454,12 @@ async function makeH2HCard(an,bn){
   x.fillText('deadshotleague.com',S/2,S-58);
   return new Promise(res=>c.toBlob(res,'image/png'));
 }
-async function shareBlob(blob,fname,title,text,btn,label){
+async function shareBlob(blob,fname){
   const file=new File([blob],fname,{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){
-    await navigator.share({files:[file],title,text});
+    /* files only. Passing title/text makes the share sheet prefill a caption into the
+       message, which reads as spam next to the picture. */
+    await navigator.share({files:[file]});
   }else{
     const u=URL.createObjectURL(blob), a=document.createElement('a');
     a.href=u; a.download=fname; document.body.appendChild(a); a.click(); a.remove();
@@ -3466,9 +3473,7 @@ async function shareH2H(an,bn,btn){
   try{
     const blob=await makeH2HCard(an,bn);
     if(!blob){toast('Pick two different managers first');return;}
-    const rec=MX.all.t[an+'|'+bn];
-    await shareBlob(blob,`deadshot-${an.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-v-${bn.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`,
-      `${an} vs ${bn}`, rec?`${an} leads ${rec[0]}–${rec[1]} all-time.`:`${an} and ${bn} have never met.`);
+    await shareBlob(blob,`deadshot-${an.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-v-${bn.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`);
   }catch(e){ if(!(e&&e.name==='AbortError'))toast('Could not build the card'); }
   finally{ if(btn){btn.disabled=false;btn.innerHTML=label;} }
 }
@@ -3480,7 +3485,7 @@ async function shareCard(name,btn){
     if(!blob)throw new Error('no card');
     const file=new File([blob],`deadshot-${name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`,{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],title:`${name} — Deadshot`,text:`${name} · ${mgrVibe(M.filter(x=>x.name===name)[0])}`});
+      await navigator.share({files:[file]});
     }else{
       const u=URL.createObjectURL(blob), a=document.createElement('a');
       a.href=u; a.download=file.name; document.body.appendChild(a); a.click(); a.remove();
