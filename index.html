@@ -3928,12 +3928,12 @@ async function makeSeasonCard(y){
 
   /* the final table, the part everybody argues about */
   cardRule(x,S,P,344);
-  const COL={pl:96,tm:150,rec:S-282,pf:S-84};
+  const COL={pl:96,tm:202,rec:S-282,pf:S-84};
   x.textAlign='left'; x.fillStyle=P.dim; x.font='500 19px "IBM Plex Mono",monospace';
-  x.fillText('# ',84,382); x.fillText('T E A M',COL.tm,382);
+  x.fillText('F I N',84,382); x.fillText('T E A M',COL.tm,382);
   x.textAlign='right'; x.fillText('W - L',COL.rec,382); x.fillText('P F',COL.pf,382);
 
-  const step=Math.min(42,(S-540)/Math.max(1,rs.length));
+  const step=Math.min(40,(S-560)/Math.max(1,rs.length));
   rs.forEach((r,i)=>{
     const ty=420+i*step;
     x.textAlign='left';
@@ -3945,15 +3945,29 @@ async function makeSeasonCard(y){
     x.textAlign='right';
     x.fillStyle=P.dim; x.font='400 24px "IBM Plex Mono",monospace';
     x.fillText(r.w+'-'+r.l+(r.t?'-'+r.t:''),COL.rec,ty);
-    x.fillStyle=P.ink; x.fillText(r.pf.toFixed(1),COL.pf,ty);
+    x.fillStyle=P.ink; x.fillText(r.pf.toFixed(2),COL.pf,ty);
   });
 
   const botY=420+rs.length*step+18;
   cardRule(x,S,P,botY);
   const most=rs.reduce((a,b)=>b.pf>a.pf?b:a);
+  const bestRec=rs.reduce((a,b)=>(b.w+b.t/2)>(a.w+a.t/2)?b:a);
   x.textAlign='center'; x.fillStyle=P.dim; x.font='400 26px "IBM Plex Sans",sans-serif';
-  x.fillText(ch.n+' teams  ·  '+ch.g+'-game season  ·  '+ch.spots+'-team bracket',S/2,botY+44);
-  x.fillText('Most points: '+cardClip(x,most.team,S-260)+'  ·  '+most.pf.toFixed(2),S/2,botY+86);
+  x.font='400 24px "IBM Plex Sans",sans-serif';
+  x.fillText(ch.n+' teams  ·  '+ch.g+'-game season  ·  '+ch.spots+'-team bracket  ·  final placings',
+    S/2,botY+44);
+  x.font='400 26px "IBM Plex Sans",sans-serif';
+  /* saying "most points: <the champion>" when the table already has them top is noise;
+     the interesting version of that fact is when somebody else led and still lost */
+  const champTeams=ch.teams;
+  const line2=champTeams.indexOf(most.team)>=0
+    ? (champTeams.indexOf(bestRec.team)>=0
+        ? 'Led the league in scoring and in record. No argument to be had.'
+        : 'Led the league in scoring. Best record was '+cardClip(x,bestRec.team,420)+
+          ' at '+bestRec.w+'-'+bestRec.l+(bestRec.t?'-'+bestRec.t:'')+'.')
+    : 'Most points: '+cardClip(x,most.team,420)+'  ·  '+most.pf.toFixed(2)+
+      ', and finished '+ord(most.place)+'.';
+  x.fillText(line2,S/2,botY+86);
   cardFoot(x,S,P);
   return new Promise(res=>cv.toBlob(res,'image/png'));
 }
@@ -3967,9 +3981,15 @@ function gameFacts(y,wk,team){
   const B=aFirst?{t:g.tb,p:g.ab,pr:g.pb}:{t:g.ta,p:g.aa,pr:g.pa};
   const all=loggedGames().map(z=>Math.abs(z.pa-z.pb)).sort((a,b)=>b-a);
   const marg=A.p-B.p;
+  /* how many of the rest of the league that winning score would have beaten the same
+     week. Only exists for regular-season weeks, which is where the race data lives. */
+  const wi=K.weeks.indexOf(wk);
+  const seq=K.race[A.t];
+  const ap=(wi>=0&&seq&&seq[wi])?seq[wi].ap:null;
   return {y:y,wk:wk,A:A,B:B,marg:marg,mgA:K.mgr[A.t],mgB:K.mgr[B.t],
           rnd:roundName(y,K,g)||('Week '+wk),
-          vd:isVoid(y,wk,g.ta,g.tb),
+          vd:isVoid(y,wk,g.ta,g.tb), tie:g.aa===g.ab,
+          ap:ap, others:K.teams.length-1,
           rank:all.filter(v=>v>marg).length+1, n:all.length};
 }
 async function makeGameCard(y,wk,team){
@@ -3993,7 +4013,7 @@ async function makeGameCard(y,wk,team){
   };
   side(G.A.t,G.mgA,G.A.p,268,true);
   x.textAlign='center'; x.fillStyle=P.dim; x.font='500 22px "IBM Plex Mono",monospace';
-  x.fillText('B E A T',S/2,368);
+  x.fillText(G.tie?'T I E D   W I T H':'B E A T',S/2,368);
   side(G.B.t,G.mgB,G.B.p,452,false);
 
   cardRule(x,S,P,540);
@@ -4001,13 +4021,21 @@ async function makeGameCard(y,wk,team){
   x.fillStyle=P.accent; x.font='900 172px "Big Shoulders Display",sans-serif';
   x.fillText(G.marg.toFixed(2),S/2,700);
   x.fillStyle=P.dim; x.font='500 24px "IBM Plex Mono",monospace';
-  x.fillText('P O I N T   M A R G I N',S/2,748);
+  x.fillText(G.tie?'D E A D   H E A T':'P O I N T   M A R G I N',S/2,748);
 
   cardRule(x,S,P,806);
   x.fillStyle=P.ink; x.font='400 28px "IBM Plex Sans",sans-serif';
-  const l1=G.rank===1?'The biggest beating in '+G.n+' logged games.'
+  /* "the 216th biggest margin of 406" is true and says nothing. The ranking only earns
+     its place when the beating was actually one of the worst ever; otherwise the useful
+     fact is how that winning score held up against the whole league that week. */
+  const l1=G.tie?'A dead heat. It has happened '+
+      (loggedGames().filter(z=>z.pa===z.pb).length)+' times in '+G.n+' logged games.'
+    :G.rank===1?'The biggest beating in '+G.n+' logged games.'
+    :G.rank<=20?'One of the 20 worst beatings on record — '+ord(G.rank)+' of '+G.n+' games.'
+    :G.ap!=null?'That '+G.A.p.toFixed(2)+' would have beaten '+G.ap+' of the other '+
+      G.others+' that week.'
     :'The '+ord(G.rank)+' biggest margin of '+G.n+' logged games.';
-  x.fillText(l1,S/2,860);
+  x.fillText(cardClip(x,l1,S-140),S/2,860);
   x.fillStyle=P.dim;
   const diff=G.A.p-G.A.pr;
   x.fillText(cardClip(x,G.A.t,S-200)+' was projected '+G.A.pr.toFixed(1)+'  ·  '+
