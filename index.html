@@ -37,6 +37,7 @@
   --rule:#1E2E24; --rule-2:#16221B;
   --brass:#35E07A; --brass-2:#1E7A44; --brass-wash:#0D2416;
   --pos:#D9603F; --neg:#3C9FD4; --mid:#3A4A41;
+  --sea-1:#35E07A; --sea-2:#E8C24A; --sea-3:#5AB6F0; --sea-4:#FF7A5C; --sea-5:#C08BF5; --sea-6:#6FE8D0; --sea-7:#F58FC8; --sea-8:#C3D94F;
   --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px -14px rgba(0,0,0,.8);
   --mast-bg:#080B09; --mast-ink:#EAFBF0; --mast-sub:#8FCFA8; --mast-kick:#35E07A;
   --mast-rule:#16351F; --mast-glow:rgba(53,224,122,.55); --mast-glow2:rgba(53,224,122,.22);
@@ -54,6 +55,7 @@
   --rule:#D5DBE1; --rule-2:#E6EAEE;
   --brass:#8C6410; --brass-2:#B8893A; --brass-wash:#F3ECDC;
   --pos:#B0442C; --neg:#1272B0; --mid:#B4BCC4;
+  --sea-1:#8C6410; --sea-2:#1F6F60; --sea-3:#245E9E; --sea-4:#A8231F; --sea-5:#6B3E9E; --sea-6:#3B7A2A; --sea-7:#B5541A; --sea-8:#95246F;
   --shadow:0 1px 2px rgba(16,22,28,.06),0 8px 24px -12px rgba(16,22,28,.18);
   --mast-bg:#FFFFFF; --mast-ink:#10161C; --mast-sub:#48545F; --mast-kick:#8C6410;
   --mast-rule:#D5DBE1; --mast-glow:transparent; --mast-glow2:transparent;
@@ -69,6 +71,7 @@
   --rule:#E0D6D2; --rule-2:#EFE8E5;
   --brass:#8E1520; --brass-2:#B8434C; --brass-wash:#FBEDED;
   --pos:#B0442C; --neg:#1272B0; --mid:#C3B9B5;
+  --sea-1:#9E1723; --sea-2:#1F6F60; --sea-3:#245E9E; --sea-4:#9A7108; --sea-5:#6B3E9E; --sea-6:#3B7A2A; --sea-7:#B5541A; --sea-8:#95246F;
   --shadow:0 1px 2px rgba(26,18,16,.07),0 8px 26px -14px rgba(142,21,32,.22);
   --mast-bg:#8E1520; --mast-ink:#FFFFFF; --mast-sub:#F0C9CC; --mast-kick:#F0C9CC;
   --mast-rule:#6E0F18; --mast-glow:rgba(0,0,0,.28); --mast-glow2:transparent;
@@ -105,6 +108,7 @@
   --rule:#2E2159; --rule-2:#211846;
   --brass:#FF2E88; --brass-2:#A31E5C; --brass-wash:#2A0C22;
   --pos:#FF8A4C; --neg:#56C7F5; --mid:#443868;
+  --sea-1:#FF2E88; --sea-2:#56C7F5; --sea-3:#FFD24A; --sea-4:#7BF59A; --sea-5:#B98BFF; --sea-6:#FF8A4C; --sea-7:#5FE8DE; --sea-8:#FF7FC4;
   --shadow:0 0 0 1px rgba(255,46,136,.12),0 14px 40px -18px rgba(255,46,136,.4);
   --mast-bg:#07050F; --mast-ink:#FFFFFF; --mast-sub:#8FE9FF; --mast-kick:#FF2E88;
   --mast-rule:#2E2159; --mast-glow:rgba(255,46,136,.6); --mast-glow2:rgba(86,199,245,.35);
@@ -121,6 +125,7 @@
   --rule:#2B2B30; --rule-2:#1F1F23;
   --brass:#C8A24A; --brass-2:#8E7231; --brass-wash:#1D1912;
   --pos:#C0392B; --neg:#5B8CA8; --mid:#3B3B42;
+  --sea-1:#C8A24A; --sea-2:#82B3D8; --sea-3:#CC7F6C; --sea-4:#93C289; --sea-5:#B99ED8; --sea-6:#B0B4BE; --sea-7:#7FC9C0; --sea-8:#D493B1;
   --shadow:0 0 0 1px rgba(200,162,74,.1),0 18px 44px -22px rgba(0,0,0,.9);
   --mast-bg:#08080A; --mast-ink:#EDE8DA; --mast-sub:#9E988B; --mast-kick:#B0271F;
   --mast-rule:#2B2B30; --mast-glow:rgba(200,162,74,.28); --mast-glow2:rgba(176,39,31,.2);
@@ -181,6 +186,7 @@
   --rule:#6B4028; --rule-2:#5A3520;
   --brass:#FFFFFF; --brass-2:#C9A88F; --brass-wash:#3E2417;
   --pos:#F08A5C; --neg:#6FC0F0; --mid:#7A5238;
+  --sea-1:#F6E7D8; --sea-2:#F0B24A; --sea-3:#7FC5E8; --sea-4:#8FD69A; --sea-5:#E88FA8; --sea-6:#C9A8F0; --sea-7:#F08A5C; --sea-8:#D9D46F;
   --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 26px -14px rgba(0,0,0,.75);
   --mast-bg:#35190F; --mast-ink:#FFFFFF; --mast-sub:#D9BCA4; --mast-kick:#FFFFFF;
   --mast-rule:#6B4028; --mast-glow:rgba(0,0,0,.5); --mast-glow2:rgba(255,255,255,.12);
@@ -1280,11 +1286,11 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
     <div class="card">
       <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
-        <span class="sub">Every season with a game log &middot; one line per season, brightest is most recent</span></div>
+        <span class="sub">Every season with a game log &middot; one line per season, each with its own colour and line style</span></div>
       <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
       <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>brightest is most recent</strong>. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season has its own colour and its own line style</strong>, and a year keeps the same colour on every manager's chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
     </div>
   </section>
 
@@ -1342,7 +1348,10 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     </div>
 
     <div class="card">
-      <div class="card-h"><h3>Weekly scoreboard</h3><div class="right pills" id="wkSel"></div></div>
+      <div class="card-h"><h3>Weekly scoreboard</h3>
+        <span class="sub">the arrow on any result makes a card of it</span>
+        <button id="wkLink" style="padding:5px 11px;margin-left:8px">&#128279; Copy link to this week</button>
+        <div class="right pills" id="wkSel"></div></div>
       <div class="card-b" id="wkOut"></div>
     </div>
 
@@ -1395,6 +1404,8 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
     <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
     <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
+      <select id="recPick" style="margin-left:8px"></select>
+      <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
       <span class="sub" style="margin-left:9px" id="recsCount"></span></div>
     <div id="recsWrap" hidden>
       <div id="recs"></div>
@@ -1426,7 +1437,8 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
         <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select>
-        <button id="cmpShare" class="on" style="padding:7px 14px;margin-left:8px">&#8593; Share this matchup</button></div></div>
+        <button id="cmpShare" class="on" style="padding:7px 14px;margin-left:8px">&#8593; Share this matchup</button>
+        <button id="cmpRiv" style="padding:7px 14px;margin-left:6px">&#8593; Every meeting</button></div></div>
       <div class="card-b" id="cmpOut"></div>
     </div>
     <div class="card">
@@ -1535,7 +1547,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
   <div class="wr-stage" id="wrStage">
     <div class="wr-blob a" aria-hidden="true"></div><div class="wr-blob b" aria-hidden="true"></div>
     <div class="wr-bars" id="wrBars"></div>
-    <div class="wr-top"><div class="wrb" id="wrBrand"></div><button class="wr-x" id="wrX" aria-label="Close">&#10005;</button></div>
+    <div class="wr-top"><div class="wrb" id="wrBrand"></div><button class="wr-x" id="wrShare" aria-label="Share this card" title="Share this card">&#8593;</button><button class="wr-x" id="wrX" aria-label="Close" style="margin-left:7px">&#10005;</button></div>
     <button class="wr-nav l" id="wrPrev" aria-label="Previous card"></button>
     <button class="wr-nav r" id="wrNext" aria-label="Next card"></button>
     <div class="wr-card" id="wrCard" aria-live="polite"></div>
@@ -2335,12 +2347,17 @@ function openMgr(name){
       <thead><tr><th>Year</th><th>Round</th><th></th><th class="num">For</th><th class="num">Against</th><th>Opponent</th></tr></thead><tbody>${pg}</tbody></table></div>`:''}
     ${wrapAvail(name)?`<div style="margin:20px 0 0"><button class="wrapBtn on" data-w="${esc(name)}" style="padding:9px 16px">&#9733; ${LAST} Wrapped</button>
       <span class="sub" style="margin-left:9px">the season, one card at a time</span></div>`:''}
-    <div style="margin:14px 0 0"><button class="shareBtn" data-s="${esc(name)}" style="padding:9px 16px">&#8593; Share card</button>
-      <span class="sub" style="margin-left:9px">a picture for the group chat</span></div>
+    <div style="margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <button class="shareBtn" data-s="${esc(name)}" style="padding:9px 16px">&#8593; Share card</button>
+      <button class="roastBtn" data-s="${esc(name)}" style="padding:9px 16px">&#8593; The case against</button>
+      <button data-link="m=${esc(name)}" data-link-hash="power" style="padding:9px 16px">&#128279; Copy link</button>
+      <span class="sub">a picture for the group chat, or a link that opens on this manager</span></div>
     ${rivals.length?`<div class="sub-h">Playoff head-to-head</div><div style="display:flex;flex-wrap:wrap;gap:7px">${
       rivals.map(r=>`<span class="chip" style="cursor:pointer" data-m="${esc(r.o)}"><b>${r.w}–${r.l}</b> vs ${esc(r.o)}</span>`).join('')}</div>`:''}`;
   const wb=$('#mBody .wrapBtn'); if(wb)wb.onclick=()=>openWrapped(wb.dataset.w);
   const sb=$('#mBody .shareBtn'); if(sb)sb.onclick=()=>shareCard(sb.dataset.s,sb);
+  const rb=$('#mBody .roastBtn'); if(rb)rb.onclick=()=>shareAny(
+    ()=>makeRoastCard(rb.dataset.s),'deadshot-case-against-'+slug(rb.dataset.s)+'.png',rb);
   ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
 }
 function closeMgr(){ov.classList.remove('on');document.body.style.overflow='';hideTip();
@@ -3059,7 +3076,9 @@ function drawSeason(y){
     <div style="font-size:11.5px;color:var(--ink-2);margin-top:5px">${c.mgrs.map(esc).join(' &amp; ')}</div></div></div>`;
   $('#seasonPane').innerHTML=`
     <div class="card"><div class="card-h"><h3>${y} standings</h3>
-      <span class="sub">${c.n} teams · ${c.g}-game season · ${c.spots}-team bracket · league avg ${c.lg.toFixed(2)} PPG</span></div>
+      <span class="sub">${c.n} teams · ${c.g}-game season · ${c.spots}-team bracket · league avg ${c.lg.toFixed(2)} PPG</span>
+      <div class="right"><button id="seaShare" style="padding:7px 13px">&#8593; Share the season</button>
+        <button data-link="y=${y}" data-link-hash="seasons" style="padding:7px 13px;margin-left:6px">&#128279; Copy link</button></div></div>
       <div class="scroll"><table id="tS"></table></div></div>
     <div class="card"><div class="card-h"><h3>${y} bracket</h3>
       <span class="sub">${c.co?'Final voided — title split':'Hover a team to trace its run · click to lock it'}</span>
@@ -3220,6 +3239,8 @@ drawMtx(); REDRAW.push(drawMtx);
     const cell=(m,k,d)=>k==='winpct'?pct(m[k]):(d?(+m[k]).toFixed(d):m[k]);
     const better=(k,x,y)=>k==='avgPlace'?x<y:x>y;
     {const sh=$('#cmpShare'); if(sh)sh.onclick=()=>shareH2H($('#cmpA').value,$('#cmpB').value,sh);}
+    {const rv=$('#cmpRiv'); if(rv)rv.onclick=()=>{const a=$('#cmpA').value,b=$('#cmpB').value;
+      shareAny(()=>makeRivalryCard(a,b),'deadshot-'+slug(a)+'-every-meeting-'+slug(b)+'.png',rv);};}
     $('#cmpOut').innerHTML=`<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;max-width:100%">
       <table style="flex:1 1 300px;min-width:0"><thead><tr><th></th><th class="num">${esc(a.name)}</th><th class="num">${esc(b.name)}</th></tr></thead><tbody>${
       rows.map(([lab,k,d])=>{const x=a[k],y=b[k];
@@ -3301,17 +3322,19 @@ function drawCareerRace(){
   const ys=r=>P.t+(r-1)*(H-P.t-P.b)/(NT-1);
   const PLACE={}; ROWS.forEach(r=>{PLACE[r.y+'|'+r.team]=r.place;});
   const MEDAL={1:{f:'#D9A82B',s:'#8A6710',i:'#3A2A05'},2:{f:'#AEB6BD',s:'#6E767D',i:'#2B3035'},3:{f:'#B9793F',s:'#7A4B20',i:'#2E1A08'}};
-  /* Seasons have to be told apart at a glance. A --mid -> --brass ramp alone was too
-     subtle: on several skins those two sit close together and the middle years blurred.
-     Ramp from a faint neutral all the way to the full accent (a much wider lightness
-     span, which survives every skin including redact where --brass is pure white), and
-     vary stroke weight with it as a second, colour-blind-safe cue. */
-  const BR=cssv('--brass');
-  const FAR=mix(cssv('--surface'),cssv('--ink-3'),0.62);
-  const tOf=i=>S.length<2?1:i/(S.length-1);
-  const col=i=>S.length<2?BR:mix(FAR,BR,tOf(i));
-  const wid=i=>1.7+1.6*tOf(i);
-  const rad=i=>3.4+1.2*tOf(i);
+  /* Seasons have to be told apart at a glance, and a one-hue brightness ramp was not
+     enough -- on several skins the middle years blurred into each other. Each season now
+     carries its own hue AND its own dash pattern, keyed to the YEAR rather than to this
+     manager's place in the list, so 2021 is the same colour on every manager's chart.
+     Two independent cues means it survives a screenshot, a printout, and colour
+     blindness. The hues are per-skin tokens because all six grounds differ. */
+  const NSEA=8;
+  const YIDX={}; YRS.forEach((y,k)=>{YIDX[y]=k;});
+  const SDASH=['','9 5','2 4.5','15 4 2 4','5 5','1 4','20 6','9 4 2 4 2 4'];
+  const seaK=y=>YIDX[y]%NSEA;
+  const col=y=>cssv('--sea-'+(seaK(y)+1))||cssv('--brass');
+  const dsh=y=>SDASH[seaK(y)];
+  const WID=2.4, RAD=3.8;
 
   let grid='';
   for(let r=1;r<=NT;r++){
@@ -3328,7 +3351,7 @@ function drawCareerRace(){
     const R=crRank(s.K)[s.team];
     const d=R.map((p,k)=>(k?'L':'M')+xs(k)+','+ys(p.rank)).join(' ');
     const endRank=R[R.length-1].rank, fp=PLACE[s.y+'|'+s.team]||endRank;
-    return {y:s.y,team:s.team,K:s.K,R,d,c:col(i),w:wid(i),r:rad(i),seedRank:endRank,fin:fp,moved:endRank-fp,
+    return {y:s.y,team:s.team,K:s.K,R,d,c:col(s.y),dash:dsh(s.y),w:WID,r:RAD,seedRank:endRank,fin:fp,moved:endRank-fp,
             fx:FINX,fy:ys(fp),
             tail:`M${xs(R.length-1)},${ys(endRank)} L${FINX},${ys(fp)}`};});
   /* two seasons can finish in the same place; fan those apart like the season chart does */
@@ -3339,7 +3362,7 @@ function drawCareerRace(){
     l.tail=`M${xs(l.R.length-1)},${ys(l.seedRank)} L${l.fx},${l.fy}`;}));
 
   const paths=lines.map(l=>
-    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
+    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-dasharray="${l.dash}" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
     `<path class="crl" d="${l.tail}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-dasharray="4 3" stroke-linecap="round" data-cy="${l.y}"/>`).join('');
   const hits=lines.map(l=>`<path class="crhit" d="${l.d}" fill="none" stroke="transparent" stroke-width="15" data-cy="${l.y}" style="cursor:pointer;pointer-events:stroke"/>`).join('');
   let dots='';
@@ -3379,7 +3402,10 @@ function drawCareerRace(){
   })();
 
   $('#crLeg').innerHTML=`<span class="fb-lab" style="margin-right:4px">Seasons</span>`+
-    S.map((s,i)=>`<button data-cy="${s.y}" style="padding:4px 9px"><b style="color:${col(i)}">${s.y}</b> <span class="dim">${esc(s.team)}</span></button>`).join('')+
+    S.map(s=>`<button data-cy="${s.y}" style="padding:4px 9px">`+
+      `<svg width="19" height="9" viewBox="0 0 19 9" style="vertical-align:-1px;margin-right:5px" aria-hidden="true">`+
+      `<line x1="0.5" y1="4.5" x2="18.5" y2="4.5" stroke="${col(s.y)}" stroke-width="2.6" stroke-dasharray="${dsh(s.y)}" stroke-linecap="round"/></svg>`+
+      `<b style="color:${col(s.y)}">${s.y}</b> <span class="dim">${esc(s.team)}</span></button>`).join('')+
     (S.length>1?`<button id="crClear" style="padding:4px 9px">Clear</button>`:'');
 
   function paint(hov){
@@ -3786,6 +3812,552 @@ async function shareCard(name,btn){
   }finally{ if(btn){btn.disabled=false;btn.innerHTML=label;} }
 }
 
+/* ---- more shareable cards ---------------------------------------------------
+   Every card below is the same 1080 square as the manager and head-to-head cards,
+   drawn in whatever theme the reader is looking at, and sent through the same
+   shareBlob path. cardBase / cardKick / cardFoot exist so that adding a card is a
+   matter of writing a layout, not another copy of the background, the rule lines
+   and the footer. */
+const CARD_S=1080;
+function cardBase(){
+  const S=CARD_S, cv=document.createElement('canvas'); cv.width=S; cv.height=S;
+  const x=cv.getContext('2d'), P=cardPalette();
+  x.fillStyle=P.bg; x.fillRect(0,0,S,S);
+  const g=x.createRadialGradient(S/2,130,10,S/2,130,860);
+  g.addColorStop(0,P.glow); g.addColorStop(1,P.glow0); x.fillStyle=g; x.fillRect(0,0,S,S);
+  x.textBaseline='alphabetic';
+  return {cv,x,P,S};
+}
+async function cardFonts(){try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;}catch(e){}}
+function cardKick(x,S,P,t){
+  x.textAlign='center'; x.fillStyle=P.accent; x.font='600 25px "IBM Plex Mono",monospace';
+  x.fillText(String(t).toUpperCase().split('').join(' '),S/2,108);
+}
+function cardFoot(x,S,P){
+  x.textAlign='center'; x.fillStyle=P.accent; x.font='600 26px "IBM Plex Mono",monospace';
+  x.fillText(cardHost(),S/2,S-58);
+}
+function cardRule(x,S,P,y){
+  x.strokeStyle=P.rule; x.lineWidth=1; x.beginPath(); x.moveTo(84,y); x.lineTo(S-84,y); x.stroke();
+}
+/* shrink to fit rather than clip -- team names in this league run very long */
+function cardFit(x,text,maxW,start,min,weight,face){
+  let fs=start; x.font=weight+' '+fs+'px '+face;
+  while(x.measureText(text).width>maxW&&fs>min){fs-=3; x.font=weight+' '+fs+'px '+face;}
+  return fs;
+}
+function cardClip(x,text,maxW){
+  if(x.measureText(text).width<=maxW)return text;
+  let t=text;
+  while(t.length>2&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);
+  return t+'…';
+}
+function cardTiles(x,S,P,y,tiles){
+  cardRule(x,S,P,y-46); x.textAlign='left';
+  tiles.forEach((t,i)=>{
+    const px=84+i*((S-168)/tiles.length);
+    x.fillStyle=P.accent; x.font='600 56px "IBM Plex Mono",monospace'; x.fillText(t[1],px,y+22);
+    x.fillStyle=P.dim; x.font='500 21px "IBM Plex Mono",monospace'; x.fillText(t[0].split('').join(' '),px,y+58);
+  });
+}
+/* the site's copy is HTML; canvas wants plain text */
+function cardText(s){
+  return String(s).replace(/<br\s*\/?>/gi,' ').replace(/<[^>]*>/g,'')
+    .replace(/&mdash;/g,'—').replace(/&ndash;/g,'–').replace(/&minus;/g,'−')
+    .replace(/&sigma;/g,'σ').replace(/&harr;/g,'↔').replace(/&nbsp;/g,' ')
+    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
+    .replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+}
+
+/* Every meeting between two managers that the data can actually prove: playoff games
+   exist for all ten seasons, regular-season games only for the years with a game log.
+   The two sources never overlap, because the weekly side skips anything flagged as a
+   bracket game. */
+function meetings(an,bn){
+  const out=[];
+  D.games.forEach(g=>{
+    if(g.void)return;
+    if(g.ma===an&&g.mb===bn)out.push({y:g.y,wk:g.wk,rnd:g.rnd,me:g.pa,them:g.pb,mine:g.ta,theirs:g.tb,po:1});
+    else if(g.mb===an&&g.ma===bn)out.push({y:g.y,wk:g.wk,rnd:g.rnd,me:g.pb,them:g.pa,mine:g.tb,theirs:g.ta,po:1});
+  });
+  (D.wkYears||[]).forEach(y=>{
+    const K=D.wk[y]; if(!K)return;
+    K.games.forEach(g=>{
+      if(g.br)return;
+      const ma=K.mgr[g.ta], mb=K.mgr[g.tb];
+      if(ma===an&&mb===bn)out.push({y:y,wk:g.wk,rnd:'Week '+g.wk,me:g.aa,them:g.ab,mine:g.ta,theirs:g.tb,po:0});
+      else if(mb===an&&ma===bn)out.push({y:y,wk:g.wk,rnd:'Week '+g.wk,me:g.ab,them:g.aa,mine:g.tb,theirs:g.ta,po:0});
+    });
+  });
+  return out.sort((a,b)=>a.y-b.y||a.wk-b.wk);
+}
+
+/* every logged game, flattened once and kept, so a card can say where a result ranks */
+let LOGGED=null;
+function loggedGames(){
+  if(LOGGED)return LOGGED;
+  const out=[];
+  (D.wkYears||[]).forEach(y=>{
+    const K=D.wk[y]; if(!K)return;
+    K.games.forEach(g=>{
+      if(isVoid(y,g.wk,g.ta,g.tb))return;
+      out.push({y:y,wk:g.wk,ta:g.ta,tb:g.tb,pa:g.aa,pb:g.ab,prA:g.pa,prB:g.pb,
+                ma:K.mgr[g.ta],mb:K.mgr[g.tb],br:g.br});
+    });
+  });
+  LOGGED=out; return out;
+}
+
+/* ---- 1. the season card ---- */
+async function makeSeasonCard(y){
+  const ch=D.champs.find(z=>z.y===y); if(!ch)return null;
+  const rs=ROWS.filter(r=>r.y===y).sort((a,b)=>a.place-b.place);
+  if(!rs.length)return null;
+  await cardFonts();
+  const {cv,x,P,S}=cardBase();
+  cardKick(x,S,P,'The '+y+' season');
+
+  x.textAlign='center';
+  x.fillStyle=P.dim; x.font='500 23px "IBM Plex Mono",monospace';
+  x.fillText((ch.co?'CO-CHAMPIONS':'CHAMPION').split('').join(' '),S/2,176);
+  const champ=ch.teams.join(' & ').toUpperCase();
+  cardFit(x,champ,S-140,96,40,900,'"Big Shoulders Display",sans-serif');
+  x.fillStyle=P.ink; x.fillText(champ,S/2,262);
+  x.fillStyle=P.dim; x.font='400 27px "IBM Plex Sans",sans-serif';
+  x.fillText(ch.mgrs.join(' & '),S/2,304);
+
+  /* the final table, the part everybody argues about */
+  cardRule(x,S,P,344);
+  const COL={pl:96,tm:150,rec:S-282,pf:S-84};
+  x.textAlign='left'; x.fillStyle=P.dim; x.font='500 19px "IBM Plex Mono",monospace';
+  x.fillText('# ',84,382); x.fillText('T E A M',COL.tm,382);
+  x.textAlign='right'; x.fillText('W - L',COL.rec,382); x.fillText('P F',COL.pf,382);
+
+  const step=Math.min(42,(S-540)/Math.max(1,rs.length));
+  rs.forEach((r,i)=>{
+    const ty=420+i*step;
+    x.textAlign='left';
+    x.fillStyle=r.place===1?P.accent:P.dim;
+    x.font='600 25px "IBM Plex Mono",monospace'; x.fillText(String(r.place),84,ty);
+    x.fillStyle=r.place===1?P.accent:P.ink;
+    x.font=(r.place===1?'600 ':'400 ')+26+'px "IBM Plex Sans",sans-serif';
+    x.fillText(cardClip(x,r.team,COL.rec-COL.tm-90),COL.tm,ty);
+    x.textAlign='right';
+    x.fillStyle=P.dim; x.font='400 24px "IBM Plex Mono",monospace';
+    x.fillText(r.w+'-'+r.l+(r.t?'-'+r.t:''),COL.rec,ty);
+    x.fillStyle=P.ink; x.fillText(r.pf.toFixed(1),COL.pf,ty);
+  });
+
+  const botY=420+rs.length*step+18;
+  cardRule(x,S,P,botY);
+  const most=rs.reduce((a,b)=>b.pf>a.pf?b:a);
+  x.textAlign='center'; x.fillStyle=P.dim; x.font='400 26px "IBM Plex Sans",sans-serif';
+  x.fillText(ch.n+' teams  ·  '+ch.g+'-game season  ·  '+ch.spots+'-team bracket',S/2,botY+44);
+  x.fillText('Most points: '+cardClip(x,most.team,S-260)+'  ·  '+most.pf.toFixed(2),S/2,botY+86);
+  cardFoot(x,S,P);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
+
+/* ---- 2. the receipt: one game ---- */
+function gameFacts(y,wk,team){
+  const K=D.wk[y]; if(!K)return null;
+  const g=K.games.find(z=>z.wk===wk&&(z.ta===team||z.tb===team)); if(!g)return null;
+  const aFirst=g.aa>=g.ab;
+  const A=aFirst?{t:g.ta,p:g.aa,pr:g.pa}:{t:g.tb,p:g.ab,pr:g.pb};
+  const B=aFirst?{t:g.tb,p:g.ab,pr:g.pb}:{t:g.ta,p:g.aa,pr:g.pa};
+  const all=loggedGames().map(z=>Math.abs(z.pa-z.pb)).sort((a,b)=>b-a);
+  const marg=A.p-B.p;
+  return {y:y,wk:wk,A:A,B:B,marg:marg,mgA:K.mgr[A.t],mgB:K.mgr[B.t],
+          rnd:roundName(y,K,g)||('Week '+wk),
+          vd:isVoid(y,wk,g.ta,g.tb),
+          rank:all.filter(v=>v>marg).length+1, n:all.length};
+}
+async function makeGameCard(y,wk,team){
+  const G=gameFacts(y,wk,team); if(!G)return null;
+  await cardFonts();
+  const {cv,x,P,S}=cardBase();
+  cardKick(x,S,P,'The receipt');
+  x.textAlign='center'; x.fillStyle=P.dim; x.font='400 28px "IBM Plex Sans",sans-serif';
+  x.fillText(G.rnd+'  ·  '+G.y+(G.vd?'  ·  VOIDED':''),S/2,162);
+
+  const side=(t,mg,p,ty,win)=>{
+    x.textAlign='right'; x.fillStyle=win?P.accent:P.dim;
+    x.font='600 78px "IBM Plex Mono",monospace';
+    const sw=x.measureText(p.toFixed(2)).width;
+    x.fillText(p.toFixed(2),S-84,ty);
+    x.textAlign='left'; x.fillStyle=win?P.ink:P.dim;
+    cardFit(x,t,S-190-sw,52,26,700,'"IBM Plex Sans",sans-serif');
+    x.fillText(t,84,ty);
+    x.fillStyle=P.dim; x.font='400 25px "IBM Plex Sans",sans-serif';
+    x.fillText(mg,84,ty+38);
+  };
+  side(G.A.t,G.mgA,G.A.p,268,true);
+  x.textAlign='center'; x.fillStyle=P.dim; x.font='500 22px "IBM Plex Mono",monospace';
+  x.fillText('B E A T',S/2,368);
+  side(G.B.t,G.mgB,G.B.p,452,false);
+
+  cardRule(x,S,P,540);
+  x.textAlign='center';
+  x.fillStyle=P.accent; x.font='900 172px "Big Shoulders Display",sans-serif';
+  x.fillText(G.marg.toFixed(2),S/2,700);
+  x.fillStyle=P.dim; x.font='500 24px "IBM Plex Mono",monospace';
+  x.fillText('P O I N T   M A R G I N',S/2,748);
+
+  cardRule(x,S,P,806);
+  x.fillStyle=P.ink; x.font='400 28px "IBM Plex Sans",sans-serif';
+  const l1=G.rank===1?'The biggest beating in '+G.n+' logged games.'
+    :'The '+ord(G.rank)+' biggest margin of '+G.n+' logged games.';
+  x.fillText(l1,S/2,860);
+  x.fillStyle=P.dim;
+  const diff=G.A.p-G.A.pr;
+  x.fillText(cardClip(x,G.A.t,S-200)+' was projected '+G.A.pr.toFixed(1)+'  ·  '+
+    (diff>=0?'beat it by ':'missed it by ')+Math.abs(diff).toFixed(1),S/2,906);
+  cardFoot(x,S,P);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
+
+/* ---- 3. one line from the record book ---- */
+let BIGRECS=null;
+function bigRecords(){
+  if(BIGRECS)return BIGRECS;
+  const gs=loggedGames();
+  const sc=[];
+  gs.forEach(g=>{
+    sc.push({y:g.y,wk:g.wk,t:g.ta,m:g.ma,p:g.pa,o:g.tb,op:g.pb});
+    sc.push({y:g.y,wk:g.wk,t:g.tb,m:g.mb,p:g.pb,o:g.ta,op:g.pa});
+  });
+  const pick=(arr,f)=>arr.length?arr.reduce((a,b)=>f(b)>f(a)?b:a):null;
+  const R=[];
+  const hi=pick(sc,z=>z.p), lo=pick(sc,z=>-z.p);
+  const blow=pick(gs,z=>Math.abs(z.pa-z.pb)), close=pick(gs,z=>-Math.abs(z.pa-z.pb));
+  const szPF=pick(ROWS,z=>z.pf), szPI=pick(ROWS,z=>z.pi), szW=pick(ROWS,z=>z.w+z.t/2);
+  const mostT=pick(M,z=>z.titles);
+  const bestPct=pick(M.filter(z=>z.g>=40),z=>z.winpct);
+  const mostApp=pick(M,z=>z.apps);
+  if(hi)R.push({k:'Most points in a week',v:hi.p.toFixed(2),who:hi.m,
+    when:hi.t+'  ·  week '+hi.wk+', '+hi.y,sub:'Beat '+hi.o+', who managed '+hi.op.toFixed(2)+'.'});
+  if(lo)R.push({k:'Fewest points in a week',v:lo.p.toFixed(2),who:lo.m,
+    when:lo.t+'  ·  week '+lo.wk+', '+lo.y,sub:'Faced '+lo.o+', who scored '+lo.op.toFixed(2)+'.'});
+  if(blow)R.push({k:'Biggest beating',v:Math.abs(blow.pa-blow.pb).toFixed(2),
+    who:(blow.pa>blow.pb?blow.ma:blow.mb),
+    when:'week '+blow.wk+', '+blow.y,
+    sub:(blow.pa>blow.pb?blow.ta:blow.tb)+' '+Math.max(blow.pa,blow.pb).toFixed(2)+
+        ' – '+Math.min(blow.pa,blow.pb).toFixed(2)+' '+(blow.pa>blow.pb?blow.tb:blow.ta)+'.'});
+  if(close)R.push({k:'Closest finish',v:Math.abs(close.pa-close.pb).toFixed(2),
+    who:(close.pa>close.pb?close.ma:close.mb),
+    when:'week '+close.wk+', '+close.y,
+    sub:(close.pa>close.pb?close.ta:close.tb)+' '+Math.max(close.pa,close.pb).toFixed(2)+
+        ' – '+Math.min(close.pa,close.pb).toFixed(2)+' '+(close.pa>close.pb?close.tb:close.ta)+'.'});
+  if(szPF)R.push({k:'Most points in a season',v:szPF.pf.toFixed(2),who:szPF.mgr,
+    when:szPF.team+'  ·  '+szPF.y,sub:szPF.ppg.toFixed(2)+' a game across '+szPF.g+' games. Finished '+ord(szPF.place)+'.'});
+  if(szW)R.push({k:'Best season record',v:szW.w+'-'+szW.l+(szW.t?'-'+szW.t:''),who:szW.mgr,
+    when:szW.team+'  ·  '+szW.y,sub:szW.pf.toFixed(2)+' points for. Finished '+ord(szW.place)+' of '+szW.teams+'.'});
+  if(szPI)R.push({k:'Highest power index, one season',v:szPI.pi.toFixed(1),who:szPI.mgr,
+    when:szPI.team+'  ·  '+szPI.y,sub:'The strongest single season the league has recorded.'});
+  if(mostT&&mostT.titles)R.push({k:'Most titles',v:String(mostT.titles%1?mostT.titles.toFixed(1):mostT.titles),
+    who:mostT.name,when:mostT.seasons+' seasons  ·  '+mostT.first+'–'+mostT.last,
+    sub:'Last one in '+mostT.lastTitle+'. '+mostT.podium+' podium finishes in all.'});
+  if(bestPct)R.push({k:'Best career win rate',v:pct(bestPct.winpct),who:bestPct.name,
+    when:bestPct.w+'-'+bestPct.l+(bestPct.t?'-'+bestPct.t:'')+'  ·  '+bestPct.g+' games',
+    sub:'Across '+bestPct.seasons+' seasons, '+bestPct.first+' to '+bestPct.last+'.'});
+  if(mostApp)R.push({k:'Most playoff appearances',v:String(mostApp.apps),who:mostApp.name,
+    when:mostApp.apps+' of '+mostApp.seasons+' seasons',
+    sub:mostApp.poW+'-'+mostApp.poL+' once they got there.'});
+  BIGRECS=R; return R;
+}
+async function makeRecordCard(i){
+  const R=bigRecords()[i]; if(!R)return null;
+  await cardFonts();
+  const {cv,x,P,S}=cardBase();
+  cardKick(x,S,P,'League record');
+  x.textAlign='center';
+  x.fillStyle=P.dim; x.font='400 33px "IBM Plex Sans",sans-serif';
+  x.fillText(R.k,S/2,214);
+  cardFit(x,R.v,S-140,210,72,900,'"Big Shoulders Display",sans-serif');
+  x.fillStyle=P.accent; x.fillText(R.v,S/2,420);
+  cardRule(x,S,P,486);
+  cardFit(x,R.who.toUpperCase(),S-140,86,36,900,'"Big Shoulders Display",sans-serif');
+  x.fillStyle=P.ink; x.fillText(R.who.toUpperCase(),S/2,576);
+  x.fillStyle=P.dim; x.font='400 29px "IBM Plex Sans",sans-serif';
+  x.fillText(cardClip(x,R.when,S-140),S/2,626);
+  x.fillStyle=P.ink; x.font='italic 400 34px "IBM Plex Sans",sans-serif';
+  cardWrap(x,R.sub,S-190).slice(0,3).forEach((l,k)=>x.fillText(l,S/2,724+k*48));
+  cardFoot(x,S,P);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
+
+/* ---- 4. a single Wrapped slide ---- */
+async function makeWrapCard(name,i){
+  const built=wrapCards(name); if(!built)return null;
+  const c=built.cards[i]; if(!c)return null;
+  await cardFonts();
+  const {cv,x,P,S}=cardBase();
+  cardKick(x,S,P,LAST+' Wrapped');
+  x.textAlign='center';
+  x.fillStyle=P.ink; x.font='700 44px "IBM Plex Sans",sans-serif';
+  x.fillText(cardClip(x,name,S-160),S/2,180);
+  x.fillStyle=P.dim; x.font='400 27px "IBM Plex Sans",sans-serif';
+  x.fillText(cardClip(x,built.team,S-160),S/2,222);
+
+  cardRule(x,S,P,272);
+  /* the opening slide's label is the same words as the kicker and its value is the
+     manager's own name, both of which are already at the top of the card */
+  const lab=cardText(c.k), val=cardText(c.v);
+  const dupLab=lab.toLowerCase()===(LAST+' wrapped').toLowerCase();
+  const dupVal=val.toLowerCase()===name.toLowerCase();
+  if(!dupLab){
+    x.fillStyle=P.dim; x.font='500 25px "IBM Plex Mono",monospace';
+    x.fillText(lab.toUpperCase().split('').join(' '),S/2,332);
+  }
+  if(!dupVal){
+    cardFit(x,val,S-150,c.sm?110:190,54,900,'"Big Shoulders Display",sans-serif');
+    x.fillStyle=P.accent; x.fillText(val,S/2,c.sm?466:508);
+  }
+
+  const pills=(c.pills||[]).map(cardText).filter(Boolean).slice(0,3);
+  /* the note sits centred in whatever room is left, so a one-line card and a
+     five-line card both look composed instead of top-heavy */
+  const noteBot=pills.length?838:940;
+  const noteTop=(dupLab&&dupVal)?330:566;
+  x.font='400 36px "IBM Plex Sans",sans-serif';
+  const nl=cardWrap(x,cardText(c.n),S-180).slice(0,5);
+  const nStart=noteTop+Math.max(0,(noteBot-noteTop-(nl.length-1)*50)/2);
+  x.fillStyle=P.ink;
+  nl.forEach((l,k)=>x.fillText(l,S/2,nStart+k*50));
+
+  if(pills.length){
+    cardRule(x,S,P,878);
+    x.font='500 26px "IBM Plex Mono",monospace';
+    const gap=(S-168)/pills.length;
+    pills.forEach((q,k)=>{
+      x.fillStyle=P.accent; x.textAlign='center';
+      x.fillText(cardClip(x,q,gap-24),84+gap*k+gap/2,932);
+    });
+  }
+  cardFoot(x,S,P);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
+
+/* ---- 5. the rivalry, meeting by meeting ---- */
+async function makeRivalryCard(an,bn){
+  if(!byName[an]||!byName[bn]||an===bn)return null;
+  const ms=meetings(an,bn);
+  if(!ms.length)return null;
+  await cardFonts();
+  const {cv,x,P,S}=cardBase();
+  cardKick(x,S,P,'The rivalry');
+  const aw=ms.filter(m=>m.me>m.them).length, bw=ms.length-aw;
+
+  x.textAlign='center'; x.fillStyle=P.ink;
+  cardFit(x,an.toUpperCase(),S-160,62,30,900,'"Big Shoulders Display",sans-serif');
+  x.fillText(an.toUpperCase(),S/2,188);
+  x.fillStyle=P.dim; x.font='400 23px "IBM Plex Mono",monospace'; x.fillText('versus',S/2,228);
+  x.fillStyle=P.ink;
+  cardFit(x,bn.toUpperCase(),S-160,62,30,900,'"Big Shoulders Display",sans-serif');
+  x.fillText(bn.toUpperCase(),S/2,290);
+
+  x.fillStyle=P.accent; x.font='900 100px "Big Shoulders Display",sans-serif';
+  x.fillText(aw+'–'+bw,S/2,402);
+  x.fillStyle=P.dim; x.font='400 25px "IBM Plex Sans",sans-serif';
+  x.fillText(cardClip(x,'every meeting on record, from '+an+"'s side",S-140),S/2,444);
+
+  const ROWTOP=534;
+  cardRule(x,S,P,486);
+  /* show them all when they fit; otherwise the most recent, and say what was cut */
+  const room=Math.floor((S-150-ROWTOP)/40);
+  const shown=ms.length<=room?ms:ms.slice(-room);
+  const cut=ms.length-shown.length;
+  shown.forEach((m,i)=>{
+    const ty=ROWTOP+i*40, win=m.me>m.them;
+    x.textAlign='left'; x.fillStyle=P.dim; x.font='400 23px "IBM Plex Mono",monospace';
+    x.fillText(String(m.y),84,ty);
+    x.fillStyle=win?P.accent:P.dim; x.font='600 23px "IBM Plex Mono",monospace';
+    x.fillText(win?'W':'L',158,ty);
+    x.fillStyle=P.ink; x.font='400 24px "IBM Plex Sans",sans-serif';
+    x.fillText(cardClip(x,m.rnd,240),200,ty);
+    x.textAlign='right'; x.font='500 25px "IBM Plex Mono",monospace';
+    x.fillStyle=win?P.ink:P.dim;
+    x.fillText(m.me.toFixed(2)+'  –  '+m.them.toFixed(2),S-84,ty);
+  });
+  if(cut){
+    x.textAlign='center'; x.fillStyle=P.dim; x.font='italic 400 24px "IBM Plex Sans",sans-serif';
+    x.fillText('and '+cut+' earlier meeting'+(cut===1?'':'s'),S/2,ROWTOP+shown.length*40+16);
+  }
+  cardFoot(x,S,P);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
+
+/* ---- 6. the case against: every unflattering true thing about one manager ---- */
+function roastLines(name){
+  const m=byName[name]; if(!m)return null;
+  const mine=ROWS.filter(r=>r.mgr===name);
+  const out=[];
+  if(mine.length){
+    const worst=mine.reduce((a,b)=>b.pi<a.pi?b:a);
+    out.push(['Worst season',worst.y+' as '+worst.team,
+      ord(worst.place)+' of '+worst.teams+' at '+worst.w+'-'+worst.l+(worst.t?'-'+worst.t:'')+
+      ', power index '+worst.pi.toFixed(1)+'.']);
+  }
+  if(!m.titles)out.push(['Titles','none in '+m.seasons+' season'+(m.seasons===1?'':'s'),
+    m.podium?m.podium+' podium finish'+(m.podium===1?'':'es')+' and not one of them the top step.':'Never once on the podium.']);
+  else if(m.lastTitle&&LAST-m.lastTitle>=2)out.push(['Last title',String(m.lastTitle),
+    (LAST-m.lastTitle)+' seasons ago. A long time to keep bringing it up.']);
+  /* the opponent they have lost to most */
+  let worstOpp=null;
+  M.forEach(o=>{
+    if(o.name===name)return;
+    const r=MX.all.t[name+'|'+o.name]; if(!r)return;
+    const g=r[0]+r[1]; if(g<2)return;
+    const d=r[1]-r[0];
+    if(!worstOpp||d>worstOpp.d||(d===worstOpp.d&&g>worstOpp.g))worstOpp={n:o.name,w:r[0],l:r[1],d:d,g:g};
+  });
+  if(worstOpp&&worstOpp.d>0)out.push(['Owned by',worstOpp.n,
+    worstOpp.w+'-'+worstOpp.l+' across '+worstOpp.g+' meetings. It is not a rivalry if only one side wins.']);
+  if(m.luck>=0.5)out.push(['Luck','+'+m.luck.toFixed(2)+' wins',
+    'The scoring earned about '+m.pythW.toFixed(1)+' wins. The record says '+m.w+'. The schedule did the work.']);
+  else if(m.vsWinPct!=null&&m.vsWinPct<0.5)out.push(['Against good teams',pct(m.vsWinPct),
+    m.vsWinW+'-'+m.vsWinL+' against winning teams, '+pct(m.vsSubPct)+' against everyone else. Beats who they are supposed to beat.']);
+  if(m.apps<m.seasons)out.push(['Missed the playoffs',
+    (m.seasons-m.apps)+' of '+m.seasons+' seasons',
+    'In the bracket '+m.apps+' time'+(m.apps===1?'':'s')+', '+m.poW+'-'+m.poL+' once there.']);
+  if(m.floor!=null)out.push(['Floor',m.floor.toFixed(1),
+    'The worst version of this manager, on the same scale where 100 is league average.']);
+  return {m:m,lines:out.slice(0,5)};
+}
+async function makeRoastCard(name){
+  const R=roastLines(name); if(!R||!R.lines.length)return null;
+  await cardFonts();
+  const {cv,x,P,S}=cardBase();
+  cardKick(x,S,P,'The case against');
+  x.textAlign='center'; x.fillStyle=P.ink;
+  cardFit(x,name.toUpperCase(),S-140,116,44,900,'"Big Shoulders Display",sans-serif');
+  x.fillText(name.toUpperCase(),S/2,232);
+  x.fillStyle=P.dim; x.font='400 28px "IBM Plex Sans",sans-serif';
+  x.fillText(R.m.seasons+' season'+(R.m.seasons===1?'':'s')+'  ·  '+R.m.w+'-'+R.m.l+
+    (R.m.t?'-'+R.m.t:'')+'  ·  every word of this is from the record',S/2,280);
+
+  /* measure first: a fact that runs off the bottom of the card is worth less than one
+     fewer fact that fits, so entries are dropped from the end until the stack clears
+     the footer */
+  const TOP=346, BOT=S-118;
+  x.font='400 26px "IBM Plex Sans",sans-serif';
+  const blocks=R.lines.map(L=>{
+    const ls=cardWrap(x,L[2],S-168).slice(0,2);
+    return {L:L,ls:ls,h:104+ls.length*32};
+  });
+  while(blocks.length>1&&blocks.reduce((n,b)=>n+b.h,0)>BOT-TOP)blocks.pop();
+  let y=TOP;
+  blocks.forEach(B=>{
+    cardRule(x,S,P,y-32);
+    x.textAlign='left'; x.fillStyle=P.dim; x.font='500 21px "IBM Plex Mono",monospace';
+    x.fillText(B.L[0].toUpperCase().split('').join(' '),84,y);
+    x.fillStyle=P.accent; x.font='700 39px "IBM Plex Sans",sans-serif';
+    x.fillText(cardClip(x,B.L[1],S-168),84,y+46);
+    x.fillStyle=P.ink; x.font='400 26px "IBM Plex Sans",sans-serif';
+    B.ls.forEach((t,k)=>x.fillText(t,84,y+86+k*32));
+    y+=B.h;
+  });
+  cardFoot(x,S,P);
+  return new Promise(res=>cv.toBlob(res,'image/png'));
+}
+
+/* ---- one wrapper so a new card needs one line of wiring ---- */
+async function shareAny(builder,fname,btn){
+  const label=btn?btn.innerHTML:null;
+  if(btn){btn.disabled=true;btn.innerHTML='Building…';}
+  try{
+    const blob=await builder();
+    if(!blob){toast('Nothing to put on a card here');return;}
+    await shareBlob(blob,fname);
+  }catch(e){ if(!(e&&e.name==='AbortError'))toast('Could not build the card'); }
+  finally{ if(btn){btn.disabled=false;btn.innerHTML=label;} }
+}
+const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+
+/* ---- 7. links that open the site on one exact thing ----
+   A picture is good for the group chat; a link is better for an argument, because the
+   other person lands on the live page and can keep digging. */
+function deepLink(params,hash){
+  let base;
+  try{ base=location.origin+location.pathname; }catch(e){ base=''; }
+  if(!base||location.protocol==='file:')base='https://'+cardHost()+'/';
+  const q=Object.keys(params).filter(k=>params[k]!=null&&params[k]!=='')
+    .map(k=>encodeURIComponent(k)+'='+encodeURIComponent(params[k])).join('&');
+  return base+(q?'?'+q:'')+(hash?'#'+hash:'');
+}
+async function copyLink(url,btn){
+  const label=btn?btn.innerHTML:null;
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(url);
+    else{
+      const ta=document.createElement('textarea'); ta.value=url;
+      ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    if(btn){btn.innerHTML='Copied';setTimeout(()=>{btn.innerHTML=label;},1400);}
+    else toast('Link copied');
+  }catch(e){ toast('Could not copy the link'); }
+}
+/* one handler for every copy-link button on the page, so new ones need no wiring:
+   data-link is a query string, data-link-hash is the section to land on */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-link]'); if(!b)return;
+  e.preventDefault();
+  const p={}; String(b.dataset.link).split('&').filter(Boolean).forEach(kv=>{
+    const i=kv.indexOf('='); if(i>0)p[kv.slice(0,i)]=kv.slice(i+1);});
+  copyLink(deepLink(p,b.dataset.linkHash||''),b);
+});
+
+/* ---- wiring for the new cards ----
+   Delegated, because the season pane and the weekly scoreboard are rebuilt from
+   scratch every time the reader changes year or week, and per-render handlers would
+   have to be re-attached each time. */
+document.addEventListener('click',e=>{
+  const sea=e.target.closest('#seaShare');
+  if(sea){
+    const on=$$('#yrPills button.on')[0]; if(!on)return;
+    const y=+on.dataset.y;
+    shareAny(()=>makeSeasonCard(y),'deadshot-'+y+'-season.png',sea);
+    return;
+  }
+  if(e.target.closest('#wkLink')){
+    const wl=e.target.closest('#wkLink');
+    const wy=$$('#wkYears button.on')[0], ww=$$('#wkSel button.on')[0];
+    copyLink(deepLink({y:wy?wy.dataset.wy:'',w:ww?ww.dataset.w:''},'weekly'),wl);
+    return;
+  }
+  const rec=e.target.closest('[data-receipt]');
+  if(rec){
+    const bits=String(rec.dataset.receipt).split('|');
+    const y=+bits[0], wk=+bits[1], team=bits[2];
+    shareAny(()=>makeGameCard(y,wk,team),'deadshot-'+y+'-week'+wk+'-'+slug(team)+'.png',rec);
+  }
+});
+/* the record picker: the list is generated, so it stays true when the numbers move */
+(function(){
+  const sel=$('#recPick'), btn=$('#recShare');
+  if(!sel||!btn)return;
+  const R=bigRecords();
+  if(!R.length){sel.style.display='none';btn.style.display='none';return;}
+  sel.innerHTML=R.map((r,i)=>'<option value="'+i+'">'+esc(r.k)+'</option>').join('');
+  sel.setAttribute('aria-label','Which record to put on a card');
+  btn.onclick=()=>shareAny(()=>makeRecordCard(+sel.value),
+    'deadshot-record-'+slug(R[+sel.value].k)+'.png',btn);
+})();
+/* Wrapped: share whatever card is on screen. The story keeps running behind the share
+   sheet otherwise, so it is held until the sheet closes. */
+(function(){
+  const b=$('#wrShare'); if(!b)return;
+  b.addEventListener('click',async e=>{
+    e.stopPropagation();
+    const was=WR.paused; WR.paused=true;
+    try{
+      await shareAny(()=>makeWrapCard(WR.name,WR.i),
+        'deadshot-wrapped-'+slug(WR.name)+'-'+(WR.i+1)+'.png',b);
+    }finally{ WR.paused=was; }
+  });
+})();
+
 /* ---- From the archive -------------------------------------------------------
    A rotating moment pulled from the record. Seeded by the calendar day, so it is
    stable all day and different tomorrow, and never random on reload. During the NFL
@@ -3933,6 +4505,8 @@ function applyUrlState(){
       const sy=$$(`#yrPills button[data-y="${y}"]`)[0];
       if(sy&&typeof drawSeason==='function')drawSeason(y);
     }
+    const wk=parseInt(q.get('w'),10);
+    if(wk){const wb=$$('#wkSel button[data-w="'+wk+'"]')[0]; if(wb)wb.click();}
     const m=q.get('m');
     if(m){const b=$$('#crPick button[data-cm]').filter(x=>x.dataset.cm===m)[0];
       if(b){CRMGR=m;CRLOCK.clear();drawCareerRace();}}
@@ -3951,6 +4525,7 @@ setTimeout(applyUrlState,0);
   wire('#wkYears','data-wy','y');
   wire('#yrPills','data-y','y');
   wire('#crPick','data-cm','m');
+  wire('#wkSel','data-w','w');
 })();
 
 function drawWeekly(YR){
@@ -4195,7 +4770,7 @@ function drawWeekly(YR){
       gs.map(g=>{const vd=isVoid(YR,g.wk,g.ta,g.tb), aw=g.aa>g.ab;
         const s=(t,p,pr,win)=>`<div class="side ${vd?'':(win?'w':'lo')}"><span class="tn">${esc(t)}<small>${esc(MG[t])} · proj ${pr.toFixed(1)}</small></span>
           <span class="sc">${p.toFixed(2)}</span>${p===hi?'<span class="chip y" style="margin-left:6px">high</span>':p===lo?'<span class="chip" style="margin-left:6px;border-color:var(--neg);color:var(--neg)">low</span>':''}</div>`;
-        return `<div class="game${vd?' void':''}"><div class="gh">${vd?(roundName(YR,K5,g)||'Week '+w)+' — VOID':(roundName(YR,K5,g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${s(g.ta,g.aa,g.pa,aw)}${s(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
+        return `<div class="game${vd?' void':''}"><div class="gh"><button data-receipt="${YR}|${g.wk}|${esc(g.ta)}" title="Share this result" aria-label="Share this result" style="float:right;background:none;border:0;box-shadow:none;color:var(--brass);font-family:inherit;font-size:11px;letter-spacing:.06em;cursor:pointer;padding:0 2px;margin:0 -2px 0 6px;min-height:0">&#8593;</button>${vd?(roundName(YR,K5,g)||'Week '+w)+' — VOID':(roundName(YR,K5,g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${s(g.ta,g.aa,g.pa,aw)}${s(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
       + by.map(b=>`<div class="game"><div class="gh">${byeName(K5,b)}</div><div class="side bye"><span class="tn">${esc(b.t)}<small>${esc(MG[b.t])} · proj ${b.p.toFixed(1)}</small></span><span class="sc">${b.a.toFixed(2)}</span></div></div>`).join('')}</div>`;
   }
   $$('#wkSel button').forEach(b=>b.onclick=()=>drawWk(+b.dataset.w));
