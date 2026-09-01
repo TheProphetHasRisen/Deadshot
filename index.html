@@ -1286,11 +1286,11 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
     <div class="card">
       <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
-        <span class="sub">Every season with a game log &middot; one line per season, each with its own colour and line style</span></div>
+        <span class="sub">Every season with a game log &middot; one line per season, each in its own colour</span></div>
       <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
       <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season has its own colour and its own line style</strong>, and a year keeps the same colour on every manager's chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season in its own colour</strong>, and a year keeps the same colour on every manager's chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
     </div>
   </section>
 
@@ -1349,7 +1349,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
     <div class="card">
       <div class="card-h"><h3>Weekly scoreboard</h3>
-        <span class="sub">the arrow on any result makes a card of it</span>
+        <span class="sub">Share on any result makes a picture of it for the group chat</span>
         <button id="wkLink" style="padding:5px 11px;margin-left:8px">&#128279; Copy link to this week</button>
         <div class="right pills" id="wkSel"></div></div>
       <div class="card-b" id="wkOut"></div>
@@ -3332,10 +3332,8 @@ function drawCareerRace(){
      blindness. The hues are per-skin tokens because all six grounds differ. */
   const NSEA=8;
   const YIDX={}; YRS.forEach((y,k)=>{YIDX[y]=k;});
-  const SDASH=['','9 5','2 4.5','15 4 2 4','5 5','1 4','20 6','9 4 2 4 2 4'];
   const seaK=y=>YIDX[y]%NSEA;
   const col=y=>cssv('--sea-'+(seaK(y)+1))||cssv('--brass');
-  const dsh=y=>SDASH[seaK(y)];
   const WID=2.4, RAD=3.8;
 
   let grid='';
@@ -3353,7 +3351,7 @@ function drawCareerRace(){
     const R=crRank(s.K)[s.team];
     const d=R.map((p,k)=>(k?'L':'M')+xs(k)+','+ys(p.rank)).join(' ');
     const endRank=R[R.length-1].rank, fp=PLACE[s.y+'|'+s.team]||endRank;
-    return {y:s.y,team:s.team,K:s.K,R,d,c:col(s.y),dash:dsh(s.y),w:WID,r:RAD,seedRank:endRank,fin:fp,moved:endRank-fp,
+    return {y:s.y,team:s.team,K:s.K,R,d,c:col(s.y),w:WID,r:RAD,seedRank:endRank,fin:fp,moved:endRank-fp,
             fx:FINX,fy:ys(fp),
             tail:`M${xs(R.length-1)},${ys(endRank)} L${FINX},${ys(fp)}`};});
   /* two seasons can finish in the same place; fan those apart like the season chart does */
@@ -3364,7 +3362,7 @@ function drawCareerRace(){
     l.tail=`M${xs(l.R.length-1)},${ys(l.seedRank)} L${l.fx},${l.fy}`;}));
 
   const paths=lines.map(l=>
-    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-dasharray="${l.dash}" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
+    `<path class="crl" d="${l.d}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-linejoin="round" stroke-linecap="round" data-cy="${l.y}"/>`+
     `<path class="crl" d="${l.tail}" fill="none" stroke="${l.c}" stroke-width="${l.w}" stroke-dasharray="4 3" stroke-linecap="round" data-cy="${l.y}"/>`).join('');
   const hits=lines.map(l=>`<path class="crhit" d="${l.d}" fill="none" stroke="transparent" stroke-width="15" data-cy="${l.y}" style="cursor:pointer;pointer-events:stroke"/>`).join('');
   let dots='';
@@ -3406,7 +3404,7 @@ function drawCareerRace(){
   $('#crLeg').innerHTML=`<span class="fb-lab" style="margin-right:4px">Seasons</span>`+
     S.map(s=>`<button data-cy="${s.y}" style="padding:4px 9px">`+
       `<svg width="19" height="9" viewBox="0 0 19 9" style="vertical-align:-1px;margin-right:5px" aria-hidden="true">`+
-      `<line x1="0.5" y1="4.5" x2="18.5" y2="4.5" stroke="${col(s.y)}" stroke-width="2.6" stroke-dasharray="${dsh(s.y)}" stroke-linecap="round"/></svg>`+
+      `<line x1="0.5" y1="4.5" x2="18.5" y2="4.5" stroke="${col(s.y)}" stroke-width="3" stroke-linecap="round"/></svg>`+
       `<b style="color:${col(s.y)}">${s.y}</b> <span class="dim">${esc(s.team)}</span></button>`).join('')+
     (S.length>1?`<button id="crClear" style="padding:4px 9px">Clear</button>`:'');
 
@@ -4772,7 +4770,7 @@ function drawWeekly(YR){
       gs.map(g=>{const vd=isVoid(YR,g.wk,g.ta,g.tb), aw=g.aa>g.ab;
         const s=(t,p,pr,win)=>`<div class="side ${vd?'':(win?'w':'lo')}"><span class="tn">${esc(t)}<small>${esc(MG[t])} · proj ${pr.toFixed(1)}</small></span>
           <span class="sc">${p.toFixed(2)}</span>${p===hi?'<span class="chip y" style="margin-left:6px">high</span>':p===lo?'<span class="chip" style="margin-left:6px;border-color:var(--neg);color:var(--neg)">low</span>':''}</div>`;
-        return `<div class="game${vd?' void':''}"><div class="gh"><button data-receipt="${YR}|${g.wk}|${esc(g.ta)}" title="Share this result" aria-label="Share this result" style="float:right;background:none;border:0;box-shadow:none;color:var(--brass);font-family:inherit;font-size:11px;letter-spacing:.06em;cursor:pointer;padding:0 2px;margin:0 -2px 0 6px;min-height:0">&#8593;</button>${vd?(roundName(YR,K5,g)||'Week '+w)+' — VOID':(roundName(YR,K5,g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${s(g.ta,g.aa,g.pa,aw)}${s(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
+        return `<div class="game${vd?' void':''}"><div class="gh"><button data-receipt="${YR}|${g.wk}|${esc(g.ta)}" title="Make a shareable card of this result" aria-label="Make a shareable card of this result" style="float:right;background:none;border:0;box-shadow:none;color:var(--brass);font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:0 2px;margin:0 -2px 0 8px;min-height:0">&#8593; Share</button>${vd?(roundName(YR,K5,g)||'Week '+w)+' — VOID':(roundName(YR,K5,g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${s(g.ta,g.aa,g.pa,aw)}${s(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
       + by.map(b=>`<div class="game"><div class="gh">${byeName(K5,b)}</div><div class="side bye"><span class="tn">${esc(b.t)}<small>${esc(MG[b.t])} · proj ${b.p.toFixed(1)}</small></span><span class="sc">${b.a.toFixed(2)}</span></div></div>`).join('')}</div>`;
   }
   $$('#wkSel button').forEach(b=>b.onclick=()=>drawWk(+b.dataset.w));
