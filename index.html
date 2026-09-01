@@ -434,6 +434,9 @@
 [data-skin="leather"] #wkYears{background-color:rgba(53,25,15,.95)}
 @media (prefers-reduced-motion:reduce){.gridiron *,.pigskin *{animation:none!important}}
 @media(max-width:820px){.gridiron .goal,.pigskin .yn{display:none}}
+/* An element with an inline display beats the hidden attribute, which is exactly how the
+   trade grid stayed on screen while its own card said it was collapsed. */
+[hidden]{display:none!important}
 .gl{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;
   border-radius:50%;border:1px solid var(--brass-2);color:var(--brass);background:transparent;
   font-size:10px;font-weight:700;font-family:"IBM Plex Mono",monospace;line-height:1;
@@ -809,7 +812,8 @@ details.expl>p,details.expl .plain{margin-top:9px}
   background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.30) 46px 49px);
   mask-image:linear-gradient(180deg,transparent,#000);
   -webkit-mask-image:linear-gradient(180deg,transparent,#000)}
-.gr49 .gr-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#EBD6A2}
+.gr49 .gr-tag{position:relative;font-size:13px;font-weight:600;letter-spacing:.24em;color:#FFEFC4;
+  text-shadow:0 1px 3px rgba(40,0,0,.9)}
 .gr49 .gr-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   font-weight:900;font-size:clamp(42px,9vw,98px);line-height:.95;letter-spacing:.03em;margin-top:8px;
   color:#F4E7C4;text-shadow:0 0 30px rgba(179,153,93,.55),0 3px 0 rgba(120,0,0,.95)}
@@ -2302,15 +2306,7 @@ function titleDefense(){
     +'<div class="kd-mgr">'+esc(mgrs.toUpperCase())+' &middot; CHAMPION '+LAST+'</div></div>';
   document.body.appendChild(el);
   const c=ac();
-  if(c&&!quiet()){
-    /* a low brass swell, two struck-gold notes, and the champion enjoying himself */
-    tone(58,1.5,'sawtooth',.18,44,0);
-    tone(87,1.4,'triangle',.13,72,.05);
-    noise(.5,.09,1400,180,0,'lowpass',.9);
-    ping(1244,.9,.075,.30,1);
-    ping(1661,1.1,.065,.54,1);
-    evilLaugh(1.0);
-  }
+  if(c&&!quiet())battleReady(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2428,10 +2424,10 @@ function pandaWatch(){
     +'<div class="pn-face"><span class="ear l"></span><span class="ear r"></span>'
     +'<span class="head"><span class="eye l"><i></i></span><span class="eye r"><i></i></span>'
     +'<span class="nose"></span></span></div>'
-    +'<div class="pn-tag">Q U O T H &nbsp; T H E &nbsp; P A N D A</div>'
+    +'<div class="pn-tag">T H E R E &nbsp; A R E &nbsp; N O &nbsp; A C C I D E N T S</div>'
     +'<div class="pn-l1">BRIAN BURKE</div>'
     +'<div class="pn-l2">'+F.m.seasons+' SEASONS OF '+SEA.length+'</div>'
-    +'<div class="pn-sub">nevermore absent, and never missed by much</div>'
+    +'<div class="pn-sub">never missed a year, never missed by much</div>'
     +'<div class="pn-facts">'+F.first+'&ndash;'+F.last+' &middot; '+F.m.apps+' OF '+F.m.seasons
       +' IN THE BRACKET &middot; INDEX '+F.m.cpi.toFixed(1)+' &middot; SWING &plusmn;'
       +(F.m.sd==null?'—':F.m.sd.toFixed(1))+'</div></div>';
@@ -2447,6 +2443,98 @@ function pandaWatch(){
 }
 /* Chinese numerals for the seal. Only ever fed a season count, so ten covers it. */
 const CN_NUM=['','\u4E00','\u4E8C','\u4E09','\u56DB','\u4E94','\u516D','\u4E03','\u516B','\u4E5D','\u5341'];
+
+/* A full stand, not static. Cheering is voices, so it is built from a lot of short
+   band-limited bursts at slightly different pitches on top of a bed that swells and
+   falls, rather than from one long hiss. */
+function fansCheer(delay){
+  const c=ac(); if(!c||quiet())return;
+  const d=delay||0;
+  /* the bed: three overlapping washes, coloured where a crowd actually sits */
+  noise(3.0,0.30,1500,700,d,'bandpass',0.30);
+  noise(2.6,0.21,700,320,d+0.10,'bandpass',0.45);
+  noise(2.4,0.17,300,120,d+0.05,'lowpass',0.6);
+  /* individual voices, uneven in time and pitch, which is what makes it read as people */
+  for(let i=0;i<64;i++){
+    const t=d+Math.random()*2.3;
+    const f=760+Math.random()*1400;
+    noise(0.10+Math.random()*0.14,0.056+Math.random()*0.050,f,f*0.55,t,'bandpass',0.6);
+  }
+  /* a handful of louder ones nearer the front */
+  for(let i=0;i<9;i++){
+    const t=d+0.15+Math.random()*1.8;
+    tone(300+Math.random()*260,0.26,'sawtooth',0.038,180,t);
+  }
+}
+
+/* Bracing for a defence: three war drums, a horn climbing a triad, and the whole thing
+   locking into place on the top note. Triumphant, but planted rather than celebrating. */
+function battleReady(delay){
+  const d=delay||0;
+  [0,0.26,0.50].forEach((t,i)=>{               /* the drums */
+    tone(58-i*4,0.34,'sine',0.30+i*0.03,38,d+t);
+    noise(0.18,0.11,320,70,d+t,'lowpass',0.8);
+  });
+  /* the horn: a fifth, then the octave, then both held together */
+  [[0.52,147],[0.72,196],[0.92,294]].forEach(([t,f])=>{
+    tone(f,1.5,'sawtooth',0.085,f,d+t);
+    tone(f*0.5,1.5,'triangle',0.065,f*0.5,d+t);
+  });
+  tone(392,1.35,'sawtooth',0.055,392,d+1.06);   /* the answer on top */
+  noise(0.5,0.06,2600,700,d+1.06,'bandpass',0.7);
+  tone(49,2.0,'sine',0.16,40,d+0.9);            /* the floor it stands on */
+}
+
+/* A long, soft gong under a plucked pentatonic figure: the strike, then the room, then
+   somebody playing quietly in it. Nothing lands on a beat, so it never becomes a jingle. */
+function villageCalm(delay){
+  const c=ac(); if(!c||quiet())return;
+  const d=delay||0, t0=c.currentTime+d, D=7.5;
+  /* the gong, slower to bloom and much slower to go than a struck bell */
+  const PART=[1,1.52,2.14,2.71,3.46,4.35,5.62,7.11];
+  PART.forEach((m,i)=>{
+    const o=c.createOscillator(), g=c.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(72*m,t0);
+    o.frequency.linearRampToValueAtTime(72*m*0.982,t0+D);
+    const v=0.115*Math.pow(0.74,i), bloom=0.09+i*0.05;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0004,v),t0+bloom);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+D*Math.pow(0.9,i));
+    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0+D+0.1);
+  });
+  noise(0.09,0.10,5200,800,d,'bandpass',0.5);      /* the mallet */
+  noise(3.4,0.035,1400,180,d+0.05,'lowpass',1.6);  /* the air in the room */
+
+  /* a plucked pentatonic line -- sharp attack, long decay, a touch of bend on the way
+     out, which is what a stopped string does */
+  const SCALE=[262,294,330,392,440,523,587,659];
+  const FIG=[[0.55,0],[0.95,2],[1.30,3],[1.80,4],[2.35,5],[2.85,3],[3.40,4],[4.05,2],[4.75,0],[5.60,5]];
+  FIG.forEach(([t,k],i)=>{
+    const f=SCALE[k], s=t0+t;
+    [1,2.01,3.02].forEach((h,hi)=>{               /* a string is not a sine */
+      const o=c.createOscillator(), g=c.createGain();
+      o.type=hi?'sine':'triangle';
+      o.frequency.setValueAtTime(f*h,s);
+      o.frequency.linearRampToValueAtTime(f*h*(hi===0?1.004:1),s+0.10);
+      const v=(0.075*Math.pow(0.45,hi))*(i%3===0?1:0.8);
+      g.gain.setValueAtTime(0.0001,s);
+      g.gain.exponentialRampToValueAtTime(v,s+0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001,s+1.5*Math.pow(0.7,hi));
+      o.connect(g).connect(c.destination); o.start(s); o.stop(s+1.7);
+    });
+  });
+  /* a drone a fifth under it, so the figure has something to sit on */
+  [131,196].forEach((f,i)=>{
+    const o=c.createOscillator(), g=c.createGain();
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t0+0.3);
+    g.gain.exponentialRampToValueAtTime(0.030-i*0.008,t0+1.6);
+    g.gain.setValueAtTime(0.030-i*0.008,t0+4.2);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+D);
+    o.connect(g).connect(c.destination); o.start(t0+0.3); o.stop(t0+D+0.1);
+  });
+}
+
 /* ---- three more, all argued straight out of the record ---------------------- */
 
 /* A projector: the shutter clatter of a reel running, then a room applauding. */
@@ -2596,7 +2684,7 @@ function wuSeal(){
     +'<div class="wu-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
       +' &middot; INDEX '+m.cpi.toFixed(1)+' &middot; PEAK '+m.peak.toFixed(1)+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet()){ gong(0); ping(1568,1.4,.05,.55,1); }
+  if(ac()&&!quiet())villageCalm(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2616,7 +2704,7 @@ function fieldLevel(){
     +'<div class="gr-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.seasons+' SEASONS &middot; '
       +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.apps+' OF '+m.seasons+' IN THE BRACKET</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())crowdRoar(0);
+  if(ac()&&!quiet())fansCheer(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2634,10 +2722,10 @@ function stillStomping(){
       +F.m.w+'&ndash;'+F.m.l+(F.m.t?'&ndash;'+F.m.t:'')+' &middot; NEVER ONCE ABSENT</div></div>';
   document.body.appendChild(el);
   const c=ac();
-  if(c&&!quiet()){          /* two footfalls, then the thing that made them */
+  if(c&&!quiet()){          /* two footfalls, getting closer */
     tone(41,.55,'sine',.34,30,0);   noise(.30,.13,240,40,0,'lowpass',.9);
     tone(44,.6,'sine',.38,31,.62);  noise(.34,.16,260,42,.62,'lowpass',.9);
-    screech(1.05);
+    tone(39,.7,'sine',.40,29,1.20); noise(.38,.17,250,40,1.20,'lowpass',.9);
   }
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
@@ -3445,7 +3533,7 @@ function drawPiHelp(){
     </div>`;}).join('');
   const bandHead=`<div style="display:flex;align-items:flex-end;gap:10px;padding:0 0 5px">
     <span style="flex:0 0 78px"></span><span style="flex:1 1 auto"></span>
-    ${['SEASONS','MADE PLAYOFFS','PODIUMS','TITLES'].map(h=>
+    ${['TEAMS','MADE PLAYOFFS','PODIUMS','TITLES'].map(h=>
       `<span style="flex:0 0 84px;text-align:right;font-family:'IBM Plex Mono',monospace;
         font-size:9.5px;letter-spacing:.11em;color:var(--ink-3);line-height:1.25">${h}</span>`).join('')}
   </div>`;
@@ -3462,7 +3550,7 @@ function drawPiHelp(){
     <b>${(ex.pi-100).toFixed(1)}% ${ex.pi>=100?'more':'less'}</b> than the typical team that year.</p>
   <div class="sub-h" style="margin:0 0 2px">What the number means</div>
   <p style="margin:0 0 8px;font-size:13px;color:var(--ink-3)">Read across: what has actually
-    become of the ${ROWS.length} seasons on record that landed in each band.</p>
+    become of the ${ROWS.length} teams on record that landed in each band.</p>
   <div style="overflow-x:auto"><div style="min-width:560px">${bandHead}${bandRows}</div></div>
   <p style="margin:16px 0 0;font-size:14px;color:var(--ink-2)"><b>Why it travels.</b>
     Raw points do not. The league averaged <b class="mono">${lgA?lgA.toFixed(2):'&mdash;'}</b> a game in
