@@ -230,11 +230,38 @@ losses-to-the-rest must equal (winner-vs-winner games) minus (loser-vs-loser gam
 Note the coverage too: this stat sees every playoff game plus the 2021-2025 regular
 seasons only, because earlier years have no game log.
 
+### Phones
+
+Before content, the page used to spend 696px on a 390px phone, about 82% of a screen.
+Now 364px. Three things did it:
+
+- **Masthead** shrinks under 640px: 64px reticle, smaller wordmark, tighter stat row.
+- **The manager and theme bar collapses under 760px** behind a one-line summary that
+  reads "Managers Active 10 · Theme Crimson". It was 180px of wrapped buttons.
+  Note: `$('.fb')` does **not** work to find it, because `.fb` also matches SVG bar
+  elements elsewhere on the page and querySelector picks one of those. Reach it via
+  `$('#fbSum').closest('.fb')`.
+- **Masthead decorations are hidden under 700px.** Each is a 1400x170 SVG drawn with
+  `preserveAspectRatio="none"`, so a phone squashes it about 3.6:1 and drags its shapes
+  across the stat line. Same trap the redacted dossier hit at 7.2:1.
+
+There is deliberately no separate mobile build. One page, responsive, so a change can
+never land on one and miss the other.
+
+### Collapsible cards
+
+Add `data-collapse` to any `.card` and it gets a Hide/Show control in its header.
+`data-collapse="closed"` starts it shut. `data-collapse-also="#id"` also toggles
+related content that sits outside the card, which the Trades card needs for its grid.
+
 ### The masthead reticle
 
 - The sweep is a gradient wedge spanning 42 degrees, rotating clockwise from twelve
   o'clock over 5.5s. It was originally a flat 9% fill, invisible on dark skins. Do not
   widen it and do not add a stroked leading edge; both were tried and rejected.
+- **Sweep strength is per skin** via `--rt-sweep`. Crimson and Pigskin set `--rt` to
+  pure white, where the default .62 wedge reads as a blown-out triangle; both are turned
+  down. Gold skins keep the full value.
 - **Redacted only** gets a radar contact at (84,41), which is 51.6 degrees round. The
   wedge covers it between 2.7% and 14.3% of the cycle, so `blipPing` peaks at 9%.
   If the sweep geometry changes, that timing has to move with it.

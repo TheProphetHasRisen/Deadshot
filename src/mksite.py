@@ -54,7 +54,7 @@ HEAD = r"""<title>Deadshot Record Book</title>
   --mast-rule:#6E0F18; --mast-glow:rgba(0,0,0,.28); --mast-glow2:transparent;
   --head-ink:#1A1210; --hover:#FBF4F3; --nav-bg:rgba(255,255,255,.94); --ov:rgba(26,18,16,.62);
   --band:rgba(142,21,32,.055); --glow:rgba(142,21,32,.5);
-  --rt:#FFFFFF; --rt-grid:#B8434C; --rt-ring:#6E0F18; --rt-g1:#7A1119; --rt-g2:#5C0B12;
+  --rt:#FFFFFF; --rt-sweep:.30; --rt-grid:#B8434C; --rt-ring:#6E0F18; --rt-g1:#7A1119; --rt-g2:#5C0B12;
   --grid-h:transparent; --grid-v:transparent; --mast-grid:#A32732; --mast-vig:transparent; --tex:none;
   --card-r:3px; --tex-size:auto; --rule-style:solid;
 }
@@ -166,7 +166,7 @@ HEAD = r"""<title>Deadshot Record Book</title>
   --mast-rule:#6B4028; --mast-glow:rgba(0,0,0,.5); --mast-glow2:rgba(255,255,255,.12);
   --head-ink:#FFFFFF; --hover:#552C1A; --nav-bg:rgba(53,25,15,.95); --ov:rgba(20,9,5,.84);
   --band:rgba(255,255,255,.05); --glow:rgba(255,255,255,.55);
-  --rt:#FFFFFF; --rt-grid:#7A5238; --rt-ring:#2A1209; --rt-g1:#4A2614; --rt-g2:#2A1209;
+  --rt:#FFFFFF; --rt-sweep:.34; --rt-grid:#7A5238; --rt-ring:#2A1209; --rt-g1:#4A2614; --rt-g2:#2A1209;
   --grid-h:transparent; --grid-v:transparent; --mast-grid:transparent; --mast-vig:rgba(20,9,5,.5);
   --tex:radial-gradient(circle at 30% 30%,rgba(255,232,214,.05) .9px,transparent 1.4px),
         radial-gradient(circle at 70% 70%,rgba(0,0,0,.16) 1px,transparent 1.5px);
@@ -228,6 +228,11 @@ HEAD = r"""<title>Deadshot Record Book</title>
 [data-skin="leather"] .laces{display:none}
 @media(max-width:1080px){[data-skin="leather"] .deco{display:none}
 .laces{display:none}}
+/* Every masthead decoration is a 1400x170 SVG drawn with preserveAspectRatio="none".
+   On a phone that squashes it about 3.6:1, which distorts its shapes and drags them
+   across the stat line. They are decoration only, so drop them on small screens.
+   Same trap the redacted dossier hit at 7.2:1. */
+@media(max-width:700px){.mast .deco{display:none!important}}
 /* ================= ARCADE: full-page background field ================= */
 [data-skin="arcade"] .field{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .field .stars{position:absolute;top:-8%;left:0;width:200%;height:116%;background-repeat:repeat;will-change:transform}
@@ -671,6 +676,9 @@ a{color:var(--brass)}
   padding:26px 22px 24px;max-width:var(--max);margin:0 auto}
 .scope{flex:0 0 auto;width:126px;height:126px;filter:drop-shadow(0 0 11px var(--mast-glow))}
 /* the reticle grid becomes a football field on Pigskin: yard lines, sidelines, hashes */
+.scope .sw0{stop-opacity:0}
+.scope .sw1{stop-opacity:calc(var(--rt-sweep,.62) * .42)}
+.scope .sw2{stop-opacity:var(--rt-sweep,.62)}
 .scope .rt-grid-field{display:none}
 [data-skin="leather"] .scope .rt-grid-plain{display:none}
 [data-skin="leather"] .scope .rt-grid-field{display:block}
@@ -703,7 +711,14 @@ a{color:var(--brass)}
 .fact b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:21px;line-height:1.15;color:var(--mast-kick);
   font-variant-numeric:tabular-nums}
 .fact span{font-size:9.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--mast-sub);opacity:.8;font-family:"IBM Plex Mono",monospace}
-@media(max-width:640px){.scope{width:88px;height:88px}.facts{gap:14px}.fact b{font-size:17px}}
+@media(max-width:640px){.scope{width:64px;height:64px}
+  .mast-in{padding:15px 16px 14px;gap:10px 18px}
+  .mast h1{font-size:clamp(34px,10.5vw,92px);letter-spacing:.04em}
+  .kicker{font-size:9px;letter-spacing:.26em}
+  .facts{gap:10px 14px;margin-top:2px}
+  .fact{padding-left:9px}
+  .fact b{font-size:15px}.fact span{font-size:8.5px;letter-spacing:.1em}
+  .mast .sub-wm{font-size:19px}}
 .navmark{flex:0 0 auto;display:flex;align-items:center;padding:0 10px 0 4px;position:sticky;left:0;z-index:5;background:linear-gradient(var(--nav-bg),var(--nav-bg)),linear-gradient(var(--nav-bg),var(--nav-bg));box-shadow:-16px 0 0 var(--nav-bg),-16px 0 0 var(--nav-bg)}
 .navmark svg{width:18px;height:18px;opacity:.9}
 nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
@@ -730,6 +745,18 @@ nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visibl
 section{padding:52px 0 6px;scroll-margin-top:96px}
 .fb{border-top:1px solid var(--rule-2);background:var(--surface)}
 .fb-in{display:flex;gap:7px;align-items:center;max-width:var(--max);margin:0 auto;padding:7px 22px;flex-wrap:wrap}
+.fb-sum{display:none}
+@media(max-width:760px){
+  .fb-sum{display:flex;width:100%;align-items:center;gap:8px;padding:9px 16px;
+    background:none;border:0;border-radius:0;cursor:pointer;text-align:left;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-2)}
+  .fb-sum b{color:var(--brass);font-weight:600}
+  .fb-sum .ar{margin-left:auto;transition:transform .18s}
+  .fb.open .fb-sum .ar{transform:rotate(180deg)}
+  .fb .fb-in{display:none}
+  .fb.open .fb-in{display:flex;padding-top:0;padding-bottom:10px}
+}
 .fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
 .fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}
 .fb-in [data-skin-btn]{padding:4px 9px}
@@ -1036,9 +1063,9 @@ BODY = r"""
           <stop offset="0" stop-color="var(--rt-g1)"/><stop offset="1" stop-color="var(--rt-g2)"/>
         </radialGradient>
         <linearGradient id="swp" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stop-color="var(--rt)" stop-opacity="0"/>
-          <stop offset=".5" stop-color="var(--rt)" stop-opacity=".26"/>
-          <stop offset="1" stop-color="var(--rt)" stop-opacity=".62"/>
+          <stop class="sw0" offset="0" stop-color="var(--rt)"/>
+          <stop class="sw1" offset=".5" stop-color="var(--rt)"/>
+          <stop class="sw2" offset="1" stop-color="var(--rt)"/>
         </linearGradient>
       </defs>
       <circle cx="60" cy="60" r="55" fill="none" stroke="var(--rt-ring)" stroke-width="6"/>
@@ -1153,7 +1180,7 @@ BODY = r"""
     </div>
   </div></div>
 <nav><div class="nav-row" id="navRow"><div class="nav-in"><a class="navmark" href="#champions" aria-label="Top"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--brass)" stroke-width="9"/><g stroke="var(--brass)" stroke-width="13" stroke-linecap="round"><path d="M60 6V40"/><path d="M60 80V114"/><path d="M6 60H40"/><path d="M80 60H114"/></g><circle cx="60" cy="60" r="7" fill="var(--brass)"/></svg></a><span id="nav" style="display:contents"></span></div></div>
-  <div class="fb"><div class="fb-in">
+  <div class="fb"><button class="fb-sum" id="fbSum" type="button" aria-expanded="false"></button><div class="fb-in">
     <span class="fb-lab">Managers</span>
     <button id="fActive">Active 10</button><button id="fAll">All 20</button><button id="fNone">None</button>
     <button id="fToggle">Choose managers &#9662;</button>
@@ -1266,14 +1293,14 @@ BODY = r"""
       <div class="scroll"><table id="tAP"></table></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-collapse>
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week's score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
-    <div class="card">
-      <div class="card-h"><h3>Rivalry week &mdash; on the numbers</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
+    <div class="card" data-collapse>
+      <div class="card-h"><h3>Biggest rivals this year</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)" id="rivPick"></p></div>
       <div class="scroll"><table id="tRiv"></table></div>
     </div>
@@ -1283,7 +1310,7 @@ BODY = r"""
       <div class="card-b" id="wkOut"></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-collapse data-collapse-also="#trades">
       <div class="card-h"><h3>Trades</h3><span class="sub" id="trSub"></span></div>
       <div class="card-b"><div class="tiles" id="tradeStat" style="margin-bottom:0"></div></div>
     </div>
@@ -3289,6 +3316,51 @@ function drawTeamIndex(){
     `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
+/* On a phone the manager and theme controls wrapped to three rows and pushed the first
+   real content most of a screen down. Collapse them behind a one-line summary that says
+   what is currently selected, so the state is still visible without the bulk. */
+(function(){
+  const sum=$('#fbSum'), fb=sum&&sum.closest('.fb');
+  if(!fb||!sum)return;
+  const SKINNAME={og:'Classic',scope:'Scope',red:'Crimson',leather:'Pigskin',arcade:'Arcade',redact:'Redacted'};
+  function label(){
+    const n=SEL.size, tot=ALLNAMES.length;
+    const who=n===tot?'All '+tot:(n===ACTIVE.length&&ACTIVE.every(a=>SEL.has(a))?'Active '+n:n+' of '+tot);
+    const sk=SKINNAME[document.documentElement.getAttribute('data-skin')]||'Classic';
+    sum.innerHTML=`Managers <b>${esc(who)}</b> &middot; Theme <b>${esc(sk)}</b><span class="ar">&#9662;</span>`;
+  }
+  sum.onclick=()=>{const open=fb.classList.toggle('open');
+    sum.setAttribute('aria-expanded',open?'true':'false');};
+  label();
+  REDRAW.push(label);
+  $$('[data-skin-btn]').forEach(b=>b.addEventListener('click',()=>setTimeout(label,0)));
+})();
+/* Any card marked data-collapse gets a Hide/Show control in its header. Add
+   data-collapse-also="#id" when related content sits outside the card, as the trade
+   grid does. data-collapse="closed" starts it shut; default is open. */
+(function(){
+  $$('.card[data-collapse]').forEach(card=>{
+    const head=card.querySelector('.card-h'); if(!head)return;
+    const wrap=document.createElement('div');
+    [...card.children].filter(c=>c!==head).forEach(c=>wrap.appendChild(c));
+    card.appendChild(wrap);
+    const extraSel=card.getAttribute('data-collapse-also');
+    const extra=extraSel?$(extraSel):null;
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.style.cssText='padding:5px 11px;font-size:11px;white-space:nowrap';
+    const host=head.querySelector('.right')||head;
+    if(host===head)btn.style.marginLeft='auto';
+    host.appendChild(btn);
+    const sync=()=>{const open=!wrap.hidden;
+      btn.innerHTML=open?'Hide &#9652;':'Show &#9662;';
+      btn.classList.toggle('on',open);
+      if(extra)extra.hidden=!open;};
+    btn.onclick=()=>{wrap.hidden=!wrap.hidden;sync();};
+    wrap.hidden=(card.getAttribute('data-collapse')==='closed');
+    sync();
+  });
+})();
 /* ---- Shareable manager card -------------------------------------------------
    Draws a square PNG on a canvas and hands it to the phone's share sheet, which on
    iOS puts it straight into iMessage. Falls back to a download on desktop browsers
@@ -3430,7 +3502,7 @@ async function makeH2HCard(an,bn){
   const ppgIn=who=>{if(!meets.length)return null;
     let t=0; meets.forEach(x=>{t+=(x.ma===who?x.pa:x.pb);}); return t/meets.length;};
   const pA=ppgIn(an), pB=ppgIn(bn);
-  const cmp=[['SEASONS','seasons',0],['PPG v EACH OTHER','__h2hppg',2],['WIN %','winpct',3],['POWER IDX','cpi',1]];
+  const cmp=[['SEASONS','seasons',0],['PPG v EACH OTHER','__h2hppg',2],['POWER IDX','cpi',1],['PODIUMS','podium',0]];
   const lowerWins={};
   x.textAlign='left';
   x.strokeStyle=P.rule; x.lineWidth=1;
