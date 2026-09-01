@@ -1293,13 +1293,13 @@ BODY = r"""
       <div class="scroll"><table id="tAP"></table></div>
     </div>
 
-    <div class="card" data-collapse>
+    <div class="card" data-collapse="closed">
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week's score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
-    <div class="card" data-collapse>
+    <div class="card" data-collapse="closed">
       <div class="card-h"><h3>Biggest rivals this year</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)" id="rivPick"></p></div>
       <div class="scroll"><table id="tRiv"></table></div>
@@ -1310,7 +1310,7 @@ BODY = r"""
       <div class="card-b" id="wkOut"></div>
     </div>
 
-    <div class="card" data-collapse data-collapse-also="#trades">
+    <div class="card" data-collapse="closed" data-collapse-also="#trades">
       <div class="card-h"><h3>Trades</h3><span class="sub" id="trSub"></span></div>
       <div class="card-b"><div class="tiles" id="tradeStat" style="margin-bottom:0"></div></div>
     </div>
