@@ -745,6 +745,20 @@ nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visibl
 section{padding:52px 0 6px;scroll-margin-top:96px}
 .fb{border-top:1px solid var(--rule-2);background:var(--surface)}
 .fb-in{display:flex;gap:7px;align-items:center;max-width:var(--max);margin:0 auto;padding:7px 22px;flex-wrap:wrap}
+.skip{position:absolute;left:-9999px;top:0;z-index:500;padding:12px 18px;
+  background:var(--brass);color:var(--surface);font-family:"IBM Plex Mono",monospace;
+  font-size:13px;font-weight:600;text-decoration:none;border-radius:0 0 4px 0}
+.skip:focus{left:0}
+@media(pointer:coarse){
+  /* WCAG asks for roughly 44px of touch target. These controls were 25-27px, which is
+     a lot of mis-taps on a phone. Grow the hit area, not the visual weight. */
+  nav a{padding-top:15px;padding-bottom:15px}
+  .fb-in button,.fb-in select,.pills button,.card-h button,.card-h .right button{
+    min-height:40px;padding-top:9px;padding-bottom:9px}
+  .chip{min-height:38px;display:inline-flex;align-items:center}
+  .fb-sum{min-height:46px}
+  #recsToggle,#toTop,.wrapBtn{min-height:44px}
+}
 .fb-sum{display:none}
 @media(max-width:760px){
   .fb-sum{display:flex;width:100%;align-items:center;gap:8px;padding:9px 16px;
@@ -1055,7 +1069,8 @@ BODY = r"""
   <div class="rng"></div>
   <div class="hud"><b>DEADSHOT</b> &middot; OPTIC LIVE<br>MIL-DOT &middot; 10&times;<br>HOLD CENTRE</div>
 </div>
-<div class="mast"><div class="mast-in">
+<a class="skip" href="#main">Skip to main content</a>
+<header class="mast"><div class="mast-in">
     <svg class="scope" viewBox="0 0 120 120" role="img" aria-label="Deadshot crosshair">
       <defs>
         <clipPath id="ck"><circle cx="60" cy="60" r="52"/></clipPath>
@@ -1178,7 +1193,7 @@ BODY = r"""
       <div class="fact"><b id="f3">&mdash;</b><span>Team-seasons</span></div>
       <div class="fact"><b id="f4">&mdash;</b><span>Games logged</span></div>
     </div>
-  </div></div>
+  </div></header>
 <nav><div class="nav-row" id="navRow"><div class="nav-in"><a class="navmark" href="#champions" aria-label="Top"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--brass)" stroke-width="9"/><g stroke="var(--brass)" stroke-width="13" stroke-linecap="round"><path d="M60 6V40"/><path d="M60 80V114"/><path d="M6 60H40"/><path d="M80 60H114"/></g><circle cx="60" cy="60" r="7" fill="var(--brass)"/></svg></a><span id="nav" style="display:contents"></span></div></div>
   <div class="fb"><button class="fb-sum" id="fbSum" type="button" aria-expanded="false"></button><div class="fb-in">
     <span class="fb-lab">Managers</span>
@@ -1189,7 +1204,7 @@ BODY = r"""
     <button data-skin-btn="scope">Scope</button><button data-skin-btn="og">Classic</button><button data-skin-btn="red">Crimson</button><button data-skin-btn="leather">Pigskin</button><button data-skin-btn="arcade">Arcade</button>
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
-<div class="wrap">
+<main id="main" class="wrap">
 
   <section id="champions">
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner's run traced</div></div>
@@ -1211,7 +1226,7 @@ BODY = r"""
           <span class="fb-lab">Seasons</span>
           <button data-yr="3">Last 3</button><button data-yr="5">Last 5</button>
           <button data-yr="10">Last 10</button><button data-yr="0" class="on">All</button>
-          <input id="search" type="search" placeholder="filter managers…" style="width:150px"><span class="sub" id="searchN"></span></div></div>
+          <input id="search" type="search" aria-label="Filter managers by name" placeholder="filter managers…" style="width:150px"><span class="sub" id="searchN"></span></div></div>
       <div class="scroll"><table id="tAll"></table></div>
     </div>
   </section>
@@ -1478,7 +1493,7 @@ BODY = r"""
     Points data is verified: in all ten seasons, league-wide points for equals league-wide points against to the cent.
     One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70–70 and match Yahoo exactly.
   </footer>
-</div>
+</main>
 <div class="deco ball" aria-hidden="true"><svg viewBox="0 0 400 250">
   <ellipse cx="200" cy="125" rx="185" ry="108" fill="none" stroke="currentColor" stroke-width="7"/>
   <path d="M118 125 H282" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
@@ -3331,6 +3346,54 @@ function drawTeamIndex(){
     `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
+/* Screen-reader and keyboard semantics for tables. Doing this centrally rather than in
+   each of the ~20 table builders means a new table gets it for free, and a redraw can
+   never lose it. Runs last, and again on every redraw. */
+function a11yTables(){
+  $$('table').forEach(t=>{
+    /* name the table from the nearest visible heading */
+    if(!t.getAttribute('aria-label')&&!t.querySelector('caption')){
+      const card=t.closest('.card'), sec=t.closest('section');
+      const h=(card&&card.querySelector('h3'))||(sec&&sec.querySelector('h2'));
+      if(h)t.setAttribute('aria-label',h.textContent.trim().replace(/\s+/g,' '));
+    }
+    $$('th',t).forEach(th=>{
+      if(th.getAttribute('scope'))return;
+      const inHead=!!th.closest('thead');
+      const firstInRow=th.parentElement&&th.parentElement.firstElementChild===th;
+      th.setAttribute('scope',inHead?'col':(firstInRow?'row':'col'));
+    });
+  });
+  /* sortable headers were mouse-only: not focusable, no state announced */
+  $$('th.s').forEach(th=>{
+    if(th.tabIndex<0||th.tabIndex===undefined)th.tabIndex=0;
+    if(!th.getAttribute('role'))th.setAttribute('role','columnheader');
+    th.setAttribute('aria-sort',th.classList.contains('asc')?'ascending'
+      :th.classList.contains('desc')?'descending':'none');
+    if(!th.dataset.kb){
+      th.dataset.kb='1';
+      const refocus=()=>setTimeout(()=>{
+        a11yTables();
+        const host=th.closest('table')||document;
+        const again=host.isConnected
+          ? host.querySelectorAll('th.s')[idxOf(th)]
+          : null;
+        const live=again||document.querySelectorAll('#'+(hostId||'')+' th.s')[idxOf(th)];
+        if(live&&live.focus)live.focus();
+      },0);
+      const hostId=(th.closest('table')||{}).id||'';
+      const idxOf=el=>{const t=el.closest('table');
+        return t?[...t.querySelectorAll('th.s')].indexOf(el):0;};
+      th.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();th.click();refocus();}
+      });
+      th.addEventListener('click',()=>setTimeout(a11yTables,0));
+    }
+  });
+}
+a11yTables(); REDRAW.push(a11yTables);
+setTimeout(a11yTables,0);
+addEventListener('load',()=>setTimeout(a11yTables,80));
 /* On a phone the manager and theme controls wrapped to three rows and pushed the first
    real content most of a screen down. Collapse them behind a one-line summary that says
    what is currently selected, so the state is still visible without the bulk. */
@@ -4437,9 +4500,11 @@ SHELL_TOP = '''<!doctype html>
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%238E1520'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23FFFFFF' stroke-width='9'/%3E%3Cg stroke='%23FFFFFF' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23FFFFFF'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='22' fill='%238E1520'/%3E%3Ccircle cx='60' cy='60' r='38' fill='none' stroke='%23FFFFFF' stroke-width='9'/%3E%3Cg stroke='%23FFFFFF' stroke-width='11' stroke-linecap='round'%3E%3Cpath d='M60 14V36'/%3E%3Cpath d='M60 84V106'/%3E%3Cpath d='M14 60H36'/%3E%3Cpath d='M84 60H106'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='7' fill='%23FFFFFF'/%3E%3C/svg%3E">
-<meta name="theme-color" content="#12161B">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#8E1520">
+<link rel="canonical" href="https://deadshot-iota.vercel.app/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
 <meta property="og:title" content="Deadshot Record Book">
