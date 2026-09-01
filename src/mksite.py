@@ -806,7 +806,7 @@ tr.off{opacity:.3}
 .card-h .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .card-b{padding:16px}
 .scroll{overflow-x:auto}
-.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,196px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
 .plate{background:var(--surface);color:var(--ink);padding:15px 16px 14px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:background .12s;border:0;text-align:left;font-family:inherit;font-size:inherit;color:inherit}
 .plate:hover{background:var(--surface-2)}
 .plate{position:relative}
@@ -2529,7 +2529,7 @@ function drawLadder(d){
       <span class="lad-ev" style="color:${EV(r.score!=null?r.neff:0)[1]}" title="Evidence: ${EV(r.neff)[0]}">${'●'.repeat(EV(r.neff)[0]==='HIGH'?3:EV(r.neff)[0]==='MEDIUM'?2:1)}<span style="opacity:.25">${'●'.repeat(EV(r.neff)[0]==='HIGH'?0:EV(r.neff)[0]==='MEDIUM'?1:2)}</span></span></div>`;});
   $('#ladder').innerHTML=`<div class="lad-head"><span></span><span></span>
       <span class="lad-track-h"><i style="left:0">${lo.toFixed(1)}</i><i style="left:${zero}%;transform:translateX(-50%)">100 · league average</i><i style="right:0">${hi.toFixed(1)}</i></span>
-      <span>SCORE</span><span>PROJ W%</span><span>vs&nbsp;λ1</span><span>EVID</span></div>`+out;
+      <span>SCORE</span><span>PROJ W%</span><span>vs&nbsp;λ1</span><span class="lad-ev">EVID</span></div>`+out;
   $$('#ladder .lad').forEach(el=>{
     el.onclick=()=>openMgr(el.dataset.m);
     const r=d.find(x=>x.n===el.dataset.m);

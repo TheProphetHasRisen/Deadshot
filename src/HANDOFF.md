@@ -254,6 +254,30 @@ Add `data-collapse` to any `.card` and it gets a Hide/Show control in its header
 `data-collapse="closed"` starts it shut. `data-collapse-also="#id"` also toggles
 related content that sits outside the card, which the Trades card needs for its grid.
 
+### Formatting audit
+
+`format.js` (session scratchpad) checks the things a "no JS errors" pass never sees, on
+every skin at 390 / 768 / 1440: text clipped by its own box, text physically covered by
+something painted over it, children escaping their card, and grid cells too narrow for
+their content. **Validated by reintroducing a real regression and confirming it fires** —
+a checker that has never caught anything proves nothing.
+
+Two traps it exists because of:
+
+- **Never use a loose search-and-replace on a CSS rule.** `.board` and `.tiles` end with
+  the same `minmax(min(100%,NNNpx),1fr));gap:1px;background:var(--rule)`, and a regex
+  with `count=1` hit `.board` because it appears first in the file. That silently
+  squeezed the champions grid from 196px cells to 108px and clipped every team name.
+  Anchor on the selector (`.tiles{`) and assert what changed afterwards.
+- **Overlap cannot be judged from bounding boxes.** An inline `<sup>` or `<em>` inside a
+  paragraph has a rect spanning the whole line run, so box-intersection reports dozens of
+  false overlaps. Use `document.elementFromPoint` at the text's own position instead.
+
+Also: when a responsive rule hides grid columns, the **header labels and the row cells
+both** need the hiding class. `.lad-ev` was on the row cells only, so on phones the
+ladder header had six labels for five columns and "EVID" wrapped into the 22px rank
+column.
+
 ### Sound
 
 Everything is synthesised with the Web Audio API. There are no audio files and there
