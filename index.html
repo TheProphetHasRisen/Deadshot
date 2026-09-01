@@ -726,11 +726,6 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .pnda .pn-face .nose{position:absolute;left:50%;transform:translateX(-50%);top:58px;
   width:22px;height:15px;border-radius:50%;background:#141510}
 .pnda .pn-tag{font-size:11px;letter-spacing:.32em;color:#B7DA8C}
-.pnda .pn-quote{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:clamp(17px,2.6vw,25px);
-  line-height:1.42;color:#F4F1E6;max-width:30ch;margin:0 auto;text-wrap:balance;
-  text-shadow:0 1px 10px rgba(0,0,0,.6)}
-.pnda .pn-quote small{display:block;font-family:"IBM Plex Mono",monospace;font-style:normal;
-  font-size:10px;letter-spacing:.26em;color:#9FD063;margin-top:9px}
 .pnda .pn-l1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
   font-size:clamp(44px,9.5vw,100px);line-height:.95;letter-spacing:.03em;margin-top:8px;color:#F4F1E6;
   text-shadow:0 0 30px rgba(244,241,230,.28)}
@@ -2280,14 +2275,19 @@ if(unlocked())revealSecret();
     buf=(buf+e.key.toLowerCase()).slice(-24);
     if(buf.endsWith('cossu')){buf='';botCall();}
     if(buf.endsWith('chaos')){buf='';chaos();}
-    if(CHAMP_KEYS.some(k=>buf.endsWith(k))){buf='';titleDefense();}
-    if(buf.endsWith('burke')){buf='';pandaWatch();}
-    if(buf.endsWith('kaiper')){buf='';stillStomping();}
-    if(buf.endsWith('wu')){buf='';wuSeal();}
-    if(buf.endsWith('gearing')){buf='';fieldLevel();}
-    if(buf.endsWith('niko')){buf='';marquee();}
-    if(buf.endsWith('alpert')){buf='';marketClose();}
-    if(buf.endsWith('mcmahon')){buf='';wrongSport();}
+    /* first name or surname, either will do. Burke is surname-only on purpose: "brian"
+       belongs to the commissioner, and there are two of them in this league. */
+    const EGGWORDS=[
+      [['burke'],pandaWatch],
+      [['kaiper','shane'],stillStomping],
+      [['wu','nathan'],wuSeal],
+      [['gearing','nick'],fieldLevel],
+      [['niko','contreras'],marquee],
+      [['alpert','wesley'],marketClose],
+      [['mcmahon','dylan'],wrongSport],
+      [['krueger','kevin'],titleDefense]];
+    for(const [words,fn] of EGGWORDS)
+      if(words.some(w=>buf.endsWith(w))){buf='';fn();break;}
   });
 })();
 /* Typing the reigning champion's surname wakes him up. The trigger comes from the data
@@ -2346,9 +2346,8 @@ function pandaWatch(){
     +'<div class="pn-face"><span class="ear l"></span><span class="ear r"></span>'
     +'<span class="head"><span class="eye l"><i></i></span><span class="eye r"><i></i></span>'
     +'<span class="nose"></span></span></div>'
-    +'<div class="pn-quote">&ldquo;If you only do what you can do, you will never be more '
-    +'than you are now.&rdquo;<small>M A S T E R &nbsp; S H I F U</small></div>'
-    +'<div class="pn-l1" style="margin-top:16px">BRIAN BURKE</div>'
+    +'<div class="pn-tag">T H E R E &nbsp; A R E &nbsp; N O &nbsp; A C C I D E N T S</div>'
+    +'<div class="pn-l1">BRIAN BURKE</div>'
     +'<div class="pn-l2">'+F.m.seasons+' SEASONS OF '+SEA.length+'</div>'
     +'<div class="pn-sub">never missed a year, never missed by much</div>'
     +'<div class="pn-facts">'+F.first+'&ndash;'+F.last+' &middot; '+F.m.apps+' OF '+F.m.seasons
@@ -2463,23 +2462,20 @@ function villageCalm(delay){
 
 /* ---- three more, all argued straight out of the record ---------------------- */
 
-/* A safe going. The dial spinning, three tumblers dropping into place, the handle, the
-   weight of the door, and then the room behind it. */
-function vaultCrack(delay){
-  const d=delay||0;
-  for(let i=0;i<34;i++)                          /* the dial, slowing as it goes */
-    noise(0.012,0.055,3800,1600,d+i*0.028*(1+i*0.03),'bandpass',0.5);
-  [[1.10,150],[1.45,132],[1.82,118]].forEach(([t,f])=>{   /* the tumblers landing */
-    tone(f,0.10,'square',0.10,f*0.7,d+t);
-    noise(0.05,0.09,2400,700,d+t,'bandpass',0.6);
-  });
-  tone(74,0.30,'square',0.14,52,d+2.18);         /* the handle */
-  noise(0.16,0.12,1100,300,d+2.18,'lowpass',0.7);
-  tone(38,1.7,'sine',0.30,29,d+2.40);            /* the door, and its weight */
-  noise(1.1,0.16,420,90,d+2.40,'lowpass',0.9);
-  /* and what was behind it */
-  [262,330,392,523].forEach((f,i)=>tone(f,2.2,'triangle',0.045,f,d+2.62+i*0.07));
-  noise(1.8,0.05,2600,900,d+2.62,'bandpass',1.1);
+/* A projector running. A real one pulls 24 frames a second, so the clatter is a 24Hz
+   pulse train rather than a rhythm you could count -- that fast tick is the whole sound.
+   Under it: the motor, and the hiss of the film going through the gate. */
+function filmRoll(delay){
+  const d=delay||0, RATE=1/24, N=Math.round(3.4/RATE);
+  for(let i=0;i<N;i++){
+    const t=d+i*RATE+(Math.random()-0.5)*0.0025;   /* never perfectly even */
+    noise(0.010,0.055+Math.random()*0.02,3000,1100,t,'bandpass',0.45);
+    noise(0.016,0.030,900,320,t,'lowpass',0.7);
+  }
+  tone(48,3.6,'sawtooth',0.055,47,d);              /* the motor */
+  tone(96,3.6,'triangle',0.028,95,d);
+  noise(3.6,0.045,4200,2600,d,'highpass',1.4);     /* film through the gate */
+  noise(0.5,0.08,1600,400,d,'lowpass',0.6);        /* the lamp striking */
 }
 /* A closing bell, then the number falling away under it. */
 function closeBell(delay){
@@ -2490,16 +2486,23 @@ function closeBell(delay){
   tone(48,1.8,'sine',0.11,36,d+0.75);
 }
 /* Three bounces closing up, then the net. */
+/* A ball on a hardwood floor. The first version used a sine per bounce and came out
+   like a game console: a real bounce has no note in it at all. It is a broadband slap
+   that collapses downward in about forty milliseconds, plus the room answering. */
+function bounce(t,v){
+  noise(0.040,0.34*v,2600,190,t,'lowpass',3.2);      /* the slap of the skin */
+  noise(0.075,0.26*v,520,90,t+0.004,'lowpass',2.4);  /* the air inside it */
+  noise(0.20,0.055*v,300,80,t+0.012,'lowpass',1.1);  /* the floor and the room */
+  noise(0.012,0.12*v,7000,3000,t,'highpass',0.5);    /* the click of the seam */
+}
 function swish(delay){
   const d=delay||0;
-  let t=d, gap=0.30;
-  for(let i=0;i<4;i++){
-    tone(96-i*6,0.16,'sine',0.16*Math.pow(0.82,i),58,t);
-    noise(0.07,0.07*Math.pow(0.8,i),900,220,t,'lowpass',0.8);
-    t+=gap; gap*=0.72;
-  }
-  noise(0.26,0.075,5600,2200,t+0.10,'bandpass',0.55);   /* through the net */
-  noise(0.16,0.04,3000,1200,t+0.16,'bandpass',0.7);
+  /* bounces converge the way a dropped ball actually does, and get quieter with it */
+  let t=d, gap=0.42, v=1;
+  for(let i=0;i<6;i++){ bounce(t,v); t+=gap; gap*=0.80; v*=0.74; }
+  /* picked up, then through the net */
+  noise(0.30,0.085,5200,1800,t+0.14,'bandpass',0.5);
+  noise(0.18,0.05,3000,1100,t+0.20,'bandpass',0.75);
 }
 
 /* Niko has two titles back to back, and the second came with a worse team than the
@@ -2539,7 +2542,7 @@ function marquee(){
       +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.podium+' PODIUMS &middot; LAST ACT '
       +last.y+', '+ord(last.place)+' OF '+last.teams+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())vaultCrack(0);
+  if(ac()&&!quiet())filmRoll(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -6252,7 +6255,7 @@ function pharaoh(){
   setTimeout(()=>el.classList.add('out'),6720);
   setTimeout(()=>{el.remove();PH_BUSY=false;},8280);
 }
-(function(){const WORDS=['commish','commissioner']; let buf='';
+(function(){const WORDS=['commish','commissioner','berger','brian']; let buf='';
   addEventListener('keydown',e=>{
     if(e.metaKey||e.ctrlKey||e.altKey)return;
     const t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))return;
