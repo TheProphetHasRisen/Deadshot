@@ -726,6 +726,11 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .pnda .pn-face .nose{position:absolute;left:50%;transform:translateX(-50%);top:58px;
   width:22px;height:15px;border-radius:50%;background:#141510}
 .pnda .pn-tag{font-size:11px;letter-spacing:.32em;color:#B7DA8C}
+.pnda .pn-quote{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:clamp(17px,2.6vw,25px);
+  line-height:1.42;color:#F4F1E6;max-width:30ch;margin:0 auto;text-wrap:balance;
+  text-shadow:0 1px 10px rgba(0,0,0,.6)}
+.pnda .pn-quote small{display:block;font-family:"IBM Plex Mono",monospace;font-style:normal;
+  font-size:10px;letter-spacing:.26em;color:#9FD063;margin-top:9px}
 .pnda .pn-l1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
   font-size:clamp(44px,9.5vw,100px);line-height:.95;letter-spacing:.03em;margin-top:8px;color:#F4F1E6;
   text-shadow:0 0 30px rgba(244,241,230,.28)}
@@ -841,7 +846,8 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .mrqe .mq-bulbs i:nth-child(3n+2){animation-delay:.37s}
 .mrqe .mq-bulbs i:nth-child(3n+3){animation-delay:.73s}
 @keyframes mqBulb{0%,100%{opacity:1}50%{opacity:.22}}
-.mrqe .mq-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F2C75C}
+.mrqe .mq-tag{position:relative;font-size:15px;font-weight:600;letter-spacing:.26em;color:#FFDD8E;
+  text-shadow:0 1px 3px rgba(30,10,0,.9)}
 .mrqe .mq-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   font-weight:900;font-size:clamp(42px,9vw,98px);line-height:.95;letter-spacing:.03em;margin-top:9px;
   color:#FFF4DA;text-shadow:0 0 34px rgba(242,199,92,.6),0 3px 0 rgba(110,18,22,.95)}
@@ -2315,93 +2321,9 @@ function titleDefense(){
 
 /* ---- four voices, all synthesised ------------------------------------------- */
 
-/* A pterosaur cry: a thin, raspy call that leaps up and falls away. Two sawtooths a
-   fifth apart give the harshness, a fast vibrato gives the flutter, and a bandpass
-   noise layer on top is the air in it. */
-function screech(delay){
-  const c=ac(); if(!c||quiet())return;
-  const t0=c.currentTime+(delay||0), D=0.9;
-  const bus=c.createGain();
-  bus.gain.setValueAtTime(0.0001,t0);
-  bus.gain.exponentialRampToValueAtTime(0.16,t0+0.06);
-  bus.gain.setValueAtTime(0.16,t0+0.34);
-  bus.gain.exponentialRampToValueAtTime(0.0001,t0+D);
-  const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2100; bp.Q.value=1.5;
-  bp.connect(bus).connect(c.destination);
-  [1,1.5].forEach((m,i)=>{
-    const o=c.createOscillator(); o.type='sawtooth';
-    o.frequency.setValueAtTime(760*m,t0);
-    o.frequency.exponentialRampToValueAtTime(2450*m,t0+0.13);   /* the leap up */
-    o.frequency.exponentialRampToValueAtTime(2100*m,t0+0.34);
-    o.frequency.exponentialRampToValueAtTime(430*m,t0+D);       /* and the fall away */
-    const lfo=c.createOscillator(), lg=c.createGain();
-    lfo.frequency.value=27+i*6; lg.gain.value=90;               /* the flutter in it */
-    lfo.connect(lg).connect(o.frequency); lfo.start(t0); lfo.stop(t0+D+0.1);
-    const g=c.createGain(); g.gain.value=i?0.35:1;
-    o.connect(g).connect(bp); o.start(t0); o.stop(t0+D+0.1);
-  });
-  noise(0.5,0.05,5200,1200,(delay||0)+0.02,'bandpass',0.7);
-}
 
-/* A low laugh. Voices are resonances, so a pulse train run through the formants of
-   "uh" reads as a throat rather than a synth, and a gain envelope chopped at the rate
-   of the syllables does the rest. It steps down in pitch, because a laugh settles. */
-function evilLaugh(delay){
-  const c=ac(); if(!c||quiet())return;
-  const t0=c.currentTime+(delay||0);
-  const HA=[[0,0.19,104],[0.30,0.19,96],[0.60,0.20,88],[0.92,0.30,78]];
-  const bus=c.createGain(); bus.gain.value=0.9; bus.connect(c.destination);
-  const forms=[[570,1.0],[840,0.6],[2410,0.14]].map(([hz,amp])=>{
-    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=hz; bp.Q.value=6;
-    const g=c.createGain(); g.gain.value=amp; bp.connect(g).connect(bus); return bp;});
-  HA.forEach(([off,dur,hz])=>{
-    const s=t0+off;
-    const o=c.createOscillator(); o.type='sawtooth';
-    o.frequency.setValueAtTime(hz,s);
-    o.frequency.linearRampToValueAtTime(hz*0.88,s+dur);
-    const g=c.createGain();
-    g.gain.setValueAtTime(0.0001,s);
-    g.gain.exponentialRampToValueAtTime(0.30,s+0.03);
-    g.gain.exponentialRampToValueAtTime(0.0001,s+dur);
-    o.connect(g); forms.forEach(f=>g.connect(f));
-    o.start(s); o.stop(s+dur+0.05);
-    noise(dur*0.7,0.018,900,300,off+(delay||0),'bandpass',1.2);   /* the breath */
-  });
-  tone(41,1.5,'sine',0.13,33,delay||0);                            /* the room under it */
-}
 
-/* A struck gong: a heavy inharmonic wash that blooms after the strike rather than at
-   it, and takes a long time to go. */
-function gong(delay){
-  const c=ac(); if(!c||quiet())return;
-  const t0=c.currentTime+(delay||0), D=4.2;
-  const PART=[1,1.52,2.14,2.71,3.46,4.35,5.62,7.11];
-  PART.forEach((m,i)=>{
-    const o=c.createOscillator(), g=c.createGain();
-    o.type='sine'; o.frequency.setValueAtTime(78*m,t0);
-    o.frequency.linearRampToValueAtTime(78*m*0.985,t0+D);   /* metal drifts flat as it rings */
-    const v=0.13*Math.pow(0.72,i), bloom=0.05+i*0.03;
-    g.gain.setValueAtTime(0.0001,t0);
-    g.gain.exponentialRampToValueAtTime(Math.max(0.0004,v),t0+bloom);
-    g.gain.exponentialRampToValueAtTime(0.0001,t0+D*Math.pow(0.86,i));
-    o.connect(g).connect(c.destination); o.start(t0); o.stop(t0+D+0.1);
-  });
-  noise(0.10,0.14,6000,900,delay||0,'bandpass',0.5);        /* the mallet on the face of it */
-  noise(2.2,0.05,1800,200,(delay||0)+0.04,'lowpass',1.4);   /* the shimmer after */
-}
 
-/* Sixty thousand people, from field level: a swell that arrives late and takes its
-   time leaving, with a whistle cutting over the top of it. */
-function crowdRoar(delay){
-  const c=ac(); if(!c||quiet())return;
-  const d=delay||0;
-  noise(2.6,0.21,900,300,d,'bandpass',0.35);
-  noise(2.2,0.14,420,160,d+0.15,'lowpass',0.5);
-  tone(58,2.0,'sawtooth',0.08,44,d+0.1);
-  /* a two-tone whistle over the noise, the way a real one beats against itself */
-  [3180,3320].forEach((f,i)=>tone(f,0.42,'triangle',0.07,f*0.97,d+0.5+i*0.005));
-  noise(0.4,0.045,4200,3000,d+0.5,'bandpass',0.4);
-}
 
 /* ---- the two men who have never missed a season -------------------------------
    Brian Burke, Shane Kaiper and the owner are the only three who have played all ten.
@@ -2424,8 +2346,9 @@ function pandaWatch(){
     +'<div class="pn-face"><span class="ear l"></span><span class="ear r"></span>'
     +'<span class="head"><span class="eye l"><i></i></span><span class="eye r"><i></i></span>'
     +'<span class="nose"></span></span></div>'
-    +'<div class="pn-tag">T H E R E &nbsp; A R E &nbsp; N O &nbsp; A C C I D E N T S</div>'
-    +'<div class="pn-l1">BRIAN BURKE</div>'
+    +'<div class="pn-quote">&ldquo;If you only do what you can do, you&rsquo;ll never be better '
+    +'than what you are.&rdquo;<small>M A S T E R &nbsp; S H I F U</small></div>'
+    +'<div class="pn-l1" style="margin-top:16px">BRIAN BURKE</div>'
     +'<div class="pn-l2">'+F.m.seasons+' SEASONS OF '+SEA.length+'</div>'
     +'<div class="pn-sub">never missed a year, never missed by much</div>'
     +'<div class="pn-facts">'+F.first+'&ndash;'+F.last+' &middot; '+F.m.apps+' OF '+F.m.seasons
@@ -2450,20 +2373,23 @@ const CN_NUM=['','\u4E00','\u4E8C','\u4E09','\u56DB','\u4E94','\u516D','\u4E03',
 function fansCheer(delay){
   const c=ac(); if(!c||quiet())return;
   const d=delay||0;
-  /* the bed: three overlapping washes, coloured where a crowd actually sits */
-  noise(3.0,0.30,1500,700,d,'bandpass',0.30);
-  noise(2.6,0.21,700,320,d+0.10,'bandpass',0.45);
-  noise(2.4,0.17,300,120,d+0.05,'lowpass',0.6);
-  /* individual voices, uneven in time and pitch, which is what makes it read as people */
-  for(let i=0;i<64;i++){
-    const t=d+Math.random()*2.3;
-    const f=760+Math.random()*1400;
-    noise(0.10+Math.random()*0.14,0.056+Math.random()*0.050,f,f*0.55,t,'bandpass',0.6);
-  }
-  /* a handful of louder ones nearer the front */
-  for(let i=0;i<9;i++){
-    const t=d+0.15+Math.random()*1.8;
-    tone(300+Math.random()*260,0.26,'sawtooth',0.038,180,t);
+  /* Not one pitched note anywhere in here. Any oscillator in a crowd reads as a machine
+     -- the first attempt had a handful of sawtooths meant as voices and they came back
+     sounding like an arcade cabinet. A crowd is broadband noise, a great deal of it,
+     overlapping at every scale. */
+  noise(3.2,0.30,1600,700,d,'bandpass',0.26);
+  noise(3.0,0.24,900,380,d+0.06,'bandpass',0.40);
+  noise(2.8,0.20,420,150,d+0.03,'bandpass',0.52);
+  noise(2.6,0.17,240,90,d+0.02,'lowpass',0.62);
+  /* the sections of the ground, coming in a beat apart from each other */
+  [[0.00,1300],[0.18,1750],[0.34,1000],[0.55,2100]].forEach(([t,f])=>
+    noise(2.0+Math.random()*0.6,0.16,f,f*0.4,d+t,'bandpass',0.34));
+  /* and a great many individual voices, uneven in length, loudness and colour */
+  for(let i=0;i<170;i++){
+    const t=d+Math.random()*2.6;
+    const f=620+Math.random()*1900;
+    noise(0.06+Math.random()*0.20,0.030+Math.random()*0.055,f,f*(0.35+Math.random()*0.4),
+      t,'bandpass',0.35+Math.random()*0.7);
   }
 }
 
@@ -2537,14 +2463,23 @@ function villageCalm(delay){
 
 /* ---- three more, all argued straight out of the record ---------------------- */
 
-/* A projector: the shutter clatter of a reel running, then a room applauding. */
-function projector(delay){
+/* A safe going. The dial spinning, three tumblers dropping into place, the handle, the
+   weight of the door, and then the room behind it. */
+function vaultCrack(delay){
   const d=delay||0;
-  for(let i=0;i<26;i++)noise(0.018,0.12,2600,900,d+i*0.055,'bandpass',0.6);
-  tone(52,1.5,'sawtooth',0.09,46,d);
-  for(let i=0;i<70;i++)                       /* the applause, uneven on purpose */
-    noise(0.05,0.06,3400,1400,d+0.9+Math.random()*1.5,'bandpass',0.5);
-  noise(1.6,0.11,1800,600,d+0.9,'bandpass',0.9);
+  for(let i=0;i<34;i++)                          /* the dial, slowing as it goes */
+    noise(0.012,0.055,3800,1600,d+i*0.028*(1+i*0.03),'bandpass',0.5);
+  [[1.10,150],[1.45,132],[1.82,118]].forEach(([t,f])=>{   /* the tumblers landing */
+    tone(f,0.10,'square',0.10,f*0.7,d+t);
+    noise(0.05,0.09,2400,700,d+t,'bandpass',0.6);
+  });
+  tone(74,0.30,'square',0.14,52,d+2.18);         /* the handle */
+  noise(0.16,0.12,1100,300,d+2.18,'lowpass',0.7);
+  tone(38,1.7,'sine',0.30,29,d+2.40);            /* the door, and its weight */
+  noise(1.1,0.16,420,90,d+2.40,'lowpass',0.9);
+  /* and what was behind it */
+  [262,330,392,523].forEach((f,i)=>tone(f,2.2,'triangle',0.045,f,d+2.62+i*0.07));
+  noise(1.8,0.05,2600,900,d+2.62,'bandpass',1.1);
 }
 /* A closing bell, then the number falling away under it. */
 function closeBell(delay){
@@ -2576,9 +2511,19 @@ function marquee(){
   const backToBack=wins.length>1&&SEA.indexOf(wins[1].y)===SEA.indexOf(wins[0].y)+1;
   const worseSequel=wins.length>1&&wins[1].pi<wins[0].pi;
   const last=F.rs[F.rs.length-1];
-  const l2=backToBack?('BACK TO BACK, '+wins[0].y+' AND '+wins[1].y)
+  const l2=backToBack?('BACK TO BACK, '+wins[0].y+' AND THE '+wins[1].y+' JOB')
     :(wins.length?wins.length+(wins.length===1?' TITLE':' TITLES')+' ON THE SHELF':'NINE SEASONS, NO STATUE');
-  const sub=worseSequel
+  /* the second one is the story: it was the lowest score that has ever won this league,
+     which is a robbery rather than a repeat. Checked against every champion before it
+     gets said. */
+  const champPI=[];
+  D.champs.forEach(c=>c.teams.forEach(t=>{
+    const r=ROWS.find(x=>x.y===c.y&&x.team===t); if(r)champPI.push(r.pi);}));
+  const lowestEver=champPI.length?Math.min(...champPI):null;
+  const heist=wins.length>1&&lowestEver!=null&&Math.abs(wins[1].pi-lowestEver)<0.05;
+  const sub=heist
+    ? 'the second one was a robbery — '+wins[1].pi.toFixed(1)+', the lowest score that has ever won this league'
+    : worseSequel
     ? 'the sequel scored worse than the original — '+wins[0].pi.toFixed(1)+' then '+
       wins[1].pi.toFixed(1)+' — and still took the trophy'
     : 'nobody in this league has more of them';
@@ -2594,7 +2539,7 @@ function marquee(){
       +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.podium+' PODIUMS &middot; LAST ACT '
       +last.y+', '+ord(last.place)+' OF '+last.teams+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())projector(0);
+  if(ac()&&!quiet())vaultCrack(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2656,10 +2601,11 @@ function wrongSport(){
     +'<div class="hp-ball"><span class="hp-seam"></span></div>'
     +'<div class="hp-tag">W R O N G &nbsp; S P O R T</div>'
     +'<div class="hp-l1">DYLAN McMAHON</div>'
-    +'<div class="hp-l2">UNGUARDABLE ON A COURT</div>'
+    +'<div class="hp-l2">GIVE HIM A BASKETBALL INSTEAD</div>'
     +'<div class="hp-sub">'+(above
-        ? 'cleared the league average in '+best.y+' and still finished '+best.w+'&ndash;'+best.l+'. The rim was never the problem.'
-        : 'the rim has never been the problem. Sunday has.')+'</div>'
+        ? 'right idea, bad execution &mdash; cleared the league average in '+best.y
+          +' and still finished '+best.w+'&ndash;'+best.l
+        : 'right idea, bad execution')+'</div>'
     +'<div class="hp-facts">'+m.seasons+' SEASONS &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
       +' &middot; LUCK '+(m.luck>=0?'+':'&minus;')+Math.abs(m.luck).toFixed(2)
       +(rank<=3?' &middot; '+ord(rank)+' UNLUCKIEST':'')
