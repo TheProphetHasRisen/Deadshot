@@ -849,6 +849,10 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .mrqe .mq-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
   color:#F2C75C}
+.mrqe .mq-dir{position:relative;font-family:Fraunces,Georgia,serif;font-style:italic;
+  font-weight:600;font-size:clamp(15px,2.6vw,22px);line-height:1.2;margin-top:6px;color:#F7E7C6}
+.mrqe .mq-rule{position:relative;height:1px;margin:16px auto 0;max-width:74%;
+  background:linear-gradient(90deg,transparent,rgba(242,199,92,.5),transparent)}
 .mrqe .mq-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#F7E7C6}
 .mrqe .mq-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E9BE72}
 @media (prefers-reduced-motion:reduce){.mrqe *{animation:none!important}}
@@ -2514,8 +2518,13 @@ function marquee(){
   const backToBack=wins.length>1&&SEA.indexOf(wins[1].y)===SEA.indexOf(wins[0].y)+1;
   const worseSequel=wins.length>1&&wins[1].pi<wins[0].pi;
   const last=F.rs[F.rs.length-1];
-  const l2=backToBack?('BACK TO BACK, '+wins[0].y+' AND THE '+wins[1].y+' JOB')
-    :(wins.length?wins.length+(wins.length===1?' TITLE':' TITLES')+' ON THE SHELF':'NINE SEASONS, NO STATUE');
+  /* a marquee bills the picture, not the person: the title goes up in lights and the
+     director takes a credit underneath it */
+  const title=backToBack?'BACK 2 BACK'
+    :(wins.length?(wins.length===1?'ONE FOR THE SHELF':wins.length+' FOR THE SHELF'):'NO STATUE YET');
+  const l2=backToBack
+    ? wins[0].y+' &amp; '+wins[1].y+' &middot; HELD OVER A SECOND YEAR'
+    :(wins.length?wins.map(w=>w.y).join(' &amp; '):m.seasons+' SEASONS, STILL RUNNING');
   /* the second one is the story: it was the lowest score that has ever won this league,
      which is a robbery rather than a repeat. Checked against every champion before it
      gets said. */
@@ -2530,17 +2539,27 @@ function marquee(){
     ? 'the sequel scored worse than the original — '+wins[0].pi.toFixed(1)+' then '+
       wins[1].pi.toFixed(1)+' — and still took the trophy'
     : 'nobody in this league has more of them';
+  /* the small print at the bottom of a poster: the run, the takings, the reviews, and
+     how it finished. Every figure comes out of the record. */
+  const bill=[];
+  bill.push(F.first+'&ndash;'+F.last);
+  bill.push(m.seasons+' SEASONS');
+  bill.push(m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:''));
+  if(wins.length)bill.push(wins.map(w=>w.pi.toFixed(1)).join(' THEN ')+' IN THE TITLE YEARS');
+  bill.push(m.podium+' PODIUM'+(m.podium===1?'':'S'));
+  bill.push('FINAL SCREENING '+last.y+', '+ord(last.place)+' OF '+last.teams);
+  const billing=bill.join(' &middot; ');
   const el=document.createElement('div'); el.className='mrqe';
   const bulbs='<i></i>'.repeat(11);
   el.innerHTML='<div class="mq-in">'
     +'<div class="mq-bulbs t">'+bulbs+'</div><div class="mq-bulbs b">'+bulbs+'</div>'
     +'<div class="mq-tag">N O W &nbsp; S H O W I N G</div>'
-    +'<div class="mq-l1">NIKO CONTRERAS</div>'
-    +'<div class="mq-l2">'+l2+'</div>'
+    +'<div class="mq-l1">'+title+'</div>'
+    +'<div class="mq-dir">Dir. by '+esc(m.name)+'</div>'
+    +'<div class="mq-rule"></div>'
+    +'<div class="mq-l2" style="font-size:clamp(16px,3.2vw,32px);margin-top:12px">'+l2+'</div>'
     +'<div class="mq-sub">'+sub+'</div>'
-    +'<div class="mq-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.seasons+' SEASONS &middot; '
-      +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.podium+' PODIUMS &middot; LAST ACT '
-      +last.y+', '+ord(last.place)+' OF '+last.teams+'</div></div>';
+    +'<div class="mq-facts">'+billing+'</div></div>';
   document.body.appendChild(el);
   if(ac()&&!quiet())filmRoll(0);
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
