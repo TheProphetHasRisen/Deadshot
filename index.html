@@ -2497,15 +2497,18 @@ function villageCalm(delay){
    pulse train rather than a rhythm you could count -- that fast tick is the whole sound.
    Under it: the motor, and the hiss of the film going through the gate. */
 function filmRoll(delay){
-  const d=delay||0, RATE=1/24, N=Math.round(3.4/RATE);
+  /* The card is up for 5250ms and then fades for 700. The reel should still be running
+     when it starts to go, so this covers 5.4s and the motor's own decay carries it into
+     the fade rather than stopping dead two seconds early. */
+  const d=delay||0, RATE=1/24, RUN=5.4, N=Math.round(RUN/RATE);
   for(let i=0;i<N;i++){
     const t=d+i*RATE+Math.random()*0.0025;   /* never perfectly even, never negative */
     noise(0.010,0.055+Math.random()*0.02,3000,1100,t,'bandpass',0.45);
     noise(0.016,0.030,900,320,t,'lowpass',0.7);
   }
-  tone(48,3.6,'sawtooth',0.055,47,d);              /* the motor */
-  tone(96,3.6,'triangle',0.028,95,d);
-  noise(3.6,0.045,4200,2600,d,'highpass',1.4);     /* film through the gate */
+  tone(48,RUN+0.5,'sawtooth',0.055,47,d);          /* the motor */
+  tone(96,RUN+0.5,'triangle',0.028,95,d);
+  noise(RUN+0.5,0.045,4200,2600,d,'highpass',1.4); /* film through the gate */
   noise(0.5,0.08,1600,400,d,'lowpass',0.6);        /* the lamp striking */
 }
 /* A closing bell, then the number falling away under it. */
