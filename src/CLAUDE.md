@@ -7,14 +7,17 @@ every session in this repo.
 
 ```bash
 python3 export.py     # data.py + weekly*.py  → site_data.json
-python3 mksite.py     # site_data.json        → index.html
+python3 mksite.py     # site_data.json        → index.html AND sw.js
 ```
 
 Both, in that order, after any source change. `mksite.py` prints the byte count.
 
-## Never edit `index.html` or `site_data.json`
+## Never edit `index.html`, `sw.js` or `site_data.json`
 
-They are build artifacts. Every change goes into `mksite.py` (the site) or
+They are build artifacts. `sw.js` (the offline copy that makes the site installable) is
+written by `mksite.py` alongside `index.html`, and its version string is a hash of the
+page — hand-edit it and the next build silently discards the change. `manifest.webmanifest`
+sitting next to it *is* hand-written; that asymmetry is easy to trip over. Every change goes into `mksite.py` (the site) or
 `data.py` / `weekly*.py` (the data), then you rebuild. Editing the artifacts
 directly means your change is destroyed on the next build.
 

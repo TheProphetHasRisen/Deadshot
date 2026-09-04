@@ -176,7 +176,7 @@ a mismatch between the two was a real reported bug):
 
 ```
 champions · alltime · power · shape · weekly · luck · advanced
-records · seasons · h2h · trades-sec · method
+seasons · h2h · trades-sec · records · method
 ```
 
 Twelve, not fourteen. **Power Rankings was merged into Power Index** and **The .500 Line
@@ -191,19 +191,91 @@ agree: the inline script in `SHELL_TOP` that runs before paint (so there is no f
 the wrong theme), and the fallback in the skin restore near the bottom of `JS`.
 The favicon is drawn in Crimson to match.
 
-### The Record Book starts collapsed
+### The Record Book is last, and starts collapsed
 
-21 tables plus the milestone list made everything below it a long scroll. `#recsWrap`
+21 tables plus the milestone list made everything below it a long scroll, so `#recsWrap`
 is `hidden` by default with a toggle above it. The tables are still built on load, so
 `test.js` still counts them and nothing about the data changes.
 
+It also **sits second-to-last, directly before Method** (moved there 2026-09-01). It is
+reference material rather than something to read through, so it belongs at the end with
+the other reference section rather than cutting the narrative in half. Moving a section
+means moving it in **two** places — the markup in `BODY` and the `SECS` array in `JS` —
+or the nav highlight tracks the wrong section.
+
 ### Shareable cards
 
-Two canvas-drawn PNGs, both 1080x1080, both handed to the phone's share sheet
+Eight canvas-drawn PNGs, all 1080x1080, all handed to the phone's share sheet
 (`navigator.share` with a file) and falling back to a download on desktop:
 
-- **Manager card** — button in the manager modal.
-- **Head to head** — Share button next to the two pickers in the Head to Head section.
+| Card | Where the button is |
+|---|---|
+| **Manager card** | the manager modal |
+| **Head to head** | next to the two pickers in Head to Head |
+| **The rivalry** — every meeting in order | "Every meeting", same row |
+| **The case against** — the roast | the manager modal |
+| **The season** — champion + final table | the Seasons standings card header |
+| **The bracket** — the whole postseason | the Seasons bracket card header |
+| **The receipt** — one game | the arrow on any result in the weekly scoreboard |
+| **League record** — one record | the picker beside the record-book toggle |
+| **Wrapped slide** — whatever card is on screen | the arrow in the Wrapped top bar |
+
+**A card wears the theme of the page it came from — with one exception.** `cardPalette()`
+reads `--surface`, `--ink`, `--ink-3` and `--brass`. It used to read the **masthead**
+tokens, which matched on five skins and was badly wrong on Crimson: that masthead is deep
+red while the page itself is cream, so every Crimson card came out a solid red slab that
+looked nothing like the site. Anything drawn on a card must take its colour from the
+palette — two divider rules in the manager card were hardcoded `rgba(255,255,255,.10)`
+from the dark-masthead days and went invisible the moment the ground turned white.
+
+The exception is the **Wrapped slide card**, which paints the same gradient the slide was
+on (`WRBG[i % 8]`, parsed out of the CSS string) with the same soft highlights, vignette
+and white type. Wrapped is its own world on screen and a card in paper-and-ink read as a
+different product. Note the CSS angle convention when converting: 0deg points up and
+turns clockwise, so the direction vector is `(sin a, -cos a)` and the gradient line spans
+`|W sin a| + |H cos a|`.
+
+**"Every meeting" has to mean every meeting.** The rivalry card used to cut the list and
+add "and 2 earlier meetings", which the owner rejected outright. Rows now shrink to fit —
+the longest rivalry on record runs to 11 games — and only trim if the step would fall
+below 19px, which nothing currently reaches.
+
+`cardBase()` / `cardKick()` / `cardFoot()` / `cardRule()` / `cardTiles()` /
+`cardFit()` / `cardClip()` exist so a new card is a layout, not another copy of the
+background, the rule lines and the footer. `shareAny(builder, filename, btn)` is the
+one wrapper: it disables the button, shows "Building…", swallows `AbortError` (a
+dismissed share sheet is not a failure) and restores the label.
+
+**The receipt closes with three lines, not one.** The ranking ("the 216th biggest margin
+of 406 logged games") was briefly removed as saying nothing — the median margin is 23.84,
+so most games land mid-table — and the owner asked for it back, so it stays and the
+all-play line joins it: how many of the rest of the league that winning score would have
+beaten the same week, from `ap`. Playoff weeks have no `ap` and drop to two lines.
+
+**The season card's first column is final placing, not the regular-season order.** A
+10-4 team can sit fourth. The column is headed FIN and the footer says "final placings",
+because without that the table reads as broken. The footer's second line is generated:
+when the champion also led the league in scoring, repeating their own points back at the
+reader is noise, so it says that instead and names whoever had the best record.
+
+**Two cards are generated, not written.** `bigRecords()` derives the ten league records
+from `ROWS`, `M` and the game logs, and `roastLines(name)` derives the roast from the
+same places — so both stay true when the numbers move, and neither can say something
+the data does not support. `meetings(a,b)` is the shared meeting list: playoff games
+from `D.games` (all ten seasons) plus regular-season games from `D.wk[y].games` where
+`br` is empty (2021–2025 only). The two sources cannot overlap.
+
+**The roast measures before it draws.** Five facts that run off the bottom are worth
+less than four that fit, so `makeRoastCard` measures every block and pops from the end
+until the stack clears the footer. There is an automated check for this: render every
+card type for every manager, season, record, Wrapped slide, rivalry pair and a sample
+of games, in all six skins (990 renders), and flag any ink painted in the outer thirds
+of the footer band. It currently passes clean.
+
+**Wrapped's opening slide needs two guards.** Its label is the same words as the card's
+kicker and its value is the manager's own name, both of which are already printed at
+the top — so `makeWrapCard` drops each when it duplicates, and re-centres the note into
+the space that frees up.
 
 Both take their colours from `cardPalette()`, which reads the live theme's masthead
 tokens, so the picture matches the site the reader was just looking at.
@@ -217,6 +289,66 @@ the same protection for free.
 **Do not use Fraunces on the canvas.** It is a variable font and canvas cannot set its
 optical-size axis, so its numerals render in the wrong forms at display sizes. Big
 Shoulders Display has no such axis and is what both cards use for large numbers.
+
+### Power Index has a generated explainer
+
+`drawPiHelp()` fills `#piHelp` under the Power Index lede: the arithmetic in one line, a
+worked example from the most recent champion's season, a table of what each band means
+with the count of seasons in it, a paragraph on why the number travels across years, and
+a collapsed note on what it deliberately ignores. Every number in it is computed from
+`ROWS`, so adding a season keeps it true. It is in `REDRAW` because the band swatches come
+from `diverge()`, which reads the live theme.
+
+The owner considers this the most important stat on the site precisely because it is the
+only one comparable across seasons — treat the explainer as load-bearing copy, not
+decoration.
+
+**The bands carry a written label AND four counts, and that split is deliberate.** The
+labels ("a contender's year") describe the scoring level; the counts beside them —
+seasons, made playoffs, podiums, titles — say what the level has actually been worth. A
+label on its own once overclaimed badly: "a contender's year" sat on 110–120 when the
+median champion scored **107.4** and one has won the whole thing at **93.9**. Words
+describe, numbers judge. Every count is read off `ROWS`, so the right-hand side cannot go
+stale or overclaim; if you edit a label, check it against those counts first.
+
+There is no "x of y" in the playoff column — the seasons count is the column beside it.
+
+### Column headings explain themselves, from their own "?"
+
+`table()` renders a `t:` on a column as `data-th-tip` and hangs a small `.gl.gl-th`
+question mark off the heading, with the site's own tooltip bound to **that**, not to the
+heading. Two earlier versions were both wrong:
+
+- a plain `title=""` — the browser draws it in its own style after a long delay, and a
+  phone can never show it at all;
+- the tooltip bound to the whole heading — which fought with the heading's real job. You
+  went to read what a column meant and re-sorted the table instead. The `?` stops the
+  click from reaching the sort handler.
+
+Every column of the Consistency, form and Z-score table carries one; add `t:` to any new
+column and it works with no further wiring.
+
+### Absences: missed seasons and separate departures are different numbers
+
+`mgrGaps(m)` counts seasons sat out. `mgrSpells(m)` counts *separate* absences and returns
+the first season back afterwards. The manager verdicts used `mgrGaps` for both and said
+untrue things: Nick Gearing sat out four seasons but only ever left **once**, so "keeps
+disappearing for years at a time" and "left and returned more than once" were both wrong.
+**Nobody in this league has left twice.** Any new line about coming and going must use
+`mgrSpells().spells`, not the missed-season count.
+
+Two more helpers feed the verdicts, both requested because a line was true but incomplete:
+
+- `mgrSlide(m)` — the number of seasons when **every** one was lower than the last, else 0.
+  Wesley Alpert has gone 113.5 → 108.0 → 104.3 → 98.6 → 94.2, a perfect five-season slide,
+  and his line says so alongside his league-best luck. Three seasons is the minimum; below
+  that it is noise.
+- `mgrSinceTitle(m)` — seasons played since the last title and how many were below average.
+  Nick Gearing and Chris Cossu both won and then dropped below 100 in every season since,
+  which their lines now carry as a second, flatter sentence rather than a second "and".
+
+The manager share card sets the verdict smaller when it runs past four lines, so a longer
+sentence loses no clause.
 
 ### Why almost nobody is above .500 against winning teams
 
@@ -374,6 +506,89 @@ visitor's download for no benefit. `index.html` is byte-identical either way —
 - **Focus is trapped** inside both overlays (`trapTab`). Before this, Tab walked out of
   an open dialog and into the page behind it 19 times out of 20.
 
+### Link previews are per-theme, and that needs a shim
+
+Discord, iMessage and the rest fetch `og:image` **server-side from the URL alone**. They
+never see the reader's theme, and the site is one static file, so a single `og.png` could
+only ever show one of the six — which is how a stranger ended up being greeted by the
+hidden Redacted theme.
+
+`mkog.js` renders one 1200×630 card per theme from the live stylesheet (`node mkog.js`,
+and `deploy.sh` runs it on every deploy so the season counts on the card cannot go stale)
+and writes a matching one-line shim page to `t/<skin>.html`. The shim carries that theme's
+og tags for a crawler and bounces a person straight to `/` with their query and hash
+intact. `deepLink()` points a shared link at the shim for whatever theme the sharer is on.
+
+- **Redacted maps to Classic on purpose.** The hidden theme should not be the first thing
+  a stranger sees.
+- `cleanUrls` is on in `vercel.json`, so links are `/t/red`, not `/t/red.html`. Emitting
+  the `.html` form would cost every crawler a redirect hop.
+- This is deliberately **not** a serverless function. It stays a static site.
+- Adding a theme means adding it to `SKINS` in `mkog.js` **and** `OG_SKINS` in the page,
+  then re-running the generator.
+
+### It installs as a home-screen app
+
+`manifest.webmanifest` names it, `sw.js` keeps a copy on the device, and the build writes
+`sw.js` itself so its `VERSION` string changes whenever `index.html` changes — an old
+store can never outlive the page it belongs to. **VERSION is a content hash, not a
+length.** It was `len(out)` first, which meant two builds of equal length shipped a
+byte-identical worker: the browser saw no change, never ran `activate`, and every cached
+icon and font stayed pinned to the previous build. A same-length edit is mundane on a
+660KB page.
+
+**Three rules the worker learned the hard way, all reproduced before they were fixed:**
+
+- **Never store a response that is not a healthy same-origin 200.** The navigation branch
+  had no `net.ok` check, so one tapped dead link wrote a 404 page over the stored book and
+  the installed app opened to "404 — This page could not be found" on every no-signal
+  launch until the site was next loaded online. Captive portals and deploy-window 5xx do
+  the same thing.
+- **Never key a navigation response as `/` without checking the path.** Every in-scope
+  navigation entered that branch, so a shared `/t/<skin>` link wrote a 2KB redirect stub
+  over the book — and offline that stub redirects to itself. `/t/*` is now handled
+  separately and falls back to the stored book.
+- **Network-first must be raced against a clock.** `fetch()` only rejects when the network
+  is properly down; one bar does not reject, it stalls. Without a timeout the reader got a
+  blank screen with a complete copy sitting unused. It now falls back after 3.5s and lets
+  the fetch finish in the background so the next open is fresh.
+
+Fonts are requested with `crossorigin` so their responses have a real status to check —
+without it every font response is opaque, indistinguishable from a captive portal's block
+page, and a bad first visit poisoned the fonts for good.
+
+**The page is fetched network-first, and that is the whole point.** The obvious way round
+(serve the stored copy, refresh in the background) leaves every reader one launch behind
+every deploy, which is how a site like this quietly stops updating. Fonts and icons are
+cache-first instead, because they never change within a version. `skipWaiting` plus
+`clients.claim` means a new version takes over immediately rather than waiting for every
+tab to close.
+
+Registration is gated on https or localhost, so opening `index.html` off the disk is
+unaffected and stays testable. `vercel.json` marks `sw.js` no-store — a cached copy of the
+thing that manages the cache is the classic way to strand everybody on an old build.
+
+Verified end to end against a local server: manifest valid, worker takes control, the full
+book (10 plates, 10 rows) and all four typefaces render with the network off, and an edited
+page is seen on the very next open rather than the one after.
+
+### Links that open on one exact thing
+
+A picture is for the group chat; a link is for an argument, because the other person
+lands on the live page and can keep digging. `applyUrlState()` reads:
+
+- `?y=` — the season (drives both year-driven sections)
+- `?w=` — the week inside the weekly scoreboard
+- `?m=` — the manager on the career-races chart
+- `#section` — where to scroll
+
+All four are written back to the address bar as the reader clicks, so the URL is always
+already shareable. Explicit **Copy link** buttons sit on the manager card, the Seasons
+standings header and the weekly scoreboard. One delegated handler serves every one of
+them: put `data-link="y=2024&w=11"` and `data-link-hash="weekly"` on any button and it
+works with no wiring. Values in `data-link` are **raw, not URL-encoded** — `deepLink()`
+does the encoding, so encoding them in the attribute double-encodes them.
+
 ### Browser find (Cmd+F)
 
 Most of the page is rendered one view at a time, which the browser's find cannot see
@@ -392,6 +607,37 @@ into. Audited 2026-08-28:
   `#rankTbl`, `#advYrChips`). All three only duplicate content that is findable
   elsewhere. `hidden="until-found"` would work if that ever stops being true.
 
+**The bracket card reads its shape from the data.** Two exist in this league's history —
+a 4-team bracket (two semifinals into a final) and a 6-team one (two quarterfinals plus
+two first-round byes, into semifinals, into a final) — so the columns come from the weeks
+that actually have games and the rounds from `g.rnd`, never from an assumed shape. Three
+things it learned:
+
+- **placement games do not belong in the columns.** The 5th and 3rd place games are part
+  of the record but not the title path, and mixing them in made the card unreadable. They
+  sit in an "also played" strip underneath.
+- **columns are capped at 360px and the block is centred.** Letting two columns fill the
+  full width stretched a 4-team bracket into long empty strips.
+- **the champion's name is placed off its measured ascent**, not a fixed baseline. Big
+  Shoulders has a very tall ascender and a fixed baseline drove the name straight through
+  its own CHAMPION label.
+
+A void final (2022) is labelled VOID, draws no connector onward, and the champion band
+says CO-CHAMPIONS with both names.
+
+### The card audit
+
+`scratchpad/audit/cards.js` renders every card the site can produce — manager, head to
+head, season, receipt, record, roast, rivalry and every Wrapped slide — in all six skins,
+about 3,200 renders, and flags any ink in the gutter between the last line a card may use
+(y 950) and the top of the footer text (y 986). Two things it learned the hard way:
+
+- **do not test for "not the background colour".** The manager card's footer is
+  left-aligned, so a check that ignored the middle third counted the footer itself.
+- **do not compare against a flat colour.** The Wrapped cards are gradients. It tests for
+  a sharp *vertical* edge instead (each pixel against the one four rows above), which
+  text always makes and a smooth gradient never does.
+
 ### The two bump charts
 
 `#race` ("The race", in `weekly`) is **season-scoped** — `drawWeekly(YR)` rebuilds it from the season
@@ -406,12 +652,29 @@ Seasons are told apart three ways at once, deliberately — several managers reu
 team name for years (Shane Kaiper was "Stegostompem" all five), so the team name alone
 identifies nothing:
 
-1. a recency colour ramp from a faint neutral to the full accent, plus stroke weight
-   rising with it (1.7px oldest to 3.3px newest). A plain `--mid -> --brass` ramp was
-   NOT enough &mdash; on several skins those sit close together and the middle years
-   blurred. Measured: every skin now clears CIE76 deltaE 12 between adjacent seasons;
+1. **its own hue**, keyed to the *year index across the whole league*, not to the
+   manager's position in their own list — so 2021 is the same colour on every manager's
+   chart and two managers can be compared side by side. The hues live in per-skin tokens
+   `--sea-1` … `--sea-8` (eight, for headroom; `seaK()` wraps past eight). They are
+   per-skin because the six grounds are completely different — a hue that reads on
+   Crimson's white disappears on Arcade's purple-black. Every one clears WCAG 3:1
+   against its own `--surface` (measured minimum 4.43, on Crimson);
 2. a year label at the end of every line;
-3. a clickable season legend.
+3. a clickable season legend, each entry carrying a solid swatch in that season's colour.
+
+This replaced an earlier single-hue brightness ramp (faint neutral → full accent, with
+stroke weight rising alongside). It was not enough: on several skins the middle years
+blurred into each other, and brightness alone dies in a screenshot. Stroke weight is now
+uniform (2.4px) and every line is solid.
+
+Two things were built for this chart, shown to the owner, and **rejected — do not
+reintroduce them**:
+
+- **a year tag riding on each line.** Noisy, and the tags have to dodge each other
+  wherever lines bunch up.
+- **a dash pattern per season** (solid / dashed / dotted / dash-dot), added as a
+  colour-blind-safe second cue. With five clearly separated hues it only added visual
+  noise. Colour alone is the answer here.
 
 Medals on the end labels are positioned **after render, off `getBBox()`** &mdash;
 `getComputedTextLength()` ignores the `dx` between the year and team-name tspans and
@@ -442,6 +705,86 @@ skins has to survive it.
 - Type **`cossu`** — "Cossu is a bot".
 - Type **`chaos`** — scrambles every number on screen and knocks the charts out of
   alignment, then restores exactly.
+- Type **`burke`** — a panda, and a nod to the name he has played under since 2022. Ten
+  seasons out of ten and a scoring line that barely moves; black, white and bamboo.
+- Type **`kaiper`** — amber, ripples, a tremor and a pterosaur cry. Ten seasons, seven of
+  them under the same prehistoric team name.
+- Type **`wu`** — lacquer red and gold leaf, with a carver's seal. The seal carries his
+  season count in Chinese numerals, because that is a fact rather than a decoration.
+- Type **`gearing`** — 49ers scarlet and gold, yard lines and a crowd. He keeps one of the
+  twenty field-level seats the 49ers added at Levi's in the 2026 rebuild.
+
+**Every card stays on screen for 5250ms and fades over 700ms.** Cossu's is the exception
+at 3250ms. Keep new ones on the same clock.
+
+**Each manager answers to their first name and their surname**, from one `EGGWORDS` table
+rather than a wall of `if`s — the loop `break`s on the first match so two words can never
+fire two cards. Two deliberate exceptions:
+
+- **Burke is surname-only.** `brian` belongs to the commissioner, and this league has two
+  of them.
+- The commissioner answers to `commish`, `commissioner`, `berger` and `brian`. That egg
+  guards itself with `PH_BUSY` while it runs, so a test that fires it twice in a row will
+  look like a broken trigger when it is not.
+
+Six sounds have been rejected by the owner and replaced. Recorded so they do not come
+back, and because the reasons generalise:
+
+- a synthesised laugh for the champion — replaced with `battleReady`, war drums and a horn
+  climbing to the top note;
+- a pterosaur cry for Kaiper — dropped; the footfalls carry it;
+- a bell on the end of Wu's gong — replaced with `villageCalm`;
+- a projector and applause for Contreras — replaced with `vaultCrack`, because the card
+  is now about the robbery rather than the premiere;
+- **two** goes at McMahon's basketball. Same lesson as the crowd, learned twice: a bounce
+  built from a sine reads as a game console. A real one has no note in it — it is a
+  broadband slap that collapses downward in about forty milliseconds, so `bounce()` is
+  four layers of filtered noise and no oscillator at all;
+- **two** goes at the crowd for Gearing. The lesson is worth keeping: **do not put a
+  pitched oscillator in a crowd.** The second attempt used nine sawtooths as "voices" and
+  they read immediately as an arcade cabinet. `fansCheer` is now noise and nothing else —
+  four beds, four sections offset from each other, and 170 short band-limited bursts of
+  random length, loudness and colour.
+
+`screech`, `evilLaugh`, `gong` and `crowdRoar` were deleted once nothing called them.
+
+- Type **`niko`** — a lit marquee, billed the way a cinema bills a picture: the film goes
+  up in lights (**BACK 2 BACK**) and the manager takes a director's credit underneath it,
+  then a poster's small print. The card checks that the two titles really were consecutive
+  and that the second one really was the lowest-scoring champion on record before it says
+  either.
+- Type **`alpert`** — a trading terminal. His five seasons are plotted as the line they
+  actually make, 113.5 down to 94.2, with a closing bell.
+- Type **`mcmahon`** — a basketball. League lore says he is unguardable on a court; the
+  record says he cleared the league average in 2025 and went 5-9 anyway.
+
+All seven read their numbers out of `loyalFacts()` and `ROWS`, so counts and streaks stay
+true. If someone leaves the league, or a name changes, the cards follow.
+
+**Every superlative on these cards is checked against the field before it is printed.**
+Two were wrong when first drafted and would have shipped as confident lies: McMahon is the
+**second** unluckiest on record, not the first (that is the owner, at -12.30), and Alpert
+has the highest rating of anyone **still playing**, not of all time (Giacomo Watson is
+higher). Both now compute their rank at draw time. Do not hardcode a "most" or a "best"
+here — sort `M` and check.
+
+**An inline `display` beats the `hidden` attribute.** The trade grid carries an inline
+`display:grid`, so `[hidden]{display:none}` from the browser's own stylesheet lost to it
+and the trade cards stayed on screen the whole time their card said "collapsed". The fix
+is a single site-wide `[hidden]{display:none!important}`. Anything using `hidden` on an
+element that also sets `display` inline had the same latent bug.
+
+**Every sound is rendered offline and measured before it ships.** Two of the seven came
+out inaudible on the first pass — the projector at peak 0.045 and the crowd at 0.09 — and
+neither is something you notice by ear on a laptop. Render into an `OfflineAudioContext`,
+measure peak and RMS, and only trust the number.
+- Type the **reigning champion's surname** — a red-and-gold title-defence card. The
+  trigger is generated from `D.champs` for the latest season (`CHAMP_KEYS`), so it follows
+  the trophy rather than naming anyone permanently; today it is `krueger`. Co-champion
+  years arm both surnames. The "henchman" line only fires for the team that earned it.
+
+All four typed words are guarded against firing while an `input`, `textarea` or `select`
+has focus.
 
 All audio is synthesized with the Web Audio API. There are zero audio assets.
 

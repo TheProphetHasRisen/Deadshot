@@ -67,5 +67,11 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
     await p.close();
   }
   await b.close();
-  console.log(errs.length?('ERRORS:\n'+errs.join('\n')):'NO JS ERRORS');
+  if(errs.length){
+    /* deploy.sh gates on this exit code. Printing and exiting 0 meant a broken page
+       could sail past the only automated check the site has. */
+    console.error('ERRORS:\n'+errs.join('\n'));
+    process.exit(1);
+  }
+  console.log('NO JS ERRORS');
 })();

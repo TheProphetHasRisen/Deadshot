@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
@@ -38,9 +38,9 @@ if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname
 }
 </script>
 <title>Deadshot Record Book</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Press+Start+2P&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Press+Start+2P&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" crossorigin>
 <style>
 /* ============ SKINS ============ */
 :root,:root[data-skin="scope"]{
@@ -966,6 +966,13 @@ a{color:var(--brass)}
 .num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right}
 /* ---------- masthead: the scope ---------- */
 .mast{position:relative;overflow:hidden;background:var(--mast-bg);border-bottom:1px solid var(--mast-rule)}
+/* Installed on a phone the page gets the whole screen, status bar included, so the
+   masthead has to hold its own space back or the clock and battery sit on the wordmark.
+   Scoped to the installed app: in a browser there is no inset to reserve. */
+@media (display-mode:standalone){
+  .mast{padding-top:env(safe-area-inset-top,0px)}
+  .totop{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
 .mast::before{content:"";position:absolute;inset:0;
   background-image:linear-gradient(var(--mast-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mast-grid) 1px,transparent 1px);
   background-size:34px 34px;opacity:.5}
