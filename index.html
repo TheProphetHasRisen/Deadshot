@@ -9,7 +9,12 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#8E1520">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deadshot">
 <link rel="canonical" href="https://deadshotleague.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
@@ -25,6 +30,13 @@
 <meta name="twitter:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="twitter:image" content="https://deadshotleague.com/og.png">
 <script>if(location.protocol==='http:'||location.protocol==='https:'){var _va=document.createElement('script');_va.defer=true;_va.src='/_vercel/insights/script.js';document.head.appendChild(_va);}</script>
+<script>
+/* Keeps a copy on the device so the book opens with no signal. Only over https, so
+   opening index.html straight off the disk is unaffected. */
+if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){
+  addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});
+}
+</script>
 <title>Deadshot Record Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
