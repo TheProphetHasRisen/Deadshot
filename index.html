@@ -1144,6 +1144,15 @@ td.tm{color:var(--ink-2);font-style:italic}
    value column is never pushed out of reach on a 320px screen */
 @media(max-width:430px){#recs th,#recs td{padding:6px 5px}}
 @media(max-width:345px){#recs td.nm,#recs td.tm,#recs td.dim{overflow-wrap:anywhere}}
+/* the two-manager compare table: th,td are nowrap globally, so two long manager names
+   plus the label column came to 331px and dragged the whole page sideways on a 320px
+   screen. Let the names wrap rather than adding another horizontal scroller. */
+#cmpOut th,#cmpOut td{white-space:normal;overflow-wrap:break-word}
+@media(max-width:345px){#cmpOut th,#cmpOut td{padding:6px 5px}}
+/* the record-to-share picker sizes itself to its longest option label (~300px) and was
+   the next thing sticking off a 320px screen once the table above stopped doing it.
+   The 8px is its own inline margin-left. */
+#recPick{max-width:calc(100% - 8px)}
 tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6px;font-size:9px;vertical-align:2px}
 .dim{color:var(--ink-3)}
 .mlink{cursor:pointer;border-bottom:1px dotted var(--brass-2)}
@@ -1746,7 +1755,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career. These tables always cover all twenty managers, whatever the filter at the top of the page is set to &mdash; a record is a record whether or not its holder still plays.</p>
     <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
       <select id="recPick" style="margin-left:8px"></select>
       <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
@@ -3121,7 +3130,14 @@ addEventListener('keydown',e=>{
 },true);
 document.addEventListener('click',e=>{const t=e.target.closest('[data-m]'); if(t){openMgr(t.dataset.m);}});
 const mlink=n=>`<span class="mlink" data-m="${esc(n)}" tabindex="0" role="button">${esc(n)}</span>`;
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.m)openMgr(e.target.dataset.m);});
+/* preventDefault is the whole fix, not a tidy-up. openMgr() moves focus to the close
+   button, and Enter's default action is dispatched AFTER this listener runs -- against
+   whatever holds focus by then. So the card opened and the browser immediately clicked
+   the ✕, and a keyboard user saw a flash and nothing else. Space is handled too: these
+   spans are role="button", and a button is meant to answer to both keys. */
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.m){
+    e.preventDefault(); openMgr(e.target.dataset.m);}});
 
 /* ---- spotlight: click to lock any number of managers, hover to preview ---- */
 const PICK=new Set();
@@ -3873,8 +3889,15 @@ drawFive(); REDRAW.push(drawFive);
 $('#fiveMore').onclick=()=>{const t=$('#fiveTbl'); t.hidden=!t.hidden;
   $('#fiveMore').classList.toggle('on',!t.hidden);
   $('#fiveMore').innerHTML=t.hidden?'Show table &#9662;':'Hide table &#9652;';};
+/* The record book deliberately ignores the manager filter. Its own opening paragraph
+   promises that single-season records include everyone, and the career totals heading
+   says the same -- but this used to filter like every other section, and the filter
+   defaults to the active ten. Eleven of these twenty-one tables named the wrong record
+   holder unless the reader happened to press "All 20" first: the real highest-scoring
+   season is Watson's 2018, not Alpert's 2021. Only the 2+ seasons cut below is real. */
 function drawRecords(){
-  const ROWS=D.rows.filter(r=>vis(r.mgr)), M=D.mgrs.filter(m=>vis(m.name));
+  /* ROWS and M are the unfiltered globals on purpose -- see above. The shareable record
+     cards (bigRecords) always read those, so the table and the card now agree. */
   const q=M.filter(m=>m.seasons>=2);
   const S=(a,k,d=1)=>[...a].sort((x,y)=>d?k(y)-k(x):k(x)-k(y)).slice(0,5);
   const sr=(r,v)=>`<td class="nm">${mlink(r.mgr)}</td><td class="tm">${esc(r.team)}</td><td class="num mono">${r.y}</td><td class="num"><b>${v}</b></td>`;
