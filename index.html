@@ -715,7 +715,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .kdef .kd-mgr{position:relative;margin-top:6px;font-size:10.5px;letter-spacing:.28em;color:#D9A82B;opacity:.55}
 @media (prefers-reduced-motion:reduce){.kdef *{animation:none!important}}
 
-/* Burke: ten seasons out of ten, and a scoring line that barely moves. Black and white,
+/* Burke: every season there has been, and a scoring line that barely moves. Black and white,
    with bamboo. */
 .pnda{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 40%,rgba(20,21,16,.96),rgba(4,5,4,.98));
@@ -750,7 +750,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .pnda .pn-facts{margin-top:8px;font-size:11px;letter-spacing:.22em;color:#BFDD96}
 @media (prefers-reduced-motion:reduce){.pnda *{animation:none!important}}
 
-/* Kaiper: ten seasons of it, seven of them under the same prehistoric name. Amber,
+/* Kaiper: every season of it, seven of them under the same prehistoric name. Amber,
    jungle dark, and something heavy walking towards you. */
 .jrsc{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 45%,rgba(14,20,10,.95),rgba(3,5,3,.98));
@@ -4103,9 +4103,12 @@ const MX={reg:{t:tally(REGG),g:REGG,
    note:REGYRS+' only — '+REGG.length+' games. The remaining seasons\' game logs have not been loaded yet, so this grid is thin by necessity, not by design.'},
   po:{t:tally(POG),g:POG,
    title:'Playoff head-to-head',
-   note:'All 55 playoff games, 2015 to 2025. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
+   /* counted, not typed: the totals and the year range move on their own when a season lands */
+   note:'All '+D.games.length+' playoff games, '+SEA[0]+' to '+SEA[SEA.length-1]+'. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
   all:{t:tally(REGG.concat(POG)),g:REGG.concat(POG),
    title:'All games',
+   /* ten is filled in by the build, so this reads "ten"/"eleven" like the rest
+      of the copy rather than dropping a digit into the middle of a sentence */
    note:'Every meeting on record: all ten seasons of playoffs plus the '+REGYRS+' regular seasons. '+(REGG.length+POG.length)+' games.'}};
 let MXK='all';
 function drawMtx(){
@@ -4802,7 +4805,7 @@ function cardText(s){
 }
 
 /* Every meeting between two managers that the data can actually prove: playoff games
-   exist for all ten seasons, regular-season games only for the years with a game log.
+   exist for every season, regular-season games only for the years with a game log.
    The two sources never overlap, because the weekly side skips anything flagged as a
    bracket game. */
 function meetings(an,bn){
@@ -6202,7 +6205,7 @@ const STORY=(function(){
       `${ch.teams.join(' / ')} took the ${ch.spots}-team bracket in a ${rs.length}-team league.`);
     ALL[y]={cands,champ:ch?ch.mgrs.join(' & '):''};
   });
-  /* ten seasons should read as ten different stories — once an angle is used,
+  /* every season should read as a different story — once an angle is used,
      it has to be clearly better than the alternatives to be used again */
   const out={}, used={};
   const adj=c=>c.sc-26*(used[c.k]||0);

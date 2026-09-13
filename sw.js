@@ -8,7 +8,7 @@
 
    Fonts and icons are the other way round -- they never change within a version, so they
    come from the store immediately and are only fetched once. */
-const VERSION='deadshot-5e90bc926d5e';
+const VERSION='deadshot-bfe16e136204';
 const CORE=['/','/manifest.webmanifest','/favicon-32.png',
             '/favicon.svg','/apple-touch-icon.png','/icon-192.png','/icon-512.png',
             '/icon-maskable-512.png'];

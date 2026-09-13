@@ -45,6 +45,27 @@ to confirm the change landed. A script that throws mid-way after making earlier
 in-memory edits silently discards all of them. This has cost real work more than
 once.
 
+## Never type a season count, manager count or game count into the copy
+
+"ten seasons", "twenty managers", "410 games logged", "all 55 playoff games" were typed
+by hand into the page copy, the meta tags, the manifest and the link-preview cards. Every
+one of them would have started lying the day 2026 landed. They are computed now:
+
+- In `BODY`, `HEAD` and `SHELL_TOP` (and in a JS string where the copy needs a *word*
+  rather than a digit), write a placeholder: `__NSEASONS__` / `__NSEASONSW__` ("ten") /
+  `__NSEASONSWC__` ("Ten") / `__FIRSTYEAR__` / `__LASTYEAR__` / `__NMGRS__` /
+  `__NMGRSW__` / `__NTEAMSZN__` / `__NLOGGED__`. `mksite.py` fills them from
+  `site_data.json` at build time and **asserts that none survive**, so a typo fails the
+  build instead of shipping `__NSEASONSW__` in the middle of a sentence.
+- In JS where a digit is fine, read it live: `SEA.length`, `D.games.length`, `M.length`.
+- `mkog.js` reads the four masthead figures off the built page, so the preview card, its
+  alt text and all six `t/*.html` shims follow on their own.
+- `manifest.webmanifest` is still hand-written, so its description deliberately carries
+  no count at all ("Every season of...").
+
+To check a change here, clone the newest season as a fake next year in a scratch copy,
+rebuild, and confirm the wording moves to "eleven".
+
 ## Before introducing any new CSS class or `@keyframes` name
 
 `grep` for it first. The stylesheet is one giant block shared by six themes, and
@@ -128,8 +149,14 @@ Grep before you add, and check the fix on a phone as well as a desktop.
 Use `./deploy.sh` (build + verify only) and `./deploy.sh --push` with
 `DEADSHOT_REPO=TheProphetHasRisen/Deadshot` to ship. It verifies before it pushes and
 commits `index.html` to `main` in one commit. Auth is `gh`, token in the macOS keyring —
-**never ask for or accept a personal access token.** Confirm with the owner before every
-push; Vercel deploys straight from it.
+**never ask for or accept a personal access token.** Vercel deploys straight from it.
+
+**No need to ask before pushing** (Brian, 2026-09-12 — this replaces the earlier "confirm
+before every push" rule). Finish the work, let `deploy.sh` run its checks, and ship it.
+The gate is what makes that safe: `deploy.sh` refuses to push if the page's JavaScript
+does not parse, if `test.js` finds an error, if the worker or the manifest is broken, or
+if Playwright is missing. Do not push around it, and do not push work that is half-done
+or that he has not asked for — say what went live afterwards.
 
 Manual drag-and-drop still works but Chrome renames to `index_NN.html`, which cost three
 commits per deploy and a 404 once. If you do it by hand the filename must end up exactly

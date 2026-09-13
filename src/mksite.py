@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import json as _json, hashlib as _hashlib
+import json as _json, hashlib as _hashlib, re as _re
 # site_data.json is stored readable (one field per line) so changes to it are
 # legible in git and by eye. The page gets the compact form -- pretty-printing
 # inside index.html would add ~100KB to every visitor's download for no benefit.
@@ -7,8 +7,35 @@ import json as _json, hashlib as _hashlib
 # sitting inside and blanks the whole page. Team names come from Yahoo and are whatever a
 # manager typed, so this has to be escaped here, at the embed. \u003c is still valid JSON
 # and parses back to the same string.
-DATA=(_json.dumps(_json.load(open('site_data.json')),separators=(',',':'))
+_D=_json.load(open('site_data.json'))
+DATA=(_json.dumps(_D,separators=(',',':'))
       .replace('<','\\u003c').replace('\u2028','\\u2028').replace('\u2029','\\u2029'))
+
+# ---- counts that used to be typed into the prose ---------------------------------
+# "ten seasons", "twenty managers", "410 games logged" and "all 55 playoff games" were
+# written out by hand in the page copy, the meta tags, the manifest and the link-preview
+# cards. Every one of them starts lying the day a new season lands. They are placeholders
+# now, filled in from the data at build time, so the page cannot disagree with itself.
+# Spelled out, because that is how the copy already reads; digits past twenty.
+_WORDS={1:'one',2:'two',3:'three',4:'four',5:'five',6:'six',7:'seven',8:'eight',9:'nine',
+        10:'ten',11:'eleven',12:'twelve',13:'thirteen',14:'fourteen',15:'fifteen',
+        16:'sixteen',17:'seventeen',18:'eighteen',19:'nineteen',20:'twenty'}
+def _word(n): return _WORDS.get(n,str(n))
+_SEA=_D['seasons']
+# same sum as the masthead's fourth figure: every playoff game plus every regular-season
+# game in the years whose weekly log is loaded. If that formula moves, move this with it.
+_LOGGED=len(_D['games'])+sum(
+    len([g for g in _D['wk'][str(y)]['games'] if g['br']=='']) for y in _D['wkYears'])
+COUNTS={
+ '__NSEASONS__'  : str(len(_SEA)),        '__NSEASONSW__' : _word(len(_SEA)),
+ '__NSEASONSWC__': _word(len(_SEA)).capitalize(),
+ '__FIRSTYEAR__' : str(_SEA[0]),          '__LASTYEAR__'  : str(_SEA[-1]),
+ '__NMGRS__'     : str(len(_D['mgrs'])),  '__NMGRSW__'    : _word(len(_D['mgrs'])),
+ '__NTEAMSZN__'  : str(len(_D['rows'])),  '__NLOGGED__'   : str(_LOGGED),
+}
+def _fill(s):
+    for k,v in COUNTS.items(): s=s.replace(k,v)
+    return s
 
 HEAD = r"""<title>Deadshot Record Book</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -688,7 +715,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .kdef .kd-mgr{position:relative;margin-top:6px;font-size:10.5px;letter-spacing:.28em;color:#D9A82B;opacity:.55}
 @media (prefers-reduced-motion:reduce){.kdef *{animation:none!important}}
 
-/* Burke: ten seasons out of ten, and a scoring line that barely moves. Black and white,
+/* Burke: every season there has been, and a scoring line that barely moves. Black and white,
    with bamboo. */
 .pnda{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 40%,rgba(20,21,16,.96),rgba(4,5,4,.98));
@@ -723,7 +750,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .pnda .pn-facts{margin-top:8px;font-size:11px;letter-spacing:.22em;color:#BFDD96}
 @media (prefers-reduced-motion:reduce){.pnda *{animation:none!important}}
 
-/* Kaiper: ten seasons of it, seven of them under the same prehistoric name. Amber,
+/* Kaiper: every season of it, seven of them under the same prehistoric name. Amber,
    jungle dark, and something heavy walking towards you. */
 .jrsc{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 45%,rgba(14,20,10,.95),rgba(3,5,3,.98));
@@ -1640,7 +1667,7 @@ BODY = r"""
 
   <section id="advanced">
     <div class="sec-head"><h2>Advanced</h2><div class="rule-note">Consistency · Z-score · Playoffs</div></div>
-    <p class="lede">These measures are built from season totals and the playoff game log, so they cover all ten seasons. The Week by Week section examines the same ground in more detail, but only for the years with a game log loaded.</p>
+    <p class="lede">These measures are built from season totals and the playoff game log, so they cover all __NSEASONSW__ seasons. The Week by Week section examines the same ground in more detail, but only for the years with a game log loaded.</p>
     <div class="card">
       <div class="card-h"><h3>Consistency, form and Z-score</h3><span class="gl" data-gl="z" tabindex="0">?</span><span class="sub" id="advSub"></span>
         <div class="right">
@@ -1684,7 +1711,7 @@ BODY = r"""
 
   <section id="h2h">
     <div class="sec-head"><h2>Head to Head</h2><div class="rule-note">Sorted: seasons played</div></div>
-    <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all ten seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
+    <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all __NSEASONSW__ seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
         <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select>
@@ -1728,7 +1755,7 @@ BODY = r"""
 
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career. These tables always cover all twenty managers, whatever the filter at the top of the page is set to &mdash; a record is a record whether or not its holder still plays.</p>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career. These tables always cover all __NMGRSW__ managers, whatever the filter at the top of the page is set to &mdash; a record is a record whether or not its holder still plays.</p>
     <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
       <select id="recPick" style="margin-left:8px"></select>
       <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
@@ -1790,7 +1817,7 @@ BODY = r"""
 
   <footer>
     <strong>Deadshot Fantasy Football — Archives.</strong> Built from the league history workbook.
-    Points data is verified: in all ten seasons, league-wide points for equals league-wide points against to the cent.
+    Points data is verified: in all __NSEASONSW__ seasons, league-wide points for equals league-wide points against to the cent.
     One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70–70 and match Yahoo exactly.
   </footer>
 </main>
@@ -4078,10 +4105,13 @@ const MX={reg:{t:tally(REGG),g:REGG,
    note:REGYRS+' only — '+REGG.length+' games. The remaining seasons\' game logs have not been loaded yet, so this grid is thin by necessity, not by design.'},
   po:{t:tally(POG),g:POG,
    title:'Playoff head-to-head',
-   note:'All 55 playoff games, 2015 to 2025. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
+   /* counted, not typed: the totals and the year range move on their own when a season lands */
+   note:'All '+D.games.length+' playoff games, '+SEA[0]+' to '+SEA[SEA.length-1]+'. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
   all:{t:tally(REGG.concat(POG)),g:REGG.concat(POG),
    title:'All games',
-   note:'Every meeting on record: all ten seasons of playoffs plus the '+REGYRS+' regular seasons. '+(REGG.length+POG.length)+' games.'}};
+   /* __NSEASONSW__ is filled in by the build, so this reads "ten"/"eleven" like the rest
+      of the copy rather than dropping a digit into the middle of a sentence */
+   note:'Every meeting on record: all __NSEASONSW__ seasons of playoffs plus the '+REGYRS+' regular seasons. '+(REGG.length+POG.length)+' games.'}};
 let MXK='all';
 function drawMtx(){
   const src=MX[MXK], ord=[...M].filter(m=>vis(m.name)).sort(bySeasons).map(m=>m.name);
@@ -4777,7 +4807,7 @@ function cardText(s){
 }
 
 /* Every meeting between two managers that the data can actually prove: playoff games
-   exist for all ten seasons, regular-season games only for the years with a game log.
+   exist for every season, regular-season games only for the years with a game log.
    The two sources never overlap, because the weekly side skips anything flagged as a
    bracket game. */
 function meetings(an,bn){
@@ -6177,7 +6207,7 @@ const STORY=(function(){
       `${ch.teams.join(' / ')} took the ${ch.spots}-team bracket in a ${rs.length}-team league.`);
     ALL[y]={cands,champ:ch?ch.mgrs.join(' & '):''};
   });
-  /* ten seasons should read as ten different stories — once an angle is used,
+  /* every season should read as a different story — once an angle is used,
      it has to be clearly better than the alternatives to be used again */
   const out={}, used={};
   const adj=c=>c.sc-26*(used[c.k]||0);
@@ -6382,7 +6412,7 @@ SHELL_TOP = '''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
+<meta name="description" content="The Deadshot fantasy football record book — __NSEASONSW__ seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -6397,15 +6427,15 @@ SHELL_TOP = '''<!doctype html>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
 <meta property="og:title" content="Deadshot Record Book">
-<meta property="og:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades — the whole league record book, in one place.">
+<meta property="og:description" content="__NSEASONSWC__ seasons of champions, standings, power rankings, head-to-head and trades — the whole league record book, in one place.">
 <meta property="og:url" content="https://deadshotleague.com/">
 <meta property="og:image" content="https://deadshotleague.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Deadshot Archives — ten seasons, twenty managers, 410 games logged.">
+<meta property="og:image:alt" content="Deadshot Archives — __NSEASONSW__ seasons, __NMGRSW__ managers, __NLOGGED__ games logged.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Deadshot Record Book">
-<meta name="twitter:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades.">
+<meta name="twitter:description" content="__NSEASONSWC__ seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="twitter:image" content="https://deadshotleague.com/og.png">
 <script>if(location.protocol==='http:'||location.protocol==='https:'){var _va=document.createElement('script');_va.defer=true;_va.src='/_vercel/insights/script.js';document.head.appendChild(_va);}</script>
 <script>
@@ -6510,7 +6540,14 @@ self.addEventListener('fetch',e=>{
 });
 """
 
-out = SHELL_TOP + HEAD + '</head>\n<body>\n' + BODY.replace('__DATA__', DATA) + JS + '\n</body>\n</html>\n'
+_shell, _head, _body, _js = _fill(SHELL_TOP), _fill(HEAD), _fill(BODY), _fill(JS)
+# A mistyped placeholder is silent otherwise -- it ships as a literal __NSEASONSW__ sitting
+# in the middle of a sentence, and nothing else on the way to the live site would catch it.
+_left = set(_re.findall(r'__[A-Z][A-Z0-9_]*__', _shell + _head + _body + _js)) - {'__DATA__'}
+assert not _left, 'unfilled placeholder(s) in the page: ' + ', '.join(sorted(_left))
+# the counts go in before the data does, so a team name that happens to contain a
+# placeholder can never be rewritten
+out = _shell + _head + '</head>\n<body>\n' + _body.replace('__DATA__', DATA) + _js + '\n</body>\n</html>\n'
 open('index.html','w').write(out)
 # A length is not a fingerprint: two builds of equal length produced a byte-identical
 # sw.js, so the browser saw no change and every stored icon and font stayed pinned to the

@@ -1,7 +1,7 @@
 {
   "name": "Deadshot Record Book",
   "short_name": "Deadshot",
-  "description": "Ten seasons of champions, standings, power rankings, head-to-head and trades \u2014 the whole league record book, in one place.",
+  "description": "Every season of champions, standings, power rankings, head-to-head and trades \u2014 the whole league record book, in one place.",
   "id": "/",
   "start_url": "/",
   "scope": "/",

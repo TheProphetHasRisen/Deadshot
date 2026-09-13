@@ -2,33 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#8E1520">
-<link rel="canonical" href="https://deadshot-iota.vercel.app/">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deadshot">
+<link rel="canonical" href="https://deadshotleague.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
 <meta property="og:title" content="Deadshot Record Book">
 <meta property="og:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades — the whole league record book, in one place.">
-<meta property="og:url" content="https://deadshot-iota.vercel.app/">
-<meta property="og:image" content="https://deadshot-iota.vercel.app/og.png">
+<meta property="og:url" content="https://deadshotleague.com/">
+<meta property="og:image" content="https://deadshotleague.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Deadshot Archives — ten seasons, twenty managers, 410 games logged.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Deadshot Record Book">
 <meta name="twitter:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades.">
-<meta name="twitter:image" content="https://deadshot-iota.vercel.app/og.png">
+<meta name="twitter:image" content="https://deadshotleague.com/og.png">
 <script>if(location.protocol==='http:'||location.protocol==='https:'){var _va=document.createElement('script');_va.defer=true;_va.src='/_vercel/insights/script.js';document.head.appendChild(_va);}</script>
+<script>
+/* Keeps a copy on the device so the book opens with no signal. Only over https, so
+   opening index.html straight off the disk is unaffected. */
+if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){
+  addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});
+}
+</script>
 <title>Deadshot Record Book</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Press+Start+2P&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Press+Start+2P&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" crossorigin>
 <style>
 /* ============ SKINS ============ */
 :root,:root[data-skin="scope"]{
@@ -442,6 +454,9 @@
   font-size:10px;font-weight:700;font-family:"IBM Plex Mono",monospace;line-height:1;
   cursor:help;vertical-align:middle;margin-left:5px;flex:none;user-select:none}
 .gl:hover,.gl:focus{background:var(--brass);color:var(--surface);outline:none}
+/* the coarse-pointer bump below is on .gl alone, which loses to `th .gl-th` on
+   specificity, so a header "?" stayed a 14px target on a phone */
+@media(pointer:coarse){th .gl-th{width:23px;height:23px;font-size:12px}}
 /* the in-header version rides small and low-key, so twelve of them across a stats table
    read as punctuation rather than as twelve more things to look at */
 th .gl-th{width:14px;height:14px;font-size:8.5px;margin-left:6px;border-color:var(--rule);
@@ -726,11 +741,6 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .pnda .pn-face .nose{position:absolute;left:50%;transform:translateX(-50%);top:58px;
   width:22px;height:15px;border-radius:50%;background:#141510}
 .pnda .pn-tag{font-size:11px;letter-spacing:.32em;color:#B7DA8C}
-.pnda .pn-quote{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:clamp(17px,2.6vw,25px);
-  line-height:1.42;color:#F4F1E6;max-width:30ch;margin:0 auto;text-wrap:balance;
-  text-shadow:0 1px 10px rgba(0,0,0,.6)}
-.pnda .pn-quote small{display:block;font-family:"IBM Plex Mono",monospace;font-style:normal;
-  font-size:10px;letter-spacing:.26em;color:#9FD063;margin-top:9px}
 .pnda .pn-l1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
   font-size:clamp(44px,9.5vw,100px);line-height:.95;letter-spacing:.03em;margin-top:8px;color:#F4F1E6;
   text-shadow:0 0 30px rgba(244,241,230,.28)}
@@ -854,6 +864,10 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .mrqe .mq-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
   font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
   color:#F2C75C}
+.mrqe .mq-dir{position:relative;font-family:Fraunces,Georgia,serif;font-style:italic;
+  font-weight:600;font-size:clamp(15px,2.6vw,22px);line-height:1.2;margin-top:6px;color:#F7E7C6}
+.mrqe .mq-rule{position:relative;height:1px;margin:16px auto 0;max-width:74%;
+  background:linear-gradient(90deg,transparent,rgba(242,199,92,.5),transparent)}
 .mrqe .mq-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#F7E7C6}
 .mrqe .mq-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E9BE72}
 @media (prefers-reduced-motion:reduce){.mrqe *{animation:none!important}}
@@ -952,6 +966,13 @@ a{color:var(--brass)}
 .num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right}
 /* ---------- masthead: the scope ---------- */
 .mast{position:relative;overflow:hidden;background:var(--mast-bg);border-bottom:1px solid var(--mast-rule)}
+/* Installed on a phone the page gets the whole screen, status bar included, so the
+   masthead has to hold its own space back or the clock and battery sit on the wordmark.
+   Scoped to the installed app: in a browser there is no inset to reserve. */
+@media (display-mode:standalone){
+  .mast{padding-top:env(safe-area-inset-top,0px)}
+  .totop{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
 .mast::before{content:"";position:absolute;inset:0;
   background-image:linear-gradient(var(--mast-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mast-grid) 1px,transparent 1px);
   background-size:34px 34px;opacity:.5}
@@ -1123,6 +1144,15 @@ td.tm{color:var(--ink-2);font-style:italic}
    value column is never pushed out of reach on a 320px screen */
 @media(max-width:430px){#recs th,#recs td{padding:6px 5px}}
 @media(max-width:345px){#recs td.nm,#recs td.tm,#recs td.dim{overflow-wrap:anywhere}}
+/* the two-manager compare table: th,td are nowrap globally, so two long manager names
+   plus the label column came to 331px and dragged the whole page sideways on a 320px
+   screen. Let the names wrap rather than adding another horizontal scroller. */
+#cmpOut th,#cmpOut td{white-space:normal;overflow-wrap:break-word}
+@media(max-width:345px){#cmpOut th,#cmpOut td{padding:6px 5px}}
+/* the record-to-share picker sizes itself to its longest option label (~300px) and was
+   the next thing sticking off a 320px screen once the table above stopped doing it.
+   The 8px is its own inline margin-left. */
+#recPick{max-width:calc(100% - 8px)}
 tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6px;font-size:9px;vertical-align:2px}
 .dim{color:var(--ink-3)}
 .mlink{cursor:pointer;border-bottom:1px dotted var(--brass-2)}
@@ -1725,7 +1755,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career. These tables always cover all twenty managers, whatever the filter at the top of the page is set to &mdash; a record is a record whether or not its holder still plays.</p>
     <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
       <select id="recPick" style="margin-left:8px"></select>
       <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
@@ -2023,7 +2053,10 @@ function ac(){ if(AC)return AC;
 const quiet=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 function tone(f,dur,type,vol,slideTo,delay){
   const c=ac(); if(!c||quiet())return;
-  const t0=c.currentTime+(delay||0);
+  /* Never schedule in the past. A fresh AudioContext sits at currentTime 0 for its first
+     few milliseconds, so a sound that jitters its own start time could land on a negative
+     value, throw, and take its caller down with it. */
+  const t0=Math.max(c.currentTime,c.currentTime+(delay||0));
   const o=c.createOscillator(), g=c.createGain();
   o.type=type||'sine'; o.frequency.setValueAtTime(f,t0);
   if(slideTo)o.frequency.exponentialRampToValueAtTime(Math.max(20,slideTo),t0+dur);
@@ -2034,7 +2067,7 @@ function tone(f,dur,type,vol,slideTo,delay){
 }
 function noise(dur,vol,f0,f1,delay,type,curve){
   const c=ac(); if(!c||quiet())return;
-  const t0=c.currentTime+(delay||0), n=Math.max(1,Math.floor(c.sampleRate*dur));
+  const t0=Math.max(c.currentTime,c.currentTime+(delay||0)), n=Math.max(1,Math.floor(c.sampleRate*dur));
   const b=c.createBuffer(1,n,c.sampleRate), d=b.getChannelData(0);
   const p=curve||1;
   for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,p);
@@ -2054,7 +2087,7 @@ function noise(dur,vol,f0,f1,delay,type,curve){
    below it. Used for the casing hitting the floor. */
 function ping(f, dur, vol, delay, tone2) {
   const c = ac(); if (!c || quiet()) return;
-  const t0 = c.currentTime + (delay || 0);
+  const t0 = Math.max(c.currentTime, c.currentTime + (delay || 0));
   const PARTIALS = [1, 2.76, 5.40, 8.93, 13.34];
   PARTIALS.forEach((m, i) => {
     const o = c.createOscillator(), g = c.createGain();
@@ -2280,23 +2313,36 @@ if(unlocked())revealSecret();
     buf=(buf+e.key.toLowerCase()).slice(-24);
     if(buf.endsWith('cossu')){buf='';botCall();}
     if(buf.endsWith('chaos')){buf='';chaos();}
-    if(CHAMP_KEYS.some(k=>buf.endsWith(k))){buf='';titleDefense();}
-    if(buf.endsWith('burke')){buf='';pandaWatch();}
-    if(buf.endsWith('kaiper')){buf='';stillStomping();}
-    if(buf.endsWith('wu')){buf='';wuSeal();}
-    if(buf.endsWith('gearing')){buf='';fieldLevel();}
-    if(buf.endsWith('niko')){buf='';marquee();}
-    if(buf.endsWith('alpert')){buf='';marketClose();}
-    if(buf.endsWith('mcmahon')){buf='';wrongSport();}
+    /* first name or surname, either will do. Burke is surname-only on purpose: "brian"
+       belongs to the commissioner, and there are two of them in this league. */
+    /* the champion goes FIRST: the loop breaks on the first match, so if a manager who
+       already has a card of their own wins the title, their own entry would otherwise
+       shadow the title defence for the whole of their reign */
+    const EGGWORDS=[
+      [CHAMP_KEYS,titleDefense],
+      [['burke'],pandaWatch],
+      [['kaiper','shane'],stillStomping],
+      [['wu','nathan'],wuSeal],
+      [['gearing','nick'],fieldLevel],
+      [['niko','contreras'],marquee],
+      [['alpert','wesley'],marketClose],
+      [['mcmahon','dylan'],wrongSport],
+      ];
+    if(eggOpen())return;
+    for(const [words,fn] of EGGWORDS)
+      if(words.some(w=>buf.endsWith(w))){buf='';fn();break;}
   });
 })();
 /* Typing the reigning champion's surname wakes him up. The trigger comes from the data
    rather than a hardcoded name, so it follows the trophy: whoever holds it this year is
    who the page answers to. Co-champion years arm both surnames. */
 const CHAMP_NOW=(D.champs||[]).filter(c=>c.y===LAST)[0]||null;
-const CHAMP_KEYS=CHAMP_NOW?CHAMP_NOW.mgrs.map(n=>{
-  const parts=String(n).trim().toLowerCase().split(/\s+/);
-  return parts[parts.length-1];}).filter(k=>k.length>=4):[];
+/* every part of the champion's name that is long enough to type on purpose, so the card
+   answers to a first name as well as a surname, the same as the other eight */
+const CHAMP_KEYS=CHAMP_NOW
+  ?[...new Set(CHAMP_NOW.mgrs.flatMap(n=>String(n).trim().toLowerCase().split(/\s+/)))]
+    .filter(k=>k.length>=4)
+  :[];
 function titleDefense(){
   if(!CHAMP_NOW||$('.kdef'))return;
   const team=CHAMP_NOW.teams[0], mgrs=CHAMP_NOW.mgrs.join(' & ');
@@ -2312,7 +2358,7 @@ function titleDefense(){
     +'<div class="kd-mgr">'+esc(mgrs.toUpperCase())+' &middot; CHAMPION '+LAST+'</div></div>';
   document.body.appendChild(el);
   const c=ac();
-  if(c&&!quiet())battleReady(0);
+  safeSFX(()=>battleReady(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2324,6 +2370,19 @@ function titleDefense(){
 
 
 
+
+/* Two independent keydown listeners watch for typed words, so a full name like
+   "brian burke" could trip a manager card and the commissioner at the same time and stack
+   two full-screen overlays. Both check here first. */
+const EGG_SELS='.kdef,.pnda,.jrsc,.nwu,.gr49,.mrqe,.tkr,.hoop,.botcall';
+function eggOpen(){
+  try{ return !!document.querySelector(EGG_SELS)||(typeof PH_BUSY!=='undefined'&&PH_BUSY); }
+  catch(e){ return false; }
+}
+
+/* An easter egg's sound is decoration. It must never be able to strand the overlay it
+   belongs to, so every card plays through here and nothing it does can escape. */
+function safeSFX(fn){ try{ if(ac()&&!quiet())fn(); }catch(e){} }
 
 /* ---- the two men who have never missed a season -------------------------------
    Brian Burke, Shane Kaiper and the owner are the only three who have played all ten.
@@ -2346,20 +2405,19 @@ function pandaWatch(){
     +'<div class="pn-face"><span class="ear l"></span><span class="ear r"></span>'
     +'<span class="head"><span class="eye l"><i></i></span><span class="eye r"><i></i></span>'
     +'<span class="nose"></span></span></div>'
-    +'<div class="pn-quote">&ldquo;If you only do what you can do, you&rsquo;ll never be better '
-    +'than what you are.&rdquo;<small>M A S T E R &nbsp; S H I F U</small></div>'
-    +'<div class="pn-l1" style="margin-top:16px">BRIAN BURKE</div>'
+    +'<div class="pn-tag">T H E R E &nbsp; A R E &nbsp; N O &nbsp; A C C I D E N T S</div>'
+    +'<div class="pn-l1">BRIAN BURKE</div>'
     +'<div class="pn-l2">'+F.m.seasons+' SEASONS OF '+SEA.length+'</div>'
-    +'<div class="pn-sub">never missed a year, never missed by much</div>'
+    +'<div class="pn-sub">'+(F.all?'never missed a year, never missed by much'
+        :'back for more, and never missed by much')+'</div>'
     +'<div class="pn-facts">'+F.first+'&ndash;'+F.last+' &middot; '+F.m.apps+' OF '+F.m.seasons
       +' IN THE BRACKET &middot; INDEX '+F.m.cpi.toFixed(1)+' &middot; SWING &plusmn;'
       +(F.m.sd==null?'—':F.m.sd.toFixed(1))+'</div></div>';
   document.body.appendChild(el);
-  const c=ac();
-  if(c&&!quiet()){                       /* two hollow knocks on bamboo */
+  safeSFX(()=>{                          /* two hollow knocks on bamboo */
     ping(392,.55,.075,0,1); ping(330,.7,.065,.20,1);
     tone(98,.7,'triangle',.10,80,0);
-  }
+  });
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2463,23 +2521,23 @@ function villageCalm(delay){
 
 /* ---- three more, all argued straight out of the record ---------------------- */
 
-/* A safe going. The dial spinning, three tumblers dropping into place, the handle, the
-   weight of the door, and then the room behind it. */
-function vaultCrack(delay){
-  const d=delay||0;
-  for(let i=0;i<34;i++)                          /* the dial, slowing as it goes */
-    noise(0.012,0.055,3800,1600,d+i*0.028*(1+i*0.03),'bandpass',0.5);
-  [[1.10,150],[1.45,132],[1.82,118]].forEach(([t,f])=>{   /* the tumblers landing */
-    tone(f,0.10,'square',0.10,f*0.7,d+t);
-    noise(0.05,0.09,2400,700,d+t,'bandpass',0.6);
-  });
-  tone(74,0.30,'square',0.14,52,d+2.18);         /* the handle */
-  noise(0.16,0.12,1100,300,d+2.18,'lowpass',0.7);
-  tone(38,1.7,'sine',0.30,29,d+2.40);            /* the door, and its weight */
-  noise(1.1,0.16,420,90,d+2.40,'lowpass',0.9);
-  /* and what was behind it */
-  [262,330,392,523].forEach((f,i)=>tone(f,2.2,'triangle',0.045,f,d+2.62+i*0.07));
-  noise(1.8,0.05,2600,900,d+2.62,'bandpass',1.1);
+/* A projector running. A real one pulls 24 frames a second, so the clatter is a 24Hz
+   pulse train rather than a rhythm you could count -- that fast tick is the whole sound.
+   Under it: the motor, and the hiss of the film going through the gate. */
+function filmRoll(delay){
+  /* The card is up for 5250ms and then fades for 700. The reel should still be running
+     when it starts to go, so this covers 5.4s and the motor's own decay carries it into
+     the fade rather than stopping dead two seconds early. */
+  const d=delay||0, RATE=1/24, RUN=5.4, N=Math.round(RUN/RATE);
+  for(let i=0;i<N;i++){
+    const t=d+i*RATE+Math.random()*0.0025;   /* never perfectly even, never negative */
+    noise(0.010,0.055+Math.random()*0.02,3000,1100,t,'bandpass',0.45);
+    noise(0.016,0.030,900,320,t,'lowpass',0.7);
+  }
+  tone(48,RUN+0.5,'sawtooth',0.055,47,d);          /* the motor */
+  tone(96,RUN+0.5,'triangle',0.028,95,d);
+  noise(RUN+0.5,0.045,4200,2600,d,'highpass',1.4); /* film through the gate */
+  noise(0.5,0.08,1600,400,d,'lowpass',0.6);        /* the lamp striking */
 }
 /* A closing bell, then the number falling away under it. */
 function closeBell(delay){
@@ -2490,16 +2548,23 @@ function closeBell(delay){
   tone(48,1.8,'sine',0.11,36,d+0.75);
 }
 /* Three bounces closing up, then the net. */
+/* A ball on a hardwood floor. The first version used a sine per bounce and came out
+   like a game console: a real bounce has no note in it at all. It is a broadband slap
+   that collapses downward in about forty milliseconds, plus the room answering. */
+function bounce(t,v){
+  noise(0.040,0.34*v,2600,190,t,'lowpass',3.2);      /* the slap of the skin */
+  noise(0.075,0.26*v,520,90,t+0.004,'lowpass',2.4);  /* the air inside it */
+  noise(0.20,0.055*v,300,80,t+0.012,'lowpass',1.1);  /* the floor and the room */
+  noise(0.012,0.12*v,7000,3000,t,'highpass',0.5);    /* the click of the seam */
+}
 function swish(delay){
   const d=delay||0;
-  let t=d, gap=0.30;
-  for(let i=0;i<4;i++){
-    tone(96-i*6,0.16,'sine',0.16*Math.pow(0.82,i),58,t);
-    noise(0.07,0.07*Math.pow(0.8,i),900,220,t,'lowpass',0.8);
-    t+=gap; gap*=0.72;
-  }
-  noise(0.26,0.075,5600,2200,t+0.10,'bandpass',0.55);   /* through the net */
-  noise(0.16,0.04,3000,1200,t+0.16,'bandpass',0.7);
+  /* bounces converge the way a dropped ball actually does, and get quieter with it */
+  let t=d, gap=0.42, v=1;
+  for(let i=0;i<6;i++){ bounce(t,v); t+=gap; gap*=0.80; v*=0.74; }
+  /* picked up, then through the net */
+  noise(0.30,0.085,5200,1800,t+0.14,'bandpass',0.5);
+  noise(0.18,0.05,3000,1100,t+0.20,'bandpass',0.75);
 }
 
 /* Niko has two titles back to back, and the second came with a worse team than the
@@ -2511,8 +2576,13 @@ function marquee(){
   const backToBack=wins.length>1&&SEA.indexOf(wins[1].y)===SEA.indexOf(wins[0].y)+1;
   const worseSequel=wins.length>1&&wins[1].pi<wins[0].pi;
   const last=F.rs[F.rs.length-1];
-  const l2=backToBack?('BACK TO BACK, '+wins[0].y+' AND THE '+wins[1].y+' JOB')
-    :(wins.length?wins.length+(wins.length===1?' TITLE':' TITLES')+' ON THE SHELF':'NINE SEASONS, NO STATUE');
+  /* a marquee bills the picture, not the person: the title goes up in lights and the
+     director takes a credit underneath it */
+  const title=backToBack?'BACK 2 BACK'
+    :(wins.length?(wins.length===1?'ONE FOR THE SHELF':wins.length+' FOR THE SHELF'):'NO STATUE YET');
+  const l2=backToBack
+    ? wins[0].y+' &amp; '+wins[1].y+' &middot; HELD OVER A SECOND YEAR'
+    :(wins.length?wins.map(w=>w.y).join(' &amp; '):m.seasons+' SEASONS, STILL RUNNING');
   /* the second one is the story: it was the lowest score that has ever won this league,
      which is a robbery rather than a repeat. Checked against every champion before it
      gets said. */
@@ -2527,19 +2597,29 @@ function marquee(){
     ? 'the sequel scored worse than the original — '+wins[0].pi.toFixed(1)+' then '+
       wins[1].pi.toFixed(1)+' — and still took the trophy'
     : 'nobody in this league has more of them';
+  /* the small print at the bottom of a poster: the run, the takings, the reviews, and
+     how it finished. Every figure comes out of the record. */
+  const bill=[];
+  bill.push(F.first+'&ndash;'+F.last);
+  bill.push(m.seasons+' SEASONS');
+  bill.push(m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:''));
+  if(wins.length)bill.push(wins.map(w=>w.pi.toFixed(1)).join(' THEN ')+' IN THE TITLE YEARS');
+  bill.push(m.podium+' PODIUM'+(m.podium===1?'':'S'));
+  bill.push('FINAL SCREENING '+last.y+', '+ord(last.place)+' OF '+last.teams);
+  const billing=bill.join(' &middot; ');
   const el=document.createElement('div'); el.className='mrqe';
   const bulbs='<i></i>'.repeat(11);
   el.innerHTML='<div class="mq-in">'
     +'<div class="mq-bulbs t">'+bulbs+'</div><div class="mq-bulbs b">'+bulbs+'</div>'
     +'<div class="mq-tag">N O W &nbsp; S H O W I N G</div>'
-    +'<div class="mq-l1">NIKO CONTRERAS</div>'
-    +'<div class="mq-l2">'+l2+'</div>'
+    +'<div class="mq-l1">'+title+'</div>'
+    +'<div class="mq-dir">Dir. by '+esc(m.name)+'</div>'
+    +'<div class="mq-rule"></div>'
+    +'<div class="mq-l2" style="font-size:clamp(16px,3.2vw,32px);margin-top:12px">'+l2+'</div>'
     +'<div class="mq-sub">'+sub+'</div>'
-    +'<div class="mq-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.seasons+' SEASONS &middot; '
-      +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.podium+' PODIUMS &middot; LAST ACT '
-      +last.y+', '+ord(last.place)+' OF '+last.teams+'</div></div>';
+    +'<div class="mq-facts">'+billing+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())vaultCrack(0);
+  safeSFX(()=>filmRoll(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2563,6 +2643,8 @@ function marketClose(){
       font-family="IBM Plex Mono,monospace">${pis[0].toFixed(1)}</text>
     <text x="${xs(pis.length-1)}" y="${ys(pis[pis.length-1])+20}" text-anchor="end" font-size="11"
       fill="#E4453C" font-family="IBM Plex Mono,monospace">${pis[pis.length-1].toFixed(1)}</text>`;
+  /* the decline is checked, not asserted: mgrSlide returns 0 the moment a season goes up */
+  const decl=mgrSlide(m);
   const active=M.filter(x=>x.last===LAST&&x.seasons>=3);
   const topActive=active.length&&active.slice().sort((a,b)=>b.cpi-a.cpi)[0].name===m.name;
   const qual=M.filter(x=>x.g>=40);
@@ -2576,13 +2658,13 @@ function marketClose(){
       +dots+labs+'</svg></div>'
     +'<div class="tk-tag">M A R K E T &nbsp; C L O S E</div>'
     +'<div class="tk-l1">WESLEY ALPERT</div>'
-    +'<div class="tk-l2">DOWN '+(['','ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT'][rs.length]||rs.length)+' STRAIGHT</div>'
-    +'<div class="tk-sub">'+claim+', and it has fallen every year he has played</div>'
+    +'<div class="tk-l2">'+(decl?'DOWN '+(['','ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT'][decl]||decl)+' STRAIGHT':'THE LONG WAY DOWN')+'</div>'
+    +'<div class="tk-sub">'+claim+(decl?', and it has fallen in every season since his first':'')+'</div>'
     +'<div class="tk-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
       +' ('+pct(m.winpct)+') &middot; '+m.second+' SECOND PLACES &middot; '
       +(m.titles?m.titles+' TITLES':'NO TITLE')+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())closeBell(0);
+  safeSFX(()=>closeBell(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2611,7 +2693,7 @@ function wrongSport(){
       +(rank<=3?' &middot; '+ord(rank)+' UNLUCKIEST':'')
       +' &middot; '+(m.apps?m.apps+' IN THE BRACKET':'NO BRACKET YET')+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())swish(0);
+  safeSFX(()=>swish(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2630,7 +2712,7 @@ function wuSeal(){
     +'<div class="wu-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
       +' &middot; INDEX '+m.cpi.toFixed(1)+' &middot; PEAK '+m.peak.toFixed(1)+'</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())villageCalm(0);
+  safeSFX(()=>villageCalm(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2650,7 +2732,7 @@ function fieldLevel(){
     +'<div class="gr-facts">'+F.first+'&ndash;'+F.last+' &middot; '+m.seasons+' SEASONS &middot; '
       +m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')+' &middot; '+m.apps+' OF '+m.seasons+' IN THE BRACKET</div></div>';
   document.body.appendChild(el);
-  if(ac()&&!quiet())fansCheer(0);
+  safeSFX(()=>fansCheer(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2663,16 +2745,16 @@ function stillStomping(){
     +'<div class="jr-tag">T R E M O R &nbsp; D E T E C T E D</div>'
     +'<div class="jr-l1">'+esc(F.team.toUpperCase())+'</div>'
     +'<div class="jr-l2">'+F.m.seasons+' SEASONS. STILL STOMPING.</div>'
-    +'<div class="jr-sub">'+F.run+' straight years under the same ancient name, and the ground still moves</div>'
+    +'<div class="jr-sub">'+F.run+' straight seasons under the same ancient name, and the ground still moves</div>'
     +'<div class="jr-facts">SHANE KAIPER &middot; '+F.first+'&ndash;'+F.last+' &middot; '
-      +F.m.w+'&ndash;'+F.m.l+(F.m.t?'&ndash;'+F.m.t:'')+' &middot; NEVER ONCE ABSENT</div></div>';
+      +F.m.w+'&ndash;'+F.m.l+(F.m.t?'&ndash;'+F.m.t:'')
+      +(F.all?' &middot; NEVER ONCE ABSENT':' &middot; '+F.m.seasons+' OF '+SEA.length+' SEASONS')+'</div></div>';
   document.body.appendChild(el);
-  const c=ac();
-  if(c&&!quiet()){          /* two footfalls, getting closer */
+  safeSFX(()=>{             /* three footfalls, getting closer */
     tone(41,.55,'sine',.34,30,0);   noise(.30,.13,240,40,0,'lowpass',.9);
     tone(44,.6,'sine',.38,31,.62);  noise(.34,.16,260,42,.62,'lowpass',.9);
     tone(39,.7,'sine',.40,29,1.20); noise(.38,.17,250,40,1.20,'lowpass',.9);
-  }
+  });
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
   setTimeout(off,5250);
@@ -2807,7 +2889,9 @@ function wrapAvail(name){
 function wrapCards(name){
   const K=D.wk[LAST], t=wrapAvail(name); if(!t)return null;
   const seq=K.race[t], row=ROWS.find(r=>r.y===LAST&&r.team===t), ap=K.allplay[t];
-  if(!seq||!row)return null;
+  /* an empty array is truthy, so this used to fall through to a reduce with no initial
+     value the moment a new season existed but had no results in it yet */
+  if(!seq||!seq.length||!row)return null;
   const fm=(K.form||{})[t]||{}, fv=(K.five||{})[t]||{};
   const pts=seq.map(x=>x.pts);
   const hi=seq.reduce((a,b)=>b.pts>a.pts?b:a), lo=seq.reduce((a,b)=>b.pts<a.pts?b:a);
@@ -3046,7 +3130,14 @@ addEventListener('keydown',e=>{
 },true);
 document.addEventListener('click',e=>{const t=e.target.closest('[data-m]'); if(t){openMgr(t.dataset.m);}});
 const mlink=n=>`<span class="mlink" data-m="${esc(n)}" tabindex="0" role="button">${esc(n)}</span>`;
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.m)openMgr(e.target.dataset.m);});
+/* preventDefault is the whole fix, not a tidy-up. openMgr() moves focus to the close
+   button, and Enter's default action is dispatched AFTER this listener runs -- against
+   whatever holds focus by then. So the card opened and the browser immediately clicked
+   the ✕, and a keyboard user saw a flash and nothing else. Space is handled too: these
+   spans are role="button", and a button is meant to answer to both keys. */
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.m){
+    e.preventDefault(); openMgr(e.target.dataset.m);}});
 
 /* ---- spotlight: click to lock any number of managers, hover to preview ---- */
 const PICK=new Set();
@@ -3121,7 +3212,15 @@ function table(el,cols,data,opts={}){
       q.setAttribute('role','button');
       q.setAttribute('aria-label','What '+th.textContent.trim()+' means');
       q.addEventListener('click',e=>e.stopPropagation());
-      q.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.preventDefault();});
+      /* stopPropagation as well as preventDefault: the th itself has a keydown handler
+         that sorts, so Enter on the "?" used to re-sort the table and throw focus away
+         instead of showing the explanation */
+      q.addEventListener('keydown',e=>{
+        if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();
+          const r=q.getBoundingClientRect();
+          showTip({clientX:r.left+r.width/2,clientY:r.bottom-4},q.dataset.tip||th.dataset.thTip);}
+        if(e.key==='Escape')hideTip();});
+      q.dataset.tip=th.dataset.thTip;
       bindTip(q,th.dataset.thTip);
       th.appendChild(document.createTextNode(' ')); th.appendChild(q);});
     if(opts.after)opts.after(d);
@@ -3361,7 +3460,9 @@ function mgrSlide(m){
   const rs=ROWS.filter(r=>r.mgr===m.name).sort((a,b)=>a.y-b.y);
   if(rs.length<3)return 0;
   for(let i=1;i<rs.length;i++) if(rs[i].pi>=rs[i-1].pi) return 0;
-  return rs.length;
+  /* the number of DECLINES, not of seasons: five seasons contain four drops, and a first
+     season cannot have scored less than the year before */
+  return rs.length-1;
 }
 /* what has happened since the last title, so a line can say whether it stuck */
 function mgrSinceTitle(m){
@@ -3375,7 +3476,9 @@ function mgrSpells(m){
   const ys=(MGR_YEARS[m.name]||[]).slice().sort((a,b)=>a-b);
   if(ys.length<2)return {spells:0,missed:0,back:null};
   let spells=0,missed=0,inGap=false,back=null;
-  SEA.filter(y=>y>ys[0]&&y<ys[ys.length-1]).forEach(y=>{
+  /* bound is inclusive: a manager whose comeback IS their most recent season never had
+     `back` set, so the champion-on-return lines were unreachable in a live season */
+  SEA.filter(y=>y>ys[0]&&y<=ys[ys.length-1]).forEach(y=>{
     const out=ys.indexOf(y)<0;
     if(out){missed++; if(!inGap)spells++;}
     else if(inGap)back=y;
@@ -3786,8 +3889,15 @@ drawFive(); REDRAW.push(drawFive);
 $('#fiveMore').onclick=()=>{const t=$('#fiveTbl'); t.hidden=!t.hidden;
   $('#fiveMore').classList.toggle('on',!t.hidden);
   $('#fiveMore').innerHTML=t.hidden?'Show table &#9662;':'Hide table &#9652;';};
+/* The record book deliberately ignores the manager filter. Its own opening paragraph
+   promises that single-season records include everyone, and the career totals heading
+   says the same -- but this used to filter like every other section, and the filter
+   defaults to the active ten. Eleven of these twenty-one tables named the wrong record
+   holder unless the reader happened to press "All 20" first: the real highest-scoring
+   season is Watson's 2018, not Alpert's 2021. Only the 2+ seasons cut below is real. */
 function drawRecords(){
-  const ROWS=D.rows.filter(r=>vis(r.mgr)), M=D.mgrs.filter(m=>vis(m.name));
+  /* ROWS and M are the unfiltered globals on purpose -- see above. The shareable record
+     cards (bigRecords) always read those, so the table and the card now agree. */
   const q=M.filter(m=>m.seasons>=2);
   const S=(a,k,d=1)=>[...a].sort((x,y)=>d?k(y)-k(x):k(x)-k(y)).slice(0,5);
   const sr=(r,v)=>`<td class="nm">${mlink(r.mgr)}</td><td class="tm">${esc(r.team)}</td><td class="num mono">${r.y}</td><td class="num"><b>${v}</b></td>`;
@@ -4462,8 +4572,12 @@ async function makeShareCard(name){
   x.strokeStyle=P.rule; x.lineWidth=1;
   x.beginPath(); x.moveTo(84,top-46); x.lineTo(S-84,top-46); x.stroke();
   tiles.forEach((t,i)=>{
-    const px=84+i*((S-168)/4);
-    x.fillStyle=GOLD; x.font='600 62px "IBM Plex Mono",monospace'; x.fillText(t[1],px,top+24);
+    const pitch=(S-168)/4, px=84+i*pitch;
+    /* Walter Bremer's 52-59-1 measures 260px in a 228px column and was printing straight
+       over the next tile's value. Shrink to fit the column, never past it. */
+    x.fillStyle=GOLD;
+    cardFit(x,t[1],pitch-14,62,34,600,'"IBM Plex Mono",monospace');
+    x.fillText(t[1],px,top+24);
     x.fillStyle=DIM;  x.font='500 22px "IBM Plex Mono",monospace';
     x.fillText(t[0].split('').join(' '),px,top+62);
   });
@@ -4766,7 +4880,9 @@ async function makeSeasonCard(y){
     x.fillStyle=P.ink; x.fillText(r.pf.toFixed(2),COL.pf,ty);
   });
 
-  const botY=420+rs.length*step+18;
+  /* the row step shrinks past twelve teams but the block underneath did not move, so the
+     two summary lines ended up on top of the footer */
+  const botY=Math.min(420+rs.length*step+18,S-190);
   cardRule(x,S,P,botY);
   const most=rs.reduce((a,b)=>b.pf>a.pf?b:a);
   const bestRec=rs.reduce((a,b)=>(b.w+b.t/2)>(a.w+a.t/2)?b:a);
@@ -4878,7 +4994,9 @@ async function makeBracketCard(y){
     x.fillStyle=win&&!dead?P.ink:P.dim;
     const tfs=bw<330?18:19;
     x.font=(win&&!dead?'600 ':'400 ')+tfs+'px "IBM Plex Sans",sans-serif';
-    const scoreW=pts==null?0:64;
+    /* a six-figure score is 65px at this size; 64 left no gutter at all and the name ran
+       into it. 82 buys the score its width plus a real gap. */
+    const scoreW=pts==null?0:82;
     x.fillText(cardClip(x,t,bw-46-scoreW),bx+36,by+24);
     if(pts!=null){
       x.textAlign='right'; x.font='500 18px "IBM Plex Mono",monospace';
@@ -4984,7 +5102,9 @@ async function makeGameCard(y,wk,team){
     x.fillText(p.toFixed(2),S-84,ty);
     x.textAlign='left'; x.fillStyle=win?P.ink:P.dim;
     cardFit(x,t,S-190-sw,52,26,700,'"IBM Plex Sans",sans-serif');
-    x.fillText(t,84,ty);
+    /* cardFit stops at its floor and gives up; every other card clips afterwards and this
+       one did not, so a long enough name would run under the score */
+    x.fillText(cardClip(x,t,S-190-sw),84,ty);
     x.fillStyle=P.dim; x.font='400 25px "IBM Plex Sans",sans-serif';
     x.fillText(mg,84,ty+38);
   };
@@ -5039,16 +5159,20 @@ function bigRecords(){
   const mostT=pick(M,z=>z.titles);
   const bestPct=pick(M.filter(z=>z.g>=40),z=>z.winpct);
   const mostApp=pick(M,z=>z.apps);
-  if(hi)R.push({k:'Most points in a week',v:hi.p.toFixed(2),who:hi.m,
+  /* these four come from loggedGames(), which is the weekly logs only -- a subset of the
+     league's seasons -- so the label has to carry the coverage or it claims too much */
+  const LOGY=(D.wkYears||[]).slice().sort((a,b)=>a-b);
+  const SINCE=LOGY.length&&LOGY.length!==SEA.length?' ('+LOGY[0]+'\u2013'+LOGY[LOGY.length-1]+')':'';
+  if(hi)R.push({k:'Most points in a week'+SINCE,v:hi.p.toFixed(2),who:hi.m,
     when:hi.t+'  ·  week '+hi.wk+', '+hi.y,sub:'Beat '+hi.o+', who managed '+hi.op.toFixed(2)+'.'});
-  if(lo)R.push({k:'Fewest points in a week',v:lo.p.toFixed(2),who:lo.m,
+  if(lo)R.push({k:'Fewest points in a week'+SINCE,v:lo.p.toFixed(2),who:lo.m,
     when:lo.t+'  ·  week '+lo.wk+', '+lo.y,sub:'Faced '+lo.o+', who scored '+lo.op.toFixed(2)+'.'});
-  if(blow)R.push({k:'Biggest beating',v:Math.abs(blow.pa-blow.pb).toFixed(2),
+  if(blow)R.push({k:'Biggest beating'+SINCE,v:Math.abs(blow.pa-blow.pb).toFixed(2),
     who:(blow.pa>blow.pb?blow.ma:blow.mb),
     when:'week '+blow.wk+', '+blow.y,
     sub:(blow.pa>blow.pb?blow.ta:blow.tb)+' '+Math.max(blow.pa,blow.pb).toFixed(2)+
         ' – '+Math.min(blow.pa,blow.pb).toFixed(2)+' '+(blow.pa>blow.pb?blow.tb:blow.ta)+'.'});
-  if(close)R.push({k:'Closest finish',v:Math.abs(close.pa-close.pb).toFixed(2),
+  if(close)R.push({k:'Closest finish'+SINCE,v:Math.abs(close.pa-close.pb).toFixed(2),
     who:(close.pa>close.pb?close.ma:close.mb),
     when:'week '+close.wk+', '+close.y,
     sub:(close.pa>close.pb?close.ta:close.tb)+' '+Math.max(close.pa,close.pb).toFixed(2)+
@@ -5059,9 +5183,16 @@ function bigRecords(){
     when:szW.team+'  ·  '+szW.y,sub:szW.pf.toFixed(2)+' points for. Finished '+ord(szW.place)+' of '+szW.teams+'.'});
   if(szPI)R.push({k:'Highest power index, one season',v:szPI.pi.toFixed(1),who:szPI.mgr,
     when:szPI.team+'  ·  '+szPI.y,sub:'The strongest single season the league has recorded.'});
-  if(mostT&&mostT.titles)R.push({k:'Most titles',v:String(mostT.titles%1?mostT.titles.toFixed(1):mostT.titles),
-    who:mostT.name,when:mostT.seasons+' seasons  ·  '+mostT.first+'–'+mostT.last,
-    sub:'Last one in '+mostT.lastTitle+'. '+mostT.podium+' podium finishes in all.'});
+  /* pick() keeps the first on a tie, which quietly erased a joint record holder */
+  if(mostT&&mostT.titles){
+    const tied=M.filter(z=>z.titles===mostT.titles);
+    R.push({k:'Most titles',v:String(mostT.titles%1?mostT.titles.toFixed(1):mostT.titles),
+      who:tied.map(z=>z.name).join(' & '),
+      when:tied.length>1?'shared, and neither has it alone':mostT.seasons+' seasons  ·  '+mostT.first+'–'+mostT.last,
+      sub:tied.length>1
+        ?'Nobody in league history has more.'
+        :'Last one in '+mostT.lastTitle+'. '+mostT.podium+' podium finishes in all.'});
+  }
   if(bestPct)R.push({k:'Best career win rate',v:pct(bestPct.winpct),who:bestPct.name,
     when:bestPct.w+'-'+bestPct.l+(bestPct.t?'-'+bestPct.t:'')+'  ·  '+bestPct.g+' games',
     sub:'Across '+bestPct.seasons+' seasons, '+bestPct.first+' to '+bestPct.last+'.'});
@@ -5216,11 +5347,11 @@ async function makeRivalryCard(an,bn){
   /* "every meeting" has to mean every meeting: the rows shrink to fit rather than the
      list being cut short. The longest rivalry on record runs to 11 games. */
   const BOT=S-140;
-  let ROWTOP=534, step=40;
-  if(ms.length*step>BOT-ROWTOP){
-    ROWTOP=496;
-    step=(BOT-ROWTOP)/ms.length;
-  }
+  /* Only steal the space above if the rows genuinely cannot fit without it. The old test
+     compared against the DEFAULT step and moved the top up regardless, which dragged the
+     divider rule up through the subtitle at eleven meetings. */
+  let ROWTOP=534, step=Math.min(40,(BOT-ROWTOP)/ms.length);
+  if(step<19){ ROWTOP=496; step=Math.min(40,(BOT-ROWTOP)/ms.length); }
   const shown=step>=19?ms:ms.slice(-Math.floor((BOT-ROWTOP)/19));
   if(step<19)step=19;
   const cut=ms.length-shown.length;
@@ -5270,8 +5401,12 @@ function roastLines(name){
     const d=r[1]-r[0];
     if(!worstOpp||d>worstOpp.d||(d===worstOpp.d&&g>worstOpp.g))worstOpp={n:o.name,w:r[0],l:r[1],d:d,g:g};
   });
-  if(worstOpp&&worstOpp.d>0)out.push(['Owned by',worstOpp.n,
-    worstOpp.w+'-'+worstOpp.l+' across '+worstOpp.g+' meetings. It is not a rivalry if only one side wins.']);
+  /* "It is not a rivalry if only one side wins" was firing on a 3-4 record. It now needs a
+     real gap AND a win rate under a third, and the sentence quotes the numbers rather than
+     making an absolute claim the record may not support. */
+  if(worstOpp&&worstOpp.d>=3&&worstOpp.w/worstOpp.g<0.34)out.push(['Owned by',worstOpp.n,
+    worstOpp.g+' meetings and '+worstOpp.l+' of them went the other way'+
+    (worstOpp.w?'.':'. Not one has ever gone his.')]);
   if(m.luck>=0.5)out.push(['Luck','+'+m.luck.toFixed(2)+' wins',
     'The scoring earned about '+m.pythW.toFixed(1)+' wins. The record says '+m.w+'. The schedule did the work.']);
   else if(m.vsWinPct!=null&&m.vsWinPct<0.5)out.push(['Against good teams',pct(m.vsWinPct),
@@ -6252,13 +6387,13 @@ function pharaoh(){
   setTimeout(()=>el.classList.add('out'),6720);
   setTimeout(()=>{el.remove();PH_BUSY=false;},8280);
 }
-(function(){const WORDS=['commish','commissioner']; let buf='';
+(function(){const WORDS=['commish','commissioner','berger','brian']; let buf='';
   addEventListener('keydown',e=>{
     if(e.metaKey||e.ctrlKey||e.altKey)return;
     const t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))return;
     if(e.key.length!==1)return;
     buf=(buf+e.key.toLowerCase()).slice(-24);
-    if(WORDS.some(w=>buf.endsWith(w))){buf='';pharaoh();}});})();
+    if(WORDS.some(w=>buf.endsWith(w))){buf=''; if(!eggOpen())pharaoh();}});})();
 
 glossify();
 
