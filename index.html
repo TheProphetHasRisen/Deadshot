@@ -603,7 +603,13 @@ details.expl>summary::before{content:"\25B8";display:inline-block;transition:tra
 details.expl[open]>summary::before{transform:rotate(90deg)}
 details.expl>summary:hover{color:var(--ink)}
 details.expl>p,details.expl .plain{margin-top:9px}
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,232px),1fr));gap:16px 22px}
+/* Two fixed columns, not auto-flow: the roster has to sit top-left and every scoring
+   block has to sit together on the right. auto-fit reflowed them by width and put
+   scoring wherever it happened to land. Stacks to one column on a phone, where the
+   left column's order (roster first) is the reading order. */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:16px 30px;align-items:start}
+.rules-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media(max-width:700px){.rules{grid-template-columns:1fr;gap:16px}}
 .rules h4{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
   color:var(--brass);font-weight:600;margin:0 0 6px}
 .rules ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
@@ -3184,9 +3190,22 @@ const RULES=[
    ['Three-and-out forced 0.5','0'],
    ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1']]],
 ];
-const rulesHTML=()=>RULES.map(([h,items])=>
-  `<div><h4>${h}</h4><ul>`+items.map(([t,d])=>
-    `<li>${t}${d?` <span class="dim">(default ${d})</span>`:''}</li>`).join('')+'</ul></div>').join('');
+/* Left column leads with the roster; everything about scoring lives together on the
+   right. The assert is the point of writing it this way: add a section to RULES and
+   forget to column it, and the build fails rather than the section silently vanishing
+   from a card whose whole job is being complete. */
+const RULE_COLS=[
+  ['Roster &mdash; 17 slots','Format','Playoffs','Transactions','Waivers'],
+  ['Scoring &mdash; offense','Scoring &mdash; kicker','Scoring &mdash; defense']];
+(function(){const placed=RULE_COLS.flat(), all=RULES.map(r=>r[0]);
+  const missing=all.filter(h=>!placed.includes(h)), unknown=placed.filter(h=>!all.includes(h));
+  if(missing.length||unknown.length)
+    console.error('rules columns out of sync',{missing,unknown});})();
+const rulesSection=h=>{const r=RULES.find(x=>x[0]===h); if(!r)return '';
+  return `<div><h4>${r[0]}</h4><ul>`+r[1].map(([t,d])=>
+    `<li>${t}${d?` <span class="dim">(default ${d})</span>`:''}</li>`).join('')+'</ul></div>';};
+const rulesHTML=()=>RULE_COLS.map(names=>
+  `<div class="rules-col">${names.map(rulesSection).join('')}</div>`).join('');
 if($('#rulesBody'))$('#rulesBody').innerHTML=rulesHTML();
 function openRules(){
   RETFOCUS=document.activeElement;
