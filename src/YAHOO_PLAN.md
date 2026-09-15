@@ -1,20 +1,32 @@
 # Pulling league data from Yahoo automatically — the plan
 
-**Where things stand:** the access application was submitted on 28 Aug 2026. Yahoo
-has to approve it before anything else can happen. They publish no timetable.
+**Where things stand:** applied 28 Aug 2026. **Approved 10 Sep 2026** — the agreement is
+signed. Remaining: register the app to mint the key, send Yahoo the Client ID, wait for
+them to switch Fantasy Sports access on.
 
-The goal is to stop transcribing seasons by hand. Nothing about how the site looks
-or works changes — only where the numbers come from.
+Two goals, not one:
+
+1. Stop transcribing our own league by hand. Nothing about how the site looks or works
+   changes — only where the numbers come from.
+2. Pull **season-level fantasy football data for each year** as well — player fantasy
+   stats, average draft position, ownership — not just this league. That is what feeds
+   the draft board in `draft/`, which currently leans on scraped ESPN and FantasyPros
+   files. Same key, same API, different endpoints.
 
 ---
 
 ## The short version
 
 1. **You applied.** Done.
-2. **Yahoo approves** (or doesn't). Out of our hands. This is the only real blocker.
-3. **You do a one-time sign-in** — about two minutes, walked through step by step.
-4. **I build the fetcher**, roughly half of which I can build before approval.
-5. **It runs itself weekly** during the season and updates the site.
+2. **Yahoo approved.** Done.
+3. **You register the app and mint the key.** ~60 seconds on developer.yahoo.com/apps.
+   This was missing from an earlier version of this document, which wrongly said the key
+   arrives when Yahoo approves you. It does not — approval only unlocks your ability to
+   create one, and Yahoo then wants the Client ID back via their confirmation form.
+4. **Yahoo attaches Fantasy Sports permissions.** Out of our hands, and the last blocker.
+5. **You do a one-time sign-in** — about two minutes, walked through step by step.
+6. **I build the fetcher**, roughly half of which I can build before access lands.
+7. **It runs itself weekly** during the season and updates the site.
 
 ---
 
@@ -63,9 +75,14 @@ starts the day access is granted.
 
 ### Step 1 — you sign in once (about two minutes)
 
-Yahoo issues a key tied to your account. You approve it in your browser, once. I
-never see your password, and the key goes straight into GitHub's secret storage
-where it stays.
+Yahoo does **not** hand over a key on approval. Brian registers an "app" on
+developer.yahoo.com/apps — a short form, no software involved — and that mints the
+Client ID and Client Secret. The Client ID goes back to Yahoo on their confirmation
+form; the Secret never leaves that page until it goes into secret storage.
+
+Then he approves access in his browser, once. I never see his password, and neither
+key ever appears in this project. `.gitignore` blocks `.env`, `*_secret*` and
+`*refresh_token*` so one cannot be committed by accident.
 
 You'll get exact instructions when we get there: what to open, what to paste, what
 appears on screen, and what it looks like when it worked.
@@ -139,10 +156,40 @@ Your total involvement after approval is roughly fifteen minutes.
 
 ---
 
+## Historical IR placement — checked 12 Sep 2026, and it survives
+
+The feature Brian wants most (injury luck; who won a trade) rests on whether Yahoo
+returns a team's roster *as it stood in a given week*, IR slot included, for a season
+that has already finished. Checked directly against the archived 2025 league on the
+website, week 5:
+
+```
+QB    | Jake Browning
+...
+IR    | Joe Burrow
+IR    | Joe Mixon
+```
+
+That is week-5 truth, not end-of-season state: Browning is only in the QB slot because
+Burrow was hurt at the time. Yahoo therefore stores and serves per-week roster
+composition, IR included, for completed seasons.
+
+**Caveat:** this was verified on the *website*, not the API, because the API was still
+403 at the time. Both read the same roster records and the API's roster resource takes
+a `;week=` parameter, so this is strong evidence rather than proof. Re-confirm against
+`team/{team_key}/roster;week=N` on day one.
+
+Also confirmed while looking: the signed-in Yahoo account is the one in DEADSHØT
+(league 526001 for 2026, 214163 for 2025), and the league's own season list runs
+2013 → 2026, so the history exists at least that far back.
+
 ## Open questions I can't answer yet
 
-- How long Yahoo takes to approve, or whether they will.
-- How far back their data actually goes for this league.
-- Whether the earliest seasons include weekly detail or only totals.
+- How long Yahoo takes to provision, now that the Client ID is submitted.
+- Whether the 2015–2020 seasons return per-week rosters the way 2025 does. Could not
+  test: Yahoo's year picker no longer resolves old league ids, and the archived pages
+  blocked the script that would have read them.
+- Whether player *status* strings (Questionable, Out, the injury note) are historical
+  or only ever current. The IR slot is the reliable signal either way.
 
-All three resolve within a day of access being granted.
+All of these resolve within a day of access being granted.

@@ -4124,7 +4124,13 @@ function drawMtx(){
       if(!v){h+='<td><span></span></td>';return;}
       tw+=v[0];tl+=v[1];
       const rate=v[0]/(v[0]+v[1])-.5;
-      h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${diverge(rate,.5)};color:${inkOn(rate,.5)}">${v[0]}-${v[1]}</span></td>`;});
+      /* A clean sweep over five or more meetings is the one thing in this grid worth
+         spotting from across the room -- Alpert's 10-0 over Berger. The bar is five
+         rather than three because three-game sweeps happen nine times, and bolding all
+         of those makes the grid noisier instead of clearer. Inline, not a class:
+         .sweep is already taken by the scope and snipe masthead animations. */
+      const clean=(v[0]===0||v[1]===0)&&(v[0]+v[1])>=5;
+      h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${diverge(rate,.5)};color:${inkOn(rate,.5)}${clean?';font-weight:800':''}">${v[0]}-${v[1]}</span></td>`;});
     h+=`<td><span style="font-weight:600">${tw+tl?tw+'-'+tl:''}</span></td></tr>`;});
   $('#tMtx').innerHTML=h+'</tbody>';
   $$('#tMtx td[data-a]').forEach(td=>{const a=td.dataset.a,b=td.dataset.b,v=src.t[a+'|'+b];
