@@ -21,23 +21,33 @@ sitting next to it *is* hand-written; that asymmetry is easy to trip over. Every
 `data.py` / `weekly*.py` (the data), then you rebuild. Editing the artifacts
 directly means your change is destroyed on the next build.
 
-## Working inside `mksite.py`
+## Where the page lives
 
-`mksite.py` is ~250 KB / 3,550 lines — roughly 65k tokens. **Do not read it in
-full.** It will consume most of the context window in a single call and you will
-lose it to compaction before the task is done.
+`mksite.py` is now an 84-line assembler. The page itself is in `page/`, as real files
+an editor and a linter can read:
 
-Instead:
+| File | What |
+|---|---|
+| `page/shell.html` | doctype, `<html>`, meta tags |
+| `page/head.html` | `<title>`, font links, and the `__CSS__` placeholder |
+| `page/site.css` | ~97 KB — every rule for all six themes |
+| `page/body.html` | the markup, and the `__DATA__` placeholder |
+| `page/scripts.html` | the `<script>` wrapper, and the `__JS__` placeholder |
+| `page/site.js` | ~280 KB — the whole page's behaviour |
+| `page/sw.js` | the offline worker, with `__VERSION__` |
 
-- `grep -n` for the anchor you need, then read a narrow window around it
-  (`sed -n 'START,ENDp'` or a `Read` with `offset`/`limit`).
-- The file is four raw strings; the line numbers move as you edit, so re-grep
-  rather than trusting a remembered offset:
-  - `HEAD` (~line 4) — all CSS
-  - `BODY` (~932) — markup, contains the `__DATA__` placeholder
-  - `JS` (~1395) — all JavaScript
-  - `SHELL_TOP` (~3536) — doctype and meta
-- Prefer targeted `Edit` calls over rewriting regions.
+Until 14 Sep 2026 all of that was five giant raw strings inside `mksite.py`, which was
+6,664 lines. Editing CSS inside a Python string meant no highlighting, no autocomplete
+and nothing a linter could read. The split was verified byte-identical: same page, same
+worker, to the byte.
+
+**`page/site.js` is ~280 KB / ~4,600 lines — do not read it in full.** It will consume
+most of the context window in one call. `grep -n` for the anchor, then read a narrow
+window (`sed -n 'START,ENDp'`, or `Read` with `offset`/`limit`). Line numbers move as
+you edit, so re-grep rather than trusting a remembered offset. Prefer targeted `Edit`
+calls over rewriting regions.
+
+`page/site.css` is one block shared by six themes — see the CSS-collision rule below.
 
 If you patch with a Python script instead of `Edit`, **assert every anchor
 matches exactly once before opening the file for write**, and `grep` afterwards
@@ -81,8 +91,10 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
 ## Verify before you report done
 
 1. `python3 export.py && python3 mksite.py`
-2. Extract the largest inline `<script>` from `index.html` and `node --check` it —
-   a syntax error there blanks the entire page and nothing else will catch it.
+2. `npm run lint` — eslint over `page/site.js` and `page/sw.js`. Bugs only, no style
+   rules. It must come back **completely silent**; warnings that live forever get
+   ignored, so fix them or justify them with a commented `eslint-disable-next-line`.
+   `node --check` only answers "does it parse" and misses a typo'd name entirely.
 3. `node test.js` (set `CHROMIUM_PATH` if Playwright can't find a browser).
    `net::ERR_TUNNEL_CONNECTION_FAILED` is expected sandbox noise, not a failure.
 4. For anything visual, drive it in a headless browser and screenshot it. Check

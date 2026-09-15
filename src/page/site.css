@@ -1,0 +1,1317 @@
+
+/* ============ SKINS ============ */
+:root,:root[data-skin="scope"]{
+  --ground:#080B09; --surface:#0E1411; --surface-2:#131B17;
+  --ink:#DCEDE2; --ink-2:#8FA898; --ink-3:#718A79;
+  --rule:#1E2E24; --rule-2:#16221B;
+  --brass:#35E07A; --brass-2:#1E7A44; --brass-wash:#0D2416;
+  --pos:#D9603F; --neg:#3C9FD4; --mid:#3A4A41;
+  --sea-1:#35E07A; --sea-2:#E8C24A; --sea-3:#5AB6F0; --sea-4:#FF7A5C; --sea-5:#C08BF5; --sea-6:#6FE8D0; --sea-7:#F58FC8; --sea-8:#C3D94F;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px -14px rgba(0,0,0,.8);
+  --mast-bg:#080B09; --mast-ink:#EAFBF0; --mast-sub:#8FCFA8; --mast-kick:#35E07A;
+  --mast-rule:#16351F; --mast-glow:rgba(53,224,122,.55); --mast-glow2:rgba(53,224,122,.22);
+  --head-ink:#EAFBF0; --hover:#16211B; --nav-bg:rgba(14,20,17,.94); --ov:rgba(3,6,4,.82);
+  --band:rgba(53,224,122,.06); --glow:rgba(53,224,122,.65);
+  --rt:#35E07A; --rt-grid:#1E7A44; --rt-ring:#0E2A18; --rt-g1:#123A22; --rt-g2:#050A07;
+  --grid-h:rgba(53,224,122,.045); --grid-v:rgba(53,224,122,.045); --mast-grid:#0F2A19; --mast-vig:rgba(4,7,5,.86);
+  --card-r:3px; --wordmark:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --tex:none; --tex-size:auto; --rule-style:solid;
+  --max:1180px;
+}
+:root[data-skin="og"]{
+  --ground:#EDF0F3; --surface:#FFFFFF; --surface-2:#F6F8FA;
+  --ink:#10161C; --ink-2:#48545F; --ink-3:#646F7A;
+  --rule:#D5DBE1; --rule-2:#E6EAEE;
+  --brass:#8C6410; --brass-2:#B8893A; --brass-wash:#F3ECDC;
+  --pos:#B0442C; --neg:#1272B0; --mid:#B4BCC4;
+  --sea-1:#8C6410; --sea-2:#1F6F60; --sea-3:#245E9E; --sea-4:#A8231F; --sea-5:#6B3E9E; --sea-6:#3B7A2A; --sea-7:#B5541A; --sea-8:#95246F;
+  --shadow:0 1px 2px rgba(16,22,28,.06),0 8px 24px -12px rgba(16,22,28,.18);
+  --mast-bg:#FFFFFF; --mast-ink:#10161C; --mast-sub:#48545F; --mast-kick:#8C6410;
+  --mast-rule:#D5DBE1; --mast-glow:transparent; --mast-glow2:transparent;
+  --head-ink:#10161C; --hover:#F1F4F7; --nav-bg:rgba(255,255,255,.94); --ov:rgba(16,22,28,.62);
+  --band:rgba(140,100,16,.07); --glow:rgba(140,100,16,.55);
+  --rt:#8C6410; --rt-grid:#D9C48C; --rt-ring:#EDE3CC; --rt-g1:#FBF7EC; --rt-g2:#FFFFFF;
+  --grid-h:transparent; --grid-v:transparent; --mast-grid:transparent; --mast-vig:transparent; --tex:none;
+  --card-r:3px; --tex:none; --rule-style:solid;
+}
+:root[data-skin="red"]{
+  --ground:#F4F1EF; --surface:#FFFFFF; --surface-2:#FAF6F4;
+  --ink:#1A1210; --ink-2:#574844; --ink-3:#6E5C57;
+  --rule:#E0D6D2; --rule-2:#EFE8E5;
+  --brass:#8E1520; --brass-2:#B8434C; --brass-wash:#FBEDED;
+  --pos:#B0442C; --neg:#1272B0; --mid:#C3B9B5;
+  --sea-1:#9E1723; --sea-2:#1F6F60; --sea-3:#245E9E; --sea-4:#9A7108; --sea-5:#6B3E9E; --sea-6:#3B7A2A; --sea-7:#B5541A; --sea-8:#95246F;
+  --shadow:0 1px 2px rgba(26,18,16,.07),0 8px 26px -14px rgba(142,21,32,.22);
+  --mast-bg:#8E1520; --mast-ink:#FFFFFF; --mast-sub:#F0C9CC; --mast-kick:#F0C9CC;
+  --mast-rule:#6E0F18; --mast-glow:rgba(0,0,0,.28); --mast-glow2:transparent;
+  --head-ink:#1A1210; --hover:#FBF4F3; --nav-bg:rgba(255,255,255,.94); --ov:rgba(26,18,16,.62);
+  --band:rgba(142,21,32,.055); --glow:rgba(142,21,32,.5);
+  --rt:#FFFFFF; --rt-sweep:.30; --rt-grid:#B8434C; --rt-ring:#6E0F18; --rt-g1:#7A1119; --rt-g2:#5C0B12;
+  --grid-h:transparent; --grid-v:transparent; --mast-grid:#A32732; --mast-vig:transparent; --tex:none;
+  --card-r:3px; --tex-size:auto; --rule-style:solid;
+}
+
+[data-skin="scope"] .scopefield{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+/* glass vignette — you are looking down a tube */
+.scopefield .glass{position:absolute;inset:0;
+  background:radial-gradient(76% 60% at 50% 46%,transparent 0%,rgba(3,8,5,.32) 60%,rgba(2,5,3,.92) 100%)}
+/* mil-dot reticle, faint enough to read through */
+.scopefield .ret{position:absolute;inset:0;width:100%;height:100%;opacity:.15}
+.scopefield .ret line,.scopefield .ret path{stroke:#35E07A;fill:none}
+.scopefield .corner{stroke:#35E07A;fill:none;stroke-width:2;opacity:.28}
+.scopefield .rng{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,
+  transparent,rgba(53,224,122,.45) 22%,rgba(53,224,122,.45) 78%,transparent);
+  opacity:.45;animation:rangeSweep 17s ease-in-out infinite}
+@keyframes rangeSweep{0%,100%{top:14%;opacity:0}6%{opacity:.5}50%{top:86%;opacity:.5}56%{opacity:0}}
+.scopefield .hud{position:absolute;left:56px;bottom:16px;font-family:"IBM Plex Mono",monospace;
+  font-size:9.5px;letter-spacing:.16em;color:rgba(53,224,122,.42);text-align:left;line-height:1.9}
+.scopefield .hud b{color:rgba(214,240,222,.6);font-weight:600}
+.scopefield .breathe{animation:breathe 9s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translate(0,0)}25%{transform:translate(3px,-2px)}
+  50%{transform:translate(-2px,3px)}75%{transform:translate(2px,2px)}}
+@media (prefers-reduced-motion:reduce){.scopefield .rng,.scopefield .breathe{animation:none!important}}
+@media(max-width:760px){.scopefield .hud{display:none}}
+:root[data-skin="arcade"]{
+  --ground:#07050F; --surface:#120C24; --surface-2:#1B1236;
+  --ink:#E8E4FF; --ink-2:#A79DD6; --ink-3:#847BB3;
+  --rule:#2E2159; --rule-2:#211846;
+  --brass:#FF2E88; --brass-2:#A31E5C; --brass-wash:#2A0C22;
+  --pos:#FF8A4C; --neg:#56C7F5; --mid:#443868;
+  --sea-1:#FF2E88; --sea-2:#56C7F5; --sea-3:#FFD24A; --sea-4:#7BF59A; --sea-5:#B98BFF; --sea-6:#FF8A4C; --sea-7:#5FE8DE; --sea-8:#FF7FC4;
+  --shadow:0 0 0 1px rgba(255,46,136,.12),0 14px 40px -18px rgba(255,46,136,.4);
+  --mast-bg:#07050F; --mast-ink:#FFFFFF; --mast-sub:#8FE9FF; --mast-kick:#FF2E88;
+  --mast-rule:#2E2159; --mast-glow:rgba(255,46,136,.6); --mast-glow2:rgba(86,199,245,.35);
+  --head-ink:#FFFFFF; --hover:#1B1236; --nav-bg:rgba(7,5,15,.95); --ov:rgba(3,2,8,.86);
+  --band:rgba(255,46,136,.07); --glow:rgba(255,46,136,.8);
+  --rt:#FF2E88; --rt-grid:#4A2C7A; --rt-ring:#1E0F38; --rt-g1:#1B0E3A; --rt-g2:#07040F;
+  --grid-h:rgba(255,46,136,.05); --grid-v:rgba(86,199,245,.05); --mast-grid:#241452; --mast-vig:rgba(3,2,8,.82);
+  --tex:repeating-linear-gradient(0deg,rgba(0,0,0,.34) 0 1px,transparent 1px 3px);
+  --tex-size:auto;
+}
+:root[data-skin="redact"]{
+  --ground:#0A0A0B; --surface:#141416; --surface-2:#1B1B1E;
+  --ink:#DCD7C9; --ink-2:#9E988B; --ink-3:#8A8475;
+  --rule:#2B2B30; --rule-2:#1F1F23;
+  --brass:#C8A24A; --brass-2:#8E7231; --brass-wash:#1D1912;
+  --pos:#C0392B; --neg:#5B8CA8; --mid:#3B3B42;
+  --sea-1:#C8A24A; --sea-2:#82B3D8; --sea-3:#CC7F6C; --sea-4:#93C289; --sea-5:#B99ED8; --sea-6:#B0B4BE; --sea-7:#7FC9C0; --sea-8:#D493B1;
+  --shadow:0 0 0 1px rgba(200,162,74,.1),0 18px 44px -22px rgba(0,0,0,.9);
+  --mast-bg:#08080A; --mast-ink:#EDE8DA; --mast-sub:#9E988B; --mast-kick:#B0271F;
+  --mast-rule:#2B2B30; --mast-glow:rgba(200,162,74,.28); --mast-glow2:rgba(176,39,31,.2);
+  --head-ink:#EDE8DA; --hover:#1B1B1E; --nav-bg:rgba(8,8,10,.96); --ov:rgba(2,2,3,.9);
+  --band:rgba(200,162,74,.05); --glow:rgba(200,162,74,.5);
+  --rt:#C8A24A; --rt-grid:#3A3A42; --rt-ring:#141416; --rt-g1:#1A1A1E; --rt-g2:#08080A;
+  --grid-h:rgba(220,215,201,.028); --grid-v:rgba(220,215,201,.028);
+  --mast-grid:#17171B; --mast-vig:rgba(2,2,3,.86);
+  --tex:repeating-linear-gradient(0deg,rgba(255,255,255,.014) 0 1px,transparent 1px 2px),
+        radial-gradient(circle at 40% 60%,rgba(220,215,201,.02) .6px,transparent 1px);
+  --tex-size:auto,7px 7px;
+  --card-r:0px; --wordmark:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+}
+/* ---- redacted: a file that was never meant to leave the drawer ---- */
+[data-skin="redact"] .card,[data-skin="redact"] .plate,[data-skin="redact"] .game,
+[data-skin="redact"] .board,[data-skin="redact"] .modal{border-radius:0}
+[data-skin="redact"] .card{position:relative}
+[data-skin="redact"] .card::before{content:"";position:absolute;left:0;top:0;width:22px;height:22px;
+  border-left:2px solid var(--brass);border-top:2px solid var(--brass);opacity:.45;pointer-events:none}
+[data-skin="redact"] .card::after{content:"";position:absolute;right:0;bottom:0;width:22px;height:22px;
+  border-right:2px solid var(--brass);border-bottom:2px solid var(--brass);opacity:.45;pointer-events:none}
+[data-skin="redact"] thead th{background:#000;color:#BDB7A8;letter-spacing:.14em;border-bottom:2px solid var(--brass-2)}
+[data-skin="redact"] .sec-head::after{width:74px;height:12px;border-radius:0;bottom:-8px;
+  background:#000;box-shadow:0 0 0 1px var(--brass-2)}
+[data-skin="redact"] .sec-head h2{letter-spacing:.01em}
+[data-skin="redact"] .mast h1{-webkit-text-stroke:0;letter-spacing:.06em}
+[data-skin="redact"] .lad-tier span{opacity:.5}
+[data-skin="redact"] .mgroup,[data-skin="redact"] .sub-h{color:var(--brass)}
+[data-skin="redact"] nav a.on{text-shadow:0 0 10px var(--brass-2)}
+/* the stamp and the bars, masthead only */
+[data-skin="redact"] .dossier{display:block;position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+[data-skin="redact"] .dossier svg{width:100%;height:100%}
+.dossier .bar{fill:#000;opacity:.92}
+.dossier .barline{fill:#fff;opacity:.05}
+.dossier .stamp{fill:none;stroke:#B0271F;stroke-width:3;opacity:.82}
+.dossier .stampt{fill:#B0271F;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:26px;letter-spacing:.14em;opacity:.86}
+.dossier .meta{fill:#8E8779;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.17em}
+.dossier .blink{animation:redactPulse 4.6s ease-in-out infinite}
+@keyframes redactPulse{0%,88%{opacity:.86}92%{opacity:.3}96%{opacity:.86}100%{opacity:.86}}
+.dossier .wipe{fill:#000;opacity:.92;animation:redactWipe 13s ease-in-out infinite}
+@keyframes redactWipe{0%,42%{transform:scaleX(1)}50%{transform:scaleX(0)}58%,100%{transform:scaleX(1)}}
+/* the stamp and file marks sit outside the stretched SVG: preserveAspectRatio="none" skewed
+   them 7:1 on a phone. As real elements they scale with the viewport instead of the viewBox. */
+.dossier .dz-stamp{position:absolute;right:clamp(6px,2.2vw,24px);top:clamp(8px,2vw,12px);
+  transform:rotate(-11deg);transform-origin:100% 0;border:3px solid #B0271F;border-radius:2px;
+  color:#B0271F;opacity:.86;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(16px,4.6vw,27px);letter-spacing:.14em;padding:4px 11px;line-height:1}
+.dossier .dz-meta{position:absolute;right:clamp(8px,3vw,42px);bottom:clamp(6px,1.6vw,13px);
+  text-align:right;color:#8E8779;font-family:"IBM Plex Mono",monospace;
+  font-size:clamp(7px,1.7vw,9px);letter-spacing:.17em;line-height:1.9}
+/* the facts row wraps on a phone and would sit under the file marks, so give them their own band */
+@media(max-width:900px){[data-skin="redact"] .mast-in{padding-bottom:52px}}
+@media (prefers-reduced-motion:reduce){.dossier *,.wr-blob{animation:none!important}}
+:root[data-skin="leather"]{
+  --ground:#35190F; --surface:#452213; --surface-2:#552C1A;
+  --ink:#F6E7D8; --ink-2:#C5A791; --ink-3:#C2A691;
+  --rule:#6B4028; --rule-2:#5A3520;
+  --brass:#FFFFFF; --brass-2:#C9A88F; --brass-wash:#3E2417;
+  --pos:#F08A5C; --neg:#6FC0F0; --mid:#7A5238;
+  --sea-1:#F6E7D8; --sea-2:#F0B24A; --sea-3:#7FC5E8; --sea-4:#8FD69A; --sea-5:#E88FA8; --sea-6:#C9A8F0; --sea-7:#F08A5C; --sea-8:#D9D46F;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 26px -14px rgba(0,0,0,.75);
+  --mast-bg:#35190F; --mast-ink:#FFFFFF; --mast-sub:#D9BCA4; --mast-kick:#FFFFFF;
+  --mast-rule:#6B4028; --mast-glow:rgba(0,0,0,.5); --mast-glow2:rgba(255,255,255,.12);
+  --head-ink:#FFFFFF; --hover:#552C1A; --nav-bg:rgba(53,25,15,.95); --ov:rgba(20,9,5,.84);
+  --band:rgba(255,255,255,.05); --glow:rgba(255,255,255,.55);
+  --rt:#FFFFFF; --rt-sweep:.34; --rt-grid:#7A5238; --rt-ring:#2A1209; --rt-g1:#4A2614; --rt-g2:#2A1209;
+  --grid-h:transparent; --grid-v:transparent; --mast-grid:transparent; --mast-vig:rgba(20,9,5,.5);
+  --tex:radial-gradient(circle at 30% 30%,rgba(255,232,214,.05) .9px,transparent 1.4px),
+        radial-gradient(circle at 70% 70%,rgba(0,0,0,.16) 1px,transparent 1.5px);
+  --tex-size:9px 9px;
+}
+/* ---- skin-specific treatments, not just palette ---- */
+[data-skin="leather"] .card,[data-skin="leather"] .board,[data-skin="leather"] .game{
+  border-radius:9px}
+[data-skin="leather"] .card{position:relative}
+[data-skin="leather"] .card::after{content:"";position:absolute;inset:5px;border-radius:6px;pointer-events:none;
+  border:1.5px dashed rgba(255,255,255,.13)}
+[data-skin="leather"] .plate{border-radius:0}
+[data-skin="leather"] .mast h1{-webkit-text-stroke:1px rgba(0,0,0,.25)}
+[data-skin="arcade"] .card{border-radius:2px;
+  box-shadow:0 0 0 1px rgba(255,46,136,.18),0 0 22px -6px rgba(255,46,136,.35)}
+[data-skin="arcade"] .sec-head h2{text-shadow:2px 0 0 rgba(255,46,136,.45),-2px 0 0 rgba(86,199,245,.45)}
+[data-skin="arcade"] .mast h1{text-shadow:3px 0 0 rgba(255,46,136,.75),-3px 0 0 rgba(86,199,245,.6),0 0 30px rgba(255,46,136,.5)}
+[data-skin="arcade"] .plate .yr{text-shadow:2px 0 0 rgba(86,199,245,.5)}
+[data-skin="arcade"] nav a.on{text-shadow:0 0 8px var(--brass)}
+/* laces: drawn only on the football skin */
+.deco{display:none}
+[data-skin="arcade"] .dogfight{display:block;position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;opacity:.62}
+[data-skin="arcade"] .dogfight svg{width:100%;height:100%}
+.dogfight .ship{fill:#56C7F5;opacity:.85}
+.dogfight .ship.chase{fill:#FF2E88;opacity:.9}
+.dogfight .bolt{fill:#FFE24A;opacity:.95}
+.dogfight .boom{fill:#FFE24A;opacity:0}
+.dogfight .flee{animation:fly 9s linear infinite}
+.dogfight .chase{animation:fly 9s linear infinite;animation-delay:.62s}
+.dogfight .b1{animation:shot 9s linear infinite;animation-delay:1.5s}
+.dogfight .b2{animation:shot 9s linear infinite;animation-delay:3.1s}
+.dogfight .b3{animation:shot 9s linear infinite;animation-delay:5.4s}
+.dogfight .boom{animation:boom 9s linear infinite;animation-delay:6.2s}
+@keyframes fly{
+  0%{transform:translate(-130px,126px)}
+  20%{transform:translate(300px,14px)}
+  46%{transform:translate(700px,134px)}
+  72%{transform:translate(1060px,16px)}
+  100%{transform:translate(1530px,128px)}}
+@keyframes shot{
+  0%,13%{transform:translate(-30px,132px);opacity:0}
+  15%{opacity:1}
+  36%{transform:translate(660px,138px);opacity:1}
+  42%{opacity:0}
+  100%{transform:translate(660px,138px);opacity:0}}
+@keyframes boom{
+  0%,66%{transform:translate(1080px,20px) scale(.2);opacity:0}
+  70%{opacity:.9;transform:translate(1080px,20px) scale(1)}
+  77%{opacity:0;transform:translate(1080px,20px) scale(2.2)}
+  100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.dogfight *{animation:none!important}.dogfight{opacity:.25}}
+.laces{display:none}
+[data-skin="leather"] .ball{display:none;position:fixed;right:-70px;bottom:-40px;width:420px;height:262px;
+  color:rgba(255,255,255,.055);pointer-events:none;z-index:0}
+[data-skin="leather"] .ball svg{width:100%;height:100%}
+[data-skin="leather"] .sec-head::after{width:34px;height:11px;border-radius:50%;bottom:-6px;
+  background:var(--brass);box-shadow:none}
+[data-skin="leather"] thead th{border-bottom:2px solid rgba(255,255,255,.28)}
+[data-skin="leather"] .laces{display:none}
+@media(max-width:1080px){[data-skin="leather"] .deco{display:none}
+.laces{display:none}}
+/* Every masthead decoration is a 1400x170 SVG drawn with preserveAspectRatio="none".
+   On a phone that squashes it about 3.6:1, which distorts its shapes and drags them
+   across the stat line. They are decoration only, so drop them on small screens.
+   Same trap the redacted dossier hit at 7.2:1. */
+@media(max-width:700px){.mast .deco{display:none!important}}
+/* ================= ARCADE: full-page background field ================= */
+[data-skin="arcade"] .field{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.field .stars{position:absolute;top:-8%;left:0;width:200%;height:116%;background-repeat:repeat;will-change:transform}
+.field .s1{background-size:300px 210px;opacity:.9;
+  background-image:radial-gradient(1.9px 1.9px at 34px 44px,rgba(232,228,255,1),transparent 100%),
+  radial-gradient(1.7px 1.7px at 166px 138px,rgba(86,199,245,.95),transparent 100%),
+  radial-gradient(1.6px 1.6px at 248px 60px,rgba(255,46,136,.9),transparent 100%),
+  radial-gradient(1.5px 1.5px at 98px 182px,rgba(255,226,74,.8),transparent 100%),
+  radial-gradient(1.4px 1.4px at 282px 168px,rgba(232,228,255,.8),transparent 100%),
+  radial-gradient(1.3px 1.3px at 122px 96px,rgba(155,123,255,.85),transparent 100%);
+  animation:starA 34s linear infinite}
+.field .s2{background-size:230px 160px;opacity:.6;
+  background-image:radial-gradient(1.2px 1.2px at 60px 24px,rgba(232,228,255,.8),transparent 100%),
+  radial-gradient(1.1px 1.1px at 210px 120px,rgba(167,157,214,.8),transparent 100%),
+  radial-gradient(1px 1px at 130px 168px,rgba(86,199,245,.7),transparent 100%);
+  animation:starB 62s linear infinite}
+.field .s3{background-size:160px 120px;opacity:.38;
+  background-image:radial-gradient(.9px .9px at 22px 96px,rgba(232,228,255,.75),transparent 100%),
+  radial-gradient(.9px .9px at 142px 30px,rgba(255,46,136,.6),transparent 100%);
+  animation:starC 104s linear infinite}
+@keyframes starA{from{transform:translate3d(0,0,0)}to{transform:translate3d(-300px,0,0)}}
+@keyframes starB{from{transform:translate3d(0,0,0)}to{transform:translate3d(-230px,0,0)}}
+@keyframes starC{from{transform:translate3d(0,0,0)}to{transform:translate3d(-160px,0,0)}}
+.field .sky{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+.field .fs{fill:#56C7F5}
+.field .fs.hot{fill:#FF2E88}
+.field .fb{fill:#FFE24A}
+.field .inv{fill:#9B7BFF;opacity:.5}
+/* top lane: a slow chase across the whole page */
+.field .lane1 .run{animation:laneA 26s linear infinite}
+.field .lane1 .hunt{animation:laneA 26s linear infinite;animation-delay:1.1s}
+.field .lane1 .t1{animation:tracerA 26s linear infinite;animation-delay:5s}
+.field .lane1 .t2{animation:tracerA 26s linear infinite;animation-delay:11.5s}
+.field .lane1 .pop{animation:popA 26s linear infinite;animation-delay:17.6s}
+@keyframes laneA{
+  0%{transform:translate(-220px,690px)} 22%{transform:translate(340px,300px)}
+  50%{transform:translate(820px,640px)} 78%{transform:translate(1280px,250px)}
+  100%{transform:translate(1820px,560px)}}
+@keyframes tracerA{
+  0%,8%{transform:translate(-140px,700px);opacity:0} 10%{opacity:1}
+  26%{transform:translate(700px,470px);opacity:1} 31%{opacity:0}
+  100%{transform:translate(700px,470px);opacity:0}}
+@keyframes popA{
+  0%,64%{transform:translate(1290px,255px) scale(.2);opacity:0}
+  68%{opacity:.85;transform:translate(1290px,255px) scale(1)}
+  76%{opacity:0;transform:translate(1290px,255px) scale(2.6)}
+  100%{opacity:0}}
+/* bottom lane: a lone runner the other way */
+.field .lane2 .run{animation:laneB 41s linear infinite}
+@keyframes laneB{
+  0%{transform:translate(1780px,180px) scaleX(-1)} 40%{transform:translate(900px,420px) scaleX(-1)}
+  70%{transform:translate(420px,150px) scaleX(-1)} 100%{transform:translate(-260px,380px) scaleX(-1)}}
+/* marching invaders, deep background */
+.field .sq1{animation:marchA 19s steps(14) infinite}
+.field .sq2{animation:marchB 27s steps(18) infinite}
+@keyframes marchA{0%{transform:translate(-180px,120px)}100%{transform:translate(1760px,120px)}}
+@keyframes marchB{0%{transform:translate(1740px,810px)}100%{transform:translate(-200px,810px)}}
+[data-skin="arcade"] .card,[data-skin="arcade"] .plate,[data-skin="arcade"] .game,
+[data-skin="arcade"] .board,[data-skin="arcade"] .modal{background-color:rgba(18,12,36,.9)}
+[data-skin="arcade"] #wkYears{background-color:rgba(7,5,15,.94)}
+@media(max-width:760px){[data-skin="arcade"] .field .sky{display:none}}
+/* ================= CRIMSON: sniper masthead ================= */
+[data-skin="red"] .snipe{display:block;position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+[data-skin="red"] .snipe svg{width:100%;height:100%}
+.snipe .rule{stroke:#FFFFFF;opacity:.2}
+.snipe .rule2{stroke:#FFFFFF;opacity:.14}
+.snipe .lab{fill:#FFFFFF;font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.2em;opacity:.5;text-anchor:middle}
+.snipe .stad .base{stroke:#FFFFFF;stroke-width:1.4;opacity:.22;fill:none}
+.snipe .stad .tick{stroke:#FFFFFF;stroke-width:1.5;opacity:.3;fill:none}
+.snipe .stad .tickM{stroke:#FFFFFF;stroke-width:2.4;opacity:.6;fill:none;stroke-linecap:round}
+.snipe .gate{stroke:#FFFFFF;stroke-width:2;fill:none;opacity:.9;stroke-linecap:round;
+  animation:gateRun 9s cubic-bezier(.35,.05,.2,1) infinite}
+@keyframes gateRun{
+  0%{transform:translateX(490px);opacity:0}
+  8%{opacity:.85}
+  44%{transform:translateX(1322px);opacity:.85}
+  50%{opacity:.35}54%{opacity:.95}
+  76%{transform:translateX(1322px);opacity:.95}
+  86%{opacity:0}100%{transform:translateX(490px);opacity:0}}
+.snipe .apex{stroke:#FFFFFF;fill:#FFFFFF;stroke-width:1.4;opacity:.5}
+.snipe .tag{fill:#F0C9CC;font-family:"IBM Plex Mono",monospace;font-size:8px;letter-spacing:.14em;opacity:.55}
+.snipe .tgt{fill:#FFFFFF;opacity:.5;animation:tdrift 15s ease-in-out infinite alternate}
+.snipe .brk{stroke:#FFFFFF;fill:none;stroke-width:2;opacity:0;transform-origin:1322px 130px;
+  animation:lock 9s cubic-bezier(.3,.7,.2,1) infinite}
+.snipe .arc{stroke:#F6D8DA;fill:none;stroke-width:1.4;stroke-dasharray:5 7;opacity:.28;
+  stroke-dashoffset:0;animation:drift2 3.4s linear infinite}
+.snipe .trace{stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;opacity:0;
+  stroke-dasharray:1180;stroke-dashoffset:1180;animation:fire 9s linear infinite}
+.snipe .hit{stroke:#FFFFFF;fill:none;stroke-width:2.2;opacity:0;transform-origin:1322px 130px;
+  animation:impact 9s linear infinite}
+.snipe .rd{fill:#FFFFFF;font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;opacity:0;text-anchor:end}
+.snipe .rd1{animation:read 9s linear infinite}
+.snipe .rd2{animation:read 9s linear infinite;animation-delay:2.4s}
+.snipe .rd3{animation:read 9s linear infinite;animation-delay:4.8s}
+.snipe .sweep{stroke:#FFFFFF;stroke-width:1.3;opacity:.18;animation:snipeSweep 9s ease-in-out infinite}
+@keyframes tdrift{from{transform:translateX(-26px)}to{transform:translateX(22px)}}
+@keyframes lock{
+  0%{transform:scale(3.4);opacity:0} 12%{opacity:.55}
+  46%{transform:scale(1);opacity:.95} 62%{opacity:.35} 66%{opacity:.95}
+  78%{transform:scale(1);opacity:0} 100%{transform:scale(3.4);opacity:0}}
+@keyframes fire{
+  0%,60%{stroke-dashoffset:1180;opacity:0}
+  61%{opacity:.95} 66%{stroke-dashoffset:0;opacity:.95} 70%{opacity:0}
+  100%{stroke-dashoffset:0;opacity:0}}
+@keyframes impact{
+  0%,66%{transform:scale(.2);opacity:0}
+  69%{transform:scale(1);opacity:.9} 78%{transform:scale(3);opacity:0} 100%{opacity:0}}
+@keyframes read{0%,2%{opacity:0}6%{opacity:.85}24%{opacity:.85}28%{opacity:0}100%{opacity:0}}
+@keyframes snipeSweep{0%{transform:translateX(-120px)}50%{transform:translateX(1320px)}100%{transform:translateX(-120px)}}
+@keyframes drift2{to{stroke-dashoffset:-24}}
+@media (prefers-reduced-motion:reduce){.snipe *,.field *{animation:none!important}
+  .snipe .brk,.snipe .rd1{opacity:.6!important;transform:scale(1)!important}}
+@media(max-width:900px){[data-skin="red"] .snipe .lab,[data-skin="red"] .snipe .rd,
+  [data-skin="red"] .snipe .tag,[data-skin="red"] .snipe .apex{display:none}}
+/* ================= PIGSKIN: the field, the ball, the stitching ================= */
+[data-skin="leather"] .gridiron{display:block;position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.gridiron .yard{position:absolute;inset:0;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 2px,transparent 2px 78px)}
+.gridiron .yard5{position:absolute;inset:0;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.1) 0 3px,transparent 3px 390px)}
+.gridiron .hash{position:absolute;left:0;right:0;height:9px;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.075) 0 2px,transparent 2px 26px)}
+.gridiron .h1{top:31%}.gridiron .h2{top:69%}
+.gridiron .goal{position:absolute;right:2.5vw;top:50%;width:130px;height:150px;margin-top:-75px;opacity:.1}
+.gridiron .goal svg{width:100%;height:100%}
+.gridiron .trail{position:absolute;inset:0;width:100%;height:100%;opacity:.16}
+.gridiron .trail path{fill:none;stroke:#FFF;stroke-width:2;stroke-dasharray:3 12;stroke-linecap:round}
+/* the ball itself — square box, so it never distorts */
+.pball{position:absolute;left:0;top:0;width:66px;height:44px}
+.pball svg{width:100%;height:100%;display:block}
+.pball .hide{fill:#7A3F1C;stroke:#4E2710;stroke-width:3}
+.pball .stripe{stroke:#FFF6EC;stroke-width:3.4;fill:none;stroke-linecap:round}
+.pball .lace{stroke:#FFF6EC;stroke-width:3.6;stroke-linecap:round}
+.gridiron .pball{animation:punt 24s cubic-bezier(.36,.03,.62,1) infinite}
+@keyframes punt{
+  0%{transform:translate(-12vw,84vh) rotate(-40deg);opacity:0}
+  5%{opacity:.9}
+  28%{transform:translate(24vw,22vh) rotate(110deg)}
+  50%{transform:translate(50vw,7vh) rotate(230deg)}
+  72%{transform:translate(76vw,18vh) rotate(350deg)}
+  95%{transform:translate(102vw,60vh) rotate(480deg);opacity:.9}
+  100%{transform:translate(112vw,76vh) rotate(510deg);opacity:0}}
+/* masthead: sideline strip, goalposts, a ball on a dotted arc */
+[data-skin="leather"] .pigskin{display:block;position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+[data-skin="leather"] .pigskin svg.chalk{width:100%;height:100%}
+.pigskin .yl{stroke:#FFF;opacity:.2}
+.pigskin .yl5{stroke:#FFF;opacity:.34}
+.pigskin .hm{stroke:#FFF;opacity:.24}
+.pigskin .yn{fill:#FFF;opacity:.3;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:20px;letter-spacing:.06em}
+.pigskin .gp{stroke:#F6E7D8;opacity:.34;fill:none;stroke-width:3.2;stroke-linecap:round}
+.pigskin .parc{fill:none;stroke:#FFF;stroke-width:1.6;stroke-dasharray:3 9;opacity:.3;
+  animation:pdrift 3s linear infinite}
+@keyframes pdrift{to{stroke-dashoffset:-24}}
+.pigskin .pball{animation:snap 11s cubic-bezier(.32,.02,.5,1) infinite}
+@keyframes snap{
+  0%,4%{transform:translate(61.5vw,150px) rotate(-42deg) scale(.6);opacity:0}
+  11%{opacity:1}
+  38%{transform:translate(76vw,36px) rotate(140deg) scale(.86)}
+  60%{transform:translate(83vw,25px) rotate(250deg) scale(.92)}
+  84%{transform:translate(92vw,44px) rotate(400deg) scale(.9)}
+  96%{transform:translate(95.8vw,66px) rotate(462deg) scale(.86);opacity:1}
+  100%{transform:translate(96.5vw,72px) rotate(474deg) scale(.86);opacity:0}}
+/* stitching, everywhere a seam belongs */
+[data-skin="leather"] nav{border-top:2px dashed rgba(255,255,255,.22)}
+[data-skin="leather"] .sec-head::after{width:52px;height:9px;border-radius:0;bottom:-7px;background:none;
+  box-shadow:none;border-top:3px solid rgba(255,255,255,.9);
+  background-image:repeating-linear-gradient(90deg,#FFF 0 8px,transparent 8px 15px);
+  background-size:100% 3px;background-position:0 6px;background-repeat:no-repeat}
+[data-skin="leather"] thead th{background:linear-gradient(180deg,#5F3320,#4A2716);letter-spacing:.11em}
+[data-skin="leather"] .card,[data-skin="leather"] .plate,[data-skin="leather"] .game,
+[data-skin="leather"] .board,[data-skin="leather"] .modal{background-color:rgba(69,34,19,.94)}
+[data-skin="leather"] #wkYears{background-color:rgba(53,25,15,.95)}
+@media (prefers-reduced-motion:reduce){.gridiron *,.pigskin *{animation:none!important}}
+@media(max-width:820px){.gridiron .goal,.pigskin .yn{display:none}}
+/* An element with an inline display beats the hidden attribute, which is exactly how the
+   trade grid stayed on screen while its own card said it was collapsed. */
+[hidden]{display:none!important}
+.gl{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;
+  border-radius:50%;border:1px solid var(--brass-2);color:var(--brass);background:transparent;
+  font-size:10px;font-weight:700;font-family:"IBM Plex Mono",monospace;line-height:1;
+  cursor:help;vertical-align:middle;margin-left:5px;flex:none;user-select:none}
+.gl:hover,.gl:focus{background:var(--brass);color:var(--surface);outline:none}
+/* the coarse-pointer bump below is on .gl alone, which loses to `th .gl-th` on
+   specificity, so a header "?" stayed a 14px target on a phone */
+@media(pointer:coarse){th .gl-th{width:23px;height:23px;font-size:12px}}
+/* the in-header version rides small and low-key, so twelve of them across a stats table
+   read as punctuation rather than as twelve more things to look at */
+th .gl-th{width:14px;height:14px;font-size:8.5px;margin-left:6px;border-color:var(--rule);
+  color:var(--ink-3);opacity:.75;text-transform:none;letter-spacing:0}
+th .gl-th:hover,th .gl-th:focus{opacity:1;border-color:var(--brass-2);background:var(--brass);
+  color:var(--surface)}
+.plain{margin:9px 0 0;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+@media(pointer:coarse){
+  button,select,input[type=search]{min-height:36px}
+  .gl{width:23px;height:23px;font-size:12.5px;margin-left:7px}
+  .pills button,.fb button{padding:9px 13px}
+  table.mtx td span{min-height:30px;display:inline-flex;align-items:center;justify-content:center}
+  #ladder .lad{padding:9px 6px}
+  .hlc{padding:17px 16px}}
+.plain b{color:var(--ink)}
+/* power ladder */
+#ladder{display:flex;flex-direction:column;gap:2px;font-size:13px}
+.lad-head,.lad{display:grid;grid-template-columns:26px minmax(96px,1.35fr) minmax(150px,3fr) 54px 64px 46px 34px;
+  align-items:center;gap:10px}
+.lad-head{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);padding:0 6px 6px;border-bottom:1px solid var(--rule-2);margin-bottom:4px}
+.lad-head>span:nth-child(n+4){text-align:right}
+.lad-track-h{position:relative;height:11px}
+.lad-track-h i{position:absolute;font-style:normal;white-space:nowrap}
+.lad{padding:5px 6px;border-radius:3px;cursor:pointer;color:var(--ink);transition:background .12s}
+.lad:hover{background:var(--hover)}
+.lad.top .lad-n{font-weight:700}
+.lad-r{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3);text-align:right}
+.lad.top .lad-r{color:var(--brass);font-weight:700}
+.lad-n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lad-track{position:relative;height:16px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.lad-mid{display:none}
+.lad-bar{position:absolute;top:3px;bottom:3px;border-radius:1px;opacity:.8;
+  transition:left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1)}
+.lad-dot{position:absolute;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;
+  box-shadow:0 0 0 2px var(--surface);transition:left .32s cubic-bezier(.4,0,.2,1)}
+.lad-s{text-align:right;font-family:"IBM Plex Mono",monospace;font-weight:700;font-variant-numeric:tabular-nums}
+.lad-w{text-align:right;font-family:"IBM Plex Mono",monospace;color:var(--ink-2);font-size:12px;font-variant-numeric:tabular-nums}
+.lad-mv{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
+.lad-mv.up{color:var(--pos)}.lad-mv.dn{color:var(--neg)}
+.lad-ev{text-align:right;font-size:8px;letter-spacing:.5px;white-space:nowrap}
+.lad-tier{display:flex;align-items:center;gap:8px;font-family:"IBM Plex Mono",monospace;font-size:9px;
+  letter-spacing:.16em;text-transform:uppercase;margin:9px 6px 3px;opacity:.85}
+.lad-tier span{flex:1;height:1px;background:currentColor;opacity:.3}
+@media(max-width:720px){.lad-head,.lad{grid-template-columns:22px minmax(72px,1fr) 46px 52px 38px}
+  .lad-ev{display:none}
+  .lad-track,.lad-track-h{display:none}}
+.hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,268px),1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:var(--card-r);overflow:hidden;box-shadow:var(--shadow)}
+.hlc{background:var(--surface);color:var(--ink);padding:15px 16px 14px;display:flex;flex-direction:column;gap:3px;
+  border:0;text-align:left;font-family:inherit;font-size:inherit;cursor:pointer;transition:background .12s;position:relative}
+.hlc:hover{background:var(--surface-2)}
+.hlc .k{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--brass);font-weight:600}
+.hlc .v{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;line-height:1.15;margin-top:5px;
+  font-variation-settings:"opsz" 40;color:var(--ink)}
+.hlc .n{font-size:12.5px;color:var(--ink-2);line-height:1.5;margin-top:4px}
+.hlc .n b{color:var(--ink)}
+.hlc .fig{position:absolute;right:14px;top:12px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  color:var(--ink-3);font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(14px);z-index:200;
+  width:max-content;max-width:min(92vw,460px);
+  background:#000;color:#DCD7C9;border:1px solid var(--brass-2);border-radius:2px;
+  padding:11px 18px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.06em;
+  box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.warn{border-color:#B0271F;color:#F0D9D6;box-shadow:0 0 0 1px rgba(176,39,31,.35),0 0 34px rgba(176,39,31,.28),0 12px 40px rgba(0,0,0,.6);line-height:1.7}
+.toast.warn .sig{color:#E0392B;margin-right:6px}
+.toast.warn .dim2{color:#9E8C8A;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.toast .cur{display:inline-block;width:7px;margin-left:5px;color:#E0392B;animation:caret 1s steps(1) infinite}
+@keyframes caret{0%,49%{opacity:1}50%,100%{opacity:0}}
+/* the room closing in */
+.omen{position:fixed;inset:0;z-index:150;pointer-events:none;opacity:0;
+  transition:opacity .55s ease;background:
+    radial-gradient(74% 58% at 50% 40%,transparent 0%,rgba(58,0,0,.5) 50%,rgba(3,0,0,.97) 100%),
+    linear-gradient(rgba(7,0,0,.42),rgba(7,0,0,.42))}
+.omen::after{content:"";position:absolute;inset:0;opacity:.5;
+  background:repeating-linear-gradient(0deg,rgba(224,57,43,.05) 0 1px,transparent 1px 3px)}
+.omen.lv3{opacity:.42}.omen.lv4{opacity:.72}.omen.lv5{opacity:.95}
+.omen.lv4,.omen.lv5{animation:omenFlick 2.4s steps(1) infinite}
+@keyframes omenFlick{0%,92%{filter:none}94%{filter:brightness(1.7)}96%{filter:none}98%{filter:brightness(1.4)}100%{filter:none}}
+.mast .scope.hot{filter:drop-shadow(0 0 14px rgba(224,57,43,.85));animation:scopeHot .9s ease-in-out infinite}
+@keyframes scopeHot{0%,100%{filter:drop-shadow(0 0 10px rgba(224,57,43,.6))}
+  50%{filter:drop-shadow(0 0 22px rgba(224,57,43,1))}}
+/* the sixth round */
+.breach{position:fixed;inset:0;z-index:400;pointer-events:none;display:none;overflow:hidden}
+.breach.on{display:block}
+.breach .void{position:absolute;inset:0;background:#000;opacity:0;transition:opacity .5s ease}
+.breach .void.in{opacity:1}
+.breach .flash{position:absolute;inset:0;background:#fff;opacity:0}
+.breach .hole{position:absolute;width:0;height:0}
+.breach .hole i,.breach .hole b{position:absolute;left:0;top:0;border-radius:50%;transform:translate(-50%,-50%)}
+.breach .hole i{width:26px;height:26px;background:radial-gradient(circle,#000 34%,rgba(20,0,0,.6) 62%,transparent 72%);
+  box-shadow:0 0 0 2px rgba(255,120,60,.55),0 0 26px rgba(255,120,40,.75);
+  opacity:0;animation:holePunch .3s ease-out forwards}
+.breach .hole b{width:16px;height:16px;background:#FFE8B0;opacity:0;
+  animation:holeFlash .34s ease-out forwards}
+@keyframes holePunch{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}
+  30%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@keyframes holeFlash{0%{opacity:1;transform:translate(-50%,-50%) scale(.4)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(3.4)}}
+.breach .flash.go{animation:breachFlash .5s ease-out forwards}
+@keyframes breachFlash{0%{opacity:0}6%{opacity:1}22%{opacity:.35}55%{opacity:.12}100%{opacity:0}}
+.breach .cracks{position:absolute;inset:0;width:100%;height:100%}
+.breach .crack{fill:none;stroke:#FFF;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 0 5px rgba(224,57,43,.95)) drop-shadow(0 0 14px rgba(224,57,43,.5));
+  stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+  animation:crackDraw .34s cubic-bezier(.2,.8,.3,1) forwards}
+.breach .crack.case{stroke:#0A0004;opacity:.72;filter:none}
+@keyframes crackDraw{to{stroke-dashoffset:0}}
+.breach .shard{position:absolute;inset:0;background:#050506;opacity:0;
+  box-shadow:inset 0 0 0 1px rgba(224,57,43,.28);will-change:transform,opacity}
+.breach .shard.go{animation:shardOut .9s cubic-bezier(.18,.72,.28,1) forwards}
+@keyframes shardOut{0%{opacity:0;transform:none}10%{opacity:1;transform:none}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(1.3)}}
+body.breaching>.mast,body.breaching>nav,body.breaching>.wrap{
+  animation:quakeHard .62s cubic-bezier(.36,.07,.19,.97)}
+@keyframes quakeHard{
+  8%{transform:translate3d(-9px,4px,0) rotate(-.35deg)}
+  18%{transform:translate3d(11px,-6px,0) rotate(.4deg)}
+  30%{transform:translate3d(-13px,5px,0) rotate(-.45deg)}
+  44%{transform:translate3d(9px,-4px,0) rotate(.3deg)}
+  60%{transform:translate3d(-6px,3px,0) rotate(-.2deg)}
+  78%{transform:translate3d(3px,-2px,0)}
+  100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.breach .shard,.breach .crack,.breach .flash{animation:none!important}
+  body.breaching>*{animation:none!important}}
+body.quake>.mast,body.quake>nav,body.quake>.wrap{
+  animation:quake .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes quake{10%,90%{transform:translate3d(-1px,0,0)}20%,80%{transform:translate3d(2px,0,0)}
+  30%,50%,70%{transform:translate3d(-3px,0,0)}40%,60%{transform:translate3d(3px,0,0)}
+  100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.omen{animation:none!important}
+  .mast .scope.hot{animation:none!important}body.quake>*{animation:none!important}}
+.toast b{color:var(--brass);font-weight:700}
+[data-skin-btn="redact"]{font-family:"IBM Plex Mono",monospace;letter-spacing:.1em}
+.mast .scope{cursor:pointer}
+details.expl{border-top:0}
+details.expl>summary{cursor:pointer;list-style:none;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  text-transform:uppercase;letter-spacing:.11em;color:var(--brass);font-weight:600;padding:3px 0;
+  display:flex;align-items:center;gap:7px}
+details.expl>summary::-webkit-details-marker{display:none}
+details.expl>summary::before{content:"\25B8";display:inline-block;transition:transform .16s;font-size:11px}
+details.expl[open]>summary::before{transform:rotate(90deg)}
+details.expl>summary:hover{color:var(--ink)}
+details.expl>p,details.expl .plain{margin-top:9px}
+/* Two fixed columns, not auto-flow: the roster has to sit top-left and every scoring
+   block has to sit together on the right. auto-fit reflowed them by width and put
+   scoring wherever it happened to land. Stacks to one column on a phone, where the
+   left column's order (roster first) is the reading order. */
+.rules{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px 26px;align-items:start}
+.rules-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+/* three columns need ~230px each to not look shredded; below that drop to two, then one.
+   The column divs are explicit, so a dropped column wraps whole rather than interleaving. */
+@media(max-width:1040px){.rules{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.rules{grid-template-columns:1fr;gap:16px}}
+.rules h4{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--brass);font-weight:600;margin:0 0 6px}
+.rules ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+.rules li b{color:var(--ink)}
+/* ================= THE PHARAOH ================= */
+.pharaoh{position:fixed;inset:0;z-index:500;pointer-events:none;display:none;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 62%,#241206 0%,#0A0503 52%,#000 100%);opacity:0}
+.pharaoh.on{display:block;animation:phIn .7s ease forwards}
+.pharaoh.out{animation:phOut 1.1s ease forwards}
+@keyframes phIn{to{opacity:1}}
+@keyframes phOut{to{opacity:0}}
+.ph-rays{position:absolute;left:50%;top:58%;width:200vmax;height:200vmax;margin:-100vmax 0 0 -100vmax;
+  opacity:0;animation:phRays 7.7s ease-out forwards;
+  background:repeating-conic-gradient(from 0deg,rgba(255,140,32,.2) 0deg 3.5deg,rgba(227,178,60,.07) 3.5deg 7deg,transparent 7deg 15deg)}
+@keyframes phRays{0%{opacity:0;transform:rotate(0) scale(.4)}
+  18%{opacity:.85}70%{opacity:.5}100%{opacity:0;transform:rotate(26deg) scale(1.1)}}
+.ph-glow{position:absolute;left:50%;top:60%;width:120vmin;height:120vmin;margin:-60vmin 0 0 -60vmin;
+  border-radius:50%;opacity:0;animation:phGlow 7.7s ease-out forwards;
+  background:radial-gradient(circle,rgba(255,168,60,.62) 0%,rgba(200,60,20,.2) 34%,transparent 68%)}
+@keyframes phGlow{0%{opacity:0;transform:scale(.3)}22%{opacity:1;transform:scale(1)}
+  75%{opacity:.7}100%{opacity:0;transform:scale(1.25)}}
+.ph-mask{position:absolute;left:50%;bottom:-9vh;width:min(66vh,470px);
+  transform:translate(-50%,26vh) scale(.84);opacity:0;
+  animation:phRise 7.7s cubic-bezier(.16,.85,.24,1) forwards;
+  filter:drop-shadow(0 0 46px rgba(255,150,50,.6)) drop-shadow(0 0 90px rgba(190,40,10,.4))}
+@keyframes phRise{0%{transform:translate(-50%,34vh) scale(.8);opacity:0}
+  16%{opacity:1}34%{transform:translate(-50%,0) scale(1);opacity:1}
+  78%{transform:translate(-50%,-1vh) scale(1.02);opacity:1}
+  100%{transform:translate(-50%,-6vh) scale(1.05);opacity:0}}
+.ph-mask svg{width:100%;height:auto;display:block}
+.ph-shine{animation:phShine 7.7s ease-in-out forwards}
+@keyframes phShine{0%,20%{transform:translateX(-420px)}52%{transform:translateX(420px)}100%{transform:translateX(420px)}}
+.ph-txt{position:absolute;left:0;right:0;top:5%;text-align:center;padding:0 18px;z-index:3;
+  text-shadow:0 6px 34px rgba(0,0,0,.85),0 0 60px rgba(0,0,0,.7)}
+.ph-txt div{font-family:var(--wordmark),"Big Shoulders Display",Impact,sans-serif;font-weight:900;
+  line-height:.96;letter-spacing:.06em;opacity:0;
+  background:linear-gradient(180deg,#FFF0C0 6%,#E3B23C 46%,#A5761F 96%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(0 0 26px rgba(227,178,60,.65))}
+.ph-txt .l1{font-size:clamp(34px,8.4vw,104px);animation:phL 7.7s cubic-bezier(.14,.9,.2,1) forwards;animation-delay:.55s}
+.ph-txt .l2{font-size:clamp(22px,5.1vw,62px);margin-top:.12em;
+  animation:phL 7.7s cubic-bezier(.14,.9,.2,1) forwards;animation-delay:1.05s}
+@keyframes phL{0%{opacity:0;letter-spacing:.5em;transform:scale(1.12)}
+  10%{opacity:1;letter-spacing:.06em;transform:scale(1)}
+  80%{opacity:1}100%{opacity:0;transform:scale(1.03)}}
+.ph-g{position:absolute;color:#E3B23C;opacity:0;animation:phFloat 7.7s ease-out forwards}
+.ph-g svg{width:100%;height:100%;display:block;opacity:.8}
+@keyframes phFloat{0%{opacity:0;transform:translateY(30px) rotate(0)}
+  18%{opacity:.85}80%{opacity:.3}100%{opacity:0;transform:translateY(-58vh) rotate(18deg)}}
+.ph-sand{position:absolute;inset:0;opacity:0;animation:phSand 7.7s ease-out forwards;
+  background:radial-gradient(1.6px 1.6px at 20% 70%,rgba(255,214,120,.9),transparent),
+    radial-gradient(1.3px 1.3px at 70% 40%,rgba(255,214,120,.7),transparent),
+    radial-gradient(1.5px 1.5px at 44% 88%,rgba(255,230,170,.8),transparent),
+    radial-gradient(1.2px 1.2px at 86% 76%,rgba(255,214,120,.6),transparent);
+  background-size:280px 280px,190px 190px,240px 240px,160px 160px}
+@keyframes phSand{0%{opacity:0;background-position:0 0,0 0,0 0,0 0}
+  25%{opacity:.9}100%{opacity:0;background-position:0 -300px,0 -220px,0 -260px,0 -180px}}
+@media (prefers-reduced-motion:reduce){.pharaoh *{animation-duration:.01s!important}}
+.botcall{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:rgba(2,6,4,.9);animation:bcIn .22s ease-out;font-family:"IBM Plex Mono",monospace}
+.botcall.out{animation:bcOut .7s ease-in forwards}
+@keyframes bcIn{from{opacity:0}to{opacity:1}}
+@keyframes bcOut{to{opacity:0}}
+.botcall .bc-in{position:relative;text-align:center;padding:34px 52px;border:1px solid #35E07A;
+  background:rgba(4,14,8,.94);box-shadow:0 0 0 1px rgba(53,224,122,.25),0 0 60px rgba(53,224,122,.28);overflow:hidden}
+.botcall .bc-scan{position:absolute;left:0;right:0;height:34%;top:-40%;
+  background:linear-gradient(180deg,transparent,rgba(53,224,122,.16),transparent);
+  animation:bcScan 1.5s linear infinite}
+@keyframes bcScan{to{top:110%}}
+.botcall .bc-tag{font-size:10px;letter-spacing:.34em;color:#35E07A;opacity:.75}
+.botcall .bc-l1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
+  font-size:clamp(46px,10vw,104px);line-height:.95;color:#EAFFF2;letter-spacing:.04em;margin-top:8px;
+  text-shadow:0 0 26px rgba(53,224,122,.6),3px 0 0 rgba(255,46,136,.5),-3px 0 0 rgba(86,199,245,.4);
+  animation:bcGlitch 2.4s steps(1) infinite}
+.botcall .bc-l2{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
+  font-size:clamp(34px,7.4vw,74px);line-height:1;color:#35E07A;letter-spacing:.16em;
+  text-shadow:0 0 30px rgba(53,224,122,.75)}
+@keyframes bcGlitch{0%,88%{transform:none}90%{transform:translateX(-4px) skewX(-6deg)}
+  92%{transform:translateX(5px) skewX(5deg)}94%{transform:none}}
+.botcall .bc-sub{margin-top:12px;font-size:11.5px;letter-spacing:.2em;color:#8FE9C4;opacity:.8}
+.botcall .bc-bits{margin-top:6px;font-size:10px;letter-spacing:.3em;color:#35E07A;opacity:.4}
+@media (prefers-reduced-motion:reduce){.botcall *{animation:none!important}}
+/* the reigning champion, in his own colours */
+.kdef{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(60,4,9,.94),rgba(6,3,3,.97));
+  animation:kdIn .26s ease-out;font-family:"IBM Plex Mono",monospace}
+.kdef.out{animation:kdOut .7s ease-in forwards}
+@keyframes kdIn{from{opacity:0}to{opacity:1}}
+@keyframes kdOut{to{opacity:0}}
+.kdef .kd-in{position:relative;text-align:center;padding:36px 54px;max-width:min(92vw,760px);
+  border:1px solid #D9A82B;background:rgba(24,4,7,.92);
+  box-shadow:0 0 0 1px rgba(217,168,43,.22),0 0 70px rgba(142,21,32,.6);overflow:hidden}
+.kdef .kd-ray{position:absolute;left:-40%;right:-40%;height:180%;top:-40%;
+  background:conic-gradient(from 0deg,transparent 0deg,rgba(217,168,43,.14) 18deg,transparent 38deg,
+    transparent 180deg,rgba(217,168,43,.10) 198deg,transparent 218deg);
+  animation:kdRay 9s linear infinite}
+@keyframes kdRay{to{transform:rotate(360deg)}}
+.kdef .kd-tag{position:relative;font-size:10px;letter-spacing:.34em;color:#D9A82B;opacity:.85}
+.kdef .kd-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(50px,11vw,118px);line-height:.94;letter-spacing:.03em;margin-top:8px;
+  color:#F6D77A;text-shadow:0 0 30px rgba(217,168,43,.7),0 3px 0 rgba(142,21,32,.85);
+  animation:kdGlow 2.8s ease-in-out infinite}
+@keyframes kdGlow{0%,100%{text-shadow:0 0 26px rgba(217,168,43,.55),0 3px 0 rgba(142,21,32,.85)}
+  50%{text-shadow:0 0 46px rgba(217,168,43,.95),0 3px 0 rgba(142,21,32,.85)}}
+.kdef .kd-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(24px,5vw,50px);line-height:1.04;letter-spacing:.1em;margin-top:4px;
+  color:#FFF3D6;text-shadow:0 0 24px rgba(142,21,32,.9)}
+.kdef .kd-sub{position:relative;margin-top:14px;font-size:11.5px;letter-spacing:.2em;color:#E7B9BD;opacity:.9}
+.kdef .kd-mgr{position:relative;margin-top:6px;font-size:10.5px;letter-spacing:.28em;color:#D9A82B;opacity:.55}
+@media (prefers-reduced-motion:reduce){.kdef *{animation:none!important}}
+
+/* Burke: every season there has been, and a scoring line that barely moves. Black and white,
+   with bamboo. */
+.pnda{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(20,21,16,.96),rgba(4,5,4,.98));
+  animation:pnIn .26s ease-out;font-family:"IBM Plex Mono",monospace}
+.pnda.out{animation:pnOut .7s ease-in forwards}
+@keyframes pnIn{from{opacity:0}to{opacity:1}}
+@keyframes pnOut{to{opacity:0}}
+.pnda .pn-in{position:relative;text-align:center;padding:32px 54px 34px;max-width:min(92vw,720px);
+  border:1px solid #6FA33F;background:rgba(12,14,10,.94);
+  box-shadow:0 0 0 1px rgba(244,241,230,.14),0 0 66px rgba(111,163,63,.3)}
+.pnda .pn-face{position:relative;width:118px;height:104px;margin:2px auto 16px}
+.pnda .pn-face .ear{position:absolute;width:46px;height:46px;border-radius:50%;background:#141510;
+  border:3px solid #F4F1E6;top:0}
+.pnda .pn-face .ear.l{left:0}.pnda .pn-face .ear.r{right:0}
+.pnda .pn-face .head{position:absolute;left:9px;right:9px;top:14px;height:90px;border-radius:50%;
+  background:#F4F1E6}
+.pnda .pn-face .eye{position:absolute;width:30px;height:37px;border-radius:50%;background:#141510;top:24px}
+.pnda .pn-face .eye.l{left:14px;transform:rotate(-15deg)}
+.pnda .pn-face .eye.r{right:14px;transform:rotate(15deg)}
+.pnda .pn-face .eye i{position:absolute;width:9px;height:9px;border-radius:50%;background:#F4F1E6;
+  left:10px;top:11px;animation:pnBlink 4.4s steps(1) infinite}
+@keyframes pnBlink{0%,95%{opacity:1}96%,99%{opacity:.15}100%{opacity:1}}
+.pnda .pn-face .nose{position:absolute;left:50%;transform:translateX(-50%);top:58px;
+  width:22px;height:15px;border-radius:50%;background:#141510}
+.pnda .pn-tag{font-size:11px;letter-spacing:.32em;color:#B7DA8C}
+.pnda .pn-l1{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
+  font-size:clamp(44px,9.5vw,100px);line-height:.95;letter-spacing:.03em;margin-top:8px;color:#F4F1E6;
+  text-shadow:0 0 30px rgba(244,241,230,.28)}
+.pnda .pn-l2{font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;font-weight:900;
+  font-size:clamp(22px,4.6vw,46px);line-height:1.05;letter-spacing:.1em;margin-top:3px;color:#9FD063}
+.pnda .pn-sub{margin-top:13px;font-size:12px;letter-spacing:.2em;color:#EAE6D6}
+.pnda .pn-facts{margin-top:8px;font-size:11px;letter-spacing:.22em;color:#BFDD96}
+@media (prefers-reduced-motion:reduce){.pnda *{animation:none!important}}
+
+/* Kaiper: every season of it, seven of them under the same prehistoric name. Amber,
+   jungle dark, and something heavy walking towards you. */
+.jrsc{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 45%,rgba(14,20,10,.95),rgba(3,5,3,.98));
+  animation:jrIn .26s ease-out;font-family:"IBM Plex Mono",monospace}
+.jrsc.out{animation:jrOut .7s ease-in forwards}
+@keyframes jrIn{from{opacity:0}to{opacity:1}}
+@keyframes jrOut{to{opacity:0}}
+.jrsc .jr-in{position:relative;text-align:center;padding:34px 54px;max-width:min(92vw,760px);
+  border:1px solid #E8A33D;background:rgba(16,12,5,.93);
+  box-shadow:0 0 0 1px rgba(232,163,61,.2),0 0 70px rgba(196,64,43,.42);overflow:hidden}
+.jrsc .jr-rip{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;
+  border:2px solid rgba(232,163,61,.5);border-radius:50%;animation:jrRip 3s ease-out infinite;pointer-events:none}
+.jrsc .jr-rip:nth-of-type(2){animation-delay:1s}
+.jrsc .jr-rip:nth-of-type(3){animation-delay:2s}
+@keyframes jrRip{from{transform:scale(.3);opacity:.75}to{transform:scale(15);opacity:0}}
+.jrsc .jr-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F0906A}
+.jrsc .jr-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(40px,9vw,96px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#E8A33D;text-shadow:0 0 34px rgba(232,163,61,.6),0 3px 0 rgba(60,30,6,.9);
+  animation:jrShake 3.4s ease-in-out infinite}
+@keyframes jrShake{0%,86%,100%{transform:none}88%{transform:translate(2px,-1px)}
+  90%{transform:translate(-2px,1px)}92%{transform:translate(1px,1px)}94%{transform:none}}
+.jrsc .jr-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.05;letter-spacing:.1em;margin-top:3px;
+  color:#F3E2C4}
+.jrsc .jr-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F2DDBB}
+.jrsc .jr-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#EFAE86}
+@media (prefers-reduced-motion:reduce){.jrsc *{animation:none!important}}
+
+/* Wu: lacquer red and gold leaf, and a carver's seal. The seal carries the number of
+   seasons he has played, in Chinese numerals, because that is a fact rather than a
+   decoration. */
+.nwu{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(74,8,10,.95),rgba(12,3,3,.98));
+  animation:wuIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.nwu.out{animation:wuOut .7s ease-in forwards}
+@keyframes wuIn{from{opacity:0}to{opacity:1}}
+@keyframes wuOut{to{opacity:0}}
+.nwu .wu-in{position:relative;text-align:center;padding:34px 56px;max-width:min(92vw,740px);
+  border:1px solid #E8C46A;background:rgba(28,5,6,.93);
+  box-shadow:0 0 0 1px rgba(232,196,106,.24),0 0 74px rgba(176,26,32,.62);overflow:hidden}
+.nwu .wu-in::before,.nwu .wu-in::after{content:"";position:absolute;width:26px;height:26px;
+  border:2px solid #E8C46A;opacity:.55}
+.nwu .wu-in::before{left:12px;top:12px;border-right:0;border-bottom:0}
+.nwu .wu-in::after{right:12px;bottom:12px;border-left:0;border-top:0}
+.nwu .wu-seal{position:relative;width:82px;height:82px;margin:0 auto 14px;border-radius:5px;
+  background:#B01A20;border:3px solid #E8C46A;display:grid;place-items:center;
+  transform:rotate(-4deg);box-shadow:0 0 34px rgba(176,26,32,.75)}
+.nwu .wu-seal span{font-family:"Noto Serif SC","Songti SC","SimSun",serif;font-size:44px;
+  line-height:1;color:#FFF3D6;font-weight:700}
+.nwu .wu-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F0CE84}
+.nwu .wu-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(44px,9.5vw,102px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#F7E3AE;text-shadow:0 0 32px rgba(232,196,106,.6),0 3px 0 rgba(96,10,12,.9)}
+.nwu .wu-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(22px,4.6vw,46px);line-height:1.05;letter-spacing:.09em;margin-top:3px;
+  color:#F26B62}
+.nwu .wu-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F6E2C4}
+.nwu .wu-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#F0CE84}
+@media (prefers-reduced-motion:reduce){.nwu *{animation:none!important}}
+
+/* Gearing: scarlet and gold, and the yard lines you get to look along when your seat
+   is one of the twenty at pitch level. */
+.gr49{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 42%,rgba(126,4,4,.95),rgba(14,3,3,.98));
+  animation:grIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.gr49.out{animation:grOut .7s ease-in forwards}
+@keyframes grIn{from{opacity:0}to{opacity:1}}
+@keyframes grOut{to{opacity:0}}
+.gr49 .gr-in{position:relative;text-align:center;padding:34px 56px 30px;max-width:min(92vw,760px);
+  border:1px solid #C9AE72;background:linear-gradient(180deg,rgba(122,6,6,.96),rgba(74,4,4,.97));
+  box-shadow:0 0 0 1px rgba(201,174,114,.3),0 0 84px rgba(170,0,0,.75);overflow:hidden}
+.gr49 .gr-turf{position:absolute;left:0;right:0;bottom:0;height:96px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.30) 46px 49px);
+  mask-image:linear-gradient(180deg,transparent,#000);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000)}
+.gr49 .gr-tag{position:relative;font-size:13px;font-weight:600;letter-spacing:.24em;color:#FFEFC4;
+  text-shadow:0 1px 3px rgba(40,0,0,.9)}
+.gr49 .gr-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(42px,9vw,98px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#F4E7C4;text-shadow:0 0 30px rgba(179,153,93,.55),0 3px 0 rgba(120,0,0,.95)}
+.gr49 .gr-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(20px,4.2vw,42px);line-height:1.06;letter-spacing:.08em;margin-top:3px;
+  color:#F2D89C}
+.gr49 .gr-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.2em;color:#F3E3C6}
+.gr49 .gr-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E8D3A0}
+@media (prefers-reduced-motion:reduce){.gr49 *{animation:none!important}}
+
+/* Niko: two titles running, the second with a worse team than the first. A marquee. */
+.mrqe{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(28,20,10,.95),rgba(6,5,4,.98));
+  animation:mqIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.mrqe.out{animation:mqOut .7s ease-in forwards}
+@keyframes mqIn{from{opacity:0}to{opacity:1}}
+@keyframes mqOut{to{opacity:0}}
+.mrqe .mq-in{position:relative;text-align:center;padding:40px 56px;max-width:min(92vw,760px);
+  border:2px solid #F2C75C;background:linear-gradient(180deg,rgba(24,16,8,.96),rgba(46,10,12,.95));
+  box-shadow:0 0 0 1px rgba(242,199,92,.22),0 0 80px rgba(242,199,92,.34)}
+.mrqe .mq-bulbs{position:absolute;left:14px;right:14px;display:flex;justify-content:space-between}
+.mrqe .mq-bulbs.t{top:11px}.mrqe .mq-bulbs.b{bottom:11px}
+.mrqe .mq-bulbs i{width:8px;height:8px;border-radius:50%;background:#F2C75C;
+  box-shadow:0 0 9px #F2C75C;animation:mqBulb 1.1s ease-in-out infinite}
+.mrqe .mq-bulbs i:nth-child(3n+2){animation-delay:.37s}
+.mrqe .mq-bulbs i:nth-child(3n+3){animation-delay:.73s}
+@keyframes mqBulb{0%,100%{opacity:1}50%{opacity:.22}}
+.mrqe .mq-tag{position:relative;font-size:15px;font-weight:600;letter-spacing:.26em;color:#FFDD8E;
+  text-shadow:0 1px 3px rgba(30,10,0,.9)}
+.mrqe .mq-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(42px,9vw,98px);line-height:.95;letter-spacing:.03em;margin-top:9px;
+  color:#FFF4DA;text-shadow:0 0 34px rgba(242,199,92,.6),0 3px 0 rgba(110,18,22,.95)}
+.mrqe .mq-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
+  color:#F2C75C}
+.mrqe .mq-dir{position:relative;font-family:Fraunces,Georgia,serif;font-style:italic;
+  font-weight:600;font-size:clamp(15px,2.6vw,22px);line-height:1.2;margin-top:6px;color:#F7E7C6}
+.mrqe .mq-rule{position:relative;height:1px;margin:16px auto 0;max-width:74%;
+  background:linear-gradient(90deg,transparent,rgba(242,199,92,.5),transparent)}
+.mrqe .mq-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#F7E7C6}
+.mrqe .mq-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#E9BE72}
+@media (prefers-reduced-motion:reduce){.mrqe *{animation:none!important}}
+
+/* Wesley: the best win rate on record, and a rating that has fallen every single year.
+   His own five seasons are drawn as the line they make. */
+.tkr{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(6,14,12,.96),rgba(2,4,4,.98));
+  animation:tkIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.tkr.out{animation:tkOut .7s ease-in forwards}
+@keyframes tkIn{from{opacity:0}to{opacity:1}}
+@keyframes tkOut{to{opacity:0}}
+.tkr .tk-in{position:relative;text-align:center;padding:32px 54px 30px;max-width:min(92vw,760px);
+  border:1px solid #2E7D5B;background:rgba(4,10,9,.95);
+  box-shadow:0 0 0 1px rgba(63,208,122,.16),0 0 70px rgba(228,69,60,.3)}
+.tkr .tk-chart{position:relative;width:min(100%,420px);margin:2px auto 14px}
+.tkr .tk-chart svg{display:block;width:100%;height:auto}
+.tkr .tk-dot{animation:tkPulse 1.6s ease-in-out infinite}
+@keyframes tkPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tkr .tk-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#E4453C}
+.tkr .tk-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(40px,8.6vw,94px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#E9F5EC;text-shadow:0 0 30px rgba(63,208,122,.35)}
+.tkr .tk-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
+  color:#E4453C}
+.tkr .tk-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#CFE7D8}
+.tkr .tk-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#5FD497}
+@media (prefers-reduced-motion:reduce){.tkr *{animation:none!important}}
+
+/* McMahon: league lore says he is unguardable on a court. The record says the rim was
+   never his problem. */
+.hoop{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 90% at 50% 42%,rgba(58,32,12,.96),rgba(8,5,3,.98));
+  animation:hpIn .28s ease-out;font-family:"IBM Plex Mono",monospace}
+.hoop.out{animation:hpOut .7s ease-in forwards}
+@keyframes hpIn{from{opacity:0}to{opacity:1}}
+@keyframes hpOut{to{opacity:0}}
+.hoop .hp-in{position:relative;text-align:center;padding:30px 56px 34px;max-width:min(92vw,760px);
+  border:1px solid #E07B2C;background:linear-gradient(180deg,rgba(46,26,10,.96),rgba(24,13,5,.97));
+  box-shadow:0 0 0 1px rgba(224,123,44,.24),0 0 76px rgba(224,123,44,.34);overflow:hidden}
+.hoop .hp-court{position:absolute;left:50%;bottom:-118px;transform:translateX(-50%);
+  width:236px;height:236px;border:2px solid rgba(244,233,214,.28);border-radius:50%;pointer-events:none}
+.hoop .hp-ball{position:relative;width:86px;height:86px;margin:0 auto 14px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#F09A4E,#C9631E 68%);
+  box-shadow:0 0 30px rgba(224,123,44,.5);animation:hpBounce 1.9s cubic-bezier(.5,0,.6,1) infinite}
+@keyframes hpBounce{0%,100%{transform:translateY(0) scaleY(1)}
+  42%{transform:translateY(-16px) scaleY(1.03)}52%{transform:translateY(0) scaleY(.93)}62%{transform:translateY(0) scaleY(1)}}
+.hoop .hp-ball{overflow:hidden}
+/* the two curved seams: an ellipse narrower than the ball, showing only its sides */
+.hoop .hp-ball::before{content:"";position:absolute;top:-1px;bottom:-1px;left:50%;width:58%;
+  margin-left:-29%;border-radius:50%;border:3px solid rgba(60,26,8,.72);border-top:0;border-bottom:0}
+/* and the horizontal seam */
+.hoop .hp-ball::after{content:"";position:absolute;left:0;right:0;top:50%;height:3px;
+  margin-top:-1.5px;background:rgba(60,26,8,.72)}
+.hoop .hp-seam{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;
+  background:rgba(60,26,8,.72)}
+.hoop .hp-tag{position:relative;font-size:11px;letter-spacing:.32em;color:#F2B071}
+.hoop .hp-l1{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(40px,8.6vw,94px);line-height:.95;letter-spacing:.03em;margin-top:8px;
+  color:#FBEEDA;text-shadow:0 0 30px rgba(224,123,44,.5),0 3px 0 rgba(70,32,8,.9)}
+.hoop .hp-l2{position:relative;font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  font-weight:900;font-size:clamp(21px,4.4vw,44px);line-height:1.06;letter-spacing:.09em;margin-top:3px;
+  color:#F09A4E}
+.hoop .hp-sub{position:relative;margin-top:13px;font-size:12px;letter-spacing:.18em;color:#F7E3C8}
+.hoop .hp-facts{position:relative;margin-top:8px;font-size:11px;letter-spacing:.22em;color:#F2B071}
+@media (prefers-reduced-motion:reduce){.hoop *{animation:none!important}}
+.chaosov{position:fixed;inset:0;z-index:180;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);
+  animation:chFlick .09s steps(1) infinite}
+@keyframes chFlick{0%{opacity:.85;transform:translateY(0)}50%{opacity:.5;transform:translateY(1px)}100%{opacity:.85}}
+.chaosov .ch-msg{position:absolute;left:0;right:0;top:44%;text-align:center;
+  font-family:"IBM Plex Mono",monospace;font-size:clamp(15px,3vw,30px);letter-spacing:.34em;
+  color:#fff;opacity:0;text-shadow:0 0 26px rgba(0,0,0,.9),3px 0 0 rgba(255,46,136,.6),-3px 0 0 rgba(86,199,245,.6)}
+.chaosov.settle .ch-msg{animation:chMsg 1.5s ease forwards}
+@keyframes chMsg{0%{opacity:0;letter-spacing:.7em}22%{opacity:1;letter-spacing:.34em}70%{opacity:1}100%{opacity:0}}
+body.chaosing{animation:chShake .13s steps(2) infinite}
+@keyframes chShake{0%{transform:none}50%{transform:translate3d(1px,-1px,0)}100%{transform:none}}
+body.chaosing td.num,body.chaosing td.mono,body.chaosing .lad-s{color:var(--brass)!important}
+@media (prefers-reduced-motion:reduce){.chaosov,body.chaosing{animation:none!important}}
+#tTrMtx{width:auto}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--grid-h) 1px,transparent 1px),linear-gradient(90deg,var(--grid-v) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(130% 90% at 50% 0%,#000 0%,transparent 72%);
+  mask-image:radial-gradient(130% 90% at 50% 0%,#000 0%,transparent 72%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:var(--tex,none);background-size:var(--tex-size,auto);opacity:.9}
+.wrap,nav,.mast{position:relative;z-index:1}
+h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;text-wrap:balance;margin:0;font-variation-settings:"SOFT" 0,"WONK" 0}
+a{color:var(--brass)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right}
+/* ---------- masthead: the scope ---------- */
+.mast{position:relative;overflow:hidden;background:var(--mast-bg);border-bottom:1px solid var(--mast-rule)}
+/* Installed on a phone the page gets the whole screen, status bar included, so the
+   masthead has to hold its own space back or the clock and battery sit on the wordmark.
+   Scoped to the installed app: in a browser there is no inset to reserve. */
+@media (display-mode:standalone){
+  .mast{padding-top:env(safe-area-inset-top,0px)}
+  .totop{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
+.mast::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(var(--mast-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mast-grid) 1px,transparent 1px);
+  background-size:34px 34px;opacity:.5}
+.mast::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(120% 130% at 22% 40%,transparent 20%,var(--mast-vig) 78%)}
+.mast-in{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:16px 32px;
+  padding:26px 22px 24px;max-width:var(--max);margin:0 auto}
+.scope{flex:0 0 auto;width:126px;height:126px;filter:drop-shadow(0 0 11px var(--mast-glow))}
+/* the reticle grid becomes a football field on Pigskin: yard lines, sidelines, hashes */
+.scope .sw0{stop-opacity:0}
+.scope .sw1{stop-opacity:calc(var(--rt-sweep,.62) * .42)}
+.scope .sw2{stop-opacity:var(--rt-sweep,.62)}
+.scope .rt-grid-field{display:none}
+[data-skin="leather"] .scope .rt-grid-plain{display:none}
+[data-skin="leather"] .scope .rt-grid-field{display:block}
+.scope .sweep{animation:scopeSpin 5.5s linear infinite;transform-origin:60px 60px}
+@keyframes scopeSpin{to{transform:rotate(360deg)}}
+/* the contact only exists on the redacted file: the sweep passes it once per rotation
+   and it answers. Hidden everywhere else so the other five skins are untouched. */
+.scope .blip{opacity:0}
+[data-skin="redact"] .scope .blip{animation:blipPing 5.5s linear infinite}
+[data-skin="redact"] .scope .blip-ring{animation:blipRing 5.5s linear infinite;transform-origin:84px 41px}
+/* the wedge is bright at its LEADING edge, which sits at rot+42 and crosses the blip
+   at rot 9.6deg = 2.7% of the cycle. Ping there, sharply, then fade out. */
+@keyframes blipPing{0%,2.4%{opacity:0}3.4%{opacity:1}9%{opacity:.5}17%,100%{opacity:0}}
+@keyframes blipRing{0%,2.4%{transform:scale(1);opacity:0}3.4%{transform:scale(1);opacity:.9}
+  19%,100%{transform:scale(3.6);opacity:0}}
+[data-skin="redact"] .scope{filter:drop-shadow(0 0 13px var(--mast-glow)) drop-shadow(0 0 2px rgba(200,162,74,.35))}
+@media (prefers-reduced-motion:reduce){.scope .sweep{animation:none}
+  [data-skin="redact"] .scope .blip,[data-skin="redact"] .scope .blip-ring{animation:none}
+  [data-skin="redact"] .scope .blip{opacity:.9}}
+.brand{display:flex;flex-direction:column;gap:1px;min-width:0;position:relative;z-index:2}
+.kicker{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.34em;text-transform:uppercase;
+  color:var(--mast-kick);opacity:.9}
+.mast h1{font-family:var(--wordmark);font-weight:900;
+  font-size:clamp(48px,9vw,92px);line-height:.86;letter-spacing:.055em;color:var(--mast-ink);margin:2px 0 0;
+  text-shadow:0 0 20px var(--mast-glow),0 0 52px var(--mast-glow2)}
+.mast .sub{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:clamp(15px,2vw,20px);
+  color:var(--mast-sub);margin-top:5px;font-variation-settings:"opsz" 40}
+.facts{display:flex;gap:22px;flex-wrap:wrap;margin-left:auto;position:relative;z-index:2}
+.fact{display:flex;flex-direction:column;padding-left:11px;border-left:1px solid var(--mast-rule)}
+.fact b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:21px;line-height:1.15;color:var(--mast-kick);
+  font-variant-numeric:tabular-nums}
+.fact span{font-size:9.5px;text-transform:uppercase;letter-spacing:.13em;color:var(--mast-sub);opacity:.8;font-family:"IBM Plex Mono",monospace}
+@media(max-width:640px){.scope{width:64px;height:64px}
+  .mast-in{padding:15px 16px 14px;gap:10px 18px}
+  .mast h1{font-size:clamp(34px,10.5vw,92px);letter-spacing:.04em}
+  .kicker{font-size:9px;letter-spacing:.26em}
+  .facts{gap:10px 14px;margin-top:2px}
+  .fact{padding-left:9px}
+  .fact b{font-size:15px}.fact span{font-size:8.5px;letter-spacing:.1em}
+  .mast .sub-wm{font-size:19px}}
+.navmark{flex:0 0 auto;display:flex;align-items:center;padding:0 10px 0 4px;position:sticky;left:0;z-index:5;background:linear-gradient(var(--nav-bg),var(--nav-bg)),linear-gradient(var(--nav-bg),var(--nav-bg));box-shadow:-16px 0 0 var(--nav-bg),-16px 0 0 var(--nav-bg)}
+.navmark svg{width:18px;height:18px;opacity:.9}
+nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.nav-row{position:relative;max-width:var(--max);margin:0 auto}
+.nav-in{display:flex;gap:2px;overflow-x:auto;padding:0 14px;
+  scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth}
+.nav-in::-webkit-scrollbar{display:none}
+.nav-row::before,.nav-row::after{content:"";position:absolute;top:0;bottom:0;width:46px;pointer-events:none;
+  z-index:3;opacity:0;transition:opacity .22s}
+.nav-row::before{left:46px;background:linear-gradient(90deg,var(--nav-bg) 12%,transparent)}
+.nav-row::after{right:0;background:linear-gradient(270deg,var(--nav-bg) 12%,transparent)}
+.nav-row.sL::before{opacity:1}.nav-row.sR::after{opacity:1}
+.nav-ar{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:26px;height:26px;
+  display:none;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;
+  background:var(--surface);border:1px solid var(--rule);color:var(--ink-2);font-size:12px;line-height:1;padding:0}
+.nav-row.sL .nav-ar.l{display:flex}.nav-row.sR .nav-ar.r{display:flex}
+.nav-ar.l{left:50px}.nav-ar.r{right:2px}
+.nav-ar:hover{color:var(--brass);border-color:var(--brass-2)}
+@media(max-width:760px){.nav-ar{display:none!important}}
+nav a{flex:0 0 auto;padding:11px 13px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;font-family:"IBM Plex Mono",monospace}
+nav a:hover{color:var(--ink)}
+nav a.on{color:var(--brass);border-bottom-color:var(--brass)}
+nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+section{padding:52px 0 6px;scroll-margin-top:96px}
+.fb{border-top:1px solid var(--rule-2);background:var(--surface)}
+.fb-in{display:flex;gap:7px;align-items:center;max-width:var(--max);margin:0 auto;padding:7px 22px;flex-wrap:wrap}
+.skip{position:absolute;left:-9999px;top:0;z-index:500;padding:12px 18px;
+  background:var(--brass);color:var(--surface);font-family:"IBM Plex Mono",monospace;
+  font-size:13px;font-weight:600;text-decoration:none;border-radius:0 0 4px 0}
+.skip:focus{left:0}
+@media(pointer:coarse){
+  /* WCAG asks for roughly 44px of touch target. These controls were 25-27px, which is
+     a lot of mis-taps on a phone. Grow the hit area, not the visual weight. */
+  nav a{padding-top:15px;padding-bottom:15px}
+  .fb-in button,.fb-in select,.pills button,.card-h button,.card-h .right button{
+    min-height:40px;padding-top:9px;padding-bottom:9px}
+  .chip{min-height:38px;display:inline-flex;align-items:center}
+  .fb-sum{min-height:46px}
+  #recsToggle,#toTop,.wrapBtn{min-height:44px}
+}
+.fb-sum{display:none}
+@media(max-width:760px){
+  .fb-sum{display:flex;width:100%;align-items:center;gap:8px;padding:9px 16px;
+    background:none;border:0;border-radius:0;cursor:pointer;text-align:left;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-2)}
+  .fb-sum b{color:var(--brass);font-weight:600}
+  .fb-sum .ar{margin-left:auto;transition:transform .18s}
+  .fb.open .fb-sum .ar{transform:rotate(180deg)}
+  .fb .fb-in{display:none}
+  .fb.open .fb-in{display:flex;padding-top:0;padding-bottom:10px}
+}
+/* League rules opens the same content as the section at the bottom of the page, in a
+   dialog, because nobody scrolls to the bottom of a long page to check a scoring rule.
+   On a phone the whole control bar collapses behind one summary line -- this button is
+   exempted from that, so it stays reachable without expanding anything first. */
+#rulesBtn{border-color:var(--brass-2);color:var(--brass);font-weight:600}
+#rulesBtn:hover{border-color:var(--brass);background:var(--hover)}
+@media(max-width:760px){
+  .fb .fb-in{display:flex;padding:0 16px 9px}
+  .fb:not(.open) .fb-in>*:not(#rulesBtn){display:none}
+  .fb.open .fb-in{padding-top:0;padding-bottom:10px}
+  #rulesBtn{width:100%;justify-content:center;min-height:38px}
+}
+.fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
+.fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}
+.fb-in [data-skin-btn]{padding:4px 9px}
+#wkYears{position:sticky;top:86px;z-index:30;background:var(--ground);margin:0 -8px 20px;padding:9px 8px;
+  border-bottom:1px solid var(--rule);box-shadow:0 6px 14px -12px rgba(0,0,0,.6)}
+#wkYears .now{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--brass);
+  letter-spacing:.09em;text-transform:uppercase;font-weight:600}
+.fb-chips[hidden]{display:none}
+.fb-chips{max-width:var(--max);margin:0 auto;padding:2px 22px 11px;display:flex;flex-wrap:wrap;gap:5px}
+.fb-chips button{padding:3px 9px;font-size:11px;opacity:.45}
+.fb-chips button.on{opacity:1}
+.fb-chips button::before{content:"\2715";margin-right:5px;font-size:8px;opacity:.6}
+.fb-chips button.on::before{content:"\2713"}
+tr.off{opacity:.3}
+.side.off,.game.off{opacity:.32}
+.sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px var(--rule-style) var(--brass-2);padding-bottom:9px;margin-bottom:6px;position:relative}
+.sec-head::after{content:"";position:absolute;left:0;bottom:-1px;width:74px;height:2px;background:var(--brass);box-shadow:0 0 10px var(--mast-glow2)}
+.sec-head h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-.012em;font-variation-settings:"opsz" 72;color:var(--head-ink)}
+.sec-head .rule-note{margin-left:auto;font-size:10.5px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);text-align:right}
+.lede{color:var(--ink-2);max-width:70ch;margin:14px 0 22px;font-size:14.5px}
+.lede strong{color:var(--ink);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--card-r);box-shadow:var(--shadow);overflow:hidden;color:var(--ink)}
+.card+.card{margin-top:20px}
+.card-h{display:flex;align-items:baseline;gap:12px;padding:13px 16px;border-bottom:1px solid var(--rule);background:var(--surface-2);flex-wrap:wrap}
+.card-h h3{font-size:15px;font-weight:700;font-variation-settings:"opsz" 20}
+/* trade cards are titled "TeamA <-> TeamB". A long team name with no spaces in it
+   cannot wrap, and pushed the heading straight out of the card on a phone. Let it
+   break mid-word rather than overflow; min-width:0 so the flex child may shrink. */
+#trades .card-h{min-width:0}
+#trades .card-h h3{overflow-wrap:anywhere;min-width:0}
+#trades .sub-h{overflow-wrap:anywhere;min-width:0}
+.card-h .sub{font-size:11.5px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+.card-h .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.card-b{padding:16px}
+.scroll{overflow-x:auto}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,196px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.plate{background:var(--surface);color:var(--ink);padding:15px 16px 14px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:background .12s;border:0;text-align:left;font-family:inherit;font-size:inherit;color:inherit}
+.plate:hover{background:var(--surface-2)}
+.plate{position:relative}
+.plate .cup{position:absolute;right:13px;top:12px;width:30px;height:34px;color:var(--brass);opacity:.5;transition:opacity .15s,transform .15s}
+.plate:hover .cup{opacity:1;transform:translateY(-2px) scale(1.06)}
+.plate.split .cup{opacity:.38}
+.plate .yr{font-family:Fraunces,serif;font-weight:900;font-size:31px;line-height:1;letter-spacing:-.02em;color:var(--brass);font-variation-settings:"opsz" 60;text-shadow:0 0 14px var(--mast-glow2)}
+.plate .mgr{font-weight:700;font-size:14.5px;margin-top:5px}
+.plate .tm{font-size:12.5px;color:var(--ink-2);font-style:italic}
+.plate .meta{margin-top:8px;padding-top:8px;border-top:1px solid var(--rule-2);font-size:10.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink-3);letter-spacing:.03em;text-transform:uppercase}
+table{border-collapse:collapse;width:100%;font-size:13.5px;color:var(--ink)}
+td{color:var(--ink)}
+th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--rule-2);white-space:nowrap}
+thead th{position:sticky;top:0;background:var(--surface-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--ink-2);font-weight:600;font-family:"IBM Plex Mono",monospace;border-bottom:1px solid var(--rule);z-index:2}
+th.s{cursor:pointer;user-select:none}
+th.s:hover{color:var(--ink)}
+th.s::after{content:"\2195";opacity:.28;margin-left:4px;font-size:9px}
+th.s.asc::after{content:"\2191";opacity:1;color:var(--brass)}
+th.s.desc::after{content:"\2193";opacity:1;color:var(--brass)}
+tbody tr:hover{background:var(--hover)}
+td.nm{font-weight:600}
+td.tm{color:var(--ink-2);font-style:italic}
+.rk{color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:11.5px;width:26px;text-align:right}
+/* records: the team column absorbs the slack and ellipsizes, so the value never scrolls out of reach */
+#recs .scroll table{width:100%}
+#recs td.nm,#recs td.tm,#recs td.dim{white-space:normal;overflow-wrap:break-word}
+#recs td.num{white-space:normal}
+/* narrow phones: tighten the cells first, and only then allow a word to break, so the
+   value column is never pushed out of reach on a 320px screen */
+@media(max-width:430px){#recs th,#recs td{padding:6px 5px}}
+@media(max-width:345px){#recs td.nm,#recs td.tm,#recs td.dim{overflow-wrap:anywhere}}
+/* the two-manager compare table: th,td are nowrap globally, so two long manager names
+   plus the label column came to 331px and dragged the whole page sideways on a 320px
+   screen. Let the names wrap rather than adding another horizontal scroller. */
+#cmpOut th,#cmpOut td{white-space:normal;overflow-wrap:break-word}
+@media(max-width:345px){#cmpOut th,#cmpOut td{padding:6px 5px}}
+/* the record-to-share picker sizes itself to its longest option label (~300px) and was
+   the next thing sticking off a 320px screen once the table above stopped doing it.
+   The 8px is its own inline margin-left. */
+#recPick{max-width:calc(100% - 8px)}
+tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6px;font-size:9px;vertical-align:2px}
+.dim{color:var(--ink-3)}
+.mlink{cursor:pointer;border-bottom:1px dotted var(--brass-2)}
+.mlink:hover{color:var(--brass)}
+.dimrow{opacity:.14}
+.pickrow{box-shadow:inset 3px 0 0 var(--brass)}
+#tHeat tbody tr{transition:opacity .1s}
+.dbar{position:relative;height:15px;width:120px;display:block}
+.dbar i{position:absolute;top:2px;height:11px;border-radius:0 2px 2px 0;display:block}
+.dbar i.l{border-radius:2px 0 0 2px}
+.dbar u{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule);display:block}
+.chip{display:inline-block;padding:1px 7px;border-radius:2px;font-size:11px;font-family:"IBM Plex Mono",monospace;font-weight:500;border:1px solid var(--rule)}
+.chip.y{background:var(--brass-wash);border-color:var(--brass-2);color:var(--brass)}
+table.heat td.h{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;padding:0;width:52px;border:1px solid var(--surface)}
+table.heat td.h span{display:block;padding:7px 0;border-radius:2px;cursor:pointer}
+table.heat td.h.e span{color:var(--ink-2);opacity:.85;cursor:default}
+button,select,input{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:2px;padding:5px 10px;cursor:pointer}
+input{cursor:text}
+button:hover,select:hover{border-color:var(--brass-2)}
+button.on{background:var(--brass-wash);border-color:var(--brass-2);color:var(--brass);font-weight:600}
+.pills{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.pills button{padding:5px 11px;font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;padding:0;border:0;width:180px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--rule);border-radius:2px}
+input[type=range]::-moz-range-track{height:4px;background:var(--rule);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--brass);margin-top:-5.5px;border:0}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--brass);border:0}
+footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 46px;color:var(--ink-3);font-size:12px}
+.tip{position:fixed;pointer-events:none;z-index:120;background:var(--surface);color:var(--ink);border:1px solid var(--brass-2);padding:7px 10px;border-radius:3px;font-size:12px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .1s;max-width:290px}
+.tip b{color:var(--brass)}
+.tip.on{opacity:1}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+/* bracket */
+.brk{position:relative;overflow-x:auto;padding:4px 2px 8px}
+.brk-in{position:relative;display:flex;gap:44px;min-width:min-content}
+.brk svg.conn{position:absolute;inset:0;pointer-events:none;overflow:visible;width:100%;height:100%}
+.round{flex:0 0 224px;display:flex;flex-direction:column;justify-content:space-around;gap:14px;position:relative;z-index:1}
+.round h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin:0 0 2px;font-weight:600;text-align:center}
+.game{border:1px solid var(--rule);border-radius:var(--card-r);overflow:hidden;background:var(--surface);color:var(--ink);transition:box-shadow .12s,border-color .12s}
+.game.hi{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass-wash)}
+.game .gh{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;padding:4px 9px;background:var(--surface-2);color:var(--ink-2);font-family:"IBM Plex Mono",monospace;border-bottom:1px solid var(--rule-2)}
+.side{display:flex;align-items:center;gap:8px;padding:7px 9px;font-size:12.5px;cursor:default}
+.side+.side{border-top:1px solid var(--rule-2)}
+.side .sd{width:15px;font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3);text-align:right;flex:0 0 15px}
+.side .tn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.side .tn small{display:block;font-size:10.5px;color:var(--ink-3);font-weight:400}
+.side .sc{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:13px}
+.side.w{font-weight:700}
+.side.w .sc{color:var(--brass)}
+.side.lo{color:var(--ink-3)}
+.side.lo .tn{text-decoration:line-through;text-decoration-thickness:1px}
+.side.bye{color:var(--ink-3);font-style:italic}
+.side.act{background:var(--brass-wash)}
+.rt-glow{filter:drop-shadow(0 0 6px var(--mast-glow2))}
+.game.void{border-color:var(--neg)}
+.game.void .gh{background:var(--neg);color:#fff}
+.wk{border-top:1px solid var(--rule-2);padding:10px 0}
+.wk:first-child{border-top:0;padding-top:0}
+.wk summary{cursor:pointer;font-weight:700;font-size:13.5px;list-style:none;padding:3px 0}
+.wk summary::-webkit-details-marker{display:none}
+.wk summary::before{content:"\25B8";display:inline-block;margin-right:7px;color:var(--brass);transition:transform .12s}
+.wk[open] summary::before{transform:rotate(90deg)}
+.wkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;padding:10px 0 4px}
+:root[data-skin="arcade"] .mast h1{font-size:clamp(22px,3.6vw,44px);letter-spacing:.02em;line-height:1.12}
+:root[data-skin="arcade"] .fact b,:root[data-skin="arcade"] nav a{letter-spacing:.02em}
+:root[data-skin="leather"] .sec-head::after{background:repeating-linear-gradient(90deg,var(--brass) 0 7px,transparent 7px 13px);box-shadow:none}
+:root[data-skin="leather"] .mast::before{background-image:
+  repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.13) 46px 50px);
+  background-size:auto;opacity:1}
+.brk-champ{align-self:center;text-align:center;padding:14px 12px;border:1px solid var(--brass-2);background:var(--brass-wash);border-radius:3px;box-shadow:0 0 22px var(--mast-glow2)}
+.brk-champ .t{font-family:Fraunces,serif;font-weight:900;font-size:19px;color:var(--brass);line-height:1.15;text-shadow:0 0 12px var(--mast-glow2)}
+.brk-champ .s{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;font-family:"IBM Plex Mono",monospace;color:var(--brass-2);margin-bottom:4px}
+table.mtx th.v{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;padding:8px 3px;text-align:left;height:118px;white-space:nowrap;position:static}
+table.mtx td{text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:0;border:1px solid var(--surface);width:42px}
+table.mtx td span{display:block;padding:6px 0;border-radius:2px}
+table.mtx td.self span{background:var(--rule-2);color:var(--ink-2)}
+table.mtx th.rw{font-size:12px;text-align:left;font-family:"IBM Plex Sans",sans-serif;font-weight:600;
+  position:sticky;left:0;z-index:4;background:var(--surface);text-transform:none;letter-spacing:0;
+  box-shadow:1px 0 0 var(--rule)}
+table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
+.method{border-top:1px solid var(--rule)}
+.mrow{display:grid;grid-template-columns:170px 1fr 1fr;border-bottom:1px solid var(--rule-2)}
+.mrow>div{padding:12px 14px}
+.mrow .k{font-weight:700;font-size:13.5px;border-right:1px solid var(--rule-2)}
+.mrow .d{color:var(--ink-2);font-size:13px;border-right:1px solid var(--rule-2)}
+.mrow .r{color:var(--ink-2);font-size:13px}
+.mrow .k{color:var(--ink)}
+.mrow code{font-family:"IBM Plex Mono",monospace;font-size:12px;background:var(--surface-2);padding:1px 4px;border-radius:2px;color:var(--ink)}
+.mgroup{background:var(--surface-2);padding:9px 14px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--brass);font-weight:600;border-bottom:1px solid var(--rule-2)}
+@media(max-width:760px){.mrow{grid-template-columns:1fr}.mrow .k,.mrow .d{border-right:none;border-bottom:1px solid var(--rule-2)}}
+/* modal */
+.ov{position:fixed;inset:0;background:var(--ov);backdrop-filter:blur(3px);z-index:100;display:none;padding:26px 16px;overflow-y:auto}
+.ov.on{display:block}
+/* The header used to be position:sticky inside .ov, which scrolls. .ov has 26px of
+   top padding, so the header stuck 26px down and the body scrolled up through the gap
+   above it -- you could read the lede sliding along over the page behind. The dialog
+   now bounds its own height and scrolls its body instead, so nothing can pass above
+   the header. dvh as well as vh: on iOS, 100vh is the height with the browser bars
+   hidden, so a vh-only dialog is taller than the screen and the close button sits
+   under Safari's toolbar. */
+.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4);
+  display:flex;flex-direction:column;max-height:calc(100vh - 52px);max-height:calc(100dvh - 52px)}
+.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);flex:0 0 auto;border-radius:4px 4px 0 0}
+.modal-h h3{font-size:27px;font-weight:900;letter-spacing:-.015em;font-variation-settings:"opsz" 72}
+.modal-h .sub{font-size:11.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.xbtn{margin-left:auto;font-size:16px;line-height:1;padding:6px 11px}
+.modal-b{padding:20px 22px 26px;overflow-x:hidden;overflow-y:auto;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:20px}
+.tile{background:var(--surface);color:var(--ink);padding:11px 13px}
+.tile b{display:block;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-weight:600;font-size:19.5px;line-height:1.2;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tile span{font-size:9.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+.sub-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--brass);font-family:"IBM Plex Mono",monospace;font-weight:600;margin:22px 0 9px}
+.sub-h:first-child{margin-top:0}
+
+/* ============ Wrapped: story mode ============ */
+.wrap-ov{position:fixed;inset:0;z-index:140;display:none;background:#08080a}
+.wrap-ov.on{display:flex;align-items:center;justify-content:center}
+.wr-stage{position:relative;width:min(452px,calc(100vw - 20px));height:min(812px,calc(100dvh - 20px));
+  border-radius:16px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.62);display:flex;flex-direction:column;
+  background:#161622;transition:background .55s ease}
+.wr-stage::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 70% at 50% 105%,rgba(0,0,0,.5),transparent 62%);mix-blend-mode:multiply}
+.wr-blob{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;pointer-events:none}
+.wr-blob.a{width:64%;aspect-ratio:1;left:-16%;top:6%;background:rgba(255,255,255,.28);animation:wrFloatA 15s ease-in-out infinite}
+.wr-blob.b{width:52%;aspect-ratio:1;right:-14%;bottom:10%;background:rgba(255,255,255,.2);animation:wrFloatB 19s ease-in-out infinite}
+@keyframes wrFloatA{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(14%,10%) scale(1.14)}}
+@keyframes wrFloatB{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-12%,-9%) scale(1.1)}}
+.wr-bars{display:flex;gap:4px;padding:13px 13px 0;position:relative;z-index:5}
+.wr-bar{flex:1;height:3px;background:rgba(255,255,255,.26);border-radius:3px;overflow:hidden}
+.wr-bar i{display:block;height:100%;width:0;background:#fff;border-radius:3px}
+.wr-bar.done i{width:100%}
+.wr-top{display:flex;align-items:center;gap:9px;padding:11px 15px 0;position:relative;z-index:5;color:rgba(255,255,255,.82)}
+.wr-top .wrb{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wr-top .wrb b{color:#fff}
+.wr-x{margin-left:auto;background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.28);color:#fff;
+  width:28px;height:28px;border-radius:50%;font-size:13px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.wr-x:hover{background:rgba(0,0,0,.45)}
+.wr-card{flex:1;display:flex;flex-direction:column;justify-content:center;padding:6px 26px 78px;
+  position:relative;z-index:6;pointer-events:none;color:#fff;text-shadow:0 2px 18px rgba(0,0,0,.32)}
+.wr-k{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.7);animation:wrIn .5s cubic-bezier(.2,.85,.25,1) both}
+.wr-v{font-family:Fraunces,serif;font-weight:900;font-variation-settings:"opsz" 96;letter-spacing:-.025em;
+  line-height:.92;font-size:clamp(40px,12.5vw,80px);margin:15px 0 17px;word-break:break-word;
+  animation:wrPop .62s cubic-bezier(.16,1,.3,1) both;animation-delay:.09s}
+.wr-v.sm{font-size:clamp(28px,7.6vw,46px);line-height:1.04}
+.wr-n{font-size:15.5px;line-height:1.58;color:rgba(255,255,255,.9);max-width:33ch;
+  animation:wrIn .55s cubic-bezier(.2,.85,.25,1) both;animation-delay:.2s}
+.wr-n b{color:#fff}
+.wr-n .neg{color:#ffc0c0}
+.wr-sup{margin-top:20px;display:flex;flex-wrap:wrap;gap:7px;animation:wrIn .55s ease both;animation-delay:.3s}
+.wr-pill{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24);border-radius:99px;padding:5px 11px;color:#fff}
+@keyframes wrIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes wrPop{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+.wr-foot{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:14px 20px 18px;
+  display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.72);
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.wr-foot .hint{margin-left:auto;opacity:.72}
+.wr-nav{position:absolute;top:52px;bottom:0;width:34%;z-index:5;background:transparent;border:0;cursor:default;padding:0}
+.wr-nav.l{left:0}.wr-nav.r{right:0;width:66%}
+.wr-nav:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+.wr-btns{margin-top:26px;display:flex;flex-wrap:wrap;gap:9px;position:relative;z-index:7;
+  pointer-events:auto;animation:wrIn .55s ease both;animation-delay:.34s}
+.wr-btns button{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  background:#fff;color:#111;border:0;border-radius:99px;padding:11px 18px;cursor:pointer;font-weight:600}
+.wr-btns button.ghost{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.wr-btns button:hover{transform:translateY(-1px)}
+.wr-paused{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:8;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#fff;
+  background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:7px 15px;display:none}
+.wrap-ov.hold .wr-paused{display:block}
+@media(max-height:620px){.wr-card{padding-bottom:66px}.wr-v{font-size:clamp(34px,9vw,54px);margin:10px 0 12px}.wr-n{font-size:14px}}
+/* back to top */
+.totop{position:fixed;right:18px;bottom:18px;z-index:90;display:flex;align-items:center;gap:8px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;
+  background:var(--brass);color:var(--surface);border:1px solid var(--brass);border-radius:99px;
+  padding:11px 17px;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.28);
+  opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+.totop.vis{opacity:1;transform:none;pointer-events:auto}
+.totop:hover{filter:brightness(1.08)}
+.totop .ar{font-size:14px;line-height:1}
+@media(max-width:560px){.totop{right:12px;bottom:12px;padding:10px 14px;font-size:10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}

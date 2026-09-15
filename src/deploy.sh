@@ -43,6 +43,17 @@ PY
     python3 -c "import json;json.load(open('manifest.webmanifest'))" \
       || { echo "  !! manifest.webmanifest is not valid JSON — refusing"; exit 1; }
     echo "  manifest OK"
+    # the page's JavaScript now lives in page/site.js as a real file, so a linter can
+    # read it. node --check only answers "does it parse"; this catches a typo'd name or
+    # a duplicate key, which parse fine and then go wrong quietly on the live site.
+    if [ -d node_modules/eslint ]; then
+      npx eslint page/site.js page/sw.js --max-warnings 0 \
+        || { echo "  !! eslint found a problem in the page's JavaScript — refusing"; exit 1; }
+      echo "  eslint OK"
+    else
+      echo "  (eslint not installed — skipping the JavaScript lint)"
+    fi
+    node test_rules.js || { echo "  !! the League rules card no longer matches Yahoo — refusing"; exit 1; }
     # the preview cards carry the season counts, so they are redrawn from the fresh build
     say "link previews"
     node mkog.js
@@ -90,8 +101,13 @@ for f in t/*.html; do [ -f "$f" ] && cp "$f" "$CLONE/$f"; done
 # and compares. Nothing was updating src/, so that check compared the live page against a
 # months-old build and failed on every single push -- the one guard against a hand-edited
 # index.html was pure noise. Sync it.
-mkdir -p "$CLONE/src"
+mkdir -p "$CLONE/src" "$CLONE/src/page"
+# mksite.py is a small assembler now; the page itself lives in page/. Miss these and the
+# CI rebuild in the deploy repo has nothing to build from.
+cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py verify.py writer.py test.js test_writer.py \
+         test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
+         eslint.config.js package.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \
          league_rules_2026.md yahoo_scrape_status.md; do
