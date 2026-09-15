@@ -1259,12 +1259,20 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 /* modal */
 .ov{position:fixed;inset:0;background:var(--ov);backdrop-filter:blur(3px);z-index:100;display:none;padding:26px 16px;overflow-y:auto}
 .ov.on{display:block}
-.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4)}
-.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);position:sticky;top:0;z-index:3;border-radius:4px 4px 0 0}
+/* The header used to be position:sticky inside .ov, which scrolls. .ov has 26px of
+   top padding, so the header stuck 26px down and the body scrolled up through the gap
+   above it -- you could read the lede sliding along over the page behind. The dialog
+   now bounds its own height and scrolls its body instead, so nothing can pass above
+   the header. dvh as well as vh: on iOS, 100vh is the height with the browser bars
+   hidden, so a vh-only dialog is taller than the screen and the close button sits
+   under Safari's toolbar. */
+.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4);
+  display:flex;flex-direction:column;max-height:calc(100vh - 52px);max-height:calc(100dvh - 52px)}
+.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);flex:0 0 auto;border-radius:4px 4px 0 0}
 .modal-h h3{font-size:27px;font-weight:900;letter-spacing:-.015em;font-variation-settings:"opsz" 72}
 .modal-h .sub{font-size:11.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
 .xbtn{margin-left:auto;font-size:16px;line-height:1;padding:6px 11px}
-.modal-b{padding:20px 22px 26px;overflow-x:hidden}
+.modal-b{padding:20px 22px 26px;overflow-x:hidden;overflow-y:auto;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:20px}
 .tile{background:var(--surface);color:var(--ink);padding:11px 13px}
 .tile b{display:block;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-weight:600;font-size:19.5px;line-height:1.2;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
