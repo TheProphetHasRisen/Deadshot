@@ -20,6 +20,10 @@ QB, WR, WR, RB, RB, TE, W/R/T, K, DEF, BN x6, IR x2
 - Trade review: Commissioner, 2-day reject window
 - Draft pick trades: No
 - Waivers: continual rolling list, 2 days, game-time Tuesday
+  (re-read live from Yahoo 14 Sep 2026, unchanged. Rolling list = a won claim
+  drops you to the bottom of the order; nothing resets weekly or by standings,
+  and there is no FAAB budget.)
+- Injured players may be claimed straight into an IR slot: Yes
 - Post-draft players follow waiver rules
 
 ## Scoring — offense
