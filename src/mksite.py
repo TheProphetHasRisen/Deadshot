@@ -3195,9 +3195,7 @@ function openRules(){
   $('#mTitle').textContent='League rules & scoring';
   $('#mSub').textContent='The league’s own Yahoo settings · league 526001 · read 14 Sep 2026';
   /* the same grid as the page section, just inside the dialog */
-  $('#mBody').innerHTML=
-    `<p class="lede" style="margin:0 0 14px">Full PPR is the setting that matters most for reading any number on this site: a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why they cannot be compared against another league.</p>`+
-    `<div class="rules">${rulesHTML()}</div>`;
+  $('#mBody').innerHTML=`<div class="rules">${rulesHTML()}</div>`;
   ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
 }
 if($('#rulesBtn'))$('#rulesBtn').onclick=openRules;

@@ -96,6 +96,11 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
    a ~15 GB download whose only benefit here is the Simulator). Do not suggest it again;
    the iOS Simulator tools will fail, and WebKit is the substitute.
 
+6. `node test_rules.js` after touching the League rules card. It asserts all 35 of
+   Yahoo's scoring categories are present in BOTH places the rules are drawn, and that
+   the six non-default values still carry their "(default N)" note. A category dropped
+   from that card is invisible by eye -- the card still looks complete.
+
 Do not report a fix as working on the strength of the code reading correctly.
 
 ## Data changes
