@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#8E1520">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deadshot">
 <link rel="canonical" href="https://deadshotleague.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
@@ -25,10 +30,17 @@
 <meta name="twitter:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="twitter:image" content="https://deadshotleague.com/og.png">
 <script>if(location.protocol==='http:'||location.protocol==='https:'){var _va=document.createElement('script');_va.defer=true;_va.src='/_vercel/insights/script.js';document.head.appendChild(_va);}</script>
+<script>
+/* Keeps a copy on the device so the book opens with no signal. Only over https, so
+   opening index.html straight off the disk is unaffected. */
+if('serviceWorker'in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){
+  addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});
+}
+</script>
 <title>Deadshot Record Book</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Press+Start+2P&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Press+Start+2P&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" crossorigin>
 <style>
 /* ============ SKINS ============ */
 :root,:root[data-skin="scope"]{
@@ -703,7 +715,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .kdef .kd-mgr{position:relative;margin-top:6px;font-size:10.5px;letter-spacing:.28em;color:#D9A82B;opacity:.55}
 @media (prefers-reduced-motion:reduce){.kdef *{animation:none!important}}
 
-/* Burke: ten seasons out of ten, and a scoring line that barely moves. Black and white,
+/* Burke: every season there has been, and a scoring line that barely moves. Black and white,
    with bamboo. */
 .pnda{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 40%,rgba(20,21,16,.96),rgba(4,5,4,.98));
@@ -738,7 +750,7 @@ details.expl>p,details.expl .plain{margin-top:9px}
 .pnda .pn-facts{margin-top:8px;font-size:11px;letter-spacing:.22em;color:#BFDD96}
 @media (prefers-reduced-motion:reduce){.pnda *{animation:none!important}}
 
-/* Kaiper: ten seasons of it, seven of them under the same prehistoric name. Amber,
+/* Kaiper: every season of it, seven of them under the same prehistoric name. Amber,
    jungle dark, and something heavy walking towards you. */
 .jrsc{position:fixed;inset:0;z-index:320;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(120% 90% at 50% 45%,rgba(14,20,10,.95),rgba(3,5,3,.98));
@@ -954,6 +966,13 @@ a{color:var(--brass)}
 .num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right}
 /* ---------- masthead: the scope ---------- */
 .mast{position:relative;overflow:hidden;background:var(--mast-bg);border-bottom:1px solid var(--mast-rule)}
+/* Installed on a phone the page gets the whole screen, status bar included, so the
+   masthead has to hold its own space back or the clock and battery sit on the wordmark.
+   Scoped to the installed app: in a browser there is no inset to reserve. */
+@media (display-mode:standalone){
+  .mast{padding-top:env(safe-area-inset-top,0px)}
+  .totop{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+}
 .mast::before{content:"";position:absolute;inset:0;
   background-image:linear-gradient(var(--mast-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mast-grid) 1px,transparent 1px);
   background-size:34px 34px;opacity:.5}
@@ -1058,6 +1077,18 @@ section{padding:52px 0 6px;scroll-margin-top:96px}
   .fb .fb-in{display:none}
   .fb.open .fb-in{display:flex;padding-top:0;padding-bottom:10px}
 }
+/* League rules opens the same content as the section at the bottom of the page, in a
+   dialog, because nobody scrolls to the bottom of a long page to check a scoring rule.
+   On a phone the whole control bar collapses behind one summary line -- this button is
+   exempted from that, so it stays reachable without expanding anything first. */
+#rulesBtn{border-color:var(--brass-2);color:var(--brass);font-weight:600}
+#rulesBtn:hover{border-color:var(--brass);background:var(--hover)}
+@media(max-width:760px){
+  .fb .fb-in{display:flex;padding:0 16px 9px}
+  .fb:not(.open) .fb-in>*:not(#rulesBtn){display:none}
+  .fb.open .fb-in{padding-top:0;padding-bottom:10px}
+  #rulesBtn{width:100%;justify-content:center;min-height:38px}
+}
 .fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
 .fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}
 .fb-in [data-skin-btn]{padding:4px 9px}
@@ -1125,6 +1156,15 @@ td.tm{color:var(--ink-2);font-style:italic}
    value column is never pushed out of reach on a 320px screen */
 @media(max-width:430px){#recs th,#recs td{padding:6px 5px}}
 @media(max-width:345px){#recs td.nm,#recs td.tm,#recs td.dim{overflow-wrap:anywhere}}
+/* the two-manager compare table: th,td are nowrap globally, so two long manager names
+   plus the label column came to 331px and dragged the whole page sideways on a 320px
+   screen. Let the names wrap rather than adding another horizontal scroller. */
+#cmpOut th,#cmpOut td{white-space:normal;overflow-wrap:break-word}
+@media(max-width:345px){#cmpOut th,#cmpOut td{padding:6px 5px}}
+/* the record-to-share picker sizes itself to its longest option label (~300px) and was
+   the next thing sticking off a 320px screen once the table above stopped doing it.
+   The 8px is its own inline margin-left. */
+#recPick{max-width:calc(100% - 8px)}
 tr.champ td.nm .mlink::before{content:"\25C6";color:var(--brass);margin-right:6px;font-size:9px;vertical-align:2px}
 .dim{color:var(--ink-3)}
 .mlink{cursor:pointer;border-bottom:1px dotted var(--brass-2)}
@@ -1219,12 +1259,20 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 /* modal */
 .ov{position:fixed;inset:0;background:var(--ov);backdrop-filter:blur(3px);z-index:100;display:none;padding:26px 16px;overflow-y:auto}
 .ov.on{display:block}
-.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4)}
-.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);position:sticky;top:0;z-index:3;border-radius:4px 4px 0 0}
+/* The header used to be position:sticky inside .ov, which scrolls. .ov has 26px of
+   top padding, so the header stuck 26px down and the body scrolled up through the gap
+   above it -- you could read the lede sliding along over the page behind. The dialog
+   now bounds its own height and scrolls its body instead, so nothing can pass above
+   the header. dvh as well as vh: on iOS, 100vh is the height with the browser bars
+   hidden, so a vh-only dialog is taller than the screen and the close button sits
+   under Safari's toolbar. */
+.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4);
+  display:flex;flex-direction:column;max-height:calc(100vh - 52px);max-height:calc(100dvh - 52px)}
+.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);flex:0 0 auto;border-radius:4px 4px 0 0}
 .modal-h h3{font-size:27px;font-weight:900;letter-spacing:-.015em;font-variation-settings:"opsz" 72}
 .modal-h .sub{font-size:11.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
 .xbtn{margin-left:auto;font-size:16px;line-height:1;padding:6px 11px}
-.modal-b{padding:20px 22px 26px;overflow-x:hidden}
+.modal-b{padding:20px 22px 26px;overflow-x:hidden;overflow-y:auto;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:20px}
 .tile{background:var(--surface);color:var(--ink);padding:11px 13px}
 .tile b{display:block;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-weight:600;font-size:19.5px;line-height:1.2;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1489,6 +1537,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <span class="fb-count" id="fCount"></span>
     <span class="fb-lab" style="margin-left:14px">Theme</span>
     <button data-skin-btn="scope">Scope</button><button data-skin-btn="og">Classic</button><button data-skin-btn="red">Crimson</button><button data-skin-btn="leather">Pigskin</button><button data-skin-btn="arcade">Arcade</button>
+    <button id="rulesBtn" type="button">&#9776; League rules &amp; scoring</button>
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
 <main id="main" class="wrap">
@@ -1727,7 +1776,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career.</p>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career. These tables always cover all twenty managers, whatever the filter at the top of the page is set to &mdash; a record is a record whether or not its holder still plays.</p>
     <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
       <select id="recPick" style="margin-left:8px"></select>
       <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
@@ -1746,40 +1795,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="card-h"><h3>League rules</h3><span class="sub">Read from Yahoo &middot; league 526001 &middot; 26 Aug 2026</span></div>
       <div class="card-b">
         <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
-        <div class="rules">
-          <div><h4>Format</h4><ul>
-            <li>10 teams &middot; head-to-head &middot; scoring from week 1</li>
-            <li>Playoffs: 6 teams, weeks 15&ndash;17</li>
-            <li><b>Reseeding after each round</b></li>
-            <li>Seed tie-break: head-to-head record, then Yahoo's order</li>
-            <li>Fractional and negative points both on</li></ul></div>
-          <div><h4>Roster &mdash; 17 slots</h4><ul>
-            <li>QB, WR, WR, RB, RB, TE, W/R/T</li>
-            <li>K, DEF</li>
-            <li>6 bench, 2 IR</li></ul></div>
-          <div><h4>Offense</h4><ul>
-            <li>Pass 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1</li>
-            <li>Rush 10 yds/pt &middot; rush TD 6</li>
-            <li><b>Reception 1.0</b> <span class="dim">(default 0.5)</span></li>
-            <li>Rec 10 yds/pt &middot; rec TD 6</li>
-            <li>2-pt 2 &middot; fumble lost &minus;2</li></ul></div>
-          <div><h4>Kicker</h4><ul>
-            <li>FG 0&ndash;39: 3 &middot; 40&ndash;49: 4 &middot; 50+: 5</li>
-            <li>PAT 1</li></ul></div>
-          <div><h4>Defense</h4><ul>
-            <li>Sack 1 &middot; INT 2 &middot; fumble rec 2 &middot; TD 6</li>
-            <li>Safety 3 <span class="dim">(default 2)</span></li>
-            <li>Block kick 2.5 <span class="dim">(default 2)</span></li>
-            <li>4th-down stop 1 <span class="dim">(default 0)</span></li>
-            <li>Three-and-out 0.5 <span class="dim">(default 0)</span></li>
-            <li>Pts allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4</li></ul></div>
-          <div><h4>Transactions</h4><ul>
-            <li>No cap on adds or trades</li>
-            <li>Trade deadline: late November</li>
-            <li>Commissioner review, 2-day reject window</li>
-            <li>Waivers: continual rolling, 2 days</li>
-            <li>No draft-pick trading</li></ul></div>
-        </div>
+        <div class="rules" id="rulesBody"></div>
       </div>
     </div>
     <div class="sec-head"><h2>Method</h2><div class="rule-note">How every number is derived</div></div>
@@ -3102,7 +3118,86 @@ addEventListener('keydown',e=>{
 },true);
 document.addEventListener('click',e=>{const t=e.target.closest('[data-m]'); if(t){openMgr(t.dataset.m);}});
 const mlink=n=>`<span class="mlink" data-m="${esc(n)}" tabindex="0" role="button">${esc(n)}</span>`;
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.m)openMgr(e.target.dataset.m);});
+/* preventDefault is the whole fix, not a tidy-up. openMgr() moves focus to the close
+   button, and Enter's default action is dispatched AFTER this listener runs -- against
+   whatever holds focus by then. So the card opened and the browser immediately clicked
+   the ✕, and a keyboard user saw a flash and nothing else. Space is handled too: these
+   spans are role="button", and a button is meant to answer to both keys. */
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.m){
+    e.preventDefault(); openMgr(e.target.dataset.m);}});
+
+/* ============ League rules ============
+   Read off Yahoo's own settings page for league 526001 and checked again on 14 Sep 2026.
+   Defined ONCE and rendered twice -- into the section at the bottom of the page and into
+   the dialog behind the control-bar button. Two hand-written copies would have drifted
+   apart the first time a setting changed, and the whole point of this card is that it is
+   the league's real configuration rather than somebody's memory of it.
+   `d` marks a value the league changed away from Yahoo's default. */
+const RULES=[
+ ['Format',[
+   ['10 teams &middot; head-to-head &middot; scoring from week 1'],
+   ['Live standard draft &middot; 1 minute a pick'],
+   ['No divisions &middot; not a cash league'],
+   ['Fractional points and negative points both on'],
+   ['Benched players are not locked'],
+   ['League is private &middot; commissioner invites only']]],
+ ['Playoffs',[
+   ['6 teams &middot; weeks 15, 16 and 17 <span class="dim">(ends Mon Jan 4)</span>'],
+   ['<b>Reseeding after each round</b>'],
+   ['Tie-break: best regular-season record against the tied opponent'],
+   ['Eliminated teams are not locked']]],
+ ['Roster &mdash; 17 slots',[
+   ['QB, WR, WR, RB, RB, TE, W/R/T'],
+   ['K, DEF'],
+   ['6 bench, 2 IR']]],
+ ['Transactions',[
+   ['No cap on adds, per week or all season'],
+   ['No cap on trades'],
+   ['Trade deadline: <b>28 November 2026</b>'],
+   ['Commissioner review &middot; 2-day reject window'],
+   ['No draft-pick trading']]],
+ ['Waivers',[
+   ['<b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">Nothing resets weekly or by standings, and there is no FAAB budget &mdash; priority only moves when someone wins a claim.</span>'],
+   ['<b>Tuesday is the weekly clear.</b> A free agent locks the moment his NFL game kicks off; that batch processes early Tuesday morning.'],
+   ['<b>A dropped player sits 2 days</b> before claims on him process, whenever in the week he was dropped.'],
+   ['Injured players can be claimed straight into an IR slot'],
+   ['Undrafted players followed waiver rules from the start']]],
+ ['Scoring &mdash; offense',[
+   ['Passing 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1'],
+   ['Rushing 10 yds/pt &middot; rush TD 6'],
+   ['<b>Reception 1.0</b>','0.5'],
+   ['Receiving 10 yds/pt &middot; rec TD 6'],
+   ['Return TD 6 &middot; 2-point conversion 2'],
+   ['Fumble lost &minus;2 &middot; offensive fumble return TD 6']]],
+ ['Scoring &mdash; kicker',[
+   ['FG 0&ndash;19: 3 &middot; 20&ndash;29: 3 &middot; 30&ndash;39: 3'],
+   ['FG 40&ndash;49: 4 &middot; 50+: 5'],
+   ['Extra point 1']]],
+ ['Scoring &mdash; defense',[
+   ['Sack 1 &middot; INT 2 &middot; fumble recovery 2 &middot; TD 6'],
+   ['Safety 3','2'],
+   ['Block kick 2.5','2'],
+   ['Kick/punt return TD 6 &middot; extra point returned 2'],
+   ['4th-down stop 1','0'],
+   ['Three-and-out forced 0.5','0'],
+   ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1']]],
+];
+const rulesHTML=()=>RULES.map(([h,items])=>
+  `<div><h4>${h}</h4><ul>`+items.map(([t,d])=>
+    `<li>${t}${d?` <span class="dim">(default ${d})</span>`:''}</li>`).join('')+'</ul></div>').join('');
+if($('#rulesBody'))$('#rulesBody').innerHTML=rulesHTML();
+function openRules(){
+  RETFOCUS=document.activeElement;
+  $('#mTitle').textContent='League rules & scoring';
+  $('#mSub').textContent='The league’s own Yahoo settings · league 526001 · read 14 Sep 2026';
+  /* the same grid as the page section, just inside the dialog */
+  $('#mBody').innerHTML=
+    `<p class="lede" style="margin:0 0 14px">Full PPR is the setting that matters most for reading any number on this site: a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why they cannot be compared against another league.</p>`+
+    `<div class="rules">${rulesHTML()}</div>`;
+  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
+}
+if($('#rulesBtn'))$('#rulesBtn').onclick=openRules;
 
 /* ---- spotlight: click to lock any number of managers, hover to preview ---- */
 const PICK=new Set();
@@ -3854,8 +3949,15 @@ drawFive(); REDRAW.push(drawFive);
 $('#fiveMore').onclick=()=>{const t=$('#fiveTbl'); t.hidden=!t.hidden;
   $('#fiveMore').classList.toggle('on',!t.hidden);
   $('#fiveMore').innerHTML=t.hidden?'Show table &#9662;':'Hide table &#9652;';};
+/* The record book deliberately ignores the manager filter. Its own opening paragraph
+   promises that single-season records include everyone, and the career totals heading
+   says the same -- but this used to filter like every other section, and the filter
+   defaults to the active ten. Eleven of these twenty-one tables named the wrong record
+   holder unless the reader happened to press "All 20" first: the real highest-scoring
+   season is Watson's 2018, not Alpert's 2021. Only the 2+ seasons cut below is real. */
 function drawRecords(){
-  const ROWS=D.rows.filter(r=>vis(r.mgr)), M=D.mgrs.filter(m=>vis(m.name));
+  /* ROWS and M are the unfiltered globals on purpose -- see above. The shareable record
+     cards (bigRecords) always read those, so the table and the card now agree. */
   const q=M.filter(m=>m.seasons>=2);
   const S=(a,k,d=1)=>[...a].sort((x,y)=>d?k(y)-k(x):k(x)-k(y)).slice(0,5);
   const sr=(r,v)=>`<td class="nm">${mlink(r.mgr)}</td><td class="tm">${esc(r.team)}</td><td class="num mono">${r.y}</td><td class="num"><b>${v}</b></td>`;
@@ -4061,9 +4163,12 @@ const MX={reg:{t:tally(REGG),g:REGG,
    note:REGYRS+' only — '+REGG.length+' games. The remaining seasons\' game logs have not been loaded yet, so this grid is thin by necessity, not by design.'},
   po:{t:tally(POG),g:POG,
    title:'Playoff head-to-head',
-   note:'All 55 playoff games, 2015 to 2025. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
+   /* counted, not typed: the totals and the year range move on their own when a season lands */
+   note:'All '+D.games.length+' playoff games, '+SEA[0]+' to '+SEA[SEA.length-1]+'. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
   all:{t:tally(REGG.concat(POG)),g:REGG.concat(POG),
    title:'All games',
+   /* ten is filled in by the build, so this reads "ten"/"eleven" like the rest
+      of the copy rather than dropping a digit into the middle of a sentence */
    note:'Every meeting on record: all ten seasons of playoffs plus the '+REGYRS+' regular seasons. '+(REGG.length+POG.length)+' games.'}};
 let MXK='all';
 function drawMtx(){
@@ -4077,13 +4182,25 @@ function drawMtx(){
       if(!v){h+='<td><span></span></td>';return;}
       tw+=v[0];tl+=v[1];
       const rate=v[0]/(v[0]+v[1])-.5;
-      h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${diverge(rate,.5)};color:${inkOn(rate,.5)}">${v[0]}-${v[1]}</span></td>`;});
+      /* A clean sweep over five or more meetings is the one thing in this grid worth
+         spotting from across the room -- Alpert's 10-0 over Berger. The bar is five
+         rather than three because three-game sweeps happen nine times, and bolding all
+         of those makes the grid noisier instead of clearer. Inline, not a class:
+         .sweep is already taken by the scope and snipe masthead animations. */
+      const clean=(v[0]===0||v[1]===0)&&(v[0]+v[1])>=5;
+      h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${diverge(rate,.5)};color:${inkOn(rate,.5)}${clean?';font-weight:800':''}">${v[0]}-${v[1]}</span></td>`;});
     h+=`<td><span style="font-weight:600">${tw+tl?tw+'-'+tl:''}</span></td></tr>`;});
   $('#tMtx').innerHTML=h+'</tbody>';
   $$('#tMtx td[data-a]').forEach(td=>{const a=td.dataset.a,b=td.dataset.b,v=src.t[a+'|'+b];
     const g=src.g.filter(x=>(x.ma===a&&x.mb===b)||(x.ma===b&&x.mb===a))
       .sort((x,y)=>x.y-y.y||(x.wk||0)-(y.wk||0));
-    bindTip(td,`<b>${esc(a)} vs ${esc(b)}</b><br>${v[0]}–${v[1]}<br>`+
+    /* The record was 12px plain text wedged between a brass headline and ten brass
+       winner names, and it disappeared. It is the number the whole tooltip is about,
+       so it gets size and weight instead. Deliberately NOT wrapped in <b>: .tip b is
+       brass, and brass here would just make it the eleventh brass thing in the box.
+       No colour is set, so it inherits --ink and stays right in all six themes. */
+    bindTip(td,`<b>${esc(a)} vs ${esc(b)}</b>`+
+      `<div style="font-size:21px;font-weight:800;line-height:1.15;margin:3px 0 5px">${v[0]}–${v[1]}</div>`+
       g.map(x=>`${esc(x.lab)}: <b>${esc(x.pa>x.pb?x.ma:x.mb)}</b> ${Math.max(x.pa,x.pb).toFixed(2)}–${Math.min(x.pa,x.pb).toFixed(2)}`).join('<br>'));});
 }
 $$('.pills button[data-mx]').forEach(b=>b.onclick=()=>{
@@ -4760,7 +4877,7 @@ function cardText(s){
 }
 
 /* Every meeting between two managers that the data can actually prove: playoff games
-   exist for all ten seasons, regular-season games only for the years with a game log.
+   exist for every season, regular-season games only for the years with a game log.
    The two sources never overlap, because the weekly side skips anything flagged as a
    bracket game. */
 function meetings(an,bn){
@@ -6160,7 +6277,7 @@ const STORY=(function(){
       `${ch.teams.join(' / ')} took the ${ch.spots}-team bracket in a ${rs.length}-team league.`);
     ALL[y]={cands,champ:ch?ch.mgrs.join(' & '):''};
   });
-  /* ten seasons should read as ten different stories — once an angle is used,
+  /* every season should read as a different story — once an angle is used,
      it has to be clearly better than the alternatives to be used again */
   const out={}, used={};
   const adj=c=>c.sc-26*(used[c.k]||0);

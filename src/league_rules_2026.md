@@ -30,6 +30,13 @@ QB, WR, WR, RB, RB, TE, W/R/T, K, DEF, BN x6, IR x2
   (re-read live from Yahoo 14 Sep 2026, unchanged. Rolling list = a won claim
   drops you to the bottom of the order; nothing resets weekly or by standings,
   and there is no FAAB budget.)
+  EXACT TIMING, from Yahoo's own help pages SLN7129 / SLN6427: weekly waiver
+  claims are due 11:59pm PT Tuesday = 2:59am ET Wednesday, and process in one
+  batch immediately after. A player enters waivers when his first game of the
+  week kicks off, or 5:30pm PT Monday if he has no game that week. The league's
+  own player list corroborates it: on Mon 14 Sep 2026 every waived player showed
+  'W (Sep 16)' -- a Wednesday. The setting is NAMED 'Game Time - Tuesday' after
+  its deadline, which is why it is easy to read as 'clears Tuesday morning'.
 - Injured players may be claimed straight into an IR slot: Yes
 - Post-draft players follow waiver rules
 

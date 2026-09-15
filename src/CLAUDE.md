@@ -87,6 +87,14 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
    `net::ERR_TUNNEL_CONNECTION_FAILED` is expected sandbox noise, not a failure.
 4. For anything visual, drive it in a headless browser and screenshot it. Check
    the change in more than one theme when it touches CSS.
+5. For anything that has to work on a phone, test in **WebKit** (Safari's own engine)
+   at iPhone sizes, not just Chromium:
+   `npx playwright install webkit`, then `webkit.launch()` with
+   `devices['iPhone 15 Pro']` / `devices['iPhone SE']`. The SE is 320pt and finds the
+   layout breaks nothing else does.
+   There is **no Xcode on this Mac and Brian has decided not to install it** (Sep 2026 —
+   a ~15 GB download whose only benefit here is the Simulator). Do not suggest it again;
+   the iOS Simulator tools will fail, and WebKit is the substitute.
 
 Do not report a fix as working on the strength of the code reading correctly.
 

@@ -3161,7 +3161,8 @@ const RULES=[
    ['No draft-pick trading']]],
  ['Waivers',[
    ['<b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">Nothing resets weekly or by standings, and there is no FAAB budget &mdash; priority only moves when someone wins a claim.</span>'],
-   ['<b>Tuesday is the weekly clear.</b> A free agent locks the moment his NFL game kicks off; that batch processes early Tuesday morning.'],
+   ['<b>Claims are due 11:59pm Pacific Tuesday</b> &mdash; <b>2:59am Eastern Wednesday</b>. <span class="dim">Everything submitted by then processes in one batch, in waiver order. Miss it and the player is a straight first-come free agent.</span>'],
+   ['<b>A player goes on waivers the moment his first game of the week kicks off.</b> <span class="dim">If he has no game that week, 5:30pm Pacific Monday instead.</span>'],
    ['<b>A dropped player sits 2 days</b> before claims on him process, whenever in the week he was dropped.'],
    ['Injured players can be claimed straight into an IR slot'],
    ['Undrafted players followed waiver rules from the start']]],
