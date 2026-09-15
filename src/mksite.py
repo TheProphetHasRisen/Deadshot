@@ -4136,7 +4136,13 @@ function drawMtx(){
   $$('#tMtx td[data-a]').forEach(td=>{const a=td.dataset.a,b=td.dataset.b,v=src.t[a+'|'+b];
     const g=src.g.filter(x=>(x.ma===a&&x.mb===b)||(x.ma===b&&x.mb===a))
       .sort((x,y)=>x.y-y.y||(x.wk||0)-(y.wk||0));
-    bindTip(td,`<b>${esc(a)} vs ${esc(b)}</b><br>${v[0]}–${v[1]}<br>`+
+    /* The record was 12px plain text wedged between a brass headline and ten brass
+       winner names, and it disappeared. It is the number the whole tooltip is about,
+       so it gets size and weight instead. Deliberately NOT wrapped in <b>: .tip b is
+       brass, and brass here would just make it the eleventh brass thing in the box.
+       No colour is set, so it inherits --ink and stays right in all six themes. */
+    bindTip(td,`<b>${esc(a)} vs ${esc(b)}</b>`+
+      `<div style="font-size:21px;font-weight:800;line-height:1.15;margin:3px 0 5px">${v[0]}–${v[1]}</div>`+
       g.map(x=>`${esc(x.lab)}: <b>${esc(x.pa>x.pb?x.ma:x.mb)}</b> ${Math.max(x.pa,x.pb).toFixed(2)}–${Math.min(x.pa,x.pb).toFixed(2)}`).join('<br>'));});
 }
 $$('.pills button[data-mx]').forEach(b=>b.onclick=()=>{
