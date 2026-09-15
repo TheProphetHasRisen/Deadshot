@@ -3183,7 +3183,7 @@ const RULES=[
    ['Kick/punt return TD 6 &middot; extra point returned 2'],
    ['4th-down stop 1','0'],
    ['Three-and-out forced 0.5','0'],
-   ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1 by default']]],
+   ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1']]],
 ];
 const rulesHTML=()=>RULES.map(([h,items])=>
   `<div><h4>${h}</h4><ul>`+items.map(([t,d])=>
