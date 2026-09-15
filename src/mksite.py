@@ -607,8 +607,11 @@ details.expl>p,details.expl .plain{margin-top:9px}
    block has to sit together on the right. auto-fit reflowed them by width and put
    scoring wherever it happened to land. Stacks to one column on a phone, where the
    left column's order (roster first) is the reading order. */
-.rules{display:grid;grid-template-columns:1fr 1fr;gap:16px 30px;align-items:start}
+.rules{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px 26px;align-items:start}
 .rules-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+/* three columns need ~230px each to not look shredded; below that drop to two, then one.
+   The column divs are explicit, so a dropped column wraps whole rather than interleaving. */
+@media(max-width:1040px){.rules{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.rules{grid-template-columns:1fr;gap:16px}}
 .rules h4{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
   color:var(--brass);font-weight:600;margin:0 0 6px}
@@ -3197,7 +3200,8 @@ const RULES=[
    forget to column it, and the build fails rather than the section silently vanishing
    from a card whose whole job is being complete. */
 const RULE_COLS=[
-  ['Roster &mdash; 17 slots','Format','Playoffs','Transactions','Waivers'],
+  ['Roster &mdash; 17 slots','Format','Playoffs'],
+  ['Transactions','Waivers'],
   ['Scoring &mdash; offense','Scoring &mdash; kicker','Scoring &mdash; defense']];
 (function(){const placed=RULE_COLS.flat(), all=RULES.map(r=>r[0]);
   const missing=all.filter(h=>!placed.includes(h)), unknown=placed.filter(h=>!all.includes(h));
