@@ -1,9 +1,16 @@
 # DEADSHØT — league configuration
-Source: Yahoo Fantasy, league ID 526001 (2026 season), read 26 Aug 2026.
+Source: Yahoo Fantasy, league ID 526001 (2026 season), read 26 Aug 2026;
+re-read in full and reconciled against the site 14 Sep 2026.
 Pulled by driving Chrome. 2026 is PRE-DRAFT: no rosters, no results.
 
 ## Format
 - 10 teams, Head-to-Head, scoring starts Week 1
+- Draft: Live Standard, Mon Sep 7 2026 10:00pm EDT, 1 minute per pick
+- Not a cash league | League is private | Invites: commissioner only
+- Lock benched players: No | Lock eliminated teams: No
+- Play against median score: No | Play against a second opponent: No
+- Apply injured status for postponed games: No
+- Can't-cut list: Yahoo Sports
 - Playoffs: 6 teams, weeks 15/16/17 (ends Mon Jan 4)
 - Playoff tie-breaker: best regular-season record vs opponent wins
 - Playoff RESEEDING: Yes

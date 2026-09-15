@@ -1077,6 +1077,18 @@ section{padding:52px 0 6px;scroll-margin-top:96px}
   .fb .fb-in{display:none}
   .fb.open .fb-in{display:flex;padding-top:0;padding-bottom:10px}
 }
+/* League rules opens the same content as the section at the bottom of the page, in a
+   dialog, because nobody scrolls to the bottom of a long page to check a scoring rule.
+   On a phone the whole control bar collapses behind one summary line -- this button is
+   exempted from that, so it stays reachable without expanding anything first. */
+#rulesBtn{border-color:var(--brass-2);color:var(--brass);font-weight:600}
+#rulesBtn:hover{border-color:var(--brass);background:var(--hover)}
+@media(max-width:760px){
+  .fb .fb-in{display:flex;padding:0 16px 9px}
+  .fb:not(.open) .fb-in>*:not(#rulesBtn){display:none}
+  .fb.open .fb-in{padding-top:0;padding-bottom:10px}
+  #rulesBtn{width:100%;justify-content:center;min-height:38px}
+}
 .fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
 .fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}
 .fb-in [data-skin-btn]{padding:4px 9px}
@@ -1517,6 +1529,7 @@ BODY = r"""
     <span class="fb-count" id="fCount"></span>
     <span class="fb-lab" style="margin-left:14px">Theme</span>
     <button data-skin-btn="scope">Scope</button><button data-skin-btn="og">Classic</button><button data-skin-btn="red">Crimson</button><button data-skin-btn="leather">Pigskin</button><button data-skin-btn="arcade">Arcade</button>
+    <button id="rulesBtn" type="button">&#9776; League rules &amp; scoring</button>
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
 <main id="main" class="wrap">
@@ -1774,45 +1787,7 @@ BODY = r"""
       <div class="card-h"><h3>League rules</h3><span class="sub">Read from Yahoo &middot; league 526001 &middot; 26 Aug 2026</span></div>
       <div class="card-b">
         <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
-        <div class="rules">
-          <div><h4>Format</h4><ul>
-            <li>10 teams &middot; head-to-head &middot; scoring from week 1</li>
-            <li>Playoffs: 6 teams, weeks 15&ndash;17</li>
-            <li><b>Reseeding after each round</b></li>
-            <li>Seed tie-break: head-to-head record, then Yahoo's order</li>
-            <li>Fractional and negative points both on</li></ul></div>
-          <div><h4>Roster &mdash; 17 slots</h4><ul>
-            <li>QB, WR, WR, RB, RB, TE, W/R/T</li>
-            <li>K, DEF</li>
-            <li>6 bench, 2 IR</li></ul></div>
-          <div><h4>Offense</h4><ul>
-            <li>Pass 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1</li>
-            <li>Rush 10 yds/pt &middot; rush TD 6</li>
-            <li><b>Reception 1.0</b> <span class="dim">(default 0.5)</span></li>
-            <li>Rec 10 yds/pt &middot; rec TD 6</li>
-            <li>2-pt 2 &middot; fumble lost &minus;2</li></ul></div>
-          <div><h4>Kicker</h4><ul>
-            <li>FG 0&ndash;39: 3 &middot; 40&ndash;49: 4 &middot; 50+: 5</li>
-            <li>PAT 1</li></ul></div>
-          <div><h4>Defense</h4><ul>
-            <li>Sack 1 &middot; INT 2 &middot; fumble rec 2 &middot; TD 6</li>
-            <li>Safety 3 <span class="dim">(default 2)</span></li>
-            <li>Block kick 2.5 <span class="dim">(default 2)</span></li>
-            <li>4th-down stop 1 <span class="dim">(default 0)</span></li>
-            <li>Three-and-out 0.5 <span class="dim">(default 0)</span></li>
-            <li>Pts allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4</li></ul></div>
-          <div><h4>Transactions</h4><ul>
-            <li>No cap on adds or trades</li>
-            <li>Trade deadline: late November</li>
-            <li>Commissioner review, 2-day reject window</li>
-            <li>No draft-pick trading</li></ul>
-            <h4 style="margin-top:14px">Waivers</h4><ul>
-            <li><b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">No weekly reset, no reset by standings, and no FAAB budget &mdash; priority only ever moves when someone wins a claim.</span></li>
-            <li><b>Tuesday is the weekly clear.</b> A free agent locks the moment his NFL game kicks off and goes on waivers; that batch processes early Tuesday morning.</li>
-            <li><b>A dropped player sits for 2 days</b> before claims on him process, whenever in the week he was dropped.</li>
-            <li>Injured players can be claimed straight into an IR slot</li>
-            <li>Undrafted players followed waiver rules from the start</li></ul></div>
-        </div>
+        <div class="rules" id="rulesBody"></div>
       </div>
     </div>
     <div class="sec-head"><h2>Method</h2><div class="rule-note">How every number is derived</div></div>
@@ -3145,6 +3120,78 @@ const mlink=n=>`<span class="mlink" data-m="${esc(n)}" tabindex="0" role="button
 document.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.m){
     e.preventDefault(); openMgr(e.target.dataset.m);}});
+
+/* ============ League rules ============
+   Read off Yahoo's own settings page for league 526001 and checked again on 14 Sep 2026.
+   Defined ONCE and rendered twice -- into the section at the bottom of the page and into
+   the dialog behind the control-bar button. Two hand-written copies would have drifted
+   apart the first time a setting changed, and the whole point of this card is that it is
+   the league's real configuration rather than somebody's memory of it.
+   `d` marks a value the league changed away from Yahoo's default. */
+const RULES=[
+ ['Format',[
+   ['10 teams &middot; head-to-head &middot; scoring from week 1'],
+   ['Live standard draft &middot; 1 minute a pick'],
+   ['No divisions &middot; not a cash league'],
+   ['Fractional points and negative points both on'],
+   ['Benched players are not locked'],
+   ['League is private &middot; commissioner invites only']]],
+ ['Playoffs',[
+   ['6 teams &middot; weeks 15, 16 and 17 <span class="dim">(ends Mon Jan 4)</span>'],
+   ['<b>Reseeding after each round</b>'],
+   ['Tie-break: best regular-season record against the tied opponent'],
+   ['Eliminated teams are not locked']]],
+ ['Roster &mdash; 17 slots',[
+   ['QB, WR, WR, RB, RB, TE, W/R/T'],
+   ['K, DEF'],
+   ['6 bench, 2 IR']]],
+ ['Transactions',[
+   ['No cap on adds, per week or all season'],
+   ['No cap on trades'],
+   ['Trade deadline: <b>28 November 2026</b>'],
+   ['Commissioner review &middot; 2-day reject window'],
+   ['No draft-pick trading']]],
+ ['Waivers',[
+   ['<b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">Nothing resets weekly or by standings, and there is no FAAB budget &mdash; priority only moves when someone wins a claim.</span>'],
+   ['<b>Tuesday is the weekly clear.</b> A free agent locks the moment his NFL game kicks off; that batch processes early Tuesday morning.'],
+   ['<b>A dropped player sits 2 days</b> before claims on him process, whenever in the week he was dropped.'],
+   ['Injured players can be claimed straight into an IR slot'],
+   ['Undrafted players followed waiver rules from the start']]],
+ ['Scoring &mdash; offense',[
+   ['Passing 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1'],
+   ['Rushing 10 yds/pt &middot; rush TD 6'],
+   ['<b>Reception 1.0</b>','0.5'],
+   ['Receiving 10 yds/pt &middot; rec TD 6'],
+   ['Return TD 6 &middot; 2-point conversion 2'],
+   ['Fumble lost &minus;2 &middot; offensive fumble return TD 6']]],
+ ['Scoring &mdash; kicker',[
+   ['FG 0&ndash;19: 3 &middot; 20&ndash;29: 3 &middot; 30&ndash;39: 3'],
+   ['FG 40&ndash;49: 4 &middot; 50+: 5'],
+   ['Extra point 1']]],
+ ['Scoring &mdash; defense',[
+   ['Sack 1 &middot; INT 2 &middot; fumble recovery 2 &middot; TD 6'],
+   ['Safety 3','2'],
+   ['Block kick 2.5','2'],
+   ['Kick/punt return TD 6 &middot; extra point returned 2'],
+   ['4th-down stop 1','0'],
+   ['Three-and-out forced 0.5','0'],
+   ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1 by default']]],
+];
+const rulesHTML=()=>RULES.map(([h,items])=>
+  `<div><h4>${h}</h4><ul>`+items.map(([t,d])=>
+    `<li>${t}${d?` <span class="dim">(default ${d})</span>`:''}</li>`).join('')+'</ul></div>').join('');
+if($('#rulesBody'))$('#rulesBody').innerHTML=rulesHTML();
+function openRules(){
+  RETFOCUS=document.activeElement;
+  $('#mTitle').textContent='League rules & scoring';
+  $('#mSub').textContent='The league’s own Yahoo settings · league 526001 · read 14 Sep 2026';
+  /* the same grid as the page section, just inside the dialog */
+  $('#mBody').innerHTML=
+    `<p class="lede" style="margin:0 0 14px">Full PPR is the setting that matters most for reading any number on this site: a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why they cannot be compared against another league.</p>`+
+    `<div class="rules">${rulesHTML()}</div>`;
+  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
+}
+if($('#rulesBtn'))$('#rulesBtn').onclick=openRules;
 
 /* ---- spotlight: click to lock any number of managers, hover to preview ---- */
 const PICK=new Set();
