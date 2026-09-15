@@ -1873,13 +1873,25 @@ try{const st=localStorage.getItem('deadshot.sel');
 /* ---- skins ---- */
 const SKINS=['scope','og','red','leather','arcade','redact'];
 const SECRET='redact';
+/* A full redraw is 30 functions and ~95ms of blocking work on a mid-range phone. Six
+   quick theme taps used to schedule six of them, one per tap -- six separate freezes
+   over 100ms, measured. They all produce the same page, so only the last one matters:
+   collapse anything scheduled in the same frame into one pass. */
+let _redrawQueued=false;
+function scheduleRedraw(){
+  if(_redrawQueued)return;
+  _redrawQueued=true;
+  requestAnimationFrame(()=>{_redrawQueued=false;REDRAW.forEach(f=>{try{f();}catch(e){}});});
+}
 function setSkin(k,save){
   if(!SKINS.includes(k))k='og';
+  const unchanged=document.documentElement.getAttribute('data-skin')===k;
   document.documentElement.setAttribute('data-skin',k);
   $$('[data-skin-btn]').forEach(b=>b.classList.toggle('on',b.dataset.skinBtn===k));
   if(save){try{localStorage.setItem('deadshot.skin',k);}catch(e){}}
-  /* charts bake colours into markup, so redraw them on a skin change */
-  requestAnimationFrame(()=>REDRAW.forEach(f=>{try{f();}catch(e){}}));
+  /* charts bake colours into markup, so redraw them on a skin change -- but tapping the
+     theme you are already on changes no colour and needs no redraw at all */
+  if(!unchanged)scheduleRedraw();
 }
 const vis=n=>SEL.has(n);
 function saveSel(){try{localStorage.setItem('deadshot.sel',JSON.stringify([...SEL]));}catch(e){}}
