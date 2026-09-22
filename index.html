@@ -1785,7 +1785,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
   <section id="records">
     <div class="sec-head"><h2>Record Book</h2><div class="rule-note">Each table by its own metric</div></div>
-    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records include everyone</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include everyone, since volume cannot be inflated by a short career. These tables always cover all twenty managers, whatever the filter at the top of the page is set to &mdash; a record is a record whether or not its holder still plays.</p>
+    <p class="lede">Season length has been 13, 14 and 15 games, so the headline records are <strong>per game</strong>; raw totals are kept separately and labelled as counting records, because a 15-game season will always out-total a 13-game one. <strong>Single-season records have no minimum</strong>, because one enormous year is a real record no matter how briefly someone played. The career <em>rate</em> tables below (win %, average finish, power index, luck) exclude one-season managers, whose tiny samples otherwise own every extreme; the career <em>counting</em> tables (total points, playoff wins) include short careers, since volume cannot be inflated by one. <strong>The tables follow the manager filter at the top of the page</strong>; when the actual league record belongs to someone the filter is hiding, it is named under that table, so a narrowed view never passes itself off as the league record.</p>
     <div style="margin:4px 0 6px"><button id="recsToggle" style="padding:9px 16px">Show the record book &#9662;</button>
       <select id="recPick" style="margin-left:8px"></select>
       <button id="recShare" style="padding:9px 16px;margin-left:6px">&#8593; Share this record</button>
@@ -3981,52 +3981,66 @@ drawFive(); REDRAW.push(drawFive);
 $('#fiveMore').onclick=()=>{const t=$('#fiveTbl'); t.hidden=!t.hidden;
   $('#fiveMore').classList.toggle('on',!t.hidden);
   $('#fiveMore').innerHTML=t.hidden?'Show table &#9662;':'Hide table &#9652;';};
-/* The record book deliberately ignores the manager filter. Its own opening paragraph
-   promises that single-season records include everyone, and the career totals heading
-   says the same -- but this used to filter like every other section, and the filter
-   defaults to the active ten. Eleven of these twenty-one tables named the wrong record
-   holder unless the reader happened to press "All 20" first: the real highest-scoring
-   season is Watson's 2018, not Alpert's 2021. Only the 2+ seasons cut below is real. */
+/* The record book follows the manager filter, so it can answer "what are the records
+   among just these guys". It did once before and that went wrong: the filter defaults
+   to the active ten, and eleven of these twenty-one tables quietly named the wrong
+   record holder -- Alpert's 2021 as the highest-scoring season, when it is Watson's
+   2018. So every table is ranked twice. The top five come from the managers selected;
+   the #1 comes from all twenty, and if that holder is being filtered out he is named
+   under the table. A narrowed view can never pass itself off as the league record.
+   The shareable record cards (bigRecords) always use the full league. */
 function drawRecords(){
-  /* ROWS and M are the unfiltered globals on purpose -- see above. The shareable record
-     cards (bigRecords) always read those, so the table and the card now agree. */
-  const q=M.filter(m=>m.seasons>=2);
   const S=(a,k,d=1)=>[...a].sort((x,y)=>d?k(y)-k(x):k(x)-k(y)).slice(0,5);
   const sr=(r,v)=>`<td class="nm">${mlink(r.mgr)}</td><td class="tm">${esc(r.team)}</td><td class="num mono">${r.y}</td><td class="num"><b>${v}</b></td>`;
   const cr=(m,v)=>`<td class="nm">${mlink(m.name)}</td><td class="dim">${m.seasons} seasons</td><td></td><td class="num"><b>${v}</b></td>`;
-  const B=[['SINGLE SEASON',null],
-   ['Highest PPG',S(ROWS,r=>r.ppg).map(r=>sr(r,r.ppg.toFixed(2)))],
-   ['Lowest PPG',S(ROWS,r=>r.ppg,0).map(r=>sr(r,r.ppg.toFixed(2)))],
-   ['Highest power index',S(ROWS,r=>r.pi).map(r=>sr(r,r.pi.toFixed(1)))],
-   ['Lowest power index',S(ROWS,r=>r.pi,0).map(r=>sr(r,r.pi.toFixed(1)))],
-   ['Best Z-score',S(ROWS,r=>r.z).map(r=>sr(r,r.z.toFixed(2)))],
-   ['Best differential per game',S(ROWS,r=>(r.pf-r.pa)/r.g).map(r=>sr(r,((r.pf-r.pa)/r.g).toFixed(2)))],
-   ['Worst differential per game',S(ROWS,r=>(r.pf-r.pa)/r.g,0).map(r=>sr(r,((r.pf-r.pa)/r.g).toFixed(2)))],
-   ['Luckiest season',S(ROWS,r=>r.luck).map(r=>sr(r,r.luck.toFixed(2)))],
-   ['Unluckiest season',S(ROWS,r=>r.luck,0).map(r=>sr(r,r.luck.toFixed(2)))],
-   ['Most roster moves',S(ROWS.filter(r=>r.mv!=null),r=>r.mv).map(r=>sr(r,r.mv))],
-   ['COUNTING RECORDS &mdash; totals, not comparable across seasons',null],
-   ['Most points in a season',S(ROWS,r=>r.pf).map(r=>sr(r,r.pf.toFixed(2)+' <span class="dim">/'+r.g+'g</span>'))],
-   ['Fewest points in a season',S(ROWS,r=>r.pf,0).map(r=>sr(r,r.pf.toFixed(2)+' <span class="dim">/'+r.g+'g</span>'))],
-   ['CAREER RATES &mdash; 2+ seasons',null],
-   ['Best win %',S(q,m=>m.winpct).map(m=>cr(m,(100*m.winpct).toFixed(1)+'%'))],
-   ['Worst win %',S(q,m=>m.winpct,0).map(m=>cr(m,(100*m.winpct).toFixed(1)+'%'))],
-   ['Best average finish',S(q,m=>m.avgPlace,0).map(m=>cr(m,m.avgPlace.toFixed(2)))],
-   ['Best power index',S(q,m=>m.cpi).map(m=>cr(m,m.cpi.toFixed(1)))],
-   ['Worst power index',S(q,m=>m.cpi,0).map(m=>cr(m,m.cpi.toFixed(1)))],
-   ['Luckiest career',S(q,m=>m.luck).map(m=>cr(m,m.luck.toFixed(2)))],
-   ['Unluckiest career',S(q,m=>m.luck,0).map(m=>cr(m,m.luck.toFixed(2)))],
-   ['CAREER TOTALS &mdash; everyone, short careers included',null],
-   ['Most career points',S(M,m=>m.pf).map(m=>cr(m,m.pf.toFixed(0)))],
-   ['Most playoff wins',S(M,m=>m.poW).map(m=>cr(m,m.poW))]];
-  let h='',open=false;
-  B.forEach(([t,rows])=>{
-    if(!rows){if(open)h+='</div>';
+  const q=M.filter(m=>m.seasons>=2), MV=ROWS.filter(r=>r.mv!=null);
+  const f2=v=>v.toFixed(2), f1=v=>v.toFixed(1), pc=v=>(100*v).toFixed(1)+'%';
+  const dif=r=>(r.pf-r.pa)/r.g, pts=r=>r.pf.toFixed(2)+' <span class="dim">/'+r.g+'g</span>';
+  /* [title, every candidate in the league, rank by, 1 = highest first, show, row kind] */
+  const B=[['SINGLE SEASON'],
+   ['Highest PPG',ROWS,r=>r.ppg,1,r=>f2(r.ppg),'s'],
+   ['Lowest PPG',ROWS,r=>r.ppg,0,r=>f2(r.ppg),'s'],
+   ['Highest power index',ROWS,r=>r.pi,1,r=>f1(r.pi),'s'],
+   ['Lowest power index',ROWS,r=>r.pi,0,r=>f1(r.pi),'s'],
+   ['Best Z-score',ROWS,r=>r.z,1,r=>f2(r.z),'s'],
+   ['Best differential per game',ROWS,dif,1,r=>f2(dif(r)),'s'],
+   ['Worst differential per game',ROWS,dif,0,r=>f2(dif(r)),'s'],
+   ['Luckiest season',ROWS,r=>r.luck,1,r=>f2(r.luck),'s'],
+   ['Unluckiest season',ROWS,r=>r.luck,0,r=>f2(r.luck),'s'],
+   ['Most roster moves',MV,r=>r.mv,1,r=>r.mv,'s'],
+   ['COUNTING RECORDS &mdash; totals, not comparable across seasons'],
+   ['Most points in a season',ROWS,r=>r.pf,1,pts,'s'],
+   ['Fewest points in a season',ROWS,r=>r.pf,0,pts,'s'],
+   ['CAREER RATES &mdash; 2+ seasons'],
+   ['Best win %',q,m=>m.winpct,1,m=>pc(m.winpct),'c'],
+   ['Worst win %',q,m=>m.winpct,0,m=>pc(m.winpct),'c'],
+   ['Best average finish',q,m=>m.avgPlace,0,m=>f2(m.avgPlace),'c'],
+   ['Best power index',q,m=>m.cpi,1,m=>f1(m.cpi),'c'],
+   ['Worst power index',q,m=>m.cpi,0,m=>f1(m.cpi),'c'],
+   ['Luckiest career',q,m=>m.luck,1,m=>f2(m.luck),'c'],
+   ['Unluckiest career',q,m=>m.luck,0,m=>f2(m.luck),'c'],
+   ['CAREER TOTALS &mdash; short careers included'],
+   ['Most career points',M,m=>m.pf,1,m=>m.pf.toFixed(0),'c'],
+   ['Most playoff wins',M,m=>m.poW,1,m=>m.poW,'c']];
+  const who=(x,kind)=>kind==='s'?x.mgr:x.name;
+  const narrowed=SEL.size<ALLNAMES.length;
+  let h=narrowed
+    ?`<p class="dim" style="margin:4px 0 0;font-size:13px">${SEL.size?`Filtered to <b>${SEL.size} of ${ALLNAMES.length}</b> managers.`:'<b>No managers selected</b> &mdash; pick some with the filter at the top.'} League records held by anyone outside the selection are named under each table.</p>`
+    :'';
+  let open=false;
+  B.forEach(([t,all,k,d,val,kind])=>{
+    if(!all){if(open)h+='</div>';
       h+=`<h3 style="font-size:13px;letter-spacing:.11em;text-transform:uppercase;color:var(--brass);font-family:'IBM Plex Mono',monospace;margin:26px 0 12px;font-weight:600">${t}</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px">`;open=true;return;}
+    const shown=S(all.filter(x=>vis(who(x,kind))),k,d);
+    const lead=S(all,k,d)[0];
+    const row=x=>kind==='s'?sr(x,val(x)):cr(x,val(x));
+    const note=lead&&!vis(who(lead,kind))
+      ?`<p class="dim" style="margin:0;padding:8px 12px 10px;font-size:12px;border-top:1px solid var(--rule-2)">League record, outside your selection: ${mlink(who(lead,kind))} &middot; ${kind==='s'?esc(lead.team)+' &middot; '+lead.y:lead.seasons+' seasons'} &middot; <b style="color:var(--ink)">${val(lead)}</b></p>`
+      :'';
     const lt=t.toLowerCase();
     const gk=lt.includes('power index')?'pi':lt.includes('z-score')?'z':lt.includes('luck')?'luck':null;
     h+=`<div class="card"><div class="card-h"><h3>${t}</h3>${gk?`<span class="gl" data-gl="${gk}" tabindex="0">?</span>`:''}</div><div class="scroll"><table>${
-      rows.map((r,i)=>`<tr><td class="rk">${i+1}</td>${r}</tr>`).join('')}</table></div></div>`;});
+      shown.map((r,i)=>`<tr><td class="rk">${i+1}</td>${row(r)}</tr>`).join('')}</table></div>${note}</div>`;});
   $('#recs').innerHTML=h+(open?'</div>':'');
   glossify($('#recs'));
 }

@@ -603,7 +603,16 @@ details.expl>summary::before{content:"\25B8";display:inline-block;transition:tra
 details.expl[open]>summary::before{transform:rotate(90deg)}
 details.expl>summary:hover{color:var(--ink)}
 details.expl>p,details.expl .plain{margin-top:9px}
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,232px),1fr));gap:16px 22px}
+/* Two fixed columns, not auto-flow: the roster has to sit top-left and every scoring
+   block has to sit together on the right. auto-fit reflowed them by width and put
+   scoring wherever it happened to land. Stacks to one column on a phone, where the
+   left column's order (roster first) is the reading order. */
+.rules{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px 26px;align-items:start}
+.rules-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+/* three columns need ~230px each to not look shredded; below that drop to two, then one.
+   The column divs are explicit, so a dropped column wraps whole rather than interleaving. */
+@media(max-width:1040px){.rules{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.rules{grid-template-columns:1fr;gap:16px}}
 .rules h4{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
   color:var(--brass);font-weight:600;margin:0 0 6px}
 .rules ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
@@ -1077,6 +1086,18 @@ section{padding:52px 0 6px;scroll-margin-top:96px}
   .fb .fb-in{display:none}
   .fb.open .fb-in{display:flex;padding-top:0;padding-bottom:10px}
 }
+/* League rules opens the same content as the section at the bottom of the page, in a
+   dialog, because nobody scrolls to the bottom of a long page to check a scoring rule.
+   On a phone the whole control bar collapses behind one summary line -- this button is
+   exempted from that, so it stays reachable without expanding anything first. */
+#rulesBtn{border-color:var(--brass-2);color:var(--brass);font-weight:600}
+#rulesBtn:hover{border-color:var(--brass);background:var(--hover)}
+@media(max-width:760px){
+  .fb .fb-in{display:flex;padding:0 16px 9px}
+  .fb:not(.open) .fb-in>*:not(#rulesBtn){display:none}
+  .fb.open .fb-in{padding-top:0;padding-bottom:10px}
+  #rulesBtn{width:100%;justify-content:center;min-height:38px}
+}
 .fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
 .fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}
 .fb-in [data-skin-btn]{padding:4px 9px}
@@ -1247,12 +1268,20 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 /* modal */
 .ov{position:fixed;inset:0;background:var(--ov);backdrop-filter:blur(3px);z-index:100;display:none;padding:26px 16px;overflow-y:auto}
 .ov.on{display:block}
-.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4)}
-.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);position:sticky;top:0;z-index:3;border-radius:4px 4px 0 0}
+/* The header used to be position:sticky inside .ov, which scrolls. .ov has 26px of
+   top padding, so the header stuck 26px down and the body scrolled up through the gap
+   above it -- you could read the lede sliding along over the page behind. The dialog
+   now bounds its own height and scrolls its body instead, so nothing can pass above
+   the header. dvh as well as vh: on iOS, 100vh is the height with the browser bars
+   hidden, so a vh-only dialog is taller than the screen and the close button sits
+   under Safari's toolbar. */
+.modal{max-width:940px;margin:0 auto;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;box-shadow:0 24px 70px rgba(0,0,0,.4);
+  display:flex;flex-direction:column;max-height:calc(100vh - 52px);max-height:calc(100dvh - 52px)}
+.modal-h{display:flex;align-items:flex-start;gap:16px;padding:20px 22px;border-bottom:1px solid var(--rule);background:var(--surface-2);flex:0 0 auto;border-radius:4px 4px 0 0}
 .modal-h h3{font-size:27px;font-weight:900;letter-spacing:-.015em;font-variation-settings:"opsz" 72}
 .modal-h .sub{font-size:11.5px;font-family:"IBM Plex Mono",monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
 .xbtn{margin-left:auto;font-size:16px;line-height:1;padding:6px 11px}
-.modal-b{padding:20px 22px 26px;overflow-x:hidden}
+.modal-b{padding:20px 22px 26px;overflow-x:hidden;overflow-y:auto;flex:1 1 auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,108px),1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin-bottom:20px}
 .tile{background:var(--surface);color:var(--ink);padding:11px 13px}
 .tile b{display:block;font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-weight:600;font-size:19.5px;line-height:1.2;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1517,6 +1546,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <span class="fb-count" id="fCount"></span>
     <span class="fb-lab" style="margin-left:14px">Theme</span>
     <button data-skin-btn="scope">Scope</button><button data-skin-btn="og">Classic</button><button data-skin-btn="red">Crimson</button><button data-skin-btn="leather">Pigskin</button><button data-skin-btn="arcade">Arcade</button>
+    <button id="rulesBtn" type="button">&#9776; League rules &amp; scoring</button>
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
 <main id="main" class="wrap">
@@ -1774,40 +1804,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="card-h"><h3>League rules</h3><span class="sub">Read from Yahoo &middot; league 526001 &middot; 26 Aug 2026</span></div>
       <div class="card-b">
         <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
-        <div class="rules">
-          <div><h4>Format</h4><ul>
-            <li>10 teams &middot; head-to-head &middot; scoring from week 1</li>
-            <li>Playoffs: 6 teams, weeks 15&ndash;17</li>
-            <li><b>Reseeding after each round</b></li>
-            <li>Seed tie-break: head-to-head record, then Yahoo's order</li>
-            <li>Fractional and negative points both on</li></ul></div>
-          <div><h4>Roster &mdash; 17 slots</h4><ul>
-            <li>QB, WR, WR, RB, RB, TE, W/R/T</li>
-            <li>K, DEF</li>
-            <li>6 bench, 2 IR</li></ul></div>
-          <div><h4>Offense</h4><ul>
-            <li>Pass 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1</li>
-            <li>Rush 10 yds/pt &middot; rush TD 6</li>
-            <li><b>Reception 1.0</b> <span class="dim">(default 0.5)</span></li>
-            <li>Rec 10 yds/pt &middot; rec TD 6</li>
-            <li>2-pt 2 &middot; fumble lost &minus;2</li></ul></div>
-          <div><h4>Kicker</h4><ul>
-            <li>FG 0&ndash;39: 3 &middot; 40&ndash;49: 4 &middot; 50+: 5</li>
-            <li>PAT 1</li></ul></div>
-          <div><h4>Defense</h4><ul>
-            <li>Sack 1 &middot; INT 2 &middot; fumble rec 2 &middot; TD 6</li>
-            <li>Safety 3 <span class="dim">(default 2)</span></li>
-            <li>Block kick 2.5 <span class="dim">(default 2)</span></li>
-            <li>4th-down stop 1 <span class="dim">(default 0)</span></li>
-            <li>Three-and-out 0.5 <span class="dim">(default 0)</span></li>
-            <li>Pts allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4</li></ul></div>
-          <div><h4>Transactions</h4><ul>
-            <li>No cap on adds or trades</li>
-            <li>Trade deadline: late November</li>
-            <li>Commissioner review, 2-day reject window</li>
-            <li>Waivers: continual rolling, 2 days</li>
-            <li>No draft-pick trading</li></ul></div>
-        </div>
+        <div class="rules" id="rulesBody"></div>
       </div>
     </div>
     <div class="sec-head"><h2>Method</h2><div class="rule-note">How every number is derived</div></div>
@@ -1874,13 +1871,25 @@ try{const st=localStorage.getItem('deadshot.sel');
 /* ---- skins ---- */
 const SKINS=['scope','og','red','leather','arcade','redact'];
 const SECRET='redact';
+/* A full redraw is 30 functions and ~95ms of blocking work on a mid-range phone. Six
+   quick theme taps used to schedule six of them, one per tap -- six separate freezes
+   over 100ms, measured. They all produce the same page, so only the last one matters:
+   collapse anything scheduled in the same frame into one pass. */
+let _redrawQueued=false;
+function scheduleRedraw(){
+  if(_redrawQueued)return;
+  _redrawQueued=true;
+  requestAnimationFrame(()=>{_redrawQueued=false;REDRAW.forEach(f=>{try{f();}catch(e){}});});
+}
 function setSkin(k,save){
   if(!SKINS.includes(k))k='og';
+  const unchanged=document.documentElement.getAttribute('data-skin')===k;
   document.documentElement.setAttribute('data-skin',k);
   $$('[data-skin-btn]').forEach(b=>b.classList.toggle('on',b.dataset.skinBtn===k));
   if(save){try{localStorage.setItem('deadshot.skin',k);}catch(e){}}
-  /* charts bake colours into markup, so redraw them on a skin change */
-  requestAnimationFrame(()=>REDRAW.forEach(f=>{try{f();}catch(e){}}));
+  /* charts bake colours into markup, so redraw them on a skin change -- but tapping the
+     theme you are already on changes no colour and needs no redraw at all */
+  if(!unchanged)scheduleRedraw();
 }
 const vis=n=>SEL.has(n);
 function saveSel(){try{localStorage.setItem('deadshot.sel',JSON.stringify([...SEL]));}catch(e){}}
@@ -2011,7 +2020,7 @@ const navA=$$('#nav a');
 new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)navA.forEach(a=>a.classList.toggle('on',a.dataset.id===en.target.id));}),
   {rootMargin:'-45% 0px -50% 0px'}).observe&&$$('section').forEach(s=>
   new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){navA.forEach(a=>a.classList.toggle('on',a.dataset.id===en.target.id));
-    if(window.navFollow)navFollow(en.target.id);}}),
+    if(window.navFollow)window.navFollow(en.target.id);}}),
   {rootMargin:'-45% 0px -50% 0px'}).observe(s));
 
 /* filter bar */
@@ -2357,7 +2366,7 @@ function titleDefense(){
     +'<div class="kd-sub">'+esc(sub)+'</div>'
     +'<div class="kd-mgr">'+esc(mgrs.toUpperCase())+' &middot; CHAMPION '+LAST+'</div></div>';
   document.body.appendChild(el);
-  const c=ac();
+  ac();
   safeSFX(()=>battleReady(0));
   const off=()=>{el.classList.add('out');setTimeout(()=>el.remove(),700);};
   el.addEventListener('click',off);
@@ -3139,6 +3148,91 @@ document.addEventListener('keydown',e=>{
   if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.m){
     e.preventDefault(); openMgr(e.target.dataset.m);}});
 
+/* ============ League rules ============
+   Read off Yahoo's own settings page for league 526001 and checked again on 14 Sep 2026.
+   Defined ONCE and rendered twice -- into the section at the bottom of the page and into
+   the dialog behind the control-bar button. Two hand-written copies would have drifted
+   apart the first time a setting changed, and the whole point of this card is that it is
+   the league's real configuration rather than somebody's memory of it.
+   `d` marks a value the league changed away from Yahoo's default. */
+const RULES=[
+ ['Format',[
+   ['10 teams &middot; head-to-head &middot; scoring from week 1'],
+   ['Live standard draft &middot; 1 minute a pick'],
+   ['No divisions &middot; not a cash league'],
+   ['Fractional points and negative points both on'],
+   ['Benched players are not locked'],
+   ['League is private &middot; commissioner invites only']]],
+ ['Playoffs',[
+   ['6 teams &middot; weeks 15, 16 and 17 <span class="dim">(ends Mon Jan 4)</span>'],
+   ['<b>Reseeding after each round</b>'],
+   ['Tie-break: best regular-season record against the tied opponent'],
+   ['Eliminated teams are not locked']]],
+ ['Roster &mdash; 17 slots',[
+   ['QB, WR, WR, RB, RB, TE, W/R/T'],
+   ['K, DEF'],
+   ['6 bench, 2 IR']]],
+ ['Transactions',[
+   ['No cap on adds, per week or all season'],
+   ['No cap on trades'],
+   ['Trade deadline: <b>28 November 2026</b>'],
+   ['Commissioner review &middot; 2-day reject window'],
+   ['No draft-pick trading']]],
+ ['Waivers',[
+   ['<b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">Nothing resets weekly or by standings, and there is no FAAB budget &mdash; priority only moves when someone wins a claim.</span>'],
+   ['<b>Claims are due 11:59pm Pacific Tuesday</b> &mdash; <b>2:59am Eastern Wednesday</b>. <span class="dim">Everything submitted by then processes in one batch, in waiver order. Miss it and the player is a straight first-come free agent.</span>'],
+   ['<b>A player goes on waivers the moment his first game of the week kicks off.</b> <span class="dim">If he has no game that week, 5:30pm Pacific Monday instead.</span>'],
+   ['<b>A dropped player sits 2 days</b> before claims on him process, whenever in the week he was dropped.'],
+   ['Injured players can be claimed straight into an IR slot'],
+   ['Undrafted players followed waiver rules from the start']]],
+ ['Scoring &mdash; offense',[
+   ['Passing 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1'],
+   ['Rushing 10 yds/pt &middot; rush TD 6'],
+   ['<b>Reception 1.0</b>','0.5'],
+   ['Receiving 10 yds/pt &middot; rec TD 6'],
+   ['Return TD 6 &middot; 2-point conversion 2'],
+   ['Fumble lost &minus;2 &middot; offensive fumble return TD 6']]],
+ ['Scoring &mdash; kicker',[
+   ['FG 0&ndash;19: 3 &middot; 20&ndash;29: 3 &middot; 30&ndash;39: 3'],
+   ['FG 40&ndash;49: 4 &middot; 50+: 5'],
+   ['Extra point 1']]],
+ ['Scoring &mdash; defense',[
+   ['Sack 1 &middot; INT 2 &middot; fumble recovery 2 &middot; TD 6'],
+   ['Safety 3','2'],
+   ['Block kick 2.5','2'],
+   ['Kick/punt return TD 6 &middot; extra point returned 2'],
+   ['4th-down stop 1','0'],
+   ['Three-and-out forced 0.5','0'],
+   ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1']]],
+];
+/* Left column leads with the roster; everything about scoring lives together on the
+   right. The assert is the point of writing it this way: add a section to RULES and
+   forget to column it, and the build fails rather than the section silently vanishing
+   from a card whose whole job is being complete. */
+const RULE_COLS=[
+  ['Roster &mdash; 17 slots','Format','Playoffs'],
+  ['Transactions','Waivers'],
+  ['Scoring &mdash; offense','Scoring &mdash; kicker','Scoring &mdash; defense']];
+(function(){const placed=RULE_COLS.flat(), all=RULES.map(r=>r[0]);
+  const missing=all.filter(h=>!placed.includes(h)), unknown=placed.filter(h=>!all.includes(h));
+  if(missing.length||unknown.length)
+    console.error('rules columns out of sync',{missing,unknown});})();
+const rulesSection=h=>{const r=RULES.find(x=>x[0]===h); if(!r)return '';
+  return `<div><h4>${r[0]}</h4><ul>`+r[1].map(([t,d])=>
+    `<li>${t}${d?` <span class="dim">(default ${d})</span>`:''}</li>`).join('')+'</ul></div>';};
+const rulesHTML=()=>RULE_COLS.map(names=>
+  `<div class="rules-col">${names.map(rulesSection).join('')}</div>`).join('');
+if($('#rulesBody'))$('#rulesBody').innerHTML=rulesHTML();
+function openRules(){
+  RETFOCUS=document.activeElement;
+  $('#mTitle').textContent='League rules & scoring';
+  $('#mSub').textContent='The league’s own Yahoo settings · league 526001 · read 14 Sep 2026';
+  /* the same grid as the page section, just inside the dialog */
+  $('#mBody').innerHTML=`<div class="rules">${rulesHTML()}</div>`;
+  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
+}
+if($('#rulesBtn'))$('#rulesBtn').onclick=openRules;
+
 /* ---- spotlight: click to lock any number of managers, hover to preview ---- */
 const PICK=new Set();
 let HOVER=null;
@@ -3306,8 +3400,6 @@ function rankTip(r,rank){
 function drawLadder(d){
   if(!d.length){$('#ladder').innerHTML='';return;}
   const sc=d.map(r=>r.score);
-  const mu=sc.reduce((a,b)=>a+b,0)/sc.length;
-  const sd=Math.sqrt(sc.reduce((t,v)=>t+(v-mu)*(v-mu),0)/sc.length)||1;
   const pad=Math.max(.6,(Math.max(...sc)-Math.min(...sc))*.12);
   const lo=Math.min(100,...sc)-pad, hi=Math.max(100,...sc)+pad;
   const px=v=>((v-lo)/(hi-lo)*100);
@@ -4637,7 +4729,6 @@ function cardPalette(){
   if(contrastHex(accent,bg)<2.4) accent=ink;
   const rr=parseInt(accent.slice(1,3),16), gg=parseInt(accent.slice(3,5),16), bb=parseInt(accent.slice(5,7),16);
   /* a light surface needs a far gentler wash than a near-black one */
-  const lum=(0.2126*rr+0.7152*gg+0.0722*bb)/255;
   const bl=(parseInt(bg.slice(1,3),16)*0.2126+parseInt(bg.slice(3,5),16)*0.7152+parseInt(bg.slice(5,7),16)*0.0722)/255;
   const strength=bl>0.6?0.10:0.20;
   return {bg,ink,dim,accent,rule:bl>0.6?'rgba(0,0,0,.12)':'rgba(255,255,255,.10)',
@@ -4692,7 +4783,6 @@ async function makeH2HCard(an,bn){
     let t=0; meets.forEach(x=>{t+=(x.ma===who?x.pa:x.pb);}); return t/meets.length;};
   const pA=ppgIn(an), pB=ppgIn(bn);
   const cmp=[['SEASONS','seasons',0],['PPG v EACH OTHER','__h2hppg',2],['POWER IDX','cpi',1],['PODIUMS','podium',0]];
-  const lowerWins={};
   x.textAlign='left';
   x.strokeStyle=P.rule; x.lineWidth=1;
   x.beginPath(); x.moveTo(84,markY(0)); x.lineTo(S-84,markY(0)); x.stroke();
@@ -4798,14 +4888,6 @@ function cardClip(x,text,maxW){
   let t=text;
   while(t.length>2&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);
   return t+'…';
-}
-function cardTiles(x,S,P,y,tiles){
-  cardRule(x,S,P,y-46); x.textAlign='left';
-  tiles.forEach((t,i)=>{
-    const px=84+i*((S-168)/tiles.length);
-    x.fillStyle=P.accent; x.font='600 56px "IBM Plex Mono",monospace'; x.fillText(t[1],px,y+22);
-    x.fillStyle=P.dim; x.font='500 21px "IBM Plex Mono",monospace'; x.fillText(t[0].split('').join(' '),px,y+58);
-  });
 }
 /* the site's copy is HTML; canvas wants plain text */
 function cardText(s){
@@ -5574,10 +5656,18 @@ document.addEventListener('click',e=>{
   const b=$('#wrShare'); if(!b)return;
   b.addEventListener('click',async e=>{
     e.stopPropagation();
+    /* Reading WR.paused, awaiting, then restoring it looks like a race, and a linter
+       flags it as one: a second click would capture was=true and leave the story stuck
+       paused for good. It cannot happen. shareAny() sets btn.disabled=true synchronously
+       before its first await, and the browser does not dispatch click on a disabled
+       button, so no second handler ever starts. Verified by double-clicking it with a
+       deliberately slow share. If shareAny ever stops disabling the button, this becomes
+       a real bug -- keep the two together. */
     const was=WR.paused; WR.paused=true;
     try{
       await shareAny(()=>makeWrapCard(WR.name,WR.i),
         'deadshot-wrapped-'+slug(WR.name)+'-'+(WR.i+1)+'.png',b);
+    // eslint-disable-next-line require-atomic-updates
     }finally{ WR.paused=was; }
   });
 })();

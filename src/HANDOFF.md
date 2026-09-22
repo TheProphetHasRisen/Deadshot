@@ -4,11 +4,25 @@ A single-page, self-contained fantasy football history site for the Deadshot lea
 (2015–2025, 10 managers active, 20 all-time). Everything ships as one `index.html`
 with no images and no CDN scripts. ~500 KB.
 
-> **One exception, verified 2026-08-27:** the `<head>` links
-> `fonts.googleapis.com`, which pulls six `.woff2` files from `fonts.gstatic.com`.
-> The page is *not* fully offline-capable — with that host blocked it renders in
-> fallback faces. Inline them as data URIs if the no-external-requests claim ever
-> needs to be true.
+> **Offline status, re-measured against the live site 2026-09-15 — the old note here
+> was out of date.** `sw.js` did not exist when that was written. It does now, and it
+> stores the fonts as well as the page. Measured with the network genuinely cut:
+>
+> | | First visit, then offline | Second visit onward, then offline |
+> |---|---|---|
+> | Page, data, every section | works | works |
+> | The six real typefaces | fallback faces | works |
+>
+> Why the first visit differs: the worker installs during that first load but is not
+> controlling the page yet when the fonts are requested, so it never sees them and
+> cannot store them. From the second visit it controls the page, catches the font
+> requests and keeps all seven files (one stylesheet + six `.woff2`).
+>
+> The first-visit gap is cosmetic and self-heals — screenshotted, it is clean and
+> readable in system faces, just not the right typefaces. Not worth fixing: the only
+> real options are hardcoding versioned gstatic URLs into the install list (which go
+> stale) or inlining the fonts as data URIs (which adds ~150 KB to every single load
+> to fix one cosmetic first visit).
 
 Live: deployed on Vercel from a GitHub repo whose only meaningful file is `index.html`.
 
