@@ -57,11 +57,30 @@ function syncFilter(){
 
 /* tooltip */
 const tip=$('#tip');
-function showTip(e,h){tip.innerHTML=h;tip.classList.add('on');moveTip(e);}
+function showTip(e,h){clearTimeout(tipPark);tip.innerHTML=h;tip.classList.add('on');moveTip(e);}
 function moveTip(e){const r=tip.getBoundingClientRect();let x=e.clientX+14,y=e.clientY+16;
   if(x+r.width>innerWidth-8)x=e.clientX-r.width-14; if(y+r.height>innerHeight-8)y=e.clientY-r.height-16;
+  /* Flipping away from the right/bottom edge was the ONLY adjustment, with nothing
+     stopping the flip overshooting the other way. A 290px-wide tip flipped left on a
+     320px phone landed at -246..44: a 44px sliver of readable text. Every "?" explainer
+     was unreadable on every phone. Clamp into the viewport after flipping, both axes.
+     This also stops the tip being parked far off-screen while hidden, which was dragging
+     the whole page sideways during the chaos egg (a transformed body makes even a
+     position:fixed element count toward scroll width). */
+  x=Math.max(8,Math.min(x,innerWidth-r.width-8));
+  y=Math.max(8,Math.min(y,innerHeight-r.height-8));
   tip.style.left=x+'px';tip.style.top=y+'px';}
-const hideTip=()=>tip.classList.remove('on');
+let tipPark;
+/* Park the tooltip back at the origin once it has faded. It is invisible and
+   pointer-events:none when hidden, but it still sits in the layout at wherever it was
+   last shown -- so a tip positioned near the right edge of a wide window is stranded
+   off-screen the moment the window is narrowed. That stranded box still counts toward
+   the page's scroll width while <body> is transformed, which is what let the chaos egg
+   drag the whole page 482px sideways. The delay is longer than the 100ms opacity
+   transition, so nothing visibly jumps. */
+const hideTip=()=>{tip.classList.remove('on');
+  clearTimeout(tipPark);
+  tipPark=setTimeout(()=>{tip.style.left='0px';tip.style.top='0px';},150);};
 const GLOSS={
  z:`<b>Z-score</b><br>How far clear of the field you scored, in standard deviations.<br><br>`+
    `Take a team's points per game, subtract that season's league average, then divide by how spread out the league was that year.<br><br>`+

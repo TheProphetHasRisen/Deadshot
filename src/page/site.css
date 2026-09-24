@@ -461,6 +461,16 @@ th .gl-th:hover,th .gl-th:focus{opacity:1;border-color:var(--brass-2);background
 @media(max-width:720px){.lad-head,.lad{grid-template-columns:22px minmax(72px,1fr) 46px 52px 38px}
   .lad-ev{display:none}
   .lad-track,.lad-track-h{display:none}}
+/* On a 320px screen (iPhone SE, the width the house rules name as a required test size)
+   this grid wants 282px and the card gives it 242, and the card clips rather than
+   scrolls: the rank-move column was cut off entirely -- no arrows at all, and its header
+   read "VS" with the lambda missing. Tighten the gap and the fixed columns for that band
+   only; 360px and up were already fine and are untouched. */
+@media(max-width:345px){
+  .lad-head,.lad{grid-template-columns:20px minmax(56px,1fr) 42px 46px 32px;gap:5px}
+  #ladder .lad{padding-left:4px;padding-right:4px}
+  .lad-head{font-size:9px;letter-spacing:.05em}
+  .lad-w{font-size:11px}}
 .hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,268px),1fr));gap:1px;
   background:var(--rule);border:1px solid var(--rule);border-radius:var(--card-r);overflow:hidden;box-shadow:var(--shadow)}
 .hlc{background:var(--surface);color:var(--ink);padding:15px 16px 14px;display:flex;flex-direction:column;gap:3px;
@@ -1159,7 +1169,7 @@ input[type=range]::-moz-range-track{height:4px;background:var(--rule);border-rad
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--brass);margin-top:-5.5px;border:0}
 input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--brass);border:0}
 footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 46px;color:var(--ink-3);font-size:12px}
-.tip{position:fixed;pointer-events:none;z-index:120;background:var(--surface);color:var(--ink);border:1px solid var(--brass-2);padding:7px 10px;border-radius:3px;font-size:12px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .1s;max-width:290px}
+.tip{position:fixed;pointer-events:none;z-index:120;background:var(--surface);color:var(--ink);border:1px solid var(--brass-2);padding:7px 10px;border-radius:3px;font-size:12px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .1s;max-width:min(290px,calc(100vw - 16px))}
 .tip b{color:var(--brass)}
 .tip.on{opacity:1}
 .chart{position:relative}
