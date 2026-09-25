@@ -18,6 +18,10 @@ python3 export.py >/dev/null
 python3 mksite.py
 
 say "verify"
+# The numbers tripwire. verify.py proves the raw data is consistent; this proves the
+# arithmetic on top of it has not moved. A changed formula has NO symptom -- the page
+# renders, every other check passes, and the site shows a confident wrong number.
+python3 test_numbers.py || { echo "  !! computed numbers moved unexpectedly — refusing"; exit 1; }
 if command -v node >/dev/null 2>&1; then
   python3 - <<'PY'
 import re,io
@@ -107,6 +111,7 @@ mkdir -p "$CLONE/src" "$CLONE/src/page"
 cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
+         test_numbers.py numbers.lock.json \
          eslint.config.js package.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \

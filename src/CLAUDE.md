@@ -115,6 +115,26 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
 
 Do not report a fix as working on the strength of the code reading correctly.
 
+## The numbers tripwire
+
+`python3 test_numbers.py` pins every computed number -- power index, Z, pythagorean
+wins, luck, all-play, expected titles -- for all 96 team-seasons and the 10 retired
+managers' careers. `deploy.sh` gates on it.
+
+It exists because **a changed formula has no symptom.** Proven, not assumed: changing
+the pythagorean exponent from 2.37 to 2.38 moves 252 numbers and `verify.py`'s 7,470
+checks still pass with exit 0. The page renders, nothing looks wrong, and the site shows
+confident wrong numbers. That is the one failure mode nothing else here catches.
+
+- **It stays quiet when a season is added.** Team-seasons are frozen history; careers are
+  pinned only for managers who have stopped playing, because an active manager's career
+  numbers rightly move every September. A test that cries wolf every season gets
+  `--accept`ed without reading, which is worse than no test.
+- **When it fails, read what moved.** Changed something on purpose? `python3
+  test_numbers.py --accept` and commit `numbers.lock.json` in the same commit as the
+  change, so the diff shows both. Didn't change anything on purpose? A formula is broken.
+- It is deliberately blind to raw-data errors -- a mistyped score is `verify.py`'s job.
+
 ## Data changes
 
 Run `python3 verify.py` after any data change. It automates the invariants below and
