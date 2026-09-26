@@ -7,17 +7,28 @@
    is refreshed on every successful visit.
 
    Fonts and icons are the other way round -- they never change within a version, so they
-   come from the store immediately and are only fetched once. */
-const VERSION='deadshot-156087b29ac1';
+   come from the store immediately and are only fetched once. The typefaces are our own
+   files under /fonts/ (self-hosted since 25 Sep 2026) and are precached on install, so a
+   copy installed on one visit has the real faces even if the signal is gone by the next. */
+const VERSION='deadshot-d15a3f657396';
 const CORE=['/','/manifest.webmanifest','/favicon-32.png',
             '/favicon.svg','/apple-touch-icon.png','/icon-192.png','/icon-512.png',
-            '/icon-maskable-512.png'];
-const FONT=/^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
+            '/icon-maskable-512.png',
+            /* keep in step with page/fonts.css; mkfonts.py names them by Google's version */
+            '/fonts/plex-sans-v23-latin.woff2','/fonts/plex-mono-v20-400-latin.woff2',
+            '/fonts/plex-mono-v20-500-latin.woff2','/fonts/plex-mono-v20-600-latin.woff2',
+            '/fonts/fraunces-v38-latin.woff2','/fonts/big-shoulders-display-v24-latin.woff2'];
 
 self.addEventListener('install',e=>{
   /* take over straight away rather than waiting for every tab to close */
   self.skipWaiting();
-  e.waitUntil(caches.open(VERSION).then(c=>c.addAll(CORE).catch(()=>{})));
+  /* one file at a time, never addAll: addAll is all-or-nothing, so a single 404 in this
+     list would silently discard the whole precache -- the page included -- and a reader who
+     installed and then lost signal would open to nothing. Keep whatever answered healthy. */
+  e.waitUntil(caches.open(VERSION).then(c=>Promise.allSettled(CORE.map(async u=>{
+    const net=await fetch(u);
+    if(net&&net.ok)await c.put(u,net);
+  }))));
 });
 
 self.addEventListener('activate',e=>{
@@ -74,11 +85,10 @@ self.addEventListener('fetch',e=>{
     return;
   }
 
-  /* fonts and our own static files: from the store first, fetched once. Only a healthy
-     response is kept -- a captive portal's interstitial is a 200 to fetch() but not to
-     net.ok, and the font stylesheet is requested with crossorigin so it has a real
-     status to check rather than being an opaque blob. */
-  if(FONT.test(r.url)||mine){
+  /* our own static files, fonts included: from the store first, fetched once. Only a
+     healthy response is kept -- a captive portal's interstitial is a 200 to fetch() but
+     not to net.ok. Nothing cross-origin passes through here any more. */
+  if(mine){
     e.respondWith((async()=>{
       const hit=await caches.match(r);
       if(hit)return hit;

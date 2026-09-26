@@ -381,7 +381,7 @@
     <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all __NSEASONSW__ seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
-        <select id="cmpA"></select><span class="sub">versus</span><select id="cmpB"></select>
+        <select id="cmpA" aria-label="First manager"></select><span class="sub">versus</span><select id="cmpB" aria-label="Second manager"></select>
         <button id="cmpShare" class="on" style="padding:7px 14px;margin-left:8px">&#8593; Share this matchup</button>
         <button id="cmpRiv" style="padding:7px 14px;margin-left:6px">&#8593; Every meeting</button></div></div>
       <div class="card-b" id="cmpOut"></div>
@@ -465,7 +465,7 @@
   <path d="M344 70 Q308 125 344 180" fill="none" stroke="currentColor" stroke-width="5"/>
 </svg></div>
 <button class="totop" id="toTop" type="button" aria-label="Back to top"><span class="ar">&#8593;</span> Top</button>
-<div class="tip" id="tip"></div>
+<div class="tip" id="tip" role="tooltip" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="ov" id="ov"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="modal-h"><div><h3 id="mTitle"></h3><div class="sub" id="mSub"></div></div><button class="xbtn" id="mX" aria-label="Close">&#10005;</button></div>

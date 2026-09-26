@@ -2,27 +2,21 @@
 
 A single-page, self-contained fantasy football history site for the Deadshot league
 (2015–2025, 10 managers active, 20 all-time). Everything ships as one `index.html`
-with no images and no CDN scripts. ~500 KB.
+with no images and no CDN scripts, plus six self-hosted font files. ~500 KB.
 
-> **Offline status, re-measured against the live site 2026-09-15 — the old note here
-> was out of date.** `sw.js` did not exist when that was written. It does now, and it
-> stores the fonts as well as the page. Measured with the network genuinely cut:
+> **Offline status, re-measured 2026-09-25.** `sw.js` stores the page and the six
+> typefaces on the very first visit. Measured with the network genuinely cut after one
+> load over http: page, data, every section and all six real faces render; a deliberately
+> broken entry in the precache list no longer discards the rest (the install stores each
+> file on its own, never `addAll`).
 >
-> | | First visit, then offline | Second visit onward, then offline |
-> |---|---|---|
-> | Page, data, every section | works | works |
-> | The six real typefaces | fallback faces | works |
->
-> Why the first visit differs: the worker installs during that first load but is not
-> controlling the page yet when the fonts are requested, so it never sees them and
-> cannot store them. From the second visit it controls the page, catches the font
-> requests and keeps all seven files (one stylesheet + six `.woff2`).
->
-> The first-visit gap is cosmetic and self-heals — screenshotted, it is clean and
-> readable in system faces, just not the right typefaces. Not worth fixing: the only
-> real options are hardcoding versioned gstatic URLs into the install list (which go
-> stale) or inlining the fonts as data URIs (which adds ~150 KB to every single load
-> to fix one cosmetic first visit).
+> The typefaces are **self-hosted** now (`fonts/`, six `.woff2` + four OFL licences,
+> fetched once by `mkfonts.py`, declared in the generated `page/fonts.css`). Until
+> 2026-09-25 they came from Google's font server, whose stylesheet blocked first paint:
+> measured on a 4x-throttled iPhone SE, that one response 4 s late meant 4.3 s to first
+> paint. Same delay on our own font files now: 172 ms to first paint, fonts swap in after.
+> Same bytes on the wire, one origin instead of three, and `/fonts/` is served
+> `immutable` for a year because the filenames carry Google's version segment.
 
 Live: deployed on Vercel from a GitHub repo whose only meaningful file is `index.html`.
 
@@ -35,29 +29,38 @@ data.py  +  weekly*.py          ← hand-transcribed source of truth
         │
         ├── export.py           → site_data.json    (all aggregation / analytics)
         │
-        └── mksite.py           → index.html        (CSS + markup + JS + embedded JSON)
+        └── mksite.py  + page/* → index.html + sw.js (CSS + markup + JS + embedded JSON,
+                                                     and the offline worker)
 ```
 
 Two commands, in this order, from this directory:
 
 ```bash
 python3 export.py     # writes site_data.json
-python3 mksite.py     # reads site_data.json, writes index.html
+python3 mksite.py     # reads site_data.json + page/*, writes index.html AND sw.js
 ```
 
-`mksite.py` prints the byte count on success. Nothing else is generated.
+`mksite.py` prints the byte count on success. `sw.js` is generated in the same run (its
+version string is a hash of the page); nothing else is.
 
 ### Test
 
 ```bash
 npm i playwright                      # once
-node test.js                          # headless structural audit, desktop + mobile
+npx playwright install webkit         # once -- Safari's engine, for the iPhone pass
+node test.js                          # headless structural audit, desktop + mobile, then iPhone
 CHROMIUM_PATH=/path/to/chromium node test.js   # if you need to point at a specific binary
 ```
 
 `test.js` asserts row counts for every table/chart on the page and reports any
 `pageerror` / console error. A `net::ERR_TUNNEL_CONNECTION_FAILED` line is
 expected noise from the sandbox and is not a real failure.
+
+It then runs a second pass in **WebKit** (Safari's own engine) at iPhone SE (320pt) and
+iPhone 15 Pro sizes: no page errors, the page must not scroll sideways, the six real
+typefaces must load, and a manager's dossier must open from a tap and close on Escape.
+If the WebKit browser is not installed it says so and exits with code 3; `deploy.sh`
+treats that like missing Playwright -- keeps verifying, refuses to push.
 
 Also worth running after any JS edit:
 
@@ -80,11 +83,19 @@ node --check /tmp/site.js
 | `weekly.py` | 2025 week-by-week: `W2025`, `BYES2025`, `TRADES2025` |
 | `weekly2024.py` … `weekly2021.py` | Same shape for 2024, 2023, 2022, 2021 |
 | `export.py` | All analytics. Reads the above, writes `site_data.json`. |
-| `mksite.py` | The whole site. Four raw strings: `HEAD` (all CSS, line ~4), `BODY` (markup + the `__DATA__` placeholder, ~932), `JS` (~1395), `SHELL_TOP` (doctype/meta, ~3536). |
+| `mksite.py` | An ~85-line assembler. Reads the files in `page/`, fills the count placeholders (`__NSEASONS__` etc.) from `site_data.json`, embeds the data, writes `index.html` and `sw.js`. |
+| `page/shell.html` | doctype, `<html>`, meta tags |
+| `page/head.html` | `<title>`, font links, and the `__CSS__` placeholder |
+| `page/site.css` | ~97 KB -- every rule for all six themes. Grep before adding any class or `@keyframes` name. |
+| `page/body.html` | the markup, and the `__DATA__` placeholder |
+| `page/scripts.html` | the `<script>` wrapper, and the `__JS__` placeholder |
+| `page/site.js` | ~280 KB / ~4,600 lines -- the whole page's behaviour. **Never read it in full**; see section 6. |
+| `page/sw.js` | the offline worker, with `__VERSION__` |
 | `site_data.json` | Build artifact. Do not edit by hand. |
-| `index.html` | Build artifact. Do not edit by hand — every change goes in `mksite.py`. |
+| `index.html` | Build artifact. Do not edit by hand — every change goes in `page/` (or `mksite.py` for the assembly itself). |
+| `sw.js` | Build artifact too — the offline worker, written by `mksite.py` from `page/sw.js`. |
 | `CLAUDE.md` | Standing working rules — Claude Code loads this automatically each session |
-| `test.js` | Playwright audit |
+| `test.js` | Playwright audit: Chromium desktop + mobile, then WebKit at iPhone sizes |
 | `verify.py` | Data integrity checks (HANDOFF section 3 invariants). Exit 1 on any failure. |
 | `writer.py` | Renders league data back into `data.py` / `weekly*.py` format. Freezes finished seasons; refuses to write anything that fails `verify.py`. |
 | `test_writer.py` | Round-trip and guard-rail tests for `writer.py`. |
@@ -567,9 +578,11 @@ icon and font stayed pinned to the previous build. A same-length edit is mundane
   blank screen with a complete copy sitting unused. It now falls back after 3.5s and lets
   the fetch finish in the background so the next open is fresh.
 
-Fonts are requested with `crossorigin` so their responses have a real status to check —
-without it every font response is opaque, indistinguishable from a captive portal's block
-page, and a bad first visit poisoned the fonts for good.
+Fonts are same-origin files under `/fonts/` (self-hosted since 2026-09-25), so their
+responses have a real status to check. When they came from Google they had to be
+requested with `crossorigin` for that — without it every font response was opaque,
+indistinguishable from a captive portal's block page, and a bad first visit poisoned the
+fonts for good.
 
 **The page is fetched network-first, and that is the whole point.** The obvious way round
 (serve the stored copy, refresh in the background) leaves every reader one launch behind
@@ -809,15 +822,17 @@ All audio is synthesized with the Web Audio API. There are zero audio assets.
 > `CLAUDE.md` in this directory carries these as standing rules and is loaded
 > automatically every session. Keep the two in sync if you change one.
 
-0. **`mksite.py` is ~250 KB / 3,550 lines — about 65k tokens. Never read it in
+0. **`page/site.js` is ~280 KB / ~4,600 lines — about 70k tokens. Never read it in
    full.** One such read eats most of a context window. `grep -n` for the anchor,
-   then read a narrow window around it.
-1. **Never edit `index.html`.** It is generated. Edit `mksite.py` and rebuild.
-2. **Assert before you write.** When patching `mksite.py` with a script, assert the
+   then read a narrow window around it. (Until 14 Sep 2026 the whole page was five
+   raw strings inside `mksite.py`; it is real files in `page/` now, and `mksite.py`
+   is an ~85-line assembler.)
+1. **Never edit `index.html` or `sw.js`.** They are generated. Edit `page/` and rebuild.
+2. **Assert before you write.** When patching `page/*` with a script, assert the
    anchor string matches exactly once *before* opening the file for write. Several
    edits were silently lost to a script that threw on a stale anchor after having
    already made other changes in memory. Then `grep` to confirm.
-3. **Class name collisions.** `mksite.py` is one giant stylesheet. A new `.brand` class
+3. **Class name collisions.** `page/site.css` is one giant stylesheet. A new `.brand` class
    silently inherited the masthead's `.brand`; a new `.totop.on` inherited the global
    `button.on` styling. Grep for a class name before you introduce it.
 4. **`@keyframes` collisions too** — `sweep` was defined twice and the wrong one won.

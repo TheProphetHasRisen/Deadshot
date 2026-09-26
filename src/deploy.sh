@@ -37,8 +37,17 @@ PY
     echo "  !! the page's JavaScript does not parse — refusing to go further"; exit 1
   fi
   if node -e "require('playwright')" >/dev/null 2>&1; then
-    # no `| tail -1`: it hid the multi-line error report and swallowed the exit code
-    node test.js || { echo "  !! test.js failed — refusing to go further"; exit 1; }
+    # no `| tail -1`: it hid the multi-line error report and swallowed the exit code.
+    # Exit 3 means the Chromium checks passed but the WebKit (Safari-engine, iPhone)
+    # pass could not run because that browser is not installed. That is the same
+    # position as having no Playwright at all: keep verifying, never push.
+    set +e; node test.js; TEST_RC=$?; set -e
+    if [ "$TEST_RC" -eq 3 ]; then
+      echo "  (WebKit not installed — the iPhone check did not run: npx playwright install webkit)"
+      [ $PUSH -eq 1 ] && { echo "  !! refusing to push unverified on a phone"; exit 1; }
+    elif [ "$TEST_RC" -ne 0 ]; then
+      echo "  !! test.js failed — refusing to go further"; exit 1
+    fi
     # the worker and the manifest ship too, and neither was ever checked. A broken worker
     # is a sticky, per-device, invisible failure; a stray comma in the manifest silently
     # stops Add to Home Screen working.
@@ -109,7 +118,7 @@ mkdir -p "$CLONE/src" "$CLONE/src/page"
 # mksite.py is a small assembler now; the page itself lives in page/. Miss these and the
 # CI rebuild in the deploy repo has nothing to build from.
 cp page/* "$CLONE/src/page/" 2>/dev/null || true
-for f in data.py export.py mksite.py verify.py writer.py test.js test_writer.py \
+for f in data.py export.py mksite.py mkfonts.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
          test_numbers.py numbers.lock.json \
          eslint.config.js package.json \
@@ -123,8 +132,11 @@ for f in favicon.svg favicon-32.png apple-touch-icon.png icon-192.png icon-512.p
          manifest.webmanifest sw.js; do
   [ -f "$f" ] && cp "$f" "$CLONE/$f"           # icons and response headers, served from root
 done
+# the six self-hosted typefaces and their licences; the page and the worker both name them
+mkdir -p "$CLONE/fonts"
+cp fonts/*.woff2 fonts/OFL-*.txt "$CLONE/fonts/"
 git -C "$CLONE" add -A index.html og.png og-*.png t src favicon.svg favicon-32.png \
-  apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js
+  apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts
 if git -C "$CLONE" diff --cached --quiet; then
   echo "  index.html unchanged — nothing to deploy"; exit 0
 fi

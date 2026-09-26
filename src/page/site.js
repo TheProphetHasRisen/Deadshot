@@ -7,7 +7,16 @@ const f=(v,d=2)=>v==null||v===''?'—':(+v).toFixed(d);
 const pct=v=>v==null?'—':(100*v).toFixed(1)+'%';
 const ord=n=>n+(['','st','nd','rd'][n]||'th');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+/* Theme tokens are read with getComputedStyle, and a read that lands between DOM writes
+   forces a synchronous style recalc. diverge() reads three per heat-map cell while drawHeat
+   is writing cells, and on a 4x-throttled phone that was ~100ms of the startup long task.
+   So the reads are cached for the length of one task (cleared on a microtask) and cleared
+   by hand in setSkin(), the one place a token can change inside a task. */
+let _cv=null;
+const cssv=n=>{
+  if(!_cv){_cv=new Map(); _cv.cs=getComputedStyle(document.documentElement); queueMicrotask(()=>{_cv=null;});}
+  let v=_cv.get(n); if(v===undefined){v=_cv.cs.getPropertyValue(n).trim(); _cv.set(n,v);} return v;
+};
 const ACTIVE=[...new Set(ROWS.filter(r=>r.y===LAST).map(r=>r.mgr))];
 const surname=n=>n.split(' ').slice(-1)[0];
 /* seasons played, then surname A-Z — a stated rule, not a hand-placed order */
@@ -32,6 +41,7 @@ function scheduleRedraw(){
   requestAnimationFrame(()=>{_redrawQueued=false;REDRAW.forEach(f=>{try{f();}catch(e){}});});
 }
 function setSkin(k,save){
+  _cv=null;                          /* the tokens are about to change under the cache */
   if(!SKINS.includes(k))k='og';
   const unchanged=document.documentElement.getAttribute('data-skin')===k;
   document.documentElement.setAttribute('data-skin',k);
@@ -41,6 +51,21 @@ function setSkin(k,save){
      theme you are already on changes no colour and needs no redraw at all */
   if(!unchanged)scheduleRedraw();
 }
+/* Toggle buttons show their state with the .on class, which a screen reader cannot see.
+   Rather than touch the ~38 places that flip it, one observer mirrors .on into aria-pressed
+   on the button groups that really are toggles. Only those: aria-pressed="false" on a plain
+   action button (Clear, Show more) would wrongly announce it as a toggle, so expanders and
+   one-shot actions are deliberately not in this list. */
+const TOGGLES='[data-skin-btn],#fChips button,#fActive,#fAll,#yrPills button,.pills button,button[data-yr],button[data-adv],#advYrChips button,#qLuck,#qCon,#wkYears button,#crPick button,#crLeg button,#raceLeg button';
+const syncPressed=b=>{if(b.matches&&b.matches(TOGGLES))b.setAttribute('aria-pressed',b.classList.contains('on')?'true':'false');};
+new MutationObserver(ms=>{
+  /* a button group built later by a draw function arrives as a childList record; one sweep
+     per batch covers it (startup is a single batch), which is far cheaper than per node */
+  let built=false;
+  ms.forEach(m=>{if(m.type==='attributes')syncPressed(m.target); else built=true;});
+  if(built)$$(TOGGLES).forEach(syncPressed);
+}).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
+$$(TOGGLES).forEach(syncPressed);
 const vis=n=>SEL.has(n);
 function saveSel(){try{localStorage.setItem('deadshot.sel',JSON.stringify([...SEL]));}catch(e){}}
 function setSel(list){SEL=new Set(list);saveSel();$('#spotClear').onclick=()=>{PICK.clear();spotlight();};
@@ -57,7 +82,9 @@ function syncFilter(){
 
 /* tooltip */
 const tip=$('#tip');
-function showTip(e,h){clearTimeout(tipPark);tip.innerHTML=h;tip.classList.add('on');moveTip(e);}
+/* aria-hidden follows .on: an empty role=tooltip box has no accessible name, and a reader
+   would otherwise hear it as a nameless tooltip sitting on every page */
+function showTip(e,h){clearTimeout(tipPark);tip.innerHTML=h;tip.classList.add('on');tip.removeAttribute('aria-hidden');moveTip(e);}
 function moveTip(e){const r=tip.getBoundingClientRect();let x=e.clientX+14,y=e.clientY+16;
   if(x+r.width>innerWidth-8)x=e.clientX-r.width-14; if(y+r.height>innerHeight-8)y=e.clientY-r.height-16;
   /* Flipping away from the right/bottom edge was the ONLY adjustment, with nothing
@@ -78,7 +105,7 @@ let tipPark;
    the page's scroll width while <body> is transformed, which is what let the chaos egg
    drag the whole page 482px sideways. The delay is longer than the 100ms opacity
    transition, so nothing visibly jumps. */
-const hideTip=()=>{tip.classList.remove('on');
+const hideTip=()=>{tip.classList.remove('on');tip.setAttribute('aria-hidden','true');
   clearTimeout(tipPark);
   tipPark=setTimeout(()=>{tip.style.left='0px';tip.style.top='0px';},150);};
 const GLOSS={
@@ -119,8 +146,9 @@ function bindTip(el,h){el.addEventListener('mouseenter',e=>showTip(e,h));el.addE
   el.addEventListener('mouseleave',hideTip);
   if(el.hasAttribute('tabindex')||el.tagName==='BUTTON'){
     el.addEventListener('focus',()=>{const r=el.getBoundingClientRect();
+      el.setAttribute('aria-describedby','tip');   /* #tip is role=tooltip; announce it while focused */
       showTip({clientX:r.left+r.width/2,clientY:r.bottom-4},h);});
-    el.addEventListener('blur',hideTip);
+    el.addEventListener('blur',()=>{el.removeAttribute('aria-describedby');hideTip();});
     el.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip();});}}
 
 /* colour */
@@ -186,9 +214,11 @@ $('#nav').innerHTML=SECS.map(([i,t])=>`<a href="#${i}" data-id="${i}">${t}</a>`)
   sync();
 })();
 const navA=$$('#nav a');
-new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)navA.forEach(a=>a.classList.toggle('on',a.dataset.id===en.target.id));}),
+/* the lit nav link also carries aria-current, so a screen reader hears which section is open */
+const navOn=(a,c)=>{a.classList.toggle('on',c); if(c)a.setAttribute('aria-current','true'); else a.removeAttribute('aria-current');};
+new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)navA.forEach(a=>navOn(a,a.dataset.id===en.target.id));}),
   {rootMargin:'-45% 0px -50% 0px'}).observe&&$$('section').forEach(s=>
-  new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){navA.forEach(a=>a.classList.toggle('on',a.dataset.id===en.target.id));
+  new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){navA.forEach(a=>navOn(a,a.dataset.id===en.target.id));
     if(window.navFollow)window.navFollow(en.target.id);}}),
   {rootMargin:'-45% 0px -50% 0px'}).observe(s));
 
