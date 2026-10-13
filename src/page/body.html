@@ -1,5 +1,6 @@
 
 <script>(function(){try{var k=localStorage.getItem("deadshot.skin");var ok=["scope","og","red","leather","arcade"];if(k==="redact"&&localStorage.getItem("deadshot.clearance")==="1")ok.push("redact");document.documentElement.setAttribute("data-skin",ok.indexOf(k)>-1?k:"red");}catch(e){document.documentElement.setAttribute("data-skin","red");}})();</script>
+<noscript><p class="nojs"><b>The record book is drawn by JavaScript.</b> Turn it on for this site and reload, and all __NSEASONSW__ seasons are here.</p></noscript>
 <div class="deco field" aria-hidden="true">
   <div class="stars s1"></div><div class="stars s2"></div><div class="stars s3"></div>
   <svg class="sky" viewBox="0 0 1600 900" preserveAspectRatio="none">
@@ -189,7 +190,7 @@
 <main id="main" class="wrap">
 
   <section id="champions">
-    <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner's run traced</div></div>
+    <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner’s run traced</div></div>
     <div class="board" id="board"></div>
     <div class="card" id="arcCard" style="margin-top:18px"><div class="card-b" style="padding:15px 18px">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)">This week in league history</div>
@@ -213,8 +214,8 @@
     </div>
   </section>
   <section id="power">
-    <div class="sec-head"><h2>Power Index<span class="gl" data-gl="pi" tabindex="0">?</span></h2><div class="rule-note">Sorted: seasons played, then surname<br>Click a row to lock it — stacks with others</div></div>
-    <p class="lede"><strong>One number for how well a team scored, with the era taken out.</strong> 100 is exactly that season's league average. 112 means you scored 12% more than the typical team that year. It is the only figure on this site you can lay side by side across every season the league has played, which is what makes it the number to argue with.</p>
+    <div class="sec-head"><h2>Power Index<span class="gl" data-gl="pi" tabindex="0">?</span></h2><div class="rule-note">Sorted: seasons played, then surname<br>Click a row to lock it &middot; stacks with others</div></div>
+    <p class="lede"><strong>One number for how well a team scored, with the era taken out.</strong> 100 is exactly that season’s league average. 112 means you scored 12% more than the typical team that year. It is the only figure on this site you can lay side by side across every season the league has played, which is what makes it the number to argue with.</p>
     <div class="card">
       <div class="card-h"><h3>How to read it</h3><span class="sub">worked from a real season</span></div>
       <div class="card-b" id="piHelp"></div>
@@ -234,23 +235,23 @@
         </div></div>
       <div class="card-b" style="padding-bottom:4px"><div id="ladder"></div></div>
       <div class="card-b" style="padding-top:0"><button id="rankMore">Show model details &#9662;</button>
-        <span class="sub" style="margin-left:9px">last season's index, momentum, all-play luck, outlook, evidence</span></div>
+        <span class="sub" style="margin-left:9px">last season’s index, momentum, all-play luck, outlook, evidence</span></div>
       <div class="scroll" id="rankTbl" hidden><table id="tRank"></table></div>
       <div class="card-b" style="border-top:1px solid var(--rule);padding-top:11px">
         <details class="expl"><summary>How the score is built</summary>
-        <p class="plain" style="margin:0 0 9px"><b>In plain English:</b> &lambda; ("lambda") is the fade rate on old seasons. Slide it low and only the last year or two really count; slide it to 1.00 and a 2015 season counts exactly as much as a 2025 one. Nothing about the data changes &mdash; only how much weight the model gives the past.</p>
-        <p style="margin:0;font-size:13px;color:var(--ink-2)">Each season a manager played gets weight <span class="mono">&lambda;<sup>(2025&nbsp;&minus;&nbsp;year)</sup></span>, so at &lambda;&nbsp;=&nbsp;0.72 the 2025 season counts 1.00, 2024 counts 0.72, 2023 counts 0.52 and so on. Those weights are applied to <em>games played</em>, and the weighted mean of Power Index is then pulled toward 100 by <span class="mono">N&nbsp;/&nbsp;(N&nbsp;+&nbsp;25)</span>, where N is the weighted game count — so a manager with one loud season cannot leapfrog a decade of evidence. Projected win rate converts the score through the same Pythagorean exponent used everywhere else, against a 100-rated opponent.</p>
+        <p class="plain" style="margin:0 0 9px"><b>In plain English:</b> &lambda; ("lambda") is the fade rate on old seasons. Slide it low and only the last year or two really count; slide it to 1.00 and a 2015 season counts exactly as much as a 2025 one. Nothing about the data changes, only how much weight the model gives the past.</p>
+        <p style="margin:0;font-size:13px;color:var(--ink-2)">Each season a manager played gets weight <span class="mono">&lambda;<sup>(2025&nbsp;&minus;&nbsp;year)</sup></span>, so at &lambda;&nbsp;=&nbsp;0.72 the 2025 season counts 1.00, 2024 counts 0.72, 2023 counts 0.52 and so on. Those weights are applied to <em>games played</em>, and the weighted mean of Power Index is then pulled toward 100 by <span class="mono">N&nbsp;/&nbsp;(N&nbsp;+&nbsp;25)</span>, where N is the weighted game count, so a manager with one loud season cannot leapfrog a decade of evidence. Projected win rate converts the score through the same Pythagorean exponent used everywhere else, against a 100-rated opponent.</p>
         </details>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
+      <div class="card-h"><h3>Career races: one manager, every season</h3>
         <span class="sub">Every season with a game log &middot; one line per season, each in its own colour</span></div>
       <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
       <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season in its own colour</strong>, and a year keeps the same colour on every manager's chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season in its own colour</strong>, and a year keeps the same colour on every manager’s chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line’s dashed tail ends at where that season actually finished.</p></div>
     </div>
   </section>
 
@@ -259,7 +260,7 @@
     <div class="sec-head"><h2>Season Shape</h2><div class="rule-note">Was it a dogfight or a walkover?</div></div>
     <p class="lede">A league average hides the interesting part. These show <strong>how spread out</strong> the league was each year, whether everyone was bunched together or three teams ran away with it.</p>
     <div class="card">
-      <div class="card-h"><h3>Every team, every season</h3><span class="sub">Each dot is one team's Power Index · champions in gold · hover to preview, click to lock — as many as you like</span><div class="right"><button id="spotClear" style="display:none">Clear selection</button></div></div>
+      <div class="card-h"><h3>Every team, every season</h3><span class="sub">Each dot is one team’s Power Index · champions in gold · hover to preview, click to lock &middot; as many as you like</span><div class="right"><button id="spotClear" style="display:none">Clear selection</button></div></div>
       <div class="card-b"><div class="chart" id="strip"></div></div>
     </div>
     <div class="card">
@@ -281,15 +282,15 @@
     <div class="pills" id="wkYears"></div>
 
     <div class="card">
-      <div class="card-h"><h3>The race — league position, week by week</h3>
+      <div class="card-h"><h3>The race: league position, week by week</h3>
         <span class="sub">Rank 1 at the top · click any number of teams to lock them</span></div>
       <div class="card-b" style="padding-bottom:6px"><div class="pills" id="raceLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="race"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, the same tiebreak the league uses. The shaded band is that season's playoff field: <span id="raceSpots"></span>.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, the same tiebreak the league uses. The shaded band is that season’s playoff field: <span id="raceSpots"></span>.</p></div>
     </div>
 
     <div class="card">
-      <div class="card-h"><h3>All-play &mdash; the record with the schedule removed</h3><span class="gl" data-gl="allplay" tabindex="0">?</span>
+      <div class="card-h"><h3>All-play: the record with the schedule removed</h3><span class="gl" data-gl="allplay" tabindex="0">?</span>
         <span class="sub" id="apSub">Sorted: all-play win %</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week, count how many of the other nine teams you outscored. Every week, versus everyone.</p></div>
       <div class="scroll"><table id="tAP"></table></div>
@@ -297,7 +298,7 @@
 
     <div class="card" data-collapse="closed">
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
-      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week's score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
+      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week’s score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
@@ -351,7 +352,7 @@
       <div class="scroll"><table id="tPO"></table></div>
     </div>
   <div class="sub-h" style="margin-top:34px">The .500 Line &middot; who lives above it, who lives under it</div>
-    <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager's record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
+    <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager’s record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
     <div class="card">
       <div class="card-h"><h3>Above and below</h3><span class="gl" data-gl="five" tabindex="0">?</span>
         <span class="sub">Career &middot; every manager</span>
@@ -369,7 +370,7 @@
     <div class="card" style="margin-top:20px">
       <div class="card-b" style="padding-top:13px">
         <details class="expl"><summary>Every team name in league history</summary>
-        <p class="plain" style="margin:0 0 10px"><b>In plain English:</b> the section above shows one season at a time, so a team from a year you are not looking at cannot be found with your browser's search. This list holds every name the league has ever had, so searching for one always works.</p>
+        <p class="plain" style="margin:0 0 10px"><b>In plain English:</b> the section above shows one season at a time, so a team from a year you are not looking at cannot be found with your browser’s search. This list holds every name the league has ever had, so searching for one always works.</p>
         <div id="teamIndex" style="font-size:13px;color:var(--ink-2)"></div>
         </details>
       </div>
@@ -378,7 +379,7 @@
 
   <section id="h2h">
     <div class="sec-head"><h2>Head to Head</h2><div class="rule-note">Sorted: seasons played</div></div>
-    <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all __NSEASONSW__ seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
+    <p class="lede">Read across: the row manager’s record against the column manager. Playoffs cover all __NSEASONSW__ seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
         <select id="cmpA" aria-label="First manager"></select><span class="sub">versus</span><select id="cmpB" aria-label="Second manager"></select>
@@ -440,7 +441,7 @@
     <div class="card" style="margin-bottom:18px">
       <div class="card-h"><h3>League rules</h3><span class="sub">Read from Yahoo &middot; league 526001 &middot; 26 Aug 2026</span></div>
       <div class="card-b">
-        <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
+        <p class="lede" style="margin:0 0 13px">Everything below is the league’s own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo’s default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
         <div class="rules" id="rulesBody"></div>
       </div>
     </div>
@@ -450,9 +451,24 @@
   </section>
 
   <footer>
-    <strong>Deadshot Fantasy Football — Archives.</strong> Built from the league history workbook.
-    Points data is verified: in all __NSEASONSW__ seasons, league-wide points for equals league-wide points against to the cent.
-    One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70–70 and match Yahoo exactly.
+    <div class="foot-top">
+      <svg class="foot-mark" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--brass)" stroke-width="9"/><g stroke="var(--brass)" stroke-width="13" stroke-linecap="round"><path d="M60 6V40"/><path d="M60 80V114"/><path d="M6 60H40"/><path d="M80 60H114"/></g><circle cx="60" cy="60" r="7" fill="var(--brass)"/></svg>
+      <div>
+        <div class="foot-word">Deadshot <em>Archives</em></div>
+        <div class="foot-line">Est. __FIRSTYEAR__ &middot; __NSEASONS__ seasons &middot; __NMGRS__ managers &middot; __NLOGGED__ games logged</div>
+      </div>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-k">Provenance</div>
+        <p>Built from the league history workbook and checked against Yahoo. Points data is verified: in all __NSEASONSW__ seasons, league-wide points for equals league-wide points against to the cent.
+        One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70&ndash;70 and match Yahoo exactly.</p>
+      </div>
+      <div>
+        <div class="foot-k">Colophon</div>
+        <p>Set in Big Shoulders Display, Fraunces and IBM Plex. One page, no framework. Every figure is worked out again from the league&rsquo;s own game logs each time the book is rebuilt, and the arithmetic behind each one is written out under <a href="#method">Method</a>. Records run __FIRSTYEAR__ to __LASTYEAR__.</p>
+      </div>
+    </div>
   </footer>
 </main>
 <div class="deco ball" aria-hidden="true"><svg viewBox="0 0 400 250">

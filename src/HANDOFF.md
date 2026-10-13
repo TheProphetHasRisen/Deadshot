@@ -92,6 +92,8 @@ node --check /tmp/site.js
 | `page/site.js` | ~280 KB / ~4,600 lines -- the whole page's behaviour. **Never read it in full**; see section 6. |
 | `page/sw.js` | the offline worker, with `__VERSION__` |
 | `site_data.json` | Build artifact. Do not edit by hand. |
+| `404.html` | Build artifact: the not-found page, written by `mksite.py` from `page/404.html`. |
+| `test_copy.py` | House rules for the wording (no em dashes in the writing). `deploy.sh` gates on it. |
 | `index.html` | Build artifact. Do not edit by hand — every change goes in `page/` (or `mksite.py` for the assembly itself). |
 | `sw.js` | Build artifact too — the offline worker, written by `mksite.py` from `page/sw.js`. |
 | `CLAUDE.md` | Standing working rules — Claude Code loads this automatically each session |
@@ -404,6 +406,38 @@ Now 364px. Three things did it:
 
 There is deliberately no separate mobile build. One page, responsive, so a change can
 never land on one and miss the other.
+
+### The finish pass (2026-10-12)
+
+Brian asked for everything on the page to look like time was spent on it. The design did
+already; what gave the page away were the parts nobody had decided, where the browser or a
+number formatter had decided instead. `CLAUDE.md` ("House style") carries the rules. What
+changed:
+
+- **Em dashes**: 85 removed from the writing, each rewritten by hand, and gated.
+- **Numbers**: real minus signs (0 hyphen-minuses left on the page, was 97), en-dash records
+  everywhere, no `+0`, luck signed in every table, `1 season`, `21st`, `2021–2025`.
+- **Browser furniture**: selection, dropdown arrows, scrollbars, cursor, search box and the
+  rules-card bullets (a crosshair tick, the masthead's own mark) all follow the theme.
+  Selection contrast measured at 5.3:1 or better on all six themes.
+- **Tooltips**: any `title=` shows the site's tooltip instead of the grey system one.
+- **Empty tables**: with nobody selected, eleven tables showed a bare header. They now say so.
+- **Not-found page**: was Vercel's bare `NOT_FOUND`. Now `404.html`, in the reader's theme.
+- **Footer**: mark, name, counts, provenance and colophon, not one grey paragraph.
+- **Small tells**: the phone's browser bar follows the theme (it was fixed at Crimson's red
+  under every theme); the tab is named after the open dossier; a no-JavaScript message; a
+  note at the top of the page source; one line in the console; a crosshair cursor over the
+  masthead; Scope's footer lifted clear of the corner sight markings.
+
+Checked with a sweep that reads every word the site can show (the page, all 20 dossiers,
+every season, every tooltip: 170k characters) for a singular count with a plural noun,
+`and … and … and`, `+0`, a hyphen for a minus, an em dash in a sentence, and
+`undefined`/`NaN` leaking. All clean. The sweep scripts were session scratch; rebuild them
+from that description if a big copy change needs one.
+
+**Not done, on purpose:** a print stylesheet (the dark themes would need their tokens
+swapped for paper, and nobody has said they print it), and the ladder-tier contrast, which
+is a look-and-feel call for Brian.
 
 ### Collapsible cards
 

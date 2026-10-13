@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="en">
+<!--
+
+    D E A D S H O T   A R C H I V E S                               est. 2015
+
+    Ten seasons, twenty managers, 410 games on the record.
+    One page, no framework. Every number is rebuilt from the league's own game logs.
+    If you are reading the source, the arithmetic is under "Method" at the foot of the page.
+
+-->
+<html lang="en" data-skin="red">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="The Deadshot fantasy football record book — ten seasons of champions, standings, power rankings, head-to-head and trades.">
+<meta name="description" content="The Deadshot fantasy football record book: ten seasons of champions, standings, power rankings, head-to-head and trades.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -19,12 +28,12 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Deadshot Record Book">
 <meta property="og:title" content="Deadshot Record Book">
-<meta property="og:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades — the whole league record book, in one place.">
+<meta property="og:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades. The whole league record book, in one place.">
 <meta property="og:url" content="https://deadshotleague.com/">
 <meta property="og:image" content="https://deadshotleague.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Deadshot Archives — ten seasons, twenty managers, 410 games logged.">
+<meta property="og:image:alt" content="Deadshot Archives: ten seasons, twenty managers, 410 games logged.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Deadshot Record Book">
 <meta name="twitter:description" content="Ten seasons of champions, standings, power rankings, head-to-head and trades.">
@@ -635,7 +644,10 @@ details.expl>p,details.expl .plain{margin-top:9px}
 @media(max-width:700px){.rules{grid-template-columns:1fr;gap:16px}}
 .rules h4{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
   color:var(--brass);font-weight:600;margin:0 0 6px}
-.rules ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+.rules ul{margin:0;padding-left:0;list-style:none;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+/* a crosshair tick for a bullet, the same mark as the masthead reticle and the nav */
+.rules li{position:relative;padding-left:15px}
+.rules li::before{content:"+";position:absolute;left:0;top:0;font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--brass-2)}
 .rules li b{color:var(--ink)}
 /* ================= THE PHARAOH ================= */
 .pharaoh{position:fixed;inset:0;z-index:500;pointer-events:none;display:none;overflow:hidden;
@@ -1138,6 +1150,12 @@ tr.off{opacity:.3}
 .sec-head h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-.012em;font-variation-settings:"opsz" 72;color:var(--head-ink)}
 .sec-head .rule-note{margin-left:auto;font-size:10.5px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);text-align:right}
 .lede{color:var(--ink-2);max-width:70ch;margin:14px 0 22px;font-size:14.5px}
+/* no last line of one stranded word in the paragraphs people actually read */
+.lede,.foot-grid p,.rules li,.tip{text-wrap:pretty}
+/* The masthead is a sight picture, so the pointer over it is a crosshair. Anything in it that
+   is a real control keeps the hand. */
+.mast{cursor:crosshair}
+.mast a,.mast button{cursor:pointer}
 .lede strong{color:var(--ink);font-weight:600}
 .card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--card-r);box-shadow:var(--shadow);overflow:hidden;color:var(--ink)}
 .card+.card{margin-top:20px}
@@ -1174,6 +1192,10 @@ th.s::after{content:"\2195";opacity:.28;margin-left:4px;font-size:9px}
 th.s.asc::after{content:"\2191";opacity:1;color:var(--brass)}
 th.s.desc::after{content:"\2193";opacity:1;color:var(--brass)}
 tbody tr:hover{background:var(--hover)}
+/* the one row a table shows when it has nothing to show */
+tbody tr.tbl-empty:hover{background:none}
+tr.tbl-empty td{padding:26px 14px;text-align:center;white-space:normal;border-bottom:0;color:var(--ink-3);font-size:12.5px}
+tr.tbl-empty td b{color:var(--ink-2)}
 td.nm{font-weight:600}
 td.tm{color:var(--ink-2);font-style:italic}
 .rk{color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:11.5px;width:26px;text-align:right}
@@ -1217,11 +1239,58 @@ button.on{background:var(--brass-wash);border-color:var(--brass-2);color:var(--b
 .pills{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .pills button{padding:5px 11px;font-weight:600}
 input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;padding:0;border:0;width:180px;cursor:pointer}
+/* ---- the browser's own furniture, made to match ---------------------------------------
+   Every one of these used to be whatever the browser ships: a grey highlight when you drag
+   across text, the operating system's dropdown arrow, default grey scrollbars inside every
+   table card, a blue text cursor. Each is small. Together they are the difference between
+   a page that was finished and one that was merely built. All of it reads the theme tokens,
+   so it follows all six skins with no colour written down here. */
+::selection{background:var(--brass);color:var(--surface)}
+html{accent-color:var(--brass);caret-color:var(--brass);scrollbar-color:var(--brass-2) var(--ground)}
+/* standard properties only. ::-webkit-scrollbar is deliberately not used: defining it makes
+   Safari on a Mac swap its overlay scrollbars for permanent ones, and every card grows a bar */
+.scroll,.brk,.ov,.modal-b{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+/* the dropdown arrow: two hairline gradients in the control's own ink, so it needs no image
+   and no colour. background-image only -- the base rule above owns background-color. */
+select{-webkit-appearance:none;appearance:none;padding-right:26px;text-overflow:ellipsis;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 14px) 53%,calc(100% - 9px) 53%;background-size:5px 5px;background-repeat:no-repeat}
+select:hover,select:focus-visible{color:var(--brass)}
+select option{color:var(--ink);background:var(--surface)}
+/* the search box: square like every other control (iOS rounds it into a pill), a placeholder
+   in the site's own dim ink, and a hairline cross instead of the browser's grey blob */
+input[type=search]{-webkit-appearance:none;appearance:none}
+input::placeholder{color:var(--ink-3);opacity:1;font-style:italic;letter-spacing:.02em}
+input[type=search]::-webkit-search-decoration{-webkit-appearance:none}
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;width:11px;height:11px;margin-left:6px;cursor:pointer;
+  background:linear-gradient(45deg,transparent 44%,var(--ink-2) 44% 56%,transparent 56%),linear-gradient(-45deg,transparent 44%,var(--ink-2) 44% 56%,transparent 56%)}
+input:focus-visible,select:focus-visible{border-color:var(--brass-2)}
 input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--rule);border-radius:2px}
 input[type=range]::-moz-range-track{height:4px;background:var(--rule);border-radius:2px}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--brass);margin-top:-5.5px;border:0}
 input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--brass);border:0}
-footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 46px;color:var(--ink-3);font-size:12px}
+footer{border-top:1px solid var(--rule);margin-top:60px;padding:30px 0 50px;color:var(--ink-3);font-size:12px}
+/* The sign-off. It used to be one grey paragraph; it is now the mark, the name, what the book
+   holds, where the numbers came from and what it is set in -- the things a made object says
+   about itself on its last page. */
+.foot-top{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.foot-mark{width:36px;height:36px;flex:none}
+.foot-word{font-family:var(--wordmark);font-weight:900;font-size:28px;line-height:1;letter-spacing:.045em;text-transform:uppercase;color:var(--head-ink)}
+.foot-word em{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;font-size:15px;letter-spacing:0;text-transform:none;color:var(--brass);margin-left:4px}
+.foot-line{margin-top:7px;font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px 40px}
+.foot-k{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--brass);margin-bottom:6px}
+.foot-grid p{margin:0;line-height:1.65;max-width:70ch}
+.foot-grid a{color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--brass-2);text-underline-offset:2px}
+.foot-grid a:hover{color:var(--brass)}
+@media(max-width:720px){.foot-grid{grid-template-columns:minmax(0,1fr);gap:20px}.foot-word{font-size:24px}.foot-line{letter-spacing:.09em;line-height:1.7}}
+/* Scope pins a little block of sight markings to the bottom-left corner of the window. Cards
+   cover it as they scroll past; the footer has no background, so at the very end of the page
+   its last lines sat on top of them. Lift the footer clear. */
+[data-skin="scope"] footer{padding-bottom:124px}
+/* shown only with JavaScript off, when nothing else on the page can draw */
+.nojs{margin:0;padding:18px 20px;background:var(--surface);border-bottom:1px solid var(--rule);color:var(--ink-2);font-size:14px;text-align:center}
+.nojs b{color:var(--ink)}
 .tip{position:fixed;pointer-events:none;z-index:120;background:var(--surface);color:var(--ink);border:1px solid var(--brass-2);padding:7px 10px;border-radius:3px;font-size:12px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .1s;max-width:min(290px,calc(100vw - 16px))}
 .tip b{color:var(--brass)}
 .tip.on{opacity:1}
@@ -1383,6 +1452,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 <body>
 
 <script>(function(){try{var k=localStorage.getItem("deadshot.skin");var ok=["scope","og","red","leather","arcade"];if(k==="redact"&&localStorage.getItem("deadshot.clearance")==="1")ok.push("redact");document.documentElement.setAttribute("data-skin",ok.indexOf(k)>-1?k:"red");}catch(e){document.documentElement.setAttribute("data-skin","red");}})();</script>
+<noscript><p class="nojs"><b>The record book is drawn by JavaScript.</b> Turn it on for this site and reload, and all ten seasons are here.</p></noscript>
 <div class="deco field" aria-hidden="true">
   <div class="stars s1"></div><div class="stars s2"></div><div class="stars s3"></div>
   <svg class="sky" viewBox="0 0 1600 900" preserveAspectRatio="none">
@@ -1572,7 +1642,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 <main id="main" class="wrap">
 
   <section id="champions">
-    <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner's run traced</div></div>
+    <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to jump to that bracket<br>with the winner’s run traced</div></div>
     <div class="board" id="board"></div>
     <div class="card" id="arcCard" style="margin-top:18px"><div class="card-b" style="padding:15px 18px">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)">This week in league history</div>
@@ -1596,8 +1666,8 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     </div>
   </section>
   <section id="power">
-    <div class="sec-head"><h2>Power Index<span class="gl" data-gl="pi" tabindex="0">?</span></h2><div class="rule-note">Sorted: seasons played, then surname<br>Click a row to lock it — stacks with others</div></div>
-    <p class="lede"><strong>One number for how well a team scored, with the era taken out.</strong> 100 is exactly that season's league average. 112 means you scored 12% more than the typical team that year. It is the only figure on this site you can lay side by side across every season the league has played, which is what makes it the number to argue with.</p>
+    <div class="sec-head"><h2>Power Index<span class="gl" data-gl="pi" tabindex="0">?</span></h2><div class="rule-note">Sorted: seasons played, then surname<br>Click a row to lock it &middot; stacks with others</div></div>
+    <p class="lede"><strong>One number for how well a team scored, with the era taken out.</strong> 100 is exactly that season’s league average. 112 means you scored 12% more than the typical team that year. It is the only figure on this site you can lay side by side across every season the league has played, which is what makes it the number to argue with.</p>
     <div class="card">
       <div class="card-h"><h3>How to read it</h3><span class="sub">worked from a real season</span></div>
       <div class="card-b" id="piHelp"></div>
@@ -1617,23 +1687,23 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
         </div></div>
       <div class="card-b" style="padding-bottom:4px"><div id="ladder"></div></div>
       <div class="card-b" style="padding-top:0"><button id="rankMore">Show model details &#9662;</button>
-        <span class="sub" style="margin-left:9px">last season's index, momentum, all-play luck, outlook, evidence</span></div>
+        <span class="sub" style="margin-left:9px">last season’s index, momentum, all-play luck, outlook, evidence</span></div>
       <div class="scroll" id="rankTbl" hidden><table id="tRank"></table></div>
       <div class="card-b" style="border-top:1px solid var(--rule);padding-top:11px">
         <details class="expl"><summary>How the score is built</summary>
-        <p class="plain" style="margin:0 0 9px"><b>In plain English:</b> &lambda; ("lambda") is the fade rate on old seasons. Slide it low and only the last year or two really count; slide it to 1.00 and a 2015 season counts exactly as much as a 2025 one. Nothing about the data changes &mdash; only how much weight the model gives the past.</p>
-        <p style="margin:0;font-size:13px;color:var(--ink-2)">Each season a manager played gets weight <span class="mono">&lambda;<sup>(2025&nbsp;&minus;&nbsp;year)</sup></span>, so at &lambda;&nbsp;=&nbsp;0.72 the 2025 season counts 1.00, 2024 counts 0.72, 2023 counts 0.52 and so on. Those weights are applied to <em>games played</em>, and the weighted mean of Power Index is then pulled toward 100 by <span class="mono">N&nbsp;/&nbsp;(N&nbsp;+&nbsp;25)</span>, where N is the weighted game count — so a manager with one loud season cannot leapfrog a decade of evidence. Projected win rate converts the score through the same Pythagorean exponent used everywhere else, against a 100-rated opponent.</p>
+        <p class="plain" style="margin:0 0 9px"><b>In plain English:</b> &lambda; ("lambda") is the fade rate on old seasons. Slide it low and only the last year or two really count; slide it to 1.00 and a 2015 season counts exactly as much as a 2025 one. Nothing about the data changes, only how much weight the model gives the past.</p>
+        <p style="margin:0;font-size:13px;color:var(--ink-2)">Each season a manager played gets weight <span class="mono">&lambda;<sup>(2025&nbsp;&minus;&nbsp;year)</sup></span>, so at &lambda;&nbsp;=&nbsp;0.72 the 2025 season counts 1.00, 2024 counts 0.72, 2023 counts 0.52 and so on. Those weights are applied to <em>games played</em>, and the weighted mean of Power Index is then pulled toward 100 by <span class="mono">N&nbsp;/&nbsp;(N&nbsp;+&nbsp;25)</span>, where N is the weighted game count, so a manager with one loud season cannot leapfrog a decade of evidence. Projected win rate converts the score through the same Pythagorean exponent used everywhere else, against a 100-rated opponent.</p>
         </details>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-h"><h3>Career races &mdash; one manager, every season</h3>
+      <div class="card-h"><h3>Career races: one manager, every season</h3>
         <span class="sub">Every season with a game log &middot; one line per season, each in its own colour</span></div>
       <div class="card-b" style="padding-bottom:4px"><div class="pills" id="crPick"></div></div>
       <div class="card-b" style="padding:0 16px 6px"><div class="pills" id="crLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="crace"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season in its own colour</strong>, and a year keeps the same colour on every manager's chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line's dashed tail ends at where that season actually finished.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">The same bump chart, re-cut by manager: one line per season, <strong>each season in its own colour</strong>, and a year keeps the same colour on every manager’s chart. Weekly game logs exist for <span id="crSpan"></span> only, so earlier seasons cannot be drawn. There is no shaded playoff band here because the field size changed between these seasons; each line’s dashed tail ends at where that season actually finished.</p></div>
     </div>
   </section>
 
@@ -1642,7 +1712,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="sec-head"><h2>Season Shape</h2><div class="rule-note">Was it a dogfight or a walkover?</div></div>
     <p class="lede">A league average hides the interesting part. These show <strong>how spread out</strong> the league was each year, whether everyone was bunched together or three teams ran away with it.</p>
     <div class="card">
-      <div class="card-h"><h3>Every team, every season</h3><span class="sub">Each dot is one team's Power Index · champions in gold · hover to preview, click to lock — as many as you like</span><div class="right"><button id="spotClear" style="display:none">Clear selection</button></div></div>
+      <div class="card-h"><h3>Every team, every season</h3><span class="sub">Each dot is one team’s Power Index · champions in gold · hover to preview, click to lock &middot; as many as you like</span><div class="right"><button id="spotClear" style="display:none">Clear selection</button></div></div>
       <div class="card-b"><div class="chart" id="strip"></div></div>
     </div>
     <div class="card">
@@ -1664,15 +1734,15 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="pills" id="wkYears"></div>
 
     <div class="card">
-      <div class="card-h"><h3>The race — league position, week by week</h3>
+      <div class="card-h"><h3>The race: league position, week by week</h3>
         <span class="sub">Rank 1 at the top · click any number of teams to lock them</span></div>
       <div class="card-b" style="padding-bottom:6px"><div class="pills" id="raceLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="race"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, the same tiebreak the league uses. The shaded band is that season's playoff field: <span id="raceSpots"></span>.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, the same tiebreak the league uses. The shaded band is that season’s playoff field: <span id="raceSpots"></span>.</p></div>
     </div>
 
     <div class="card">
-      <div class="card-h"><h3>All-play &mdash; the record with the schedule removed</h3><span class="gl" data-gl="allplay" tabindex="0">?</span>
+      <div class="card-h"><h3>All-play: the record with the schedule removed</h3><span class="gl" data-gl="allplay" tabindex="0">?</span>
         <span class="sub" id="apSub">Sorted: all-play win %</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week, count how many of the other nine teams you outscored. Every week, versus everyone.</p></div>
       <div class="scroll"><table id="tAP"></table></div>
@@ -1680,7 +1750,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
     <div class="card" data-collapse="closed">
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
-      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week's score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
+      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week’s score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
@@ -1734,7 +1804,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
       <div class="scroll"><table id="tPO"></table></div>
     </div>
   <div class="sub-h" style="margin-top:34px">The .500 Line &middot; who lives above it, who lives under it</div>
-    <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager's record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
+    <p class="lede">Win percentage tells you where a career ended up. It does not tell you how much of it was spent winning. <strong>Games clear</strong> is wins minus losses across a whole career, the plainest measure there is. <strong>Weeks above</strong> goes finer, walking each season week by week and asking whether that manager’s record was above water at the time; it covers 2021&ndash;2025, the seasons with a loaded game log. <strong>Expected vs average</strong> asks a different question again: forget the schedule, how many wins did the <em>scoring</em> earn above a perfectly average team?</p>
     <div class="card">
       <div class="card-h"><h3>Above and below</h3><span class="gl" data-gl="five" tabindex="0">?</span>
         <span class="sub">Career &middot; every manager</span>
@@ -1752,7 +1822,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="card" style="margin-top:20px">
       <div class="card-b" style="padding-top:13px">
         <details class="expl"><summary>Every team name in league history</summary>
-        <p class="plain" style="margin:0 0 10px"><b>In plain English:</b> the section above shows one season at a time, so a team from a year you are not looking at cannot be found with your browser's search. This list holds every name the league has ever had, so searching for one always works.</p>
+        <p class="plain" style="margin:0 0 10px"><b>In plain English:</b> the section above shows one season at a time, so a team from a year you are not looking at cannot be found with your browser’s search. This list holds every name the league has ever had, so searching for one always works.</p>
         <div id="teamIndex" style="font-size:13px;color:var(--ink-2)"></div>
         </details>
       </div>
@@ -1761,7 +1831,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 
   <section id="h2h">
     <div class="sec-head"><h2>Head to Head</h2><div class="rule-note">Sorted: seasons played</div></div>
-    <p class="lede">Read across: the row manager's record against the column manager. Playoffs cover all ten seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
+    <p class="lede">Read across: the row manager’s record against the column manager. Playoffs cover all ten seasons; regular season covers only the years whose game logs are loaded. Use the manager filter at the top to cut the grid down to the people you care about.</p>
     <div class="card">
       <div class="card-h"><h3>Pick two managers</h3><div class="right">
         <select id="cmpA" aria-label="First manager"></select><span class="sub">versus</span><select id="cmpB" aria-label="Second manager"></select>
@@ -1823,7 +1893,7 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
     <div class="card" style="margin-bottom:18px">
       <div class="card-h"><h3>League rules</h3><span class="sub">Read from Yahoo &middot; league 526001 &middot; 26 Aug 2026</span></div>
       <div class="card-b">
-        <p class="lede" style="margin:0 0 13px">Everything below is the league's own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo's default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
+        <p class="lede" style="margin:0 0 13px">Everything below is the league’s own configuration, not an assumption. The one that matters most for reading any number on this site: Deadshot is full PPR, meaning a reception is worth 1.0, double Yahoo’s default. That is why scores here run 120&ndash;140 rather than 90&ndash;110, and why raw points cannot be compared against another league.</p>
         <div class="rules" id="rulesBody"></div>
       </div>
     </div>
@@ -1833,9 +1903,24 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
   </section>
 
   <footer>
-    <strong>Deadshot Fantasy Football — Archives.</strong> Built from the league history workbook.
-    Points data is verified: in all ten seasons, league-wide points for equals league-wide points against to the cent.
-    One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70–70 and match Yahoo exactly.
+    <div class="foot-top">
+      <svg class="foot-mark" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--brass)" stroke-width="9"/><g stroke="var(--brass)" stroke-width="13" stroke-linecap="round"><path d="M60 6V40"/><path d="M60 80V114"/><path d="M6 60H40"/><path d="M80 60H114"/></g><circle cx="60" cy="60" r="7" fill="var(--brass)"/></svg>
+      <div>
+        <div class="foot-word">Deadshot <em>Archives</em></div>
+        <div class="foot-line">Est. 2015 &middot; 10 seasons &middot; 20 managers &middot; 410 games logged</div>
+      </div>
+    </div>
+    <div class="foot-grid">
+      <div>
+        <div class="foot-k">Provenance</div>
+        <p>Built from the league history workbook and checked against Yahoo. Points data is verified: in all ten seasons, league-wide points for equals league-wide points against to the cent.
+        One known gap remains: the 2019 season is absent from the source records. The 2022 win-loss column was wrong in the original spreadsheet (72 wins against 68 losses); the 2022 game log settled it, and the corrected records shown here total 70&ndash;70 and match Yahoo exactly.</p>
+      </div>
+      <div>
+        <div class="foot-k">Colophon</div>
+        <p>Set in Big Shoulders Display, Fraunces and IBM Plex. One page, no framework. Every figure is worked out again from the league&rsquo;s own game logs each time the book is rebuilt, and the arithmetic behind each one is written out under <a href="#method">Method</a>. Records run 2015 to 2025.</p>
+      </div>
+    </div>
   </footer>
 </main>
 <div class="deco ball" aria-hidden="true"><svg viewBox="0 0 400 250">
@@ -1875,7 +1960,33 @@ const byName={}; M.forEach(m=>byName[m.name]=m);
 const rowsOf={}; ROWS.forEach(r=>(rowsOf[r.mgr]=rowsOf[r.mgr]||[]).push(r));
 const f=(v,d=2)=>v==null||v===''?'—':(+v).toFixed(d);
 const pct=v=>v==null?'—':(100*v).toFixed(1)+'%';
-const ord=n=>n+(['','st','nd','rd'][n]||'th');
+/* 21st, 22nd, 23rd -- and 11th, 12th, 13th. The old one-liner only knew 1 to 3, so the 21st
+   best season in the book came out as "21th". */
+const ord=n=>{const t=n%100;return n+(t>10&&t<14?'th':(['','st','nd','rd'][n%10]||'th'));};
+/* A signed number set the way a person would write it: a real minus sign (U+2212, the same
+   width as the plus, so a column of them lines up), a plus on a gain, and no sign at all on
+   an exact zero. "+0" and "-0.00" are what a formatter prints. */
+const sg=(v,d=2,suf='')=>{if(v==null||v==='')return '—';
+  const a=Math.abs(+v).toFixed(d);return (+a===0?'':v>0?'+':'−')+a+suf;};
+/* The same care for numbers that are already strings by the time they reach the page.
+   tyMinus turns a leading hyphen on a number into a real minus. ty also sets a win-loss
+   record with en dashes, 9–5 rather than 9-5. Both touch only the text between tags, never
+   an attribute: an SVG path or a style="left:-5%" has to stay exactly as written. No
+   lookbehind, on purpose -- Safari before 16.4 cannot parse one and the whole page dies. */
+/* "1 season", not "1 seasons". Every count that can be one goes through this. */
+const nOf=(n,w)=>n+' '+w+(n===1?'':'s');
+/* A run of years the way it would be written by hand: 2021–2025 when they are consecutive,
+   "2021, 2023 and 2025" when they are not. It used to be joined with " and ", which read
+   "2021 and 2022 and 2023 and 2024 and 2025". */
+const yearList=a=>{a=[...a];if(!a.length)return '';
+  if(a.length>2&&a.every((y,i)=>!i||y-a[i-1]===1))return a[0]+'–'+a[a.length-1];
+  return a.length===1?String(a[0]):a.slice(0,-1).join(', ')+' and '+a[a.length-1];};
+/* the label under a season filter: "2025 only", or "2021–2025 only · 5 seasons" */
+const yearSpan=a=>a.length===1?a[0]+' only':a[0]+'–'+a[a.length-1]+' only · '+nOf(a.length,'season');
+const tyMinus=h=>String(h).replace(/(^|>)([^<]+)/g,(m,a,t)=>a+t.replace(/(^|[\s(])-(?=\d|\.\d)/g,'$1−'));
+const ty=h=>tyMinus(h).replace(/(^|>)([^<]+)/g,(m,a,t)=>a+t
+  .replace(/(^|[^\d.\-−–])(\d{1,3})-(\d{1,3})(?:-(\d{1,2}))?(?![\d.\-])/g,
+    (m,pre,x,y,z)=>pre+x+'–'+y+(z!=null?'–'+z:'')));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 /* Theme tokens are read with getComputedStyle, and a read that lands between DOM writes
    forces a synchronous style recalc. diverge() reads three per heat-map cell while drawHeat
@@ -1910,6 +2021,14 @@ function scheduleRedraw(){
   _redrawQueued=true;
   requestAnimationFrame(()=>{_redrawQueued=false;REDRAW.forEach(f=>{try{f();}catch(e){}});});
 }
+/* The strip of browser around the page on a phone (the status bar, the address bar) takes
+   its colour from one meta tag. It was fixed at Crimson's red, so every other theme sat
+   under a red bar that had nothing to do with it. It follows the masthead now. */
+function paintChrome(){const m=$('meta[name="theme-color"]'),c=cssv('--mast-bg'); if(m&&c)m.setAttribute('content',c);}
+/* The tab says what you are looking at: a manager's name while their dossier is open, the
+   plain title otherwise. It is also what a bookmark or a history entry gets called. */
+const TITLE0=document.title;
+function tabTitle(t){document.title=t?t+' \u00b7 Deadshot':TITLE0;}
 function setSkin(k,save){
   _cv=null;                          /* the tokens are about to change under the cache */
   if(!SKINS.includes(k))k='og';
@@ -1917,6 +2036,7 @@ function setSkin(k,save){
   document.documentElement.setAttribute('data-skin',k);
   $$('[data-skin-btn]').forEach(b=>b.classList.toggle('on',b.dataset.skinBtn===k));
   if(save){try{localStorage.setItem('deadshot.skin',k);}catch(e){}}
+  paintChrome();
   /* charts bake colours into markup, so redraw them on a skin change -- but tapping the
      theme you are already on changes no colour and needs no redraw at all */
   if(!unchanged)scheduleRedraw();
@@ -1937,6 +2057,12 @@ new MutationObserver(ms=>{
 }).observe(document.body,{attributes:true,attributeFilter:['class'],childList:true,subtree:true});
 $$(TOGGLES).forEach(syncPressed);
 const vis=n=>SEL.has(n);
+/* What a table says when it has no rows. A header with nothing under it reads as broken;
+   this says why, and what to press. Called after any table is drawn. */
+function fillEmpty(t){const tb=t&&t.tBodies&&t.tBodies[0]; if(!tb||tb.rows.length)return;
+  const n=t.tHead&&t.tHead.rows[0]?t.tHead.rows[0].cells.length:1;
+  tb.innerHTML=`<tr class="tbl-empty"><td colspan="${n}">${SEL.size
+    ?'Nothing here matches.':'<b>No managers selected.</b> Pick some with the filter at the top.'}</td></tr>`;}
 function saveSel(){try{localStorage.setItem('deadshot.sel',JSON.stringify([...SEL]));}catch(e){}}
 function setSel(list){SEL=new Set(list);saveSel();$('#spotClear').onclick=()=>{PICK.clear();spotlight();};
 syncFilter();}
@@ -1954,7 +2080,7 @@ function syncFilter(){
 const tip=$('#tip');
 /* aria-hidden follows .on: an empty role=tooltip box has no accessible name, and a reader
    would otherwise hear it as a nameless tooltip sitting on every page */
-function showTip(e,h){clearTimeout(tipPark);tip.innerHTML=h;tip.classList.add('on');tip.removeAttribute('aria-hidden');moveTip(e);}
+function showTip(e,h){clearTimeout(tipPark);tip.innerHTML=tyMinus(h);tip.classList.add('on');tip.removeAttribute('aria-hidden');moveTip(e);}
 function moveTip(e){const r=tip.getBoundingClientRect();let x=e.clientX+14,y=e.clientY+16;
   if(x+r.width>innerWidth-8)x=e.clientX-r.width-14; if(y+r.height>innerHeight-8)y=e.clientY-r.height-16;
   /* Flipping away from the right/bottom edge was the ONLY adjustment, with nothing
@@ -1980,35 +2106,35 @@ const hideTip=()=>{tip.classList.remove('on');tip.setAttribute('aria-hidden','tr
   tipPark=setTimeout(()=>{tip.style.left='0px';tip.style.top='0px';},150);};
 const GLOSS={
  z:`<b>Z-score</b><br>How far clear of the field you scored, in standard deviations.<br><br>`+
-   `Take a team's points per game, subtract that season's league average, then divide by how spread out the league was that year.<br><br>`+
+   `Take a team’s points per game, subtract that season’s league average, then divide by how spread out the league was that year.<br><br>`+
    `<b>0.00</b> = exactly average. <b>+1.00</b> = a full standard deviation above the field, roughly the top 16% of teams. <b>&minus;1.00</b> = the same distance below.<br><br>`+
    `Why it exists: Power Index says <i>how much</i> better you scored. Z says <i>how far clear of the pack</i> you were. In a tightly bunched season a small scoring edge is a big Z; in a wild season the same edge is nothing.`,
- lambda:`<b>&lambda; &mdash; "lambda"</b><br>The fade rate on old seasons.<br><br>`+
+ lambda:`<b>&lambda; ("lambda")</b><br>The fade rate on old seasons.<br><br>`+
    `Each season a manager played is multiplied by &lambda; raised to the power of how many years ago it was. At <b>&lambda; = 0.72</b>: this year counts 1.00, last year 0.72, two years ago 0.52, three years ago 0.37.<br><br>`+
-   `<b>Low &lambda; (0.45)</b> &mdash; only the last season or two really matter.<br><b>High &lambda; (1.00)</b> &mdash; every season counts the same, however old.<br><br>`+
+   `<b>Low &lambda; (0.45)</b>: only the last season or two really matter.<br><b>High &lambda; (1.00)</b>: every season counts the same, however old.<br><br>`+
    `It changes nothing about the data. It only changes how much the model trusts the past.`,
- pi:`<b>Power Index</b><br>Scoring, indexed so that <b>100 = that season's league average</b>.<br><br>`+
+ pi:`<b>Power Index</b><br>Scoring, indexed so that <b>100 = that season’s league average</b>.<br><br>`+
    `A team at 112 scored 12% more than the average team in its own year. A team at 91 scored 9% less.<br><br>`+
    `The point of indexing is cross-era comparison: raw points per game drift over the years as rosters and scoring settings change, so 130 PPG in 2015 and 130 PPG in 2025 are not the same achievement. Power Index makes them comparable.`,
  luck:`<b>Luck</b><br>Actual wins minus the wins your scoring deserved.<br><br>`+
-   `The deserved figure comes from Pythagorean expectation &mdash; points for and points against run through an exponent (2.37 here) that converts a scoring ratio into an expected win rate.<br><br>`+
+   `The deserved figure comes from Pythagorean expectation: points for and points against run through an exponent (2.37 here) that converts a scoring ratio into an expected win rate.<br><br>`+
    `<b>+2</b> means you won two more games than your scoring earned; you drew soft matchups or won the close ones. <b>&minus;2</b> means the schedule robbed you.`,
  allplay:`<b>All-play record</b><br>What your record would be if you played <i>everyone</i> every week.<br><br>`+
    `Each week your score is compared against all nine other teams. Beat seven of them and you go 7&ndash;2 that week, regardless of who you were actually scheduled against. An exact tie counts as neither.<br><br>`+
-   `Over a season it removes schedule luck almost entirely &mdash; it is the cleanest measure of how well a team actually played.`,
+   `Over a season it removes schedule luck almost entirely. It is the cleanest measure of how well a team actually played.`,
  rivalry:`<b>Rivalry score</b><br>Meetings &times; balance &times; closeness.<br><br>`+
    `A rivalry needs all three: they have to have played often, the record has to be near even, and the games have to be tight. A 6&ndash;0 sweep is a beating, not a rivalry.`,
  expT:`<b>Expected titles</b><br>A coin flip in every round: <b>(&frac12;)^(wins needed)</b>, summed over every playoff berth.<br><br>`+
-   `In a 4-team bracket everyone needs 2 wins, so every qualifier is worth 0.25. In a 6-team bracket the top two seeds skip a round &mdash; they need 2 wins and are worth 0.25, while seeds 3&ndash;6 need 3 and are worth 0.125.<br><br>`+
+   `In a 4-team bracket everyone needs 2 wins, so every qualifier is worth 0.25. In a 6-team bracket the top two seeds skip a round: they need 2 wins and are worth 0.25, while seeds 3&ndash;6 need 3 and are worth 0.125.<br><br>`+
    `It prices the bye a top seed actually earned, and still sums to exactly 1.00 across each season, so it stays neutral.<br><br>`+
-   `<b>vs Exp</b> is real titles minus that number &mdash; the closest thing here to a clutch measure.`,
- five:`<b>The .500 line</b><br>.500 means exactly even &mdash; as many wins as losses. A win rate of .500 is 50%.<br><br>`+
+   `<b>vs Exp</b> is real titles minus that number, the closest thing here to a clutch measure.`,
+ five:`<b>The .500 line</b><br>.500 means exactly even: as many wins as losses. A win rate of .500 is 50%.<br><br>`+
    `<b>vs .500</b> here is how far above or below even a career sits: +17.6% means winning 67.6% of the time, 17.6 points clear of even.<br><br>`+
    `<b>Weeks above</b> walks each season week by week and asks whether the record was above even <i>at that moment</i>, not just where it finished. 8-6 wire to wire and 8-6 after a 1-5 start are the same record and completely different seasons.<br><br>`+
    `<b>vs winners</b> is the record against opponents who finished that season above .500.`,
  trade:`<b>Trade counting</b><br>A deal counts once for <i>each</i> side, so both managers get credit for it.<br><br>`+
    `<b>In</b> and <b>out</b> count players, not deals: a three-for-one is 3 in and 1 out for the side receiving three.<br><br>`+
-   `Only the seasons whose transaction logs are loaded are counted &mdash; 2021 through 2025.`};
+   `Only the seasons whose transaction logs are loaded are counted: 2021 through 2025.`};
 function glossify(root){(root||document).querySelectorAll('[data-gl]').forEach(el=>{
   if(el.dataset.glBound)return; el.dataset.glBound='1';
   const h=GLOSS[el.dataset.gl]; if(h)bindTip(el,h);});}
@@ -2020,6 +2146,36 @@ function bindTip(el,h){el.addEventListener('mouseenter',e=>showTip(e,h));el.addE
       showTip({clientX:r.left+r.width/2,clientY:r.bottom-4},h);});
     el.addEventListener('blur',()=>{el.removeAttribute('aria-describedby');hideTip();});
     el.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip();});}}
+
+/* A title="" attribute gives the grey system tooltip: a second's wait, the operating system's
+   font, nothing to do with the page. Anything carrying one gets the site's own tooltip
+   instead. Delegated from the document, so it covers markup that is redrawn later without
+   anyone having to remember to bind it. The text stays available to a screen reader. */
+(function(){
+  /* hasAttribute, not a truthiness test: two buttons clear their hint later by setting
+     title to '', and that has to clear ours too rather than leave the old text behind */
+  const take=el=>{if(el.hasAttribute('title')){const t=el.getAttribute('title'); el.removeAttribute('title');
+      if(t){el.dataset.tt=t; if(!el.getAttribute('aria-label')&&!el.textContent.trim())el.setAttribute('aria-label',t);}
+      else delete el.dataset.tt;}
+    return el.dataset.tt;};
+  const hit=e=>e.target&&e.target.closest?e.target.closest('[title],[data-tt]'):null;
+  document.addEventListener('mouseover',e=>{const el=hit(e); if(!el||el.closest('svg'))return;
+    const t=take(el); if(t)showTip(e,esc(t));});
+  document.addEventListener('mousemove',e=>{if(e.target&&e.target.closest&&e.target.closest('[data-tt]'))moveTip(e);});
+  document.addEventListener('mouseout',e=>{const el=e.target&&e.target.closest?e.target.closest('[data-tt]'):null;
+    if(el&&!el.contains(e.relatedTarget))hideTip();});
+  document.addEventListener('focusin',e=>{const el=hit(e); if(!el||el.closest('svg'))return;
+    const t=take(el); if(!t)return; const r=el.getBoundingClientRect();
+    showTip({clientX:r.left+r.width/2,clientY:r.bottom-4},esc(t));});
+  document.addEventListener('focusout',e=>{if(e.target&&e.target.closest&&e.target.closest('[data-tt]'))hideTip();});
+})();
+/* For whoever opens the inspector. */
+try{console.log('%cDEADSHOT%c Archives \u00b7 est. '+SEA[0]+'\n%c'+SEA.length+' seasons, '+M.length+
+  ' managers. Every number on the page is rebuilt from the league\u2019s own game logs;\nthe arithmetic is under Method. Not everything here is in the nav.',
+  'font:900 30px "Big Shoulders Display",Impact,sans-serif;letter-spacing:.05em;color:'+cssv('--brass'),
+  'font:italic 600 15px Fraunces,Georgia,serif;color:'+cssv('--brass'),
+  'font:12px "IBM Plex Mono",ui-monospace,monospace;line-height:1.6');}catch(e){}
+requestAnimationFrame(paintChrome);
 
 /* colour */
 function mix(a,b,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),B=p(b);
@@ -2095,7 +2251,7 @@ new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)navA.forEach(a
 /* filter bar */
 $('#fChips').innerHTML=[...ALLNAMES].sort().map(n=>{
   const m=byName[n], a=ACTIVE.includes(n);
-  return `<button data-n="${esc(n)}" title="${m.seasons} seasons${a?' · active':''}">${esc(n)}${a?'':' <span style="opacity:.55">·ret</span>'}</button>`;}).join('');
+  return `<button data-n="${esc(n)}" title="${nOf(m.seasons,'season')}${a?' · active':''}">${esc(n)}${a?'':' <span style="opacity:.55">·ret</span>'}</button>`;}).join('');
 $$('#fChips button').forEach(b=>b.onclick=()=>{
   const n=b.dataset.n; SEL.has(n)?SEL.delete(n):SEL.add(n); saveSel(); $('#spotClear').onclick=()=>{PICK.clear();spotlight();};
 syncFilter();});
@@ -2670,10 +2826,10 @@ function marquee(){
   const lowestEver=champPI.length?Math.min(...champPI):null;
   const heist=wins.length>1&&lowestEver!=null&&Math.abs(wins[1].pi-lowestEver)<0.05;
   const sub=heist
-    ? 'the second one was a robbery — '+wins[1].pi.toFixed(1)+', the lowest score that has ever won this league'
+    ? 'the second one was a robbery: '+wins[1].pi.toFixed(1)+', the lowest score that has ever won this league'
     : worseSequel
-    ? 'the sequel scored worse than the original — '+wins[0].pi.toFixed(1)+' then '+
-      wins[1].pi.toFixed(1)+' — and still took the trophy'
+    ? 'the sequel scored worse than the original, '+wins[0].pi.toFixed(1)+' then '+
+      wins[1].pi.toFixed(1)+', and still took the trophy'
     : 'nobody in this league has more of them';
   /* the small print at the bottom of a poster: the run, the takings, the reviews, and
      how it finished. Every figure comes out of the record. */
@@ -2731,7 +2887,7 @@ function marketClose(){
     :topActive?'the highest rating of anyone still playing':'a rating near the top of the league';
   const el=document.createElement('div'); el.className='tkr';
   el.innerHTML='<div class="tk-in">'
-    +'<div class="tk-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Wesley Alpert\'s power index, falling every season">'
+    +'<div class="tk-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Wesley Alpert’s power index, falling every season">'
       +'<path d="'+d+'" fill="none" stroke="#E4453C" stroke-width="2.6" stroke-linejoin="round"/>'
       +dots+labs+'</svg></div>'
     +'<div class="tk-tag">M A R K E T &nbsp; C L O S E</div>'
@@ -2763,11 +2919,11 @@ function wrongSport(){
     +'<div class="hp-l1">DYLAN McMAHON</div>'
     +'<div class="hp-l2">GIVE HIM A BASKETBALL INSTEAD</div>'
     +'<div class="hp-sub">'+(above
-        ? 'right idea, bad execution &mdash; cleared the league average in '+best.y
+        ? 'right idea, bad execution: cleared the league average in '+best.y
           +' and still finished '+best.w+'&ndash;'+best.l
         : 'right idea, bad execution')+'</div>'
     +'<div class="hp-facts">'+m.seasons+' SEASONS &middot; '+m.w+'&ndash;'+m.l+(m.t?'&ndash;'+m.t:'')
-      +' &middot; LUCK '+(m.luck>=0?'+':'&minus;')+Math.abs(m.luck).toFixed(2)
+      +' &middot; LUCK '+sg(m.luck,2)
       +(rank<=3?' &middot; '+ord(rank)+' UNLUCKIEST':'')
       +' &middot; '+(m.apps?m.apps+' IN THE BRACKET':'NO BRACKET YET')+'</div></div>';
   document.body.appendChild(el);
@@ -2795,7 +2951,7 @@ function wuSeal(){
   el.addEventListener('click',off);
   setTimeout(off,5250);
 }
-/* Nick keeps a seat at pitch level at Levi's, one of twenty the 49ers put down there in
+/* Nick keeps a seat at pitch level at Levi’s, one of twenty the 49ers put down there in
    the 2026 rebuild, so his card is scarlet and gold and standing on the grass. */
 function fieldLevel(){
   const F=loyalFacts('Nick Gearing'); if(!F||$('.gr49'))return;
@@ -2988,47 +3144,47 @@ function wrapCards(name){
   const pr=rankOf(myPPG,allPPG);
   const cards=[
     {intro:1,k:`${LAST} Wrapped`,v:esc(name),sm:1,
-     n:`${K.weeks.length} weeks, ${row.g} games and one very long autumn &mdash; your year as <b>${esc(t)}</b>.`,
-     pills:[`${row.w}-${row.l}${row.t?'-'+row.t:''}`,ord(row.place)+' of '+row.teams,S2(row.pf)+' PF']},
+     n:`${K.weeks.length} weeks, ${row.g} games and one very long autumn. Your year as <b>${esc(t)}</b>.`,
+     pills:[`${row.w}–${row.l}${row.t?'–'+row.t:''}`,ord(row.place)+' of '+row.teams,S2(row.pf)+' PF']},
     {k:'The season',v:`${row.w}&ndash;${row.l}${row.t?'&ndash;'+row.t:''}`,
-     n:`You finished <b>${ord(row.place)}</b> of ${row.teams} from the ${ord(row.seed)} seed. ${S2(row.pf)} points for, ${S2(row.pf/row.g)} a game &mdash; ${pr===1?'<b>the best in the league</b>':ord(pr)+' best in the league'}.`,
+     n:`You finished <b>${ord(row.place)}</b> of ${row.teams} from the ${ord(row.seed)} seed. ${S2(row.pf)} points for, ${S2(row.pf/row.g)} a game, ${pr===1?'<b>the best in the league</b>':ord(pr)+' best in the league'}.`,
      pills:[ord(row.seed)+' seed','PPG '+f(row.pf/row.g,1),'#'+pr+' scoring']},
     {k:'Your best week',v:S2(hi.pts),
-     n:`Week ${hi.w} against ${esc(hi.opp)}. ${hi.win?'You <b>won it</b>':'<span class="neg">You lost anyway</span>'} &mdash; ${S2(hi.oppPts)} came back the other way.`,
+     n:`Week ${hi.w} against ${esc(hi.opp)}. ${hi.win?'You <b>won it</b>':'<span class="neg">You lost anyway</span>'}. ${S2(hi.oppPts)} came back the other way.`,
      pills:['Week '+hi.w,'Beat '+hi.ap+' of 9 that week']},
     {k:'Your worst week',v:S2(lo.pts),
-     n:`Week ${lo.w} against ${esc(lo.opp)}. ${lo.win?'You <b>somehow won</b>':'You lost'}, ${S2(lo.oppPts)} against &mdash; a ${S2(hi.pts-lo.pts)} point drop from your ceiling.`,
+     n:`Week ${lo.w} against ${esc(lo.opp)}. ${lo.win?'You <b>somehow won</b>':'You lost'}, ${S2(lo.oppPts)} against, a ${S2(hi.pts-lo.pts)} point drop from your ceiling.`,
      pills:['Week '+lo.w]},
     bigW?{k:'Biggest win',v:'+'+S2(bigW.pts-bigW.oppPts),
      n:`Week ${bigW.w}: you put ${S2(bigW.pts)}&ndash;${S2(bigW.oppPts)} on ${esc(bigW.opp)}. Never in doubt.`,pills:['Week '+bigW.w]}:null,
     bigL?{k:'Worst beating',v:'&minus;'+S2(bigL.oppPts-bigL.pts),
      n:`Week ${bigL.w}: ${S2(bigL.pts)}&ndash;${S2(bigL.oppPts)} to ${esc(bigL.opp)}. We do not need to talk about it.`,pills:['Week '+bigL.w]}:null,
     {k:'Closest call',v:S2(Math.abs(closest.pts-closest.oppPts)),
-     n:`Week ${closest.w} against ${esc(closest.opp)} &mdash; you ${closest.win?'<b>won</b>':'lost'} by ${S2(Math.abs(closest.pts-closest.oppPts))}. One flex decision either way.`,pills:['Week '+closest.w]},
+     n:`Week ${closest.w} against ${esc(closest.opp)}: you ${closest.win?'<b>won</b>':'lost'} by ${S2(Math.abs(closest.pts-closest.oppPts))}. One flex decision either way.`,pills:['Week '+closest.w]},
     robbed?{k:'Robbed',v:S2(robbed.pts),
-     n:`Week ${robbed.w}. Your best losing score of the year &mdash; and ${esc(robbed.opp)} answered with ${S2(robbed.oppPts)}. That score alone would have beaten <b>${robbed.ap} of the other 9</b>.`,
+     n:`Week ${robbed.w}. Your best losing score of the year, and ${esc(robbed.opp)} answered with ${S2(robbed.oppPts)}. That score alone would have beaten <b>${robbed.ap} of the other 9</b>.`,
      pills:['Week '+robbed.w,'Beat '+robbed.ap+' of 9']}:null,
     gifted?{k:'Got away with it',v:S2(gifted.pts),
      n:`Week ${gifted.w}. Your worst winning score, and ${esc(gifted.opp)} still only managed ${S2(gifted.oppPts)}. Take the W and say nothing.`,pills:['Week '+gifted.w]}:null,
     {k:'Against everyone',v:`${ap.w}&ndash;${ap.l}`,
      n:`Against the whole league every week you were ${pct(ap.pct)}. Your real record says ${pct(realPct)}. ${ap.pct>realPct?'<span class="neg">The schedule cost you.</span>':'<b>The schedule was kind to you.</b>'}`,
      pills:['All-play '+pct(ap.pct),'Actual '+pct(realPct)]},
-    {k:'Luck',v:(row.luck>=0?'+':'&minus;')+S2(Math.abs(row.luck)),
+    {k:'Luck',v:sg(row.luck,2),
      n:`Your scoring deserved about <b>${f(row.pythW,1)}</b> wins. You walked off with <b>${row.w}</b>. ${row.luck>=0.8?'The football gods were paying attention.':row.luck<=-0.8?'<span class="neg">The football gods were not.</span>':'More or less what you earned.'}`},
     fm.sd!=null?{k:'Consistency',v:f(fm.sd,1),
-     n:`A weekly swing of ${f(fm.cv,1)}% around your own average. Your ceiling was ${S2(hi.pts)}, your floor ${S2(lo.pts)} &mdash; a ${S2(hi.pts-lo.pts)} point spread across the year.`,
+     n:`A weekly swing of ${f(fm.cv,1)}% around your own average. Your ceiling was ${S2(hi.pts)}, your floor ${S2(lo.pts)}: a ${S2(hi.pts-lo.pts)} point spread across the year.`,
      pills:['&sigma; '+f(fm.sd,1),'CV '+f(fm.cv,1)+'%']}:null,
-    fm.sos!=null?{k:'The schedule',v:(fm.sos-fm.sosBase>=0?'+':'&minus;')+f(Math.abs(fm.sos-fm.sosBase),2),
+    fm.sos!=null?{k:'The schedule',v:sg(fm.sos-fm.sosBase,2),
      n:`Your opponents averaged ${f(fm.sos,1)} against a balanced draw of ${f(fm.sosBase,1)}. ${fm.sos>fm.sosBase?'<b>A harder road than the league average.</b>':'An easier ride than balanced.'}`}:null,
     fv.above!=null?{k:'Above water',v:`${fv.above}/${K.weeks.length}`,
      n:`Weeks you spent with a winning record${fv.streak?`. Your best run: <b>${fv.streak}</b> straight`:''}.`}:null,
     {k:'Trades',v:String(trades.length||0),
-     n:trades.length?trades.map(x=>`${esc(x.d)} &mdash; with ${esc(x.ta===t?x.tb:x.ta)}`).join('<br>'):'You stood pat all season. Not one phone call answered.'},
+     n:trades.length?trades.map(x=>`${esc(x.d)} &middot; with ${esc(x.ta===t?x.tb:x.ta)}`).join('<br>'):'You stood pat all season. Not one phone call answered.'},
     riv?{k:'Your rival',v:esc(riv.ta===t?riv.tb:riv.ta),sm:1,
      n:`${riv.g} meeting${riv.g===1?'':'s'} this year, decided by <b>${f(riv.marg,1)}</b> points on average. Nobody else got that close, that often.`}:null,
     {out:1,k:'That was the season',v:row.place===1?'Champion':ord(row.place)+' place',sm:row.place!==1,
-     n:`You closed ${LAST} at <b>${row.w}-${row.l}${row.t?'-'+row.t:''}</b>, ${S2(row.pf)} points for and ${S2(row.pa)} against. ${row.place===1?'Nobody can take it off you.':'There is always next year.'}`,
-     pills:[ord(row.place)+' of '+row.teams,'All-play '+ap.w+'-'+ap.l,'Luck '+(row.luck>=0?'+':'')+S2(row.luck)]},
+     n:`You closed ${LAST} at <b>${row.w}–${row.l}${row.t?'–'+row.t:''}</b>, ${S2(row.pf)} points for and ${S2(row.pa)} against. ${row.place===1?'Nobody can take it off you.':'There is always next year.'}`,
+     pills:[ord(row.place)+' of '+row.teams,'All-play '+ap.w+'–'+ap.l,'Luck '+sg(row.luck,2)]},
   ].filter(Boolean);
   return {cards,row,team:t};
 }
@@ -3124,15 +3280,15 @@ function openMgr(name){
   const m=byName[name]; if(!m)return;
   const rs=[...rowsOf[name]].sort((a,b)=>a.y-b.y);
   $('#mTitle').textContent=name;
-  $('#mSub').textContent=`${m.seasons} season${m.seasons>1?'s':''} · ${m.first}–${m.last} · ${m.w}-${m.l}${m.t?'-'+m.t:''} · ${pct(m.winpct)}`;
+  $('#mSub').textContent=`${m.seasons} season${m.seasons>1?'s':''} · ${m.first}–${m.last} · ${m.w}–${m.l}${m.t?'–'+m.t:''} · ${pct(m.winpct)}`;
   const tiles=[['Titles',m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):'0'],['Podiums',m.podium],
     ['Playoffs',m.apps],['Avg finish',m.avgPlace.toFixed(2)],['Power idx',m.cpi.toFixed(1)],
-    ['Luck',(m.luck>=0?'+':'')+m.luck.toFixed(2)],['PPG',m.ppg.toFixed(1)],['Playoff W-L',m.poW+'-'+m.poL],
-    ['All-play',m.apW+m.apL?m.apW+'-'+m.apL:'—'],['All-play %',m.apPct==null?'—':pct(m.apPct)],
+    ['Luck',sg(m.luck,2)],['PPG',m.ppg.toFixed(1)],['Playoff W-L',m.poW+'–'+m.poL],
+    ['All-play',m.apW+m.apL?m.apW+'–'+m.apL:'—'],['All-play %',m.apPct==null?'—':pct(m.apPct)],
     ['Best finish',m.best?ord(m.best):'—'],['Finals',m.finals],
-    ['Games over .500',(m.gAbove>=0?'+':'−')+Math.abs(m.gAbove)],
+    ['Games over .500',sg(m.gAbove,0)],
     ['Winning seasons',m.sznAbove+'/'+m.seasons],
-    ['Vs >.500 tms',(m.vsWinW+m.vsWinL)?m.vsWinW+'-'+m.vsWinL:'—'],
+    ['Vs >.500 tms',(m.vsWinW+m.vsWinL)?m.vsWinW+'–'+m.vsWinL:'—'],
     ['Peak PI',m.peak==null?'—':m.peak.toFixed(1)]];
   /* sparkline of PI */
   const W=560,H=90,P={t:10,r:8,b:18,l:8};
@@ -3149,8 +3305,8 @@ function openMgr(name){
   spark+=SEA.map((y,i)=>`<text x="${xs(i)}" y="${H-4}" text-anchor="middle" font-size="9.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${String(y).slice(2)}</text>`).join('')+'</svg>';
   const seasonRows=rs.map(r=>`<tr class="${r.place===1?'champ':''}">
     <td class="mono">${r.y}</td><td class="tm">${esc(r.team)}</td><td class="num">${r.seed}</td>
-    <td class="mono">${r.w}-${r.l}-${r.t}</td><td class="num">${f(r.pf)}</td><td class="num">${f(r.ppg)}</td>
-    <td class="num">${f(r.pi,1)}</td><td class="num">${f(r.luck)}</td>
+    <td class="mono">${r.w}–${r.l}–${r.t}</td><td class="num">${f(r.pf)}</td><td class="num">${f(r.ppg)}</td>
+    <td class="num">${f(r.pi,1)}</td><td class="num">${sg(r.luck)}</td>
     <td class="num">${r.place===1?(r.co?'<span class="chip y">Co-champ</span>':'<span class="chip y">Champion</span>'):ord(r.place)}</td></tr>`).join('');
   const pg=D.games.filter(g=>!g.void&&(g.ma===name||g.mb===name))
     .sort((a,b)=>a.y-b.y||a.wk-b.wk).map(g=>{
@@ -3182,9 +3338,9 @@ function openMgr(name){
   const sb=$('#mBody .shareBtn'); if(sb)sb.onclick=()=>shareCard(sb.dataset.s,sb);
   const rb=$('#mBody .roastBtn'); if(rb)rb.onclick=()=>shareAny(
     ()=>makeRoastCard(rb.dataset.s),'deadshot-case-against-'+slug(rb.dataset.s)+'.png',rb);
-  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
+  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus(); tabTitle($('#mTitle').textContent.trim());
 }
-function closeMgr(){ov.classList.remove('on');document.body.style.overflow='';hideTip();
+function closeMgr(){ov.classList.remove('on');document.body.style.overflow='';hideTip();tabTitle('');
   if(RETFOCUS&&document.contains(RETFOCUS)){try{RETFOCUS.focus();}catch(e){}} RETFOCUS=null;}
 $('#mX').onclick=closeMgr;
 ov.addEventListener('click',e=>{if(e.target===ov)closeMgr();});
@@ -3237,7 +3393,7 @@ const RULES=[
    ['<b>Reseeding after each round</b>'],
    ['Tie-break: best regular-season record against the tied opponent'],
    ['Eliminated teams are not locked']]],
- ['Roster &mdash; 17 slots',[
+ ['Roster &middot; 17 slots',[
    ['QB, WR, WR, RB, RB, TE, W/R/T'],
    ['K, DEF'],
    ['6 bench, 2 IR']]],
@@ -3248,40 +3404,41 @@ const RULES=[
    ['Commissioner review &middot; 2-day reject window'],
    ['No draft-pick trading']]],
  ['Waivers',[
-   ['<b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">Nothing resets weekly or by standings, and there is no FAAB budget &mdash; priority only moves when someone wins a claim.</span>'],
-   ['<b>Claims are due 11:59pm Pacific Tuesday</b> &mdash; <b>2:59am Eastern Wednesday</b>. <span class="dim">Everything submitted by then processes in one batch, in waiver order. Miss it and the player is a straight first-come free agent.</span>'],
+   ['<b>Continual rolling list.</b> Win a claim and you go to the bottom of the order; everyone below you moves up one. <span class="dim">Nothing resets weekly or by standings, and there is no FAAB budget. Priority only moves when someone wins a claim.</span>'],
+   ['<b>Claims are due 11:59pm Pacific Tuesday</b>, which is <b>2:59am Eastern Wednesday</b>. <span class="dim">Everything submitted by then processes in one batch, in waiver order. Miss it and the player is a straight first-come free agent.</span>'],
    ['<b>A player goes on waivers the moment his first game of the week kicks off.</b> <span class="dim">If he has no game that week, 5:30pm Pacific Monday instead.</span>'],
    ['<b>A dropped player sits 2 days</b> before claims on him process, whenever in the week he was dropped.'],
    ['Injured players can be claimed straight into an IR slot'],
    ['Undrafted players followed waiver rules from the start']]],
- ['Scoring &mdash; offense',[
+ ['Scoring &middot; offense',[
    ['Passing 25 yds/pt &middot; pass TD 4 &middot; INT &minus;1'],
    ['Rushing 10 yds/pt &middot; rush TD 6'],
    ['<b>Reception 1.0</b>','0.5'],
    ['Receiving 10 yds/pt &middot; rec TD 6'],
    ['Return TD 6 &middot; 2-point conversion 2'],
    ['Fumble lost &minus;2 &middot; offensive fumble return TD 6']]],
- ['Scoring &mdash; kicker',[
+ ['Scoring &middot; kicker',[
    ['FG 0&ndash;19: 3 &middot; 20&ndash;29: 3 &middot; 30&ndash;39: 3'],
    ['FG 40&ndash;49: 4 &middot; 50+: 5'],
    ['Extra point 1']]],
- ['Scoring &mdash; defense',[
+ ['Scoring &middot; defense',[
    ['Sack 1 &middot; INT 2 &middot; fumble recovery 2 &middot; TD 6'],
    ['Safety 3','2'],
    ['Block kick 2.5','2'],
    ['Kick/punt return TD 6 &middot; extra point returned 2'],
    ['4th-down stop 1','0'],
    ['Three-and-out forced 0.5','0'],
-   ['Points allowed 0&rarr;10, 1&ndash;6&rarr;7, 7&ndash;13&rarr;4, 14&ndash;20&rarr;2, 21&ndash;27&rarr;0, 28&ndash;34&rarr;&minus;1, 35+&rarr;&minus;4','14&ndash;20 is 1']]],
+   /* each band is kept on one line: "21\u2013" at the end of a row and "27\u21920" on the next reads as two rules */
+   ['Points allowed <span style="white-space:nowrap">0&rarr;10</span>, <span style="white-space:nowrap">1&ndash;6&rarr;7</span>, <span style="white-space:nowrap">7&ndash;13&rarr;4</span>, <span style="white-space:nowrap">14&ndash;20&rarr;2</span>, <span style="white-space:nowrap">21&ndash;27&rarr;0</span>, <span style="white-space:nowrap">28&ndash;34&rarr;&minus;1</span>, <span style="white-space:nowrap">35+&rarr;&minus;4</span>','<span style="white-space:nowrap">14&ndash;20 is 1</span>']]],
 ];
 /* Left column leads with the roster; everything about scoring lives together on the
    right. The assert is the point of writing it this way: add a section to RULES and
    forget to column it, and the build fails rather than the section silently vanishing
    from a card whose whole job is being complete. */
 const RULE_COLS=[
-  ['Roster &mdash; 17 slots','Format','Playoffs'],
+  ['Roster &middot; 17 slots','Format','Playoffs'],
   ['Transactions','Waivers'],
-  ['Scoring &mdash; offense','Scoring &mdash; kicker','Scoring &mdash; defense']];
+  ['Scoring &middot; offense','Scoring &middot; kicker','Scoring &middot; defense']];
 (function(){const placed=RULE_COLS.flat(), all=RULES.map(r=>r[0]);
   const missing=all.filter(h=>!placed.includes(h)), unknown=placed.filter(h=>!all.includes(h));
   if(missing.length||unknown.length)
@@ -3298,7 +3455,7 @@ function openRules(){
   $('#mSub').textContent='The league’s own Yahoo settings · league 526001 · read 14 Sep 2026';
   /* the same grid as the page section, just inside the dialog */
   $('#mBody').innerHTML=`<div class="rules">${rulesHTML()}</div>`;
-  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
+  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus(); tabTitle($('#mTitle').textContent.trim());
 }
 if($('#rulesBtn'))$('#rulesBtn').onclick=openRules;
 
@@ -3363,7 +3520,7 @@ function table(el,cols,data,opts={}){
     el.innerHTML='<thead><tr>'+(opts.rank?'<th></th>':'')+cols.map((c,i)=>
       `<th class="s${st.i===i?' '+st.dir:''}${c.c==='num'?' num':''}" data-i="${i}"${c.t?` data-th-tip="${esc(c.t)}"`:''}>${c.h}</th>`).join('')+'</tr></thead><tbody>'+
       d.map((r,n)=>`<tr class="${opts.cls?opts.cls(r):''}">`+(opts.rank?`<td class="rk">${n+1}</td>`:'')+
-      cols.map(c=>`<td class="${c.c||''}">${c.f(r)}</td>`).join('')+'</tr>').join('')+'</tbody>';
+      cols.map(c=>`<td class="${c.c||''}">${c.c==='num'?ty(c.f(r)):c.f(r)}</td>`).join('')+'</tr>').join('')+'</tbody>';
     $$('th.s',el).forEach(th=>th.onclick=()=>{const i=+th.dataset.i;
       if(st.i===i)st.dir=st.dir==='desc'?'asc':'desc'; else{st.i=i;st.dir=cols[i].asc?'asc':'desc';} render();});
     /* An explanation hangs off its own "?", never off the heading. Making the whole
@@ -3386,6 +3543,7 @@ function table(el,cols,data,opts={}){
       q.dataset.tip=th.dataset.thTip;
       bindTip(q,th.dataset.thTip);
       th.appendChild(document.createTextNode(' ')); th.appendChild(q);});
+    fillEmpty(el);
     if(opts.after)opts.after(d);
   }
   render(); return {render};
@@ -3449,20 +3607,20 @@ function rankTip(r,rank){
   L.push(`<span style="opacity:.72">${m.seasons} season${m.seasons>1?'s':''} ${m.first}&ndash;${m.last}`
     +(titles.length?` &middot; ${titles.length===1?'champion in ':'champion in '}${titles.join(', ')}`:' &middot; no titles')
     +`</span>`);
-  L.push(`Scores <b>${gap>=0?'+':''}${gap.toFixed(1)}%</b> versus a league-average team, `
+  L.push(`Scores <b>${sg(gap,1)}%</b> versus a league-average team, `
     +`which projects to <b>${pct(r.exp)}</b> against one.`);
   if(r.last)L.push(`${LAST}: index <b>${f(r.last.pi,1)}</b>`
-    +(r.mom!=null?` &mdash; ${r.mom>=0?'<b style="color:var(--pos)">+'+r.mom.toFixed(1)+'</b> above':'<span style="color:var(--neg)">'+r.mom.toFixed(1)+'</span> below'} their own weighted history`:'')+'.');
+    +(r.mom!=null?`, ${r.mom>=0?'<b style="color:var(--pos)">+'+r.mom.toFixed(1)+'</b> above':'<span style="color:var(--neg)">'+r.mom.toFixed(1)+'</span> below'} their own weighted history`:'')+'.');
   else L.push(`<span style="color:var(--neg)">Did not play in ${LAST}</span>, so there is no recent form to weight.`);
   if(best&&worst&&m.seasons>1)
     L.push(`Ceiling <b>${f(best.pi,1)}</b> in ${best.y}, floor <b>${f(worst.pi,1)}</b> in ${worst.y}.`);
-  L.push(`Evidence <b>${ev}</b> &mdash; ${r.neff.toFixed(0)} weighted games, so ${keep}% of the raw number survives the shrink.`);
+  L.push(`Evidence <b>${ev}</b>: ${r.neff.toFixed(0)} weighted games, so ${keep}% of the raw number survives the shrink.`);
   if(mv>0)L.push(`<b style="color:var(--pos)">Recency is helping.</b> With every season counted equally they would be ${ord(base)}; at &lambda;&nbsp;=&nbsp;${LAM.toFixed(2)} they are ${ord(rank)}.`);
   else if(mv<0)L.push(`<span style="color:var(--neg)">Recency is hurting.</span> Every season equal would put them ${ord(base)}; at &lambda;&nbsp;=&nbsp;${LAM.toFixed(2)} they are ${ord(rank)}.`);
-  else L.push(`The weighting does not move them &mdash; ${ord(rank)} either way.`);
+  else L.push(`The weighting does not move them: ${ord(rank)} either way.`);
   if(r.lastLuck!=null)L.push((r.lastLuck>1.2
-    ?`<span style="color:var(--neg)">${LAST} record ran ahead of the scoring by ${r.lastLuck.toFixed(2)} wins</span> &mdash; due a correction.`
-    :r.lastLuck<-1.2?`<b style="color:var(--pos)">${LAST} scoring deserved ${(-r.lastLuck).toFixed(2)} more wins</b> &mdash; due a bounce.`
+    ?`<span style="color:var(--neg)">${LAST} record ran ahead of the scoring by ${r.lastLuck.toFixed(2)} wins</span>, due a correction.`
+    :r.lastLuck<-1.2?`<b style="color:var(--pos)">${LAST} scoring deserved ${(-r.lastLuck).toFixed(2)} more wins</b>, due a bounce.`
     :`${LAST} record matched the scoring.`)+` <span style="opacity:.6">(${r.luckSrc} luck)</span>`);
   return L.join('<br>');
 }
@@ -3514,9 +3672,9 @@ function drawRank(){
    {h:'',f:r=>dbar(r.score-100,9,pol(r.score-100)),k:r=>r.score},
    {h:'Proj win %',f:r=>pct(r.exp),c:'num',k:r=>r.exp,t:'Pythagorean win rate versus a league-average opponent'},
    {h:LAST+' idx',f:r=>r.last?f(r.last.pi,1):'—',c:'num',k:r=>r.last?r.last.pi:null},
-   {h:'Momentum',f:r=>r.mom==null?'—':(r.mom>=0?'+':'')+r.mom.toFixed(1),c:'num',k:r=>r.mom,t:'Last season versus their own weighted history'},
+   {h:'Momentum',f:r=>sg(r.mom,1),c:'num',k:r=>r.mom,t:'Last season versus their own weighted history'},
    {h:LAST+' luck',f:r=>r.lastLuck==null?'—':f(r.lastLuck),c:'num',k:r=>r.lastLuck,
-    t:'Real wins minus the wins the scoring earned. Uses all-play luck — no model, just the weekly scores — for seasons with a game log, and falls back to Pythagorean for older ones.'},
+    t:'Real wins minus the wins the scoring earned. Uses all-play luck (no model, just the weekly scores) for seasons with a game log, and falls back to Pythagorean for older ones.'},
    {h:'Outlook',f:r=>{
       if(r.lastLuck==null)return '—';
       if(r.lastLuck>1.2)return '<span class="chip" style="border-color:var(--neg);color:var(--neg)">rode luck · due to fall</span>';
@@ -3562,7 +3720,7 @@ function allTimeData(){return YRWIN?aggregate(windowYears()):M;}
 let allT;
 function buildAll(){
   const yrs=windowYears();
-  $('#rangeSub').textContent=YRWIN?`${yrs[0]}–${yrs[yrs.length-1]} only · ${yrs.length} seasons`:`all ${SEA.length} seasons`;
+  $('#rangeSub').textContent=YRWIN?yearSpan(yrs):`all ${SEA.length} seasons`;
   allT=table($('#tAll'),[
  {h:'Manager',f:r=>mlink(r.name),c:'nm',k:r=>r.name,asc:1},
  {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons},
@@ -3576,12 +3734,12 @@ function buildAll(){
  {h:'All-play',f:r=>r.apW+r.apL?`<span class="mono">${r.apW}&ndash;${r.apL}</span>`:'—',c:'num',k:r=>r.apPct,
   t:'Record against the whole league every week, summed over the seasons with a loaded game log (2021–2025). Schedule luck removed entirely.'},
  {h:'All-play %',f:r=>r.apPct==null?'—':pct(r.apPct),c:'num',k:r=>r.apPct},
- {h:'Sched luck',f:r=>r.apLuck==null?'—':(r.apLuck>=0?'+':'')+r.apLuck.toFixed(2),c:'num',k:r=>r.apLuck,
-  t:'Real wins minus all-play expected wins over those same seasons. No model, no exponent — just how the schedule fell.'},
+ {h:'Sched luck',f:r=>sg(r.apLuck,2),c:'num',k:r=>r.apLuck,
+  t:'Real wins minus all-play expected wins over those same seasons. No model, no exponent, just how the schedule fell.'},
  {h:'Avg finish',f:r=>f(r.avgPlace),c:'num',k:r=>r.avgPlace,asc:1},
  {h:'Playoffs',f:r=>r.apps,c:'num',k:r=>r.apps},
  {h:'Power idx',f:r=>f(r.cpi,1),c:'num',k:r=>r.cpi},
- {h:'Luck',f:r=>f(r.luck),c:'num',k:r=>r.luck},
+ {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck},
  {h:'Span',f:r=>`<span class="dim mono">${r.first}–${r.last}</span>`,k:r=>r.first},
 ],allTimeData(),{rank:1,sort:-1,cls:r=>r.titles>=1?'champ':'',
    filter:r=>vis(r.name)&&(!SEARCH||r.name.toLowerCase().includes(SEARCH)),
@@ -3670,7 +3828,7 @@ function mgrVibe(m){
   if(!active&&t>=2)    return 'Won twice, then left with the league still owing him a rematch.';
   if(!active&&t>=1)    return 'Left holding a ring, after the years stopped going his way.';
   if(!active&&ap===0)  return 'Never once made the bracket, and eventually stopped turning up.';
-  if(!active&&gaps>0)  return 'Played '+sz+' seasons around '+gapYr+', and has not been back since.';
+  if(!active&&gaps>0)  return 'Played '+nOf(sz,'season')+' around '+gapYr+', and has not been back since.';
   if(!active)          return 'Played, faded, and has not been back since.';
 
   /* still playing */
@@ -3756,7 +3914,7 @@ function drawPiHelp(){
     <b>${esc(ex.team)}</b> averaged <b class="mono">${ex.ppg.toFixed(2)}</b> a game in ${ex.y}.
     The league averaged <b class="mono">${ex.lg.toFixed(2)}</b>. That is
     <span class="mono">${ex.ppg.toFixed(2)} &divide; ${ex.lg.toFixed(2)} &times; 100</span> =
-    <b class="mono" style="color:var(--brass)">${ex.pi.toFixed(1)}</b> &mdash; they scored
+    <b class="mono" style="color:var(--brass)">${ex.pi.toFixed(1)}</b>. They scored
     <b>${(ex.pi-100).toFixed(1)}% ${ex.pi>=100?'more':'less'}</b> than the typical team that year.</p>
   <div class="sub-h" style="margin:0 0 2px">What the number means</div>
   <p style="margin:0 0 8px;font-size:13px;color:var(--ink-3)">Read across: what has actually
@@ -3779,7 +3937,7 @@ function drawPiHelp(){
     scored like a champion. That is the point: it measures the team, not the schedule. The
     gap between the two is what <b>Luck</b> measures, and the two sections are meant to be
     read together. It also treats every game equally, so one enormous week and a steady
-    season can land on the same number &mdash; <b>Consistency</b> is where that shows up.</p>
+    season can land on the same number. <b>Consistency</b> is where that shows up.</p>
   </details>`;
 }
 drawPiHelp(); REDRAW.push(drawPiHelp);
@@ -3793,7 +3951,7 @@ function drawHeat(){
       h+=r?`<td class="h" data-k="${y}|${esc(m.name)}" data-y="${y}"><span style="background:${diverge(r.pi-100,16)};color:${inkOn(r.pi-100,16)}">${r.pi.toFixed(1)}</span></td>`
           :'<td class="h e"><span>·</span></td>';});
     h+=`<td class="num"><b>${m.cpi.toFixed(1)}</b></td><td class="num dim">${m.seasons}</td></tr>`;});
-  $('#tHeat').innerHTML=h+'</tbody>';
+  $('#tHeat').innerHTML=h+'</tbody>'; fillEmpty($('#tHeat'));
   $('#piLegend').innerHTML=`<span style="display:inline-block;width:11px;height:11px;background:${diverge(-14,16)};border:1px solid var(--rule);vertical-align:-1px"></span> below average &nbsp;<span style="display:inline-block;width:11px;height:11px;background:${diverge(14,16)};border:1px solid var(--rule);vertical-align:-1px"></span> above`;
   $$('#tHeat tbody tr[data-mgr]').forEach(tr=>{
     tr.addEventListener('mouseenter',()=>{HOVER=tr.dataset.mgr;spotlight();});
@@ -3802,7 +3960,7 @@ function drawHeat(){
     tr.style.cursor='pointer';});
   spotlight();
   $$('#tHeat td.h[data-k]').forEach(td=>{const r=pi[td.dataset.k];
-    bindTip(td,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b> · ${r.ppg.toFixed(2)} PPG vs league ${r.lg.toFixed(2)}<br>${r.w}-${r.l}${r.t?'-'+r.t:''} · finished ${ord(r.place)}<br><i>click to open ${r.y}</i>`);
+    bindTip(td,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b> · ${r.ppg.toFixed(2)} PPG vs league ${r.lg.toFixed(2)}<br>${r.w}–${r.l}${r.t?'–'+r.t:''} · finished ${ord(r.place)}<br><i>click to open ${r.y}</i>`);
     td.onclick=()=>{LOCKTEAM=r.team;drawSeason(+td.dataset.y);$('#seasons').scrollIntoView({behavior:'smooth'});};});
   $$('#tHeat tbody tr[data-mgr] td.nm').forEach(td=>{
     const name=td.closest('tr').dataset.mgr, m=M.filter(x=>x.name===name)[0];
@@ -3840,13 +3998,13 @@ function lineChart(el,pts,fmt,label,aria){
     bindTip(r,`<b>${p.y}</b><br>${label}: <b>${fmt(p.v)}</b>`+(pr?`<br>${p.v>pr.v?'▲':'▼'} ${fmt(Math.abs(p.v-pr.v))} vs ${pr.y}`:'')+(p.extra||''));});
 }
 const BAL={
- sd:{lab:'Scoring spread',fmt:v=>v.toFixed(1),title:'Scoring spread — standard deviation of points per game',
+ sd:{lab:'Scoring spread',fmt:v=>v.toFixed(1),title:'Scoring spread: standard deviation of points per game',
   note:'How far apart the teams were on scoring. A low number means everyone put up similar points; a high number means the league had genuine haves and have-nots.',
   get:m=>m.sd},
- wsd:{lab:'Record spread',fmt:v=>v.toFixed(1)+'%',title:'Record spread — standard deviation of win rate',
+ wsd:{lab:'Record spread',fmt:v=>v.toFixed(1)+'%',title:'Record spread: standard deviation of win rate',
   note:'The same idea applied to wins rather than points. When this is high and scoring spread is low, the standings were decided by luck rather than by quality.',
   get:m=>m.wsd},
- rng:{lab:'Power index range',fmt:v=>v.toFixed(1),title:'Power index range — best team minus worst',
+ rng:{lab:'Power index range',fmt:v=>v.toFixed(1),title:'Power index range: best team minus worst',
   note:'The gap between the best and worst scoring team, in index points. The single bluntest measure of how lopsided a season was.',
   get:m=>m.rng},
  lg:{lab:'League average PPG',fmt:v=>v.toFixed(1),title:'League average points per game',
@@ -3888,7 +4046,7 @@ function drawStrip(){
     <text id="stripWho" x="${P.l}" y="${P.t-2}" font-size="12" font-weight="700" fill="var(--brass)" font-family="IBM Plex Sans,sans-serif"></text></svg>`;
   const pi={}; ROWS.forEach(r=>pi[r.y+'|'+r.mgr]=r);
   $$('#strip circle[data-k]').forEach(c=>{const r=pi[c.dataset.k];
-    bindTip(c,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b><br>${r.w}-${r.l} · finished ${ord(r.place)}${r.place===1?' 🏆':''}`);
+    bindTip(c,`<b>${esc(r.mgr)} · ${r.y}</b><br>${esc(r.team)}<br>Power index <b>${r.pi.toFixed(1)}</b><br>${r.w}–${r.l} · finished ${ord(r.place)}${r.place===1?' 🏆':''}`);
     c.addEventListener('click',()=>togglePick(r.mgr));
     c.addEventListener('mouseenter',()=>{HOVER=r.mgr;spotlight();});
     c.addEventListener('mouseleave',()=>{HOVER=null;spotlight();});});
@@ -3902,13 +4060,13 @@ function drawLuck(){
   table($('#tLuck'),[
    {h:'Manager',f:r=>mlink(r.name),c:'nm',k:r=>r.name,asc:1},
    {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons},
-   {h:'Luck',f:r=>f(r.luck),c:'num',k:r=>r.luck,t:'Actual wins minus Pythagorean wins'},
+   {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck,t:'Actual wins minus Pythagorean wins'},
    {h:'',f:r=>dbar(r.luck,13,pol(r.luck)),k:r=>r.luck},
    {h:'Actual W',f:r=>r.w,c:'num',k:r=>r.w},
    {h:'Deserved W',f:r=>f(r.pythW,1),c:'num',k:r=>r.pythW},
    {h:'Actual win %',f:r=>pct(r.winpct),c:'num',k:r=>r.winpct},
    {h:'Pyth win %',f:r=>pct(r.pythW/r.g),c:'num',k:r=>r.pythW/r.g},
-   {h:'Per season',f:r=>f(r.luck/r.seasons),c:'num',k:r=>r.luck/r.seasons},
+   {h:'Per season',f:r=>sg(r.luck/r.seasons),c:'num',k:r=>r.luck/r.seasons},
   ],M.filter(m=>vis(m.name)&&(on?m.seasons>=2:true)),{rank:1,sort:2});
 }
 $('#qLuck').onclick=e=>{e.target.classList.toggle('on');
@@ -3955,7 +4113,7 @@ function drawCon(){
   $('#advSub').textContent=(ADVSET&&ADVSET.size)
       ? (contig?`${yy[0]}–${yy[yy.length-1]} · ${yy.length} picked`:`${yy.length} seasons picked · ${yy.join(', ')}`)
       : ADVWIN===1?`${yy[0]} only`
-      : ADVWIN?`${yy[0]}–${yy[yy.length-1]} only · ${yy.length} seasons`:`all ${SEA.length} seasons`;
+      : ADVWIN?yearSpan(yy):`all ${SEA.length} seasons`;
   const yset=new Set(yy);
   $('#poSub').textContent=(yy.length<SEA.length
       ? (yy.length===1?`${yy[0]} · `:(contig?`${yy[0]}–${yy[yy.length-1]} · `:`${yy.length} seasons · `)) : '')
@@ -3963,15 +4121,15 @@ function drawCon(){
   table($('#tCon'),[
    {h:'Manager',f:r=>mlink(r.name),c:'nm',k:r=>r.name,asc:1,t:'Click any name to open their full career card.'},
    {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons,t:'Seasons played in the years currently selected above.'},
-   {h:'Career PI',f:r=>f(r.cpi,1),c:'num',k:r=>r.cpi,t:'Career Power Index. Every season they played, weighted by games, on the scale where 100 is that season\'s league average. This is the headline number: above 100 means they have outscored the field over their whole career.'},
+   {h:'Career PI',f:r=>f(r.cpi,1),c:'num',k:r=>r.cpi,t:'Career Power Index. Every season they played, weighted by games, on the scale where 100 is that season’s league average. This is the headline number: above 100 means they have outscored the field over their whole career.'},
    {h:'Peak',f:r=>f(r.peak,1),c:'num',k:r=>r.peak,t:'Their best single season, on the same 100-is-average scale. How good they have ever been.'},
    {h:'Floor',f:r=>f(r.floor,1),c:'num',k:r=>r.floor,t:'Their worst single season, same scale. How bad it has ever got.'},
    {h:'Std dev',f:r=>r.sd==null?'—':f(r.sd,1),c:'num',k:r=>r.sd,t:'How far their seasons swing away from their own average. Low is a metronome, the same manager every year. High is boom or bust.'},
-   {h:'Z avg',f:r=>(r.zAvg>=0?'+':'')+r.zAvg.toFixed(2),c:'num',k:r=>r.zAvg,t:'Career average, measured in how far clear of the pack they were rather than by how much. 0 is exactly average, +1 is a full standard deviation above the field. In a tightly bunched season a small scoring edge is a big Z; in a wild season the same edge is nothing.'},
-   {h:'Z peak',f:r=>(r.zPeak>=0?'+':'')+r.zPeak.toFixed(2),c:'num',k:r=>r.zPeak,t:'Their best season measured the same way: how far clear of the field they got at their very best.'},
-   {h:'Z floor',f:r=>(r.zFloor>=0?'+':'')+r.zFloor.toFixed(2),c:'num',k:r=>r.zFloor,t:'Their worst season measured the same way: how far behind the field they fell at their very worst.'},
+   {h:'Z avg',f:r=>sg(r.zAvg,2),c:'num',k:r=>r.zAvg,t:'Career average, measured in how far clear of the pack they were rather than by how much. 0 is exactly average, +1 is a full standard deviation above the field. In a tightly bunched season a small scoring edge is a big Z; in a wild season the same edge is nothing.'},
+   {h:'Z peak',f:r=>sg(r.zPeak,2),c:'num',k:r=>r.zPeak,t:'Their best season measured the same way: how far clear of the field they got at their very best.'},
+   {h:'Z floor',f:r=>sg(r.zFloor,2),c:'num',k:r=>r.zFloor,t:'Their worst season measured the same way: how far behind the field they fell at their very worst.'},
    {h:(()=>{const q=advYears();const a=Math.max(q[0],q[q.length-1]-2),b=q[q.length-1];return a===b?'Form '+b:'Form '+String(a).slice(2)+'–'+String(b).slice(2);})(),f:r=>r.form==null?'—':f(r.form,1),c:'num',k:r=>r.form,t:'The last three seasons only, on the same 100-is-average scale. Who they are right now, rather than who they have been.'},
-   {h:'Trend',f:r=>r.trend==null?'—':(r.trend>=0?'+':'')+r.trend.toFixed(1),c:'num',k:r=>r.trend,t:'Form minus career. A plus means they are playing better than their own history; a minus means they are falling off.'},
+   {h:'Trend',f:r=>sg(r.trend,1),c:'num',k:r=>r.trend,t:'Form minus career. A plus means they are playing better than their own history; a minus means they are falling off.'},
    {h:'',f:r=>r.trend==null?'':dbar(r.trend,9,pol(r.trend)),k:r=>r.trend,t:'The Trend column drawn as a bar. Right and warm is improving, left and cool is declining.'},
   ],A.filter(m=>vis(m.name)&&(on?m.seasons>=2:true)),{rank:1,sort:2});
   drawPO();
@@ -3988,7 +4146,7 @@ function drawPO(){table($('#tPO'),[
  {h:'Finals',f:r=>r.finals||'—',c:'num',k:r=>r.finals},
  {h:'Titles',f:r=>r.titles?(r.titles%1?r.titles.toFixed(1):r.titles):'—',c:'num',k:r=>r.titles},
  {h:'Expected',f:r=>f(r.expT),c:'num',k:r=>r.expT,t:'Coin flip every round: (½)^(wins needed). A first-round bye is worth double, and the season total is always exactly 1.00.'},
- {h:'vs Exp',f:r=>(r.vsExp>=0?'+':'')+r.vsExp.toFixed(2),c:'num',k:r=>r.vsExp},
+ {h:'vs Exp',f:r=>sg(r.vsExp,2),c:'num',k:r=>r.vsExp},
  {h:'',f:r=>dbar(r.vsExp,1.3,pol(r.vsExp)),k:r=>r.vsExp},
 ],advAgg().filter(m=>vis(m.name)),{rank:1,sort:3});}
 drawPO(); REDRAW.push(drawPO);
@@ -4019,12 +4177,12 @@ function drawFive(){
   table($('#tFive'),[
    {h:'Manager',f:r=>mlink(r.name),c:'nm',k:r=>r.name,asc:1},
    {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons},
-   {h:'W-L',f:r=>`<span class="mono">${r.w}-${r.l}${r.t?'-'+r.t:''}</span>`,k:r=>r.w-r.l},
-   {h:'Games clear',f:r=>(r.gAbove>=0?'+':'')+r.gAbove,c:'num',k:r=>r.gAbove,
+   {h:'W-L',f:r=>`<span class="mono">${r.w}–${r.l}${r.t?'–'+r.t:''}</span>`,k:r=>r.w-r.l},
+   {h:'Games clear',f:r=>sg(r.gAbove,0),c:'num',k:r=>r.gAbove,
     t:'Career wins minus losses. Positive means more games won than lost, over everything.'},
    {h:'',f:r=>dbar(r.gAbove,26,pol(r.gAbove)),k:r=>r.gAbove},
    {h:'Win %',f:r=>pct(r.winpct),c:'num',k:r=>r.winpct},
-   {h:'vs .500',f:r=>((r.winpct-.5)>=0?'+':'')+(100*(r.winpct-.5)).toFixed(1)+'%',c:'num',k:r=>r.winpct},
+   {h:'vs .500',f:r=>sg(100*(r.winpct-.5),1,'%'),c:'num',k:r=>r.winpct},
    {h:'Szns +',f:r=>r.sznAbove||'—',c:'num',k:r=>r.sznAbove,t:'Seasons finished with a winning record'},
    {h:'Szns −',f:r=>r.sznBelow||'—',c:'num',k:r=>r.sznBelow,t:'Seasons finished with a losing record'},
    {h:'Weeks above',f:r=>r.wkTot?`<span class="mono">${r.wkAbove}/${r.wkTot}</span>`:'—',c:'num',k:r=>r.wkAbovePct,
@@ -4032,16 +4190,16 @@ function drawFive(){
    {h:'Weeks %',f:r=>r.wkAbovePct==null?'—':pct(r.wkAbovePct),c:'num',k:r=>r.wkAbovePct},
    {h:'',f:r=>r.wkAbovePct==null?'':dbar(r.wkAbovePct-.5,.5,pol(r.wkAbovePct-.5)),k:r=>r.wkAbovePct},
    {h:'Best run',f:r=>r.wkStreak||'—',c:'num',k:r=>r.wkStreak,t:'Longest unbroken run of weeks spent above .500'},
-   {h:'vs winners',f:r=>(r.vsWinW+r.vsWinL)?`<span class="mono">${r.vsWinW}-${r.vsWinL}</span>`:'—',c:'num',k:r=>r.vsWinPct,
+   {h:'vs winners',f:r=>(r.vsWinW+r.vsWinL)?`<span class="mono">${r.vsWinW}–${r.vsWinL}</span>`:'—',c:'num',k:r=>r.vsWinPct,
     t:'Record against opponents who finished that season above .500. Almost nobody is above .500 here and that is arithmetic, not weakness: when a winning team plays a losing one, that game counts as "vs the rest" for the winner and "vs a winner" for the loser, so this column is loaded with the games losing teams played. League-wide it sits at .383 while "vs the rest" sits at .620. Compare managers against each other, not against .500. Covers every playoff game in league history plus the 2021 to 2025 regular seasons; earlier regular seasons have no game log.'},
    {h:'vs win %',f:r=>r.vsWinPct==null?'—':pct(r.vsWinPct),c:'num',k:r=>r.vsWinPct},
-   {h:'vs the rest',f:r=>(r.vsSubW+r.vsSubL)?`<span class="mono">${r.vsSubW}-${r.vsSubL}</span>`:'—',c:'num',k:r=>r.vsSubPct,
+   {h:'vs the rest',f:r=>(r.vsSubW+r.vsSubL)?`<span class="mono">${r.vsSubW}–${r.vsSubL}</span>`:'—',c:'num',k:r=>r.vsSubPct,
     t:'Record against opponents who finished .500 or worse.'},
-   {h:'Step-up',f:r=>r.vsGap==null?'—':(r.vsGap>=0?'+':'')+(100*r.vsGap).toFixed(1)+'%',c:'num',k:r=>r.vsGap,
-    t:'Win rate against winning teams minus win rate against the rest. Everyone is negative — good teams are harder. The question is by how much: a small gap means they play the same against anyone, a big one means they feast on the weak and fold against the strong.'},
-   {h:'Exp vs avg',f:r=>(r.expOverAvg>=0?'+':'')+r.expOverAvg.toFixed(2),c:'num',k:r=>r.expOverAvg,
-    t:'Pythagorean expected wins minus half their games — how many wins the scoring alone earned above a perfectly average team. Schedule plays no part.'},
-   {h:'Luck gap',f:r=>((r.w+r.t/2-r.g/2)-r.expOverAvg>=0?'+':'')+((r.w+r.t/2-r.g/2)-r.expOverAvg).toFixed(2),c:'num',
+   {h:'Step-up',f:r=>r.vsGap==null?'—':sg(100*r.vsGap,1,'%'),c:'num',k:r=>r.vsGap,
+    t:'Win rate against winning teams minus win rate against the rest. Everyone is negative, because good teams are harder. The question is by how much: a small gap means they play the same against anyone, a big one means they feast on the weak and fold against the strong.'},
+   {h:'Exp vs avg',f:r=>sg(r.expOverAvg,2),c:'num',k:r=>r.expOverAvg,
+    t:'Pythagorean expected wins minus half their games: how many wins the scoring alone earned above a perfectly average team. Schedule plays no part.'},
+   {h:'Luck gap',f:r=>sg((r.w+r.t/2-r.g/2)-r.expOverAvg,2),c:'num',
     k:r=>(r.w+r.t/2-r.g/2)-r.expOverAvg,
     t:'Actual wins above average minus expected wins above average. Positive means the record flatters the scoring.'},
   ],M.filter(m=>vis(m.name)),{rank:1,sort:3});
@@ -4077,10 +4235,10 @@ function drawRecords(){
    ['Luckiest season',ROWS,r=>r.luck,1,r=>f2(r.luck),'s'],
    ['Unluckiest season',ROWS,r=>r.luck,0,r=>f2(r.luck),'s'],
    ['Most roster moves',MV,r=>r.mv,1,r=>r.mv,'s'],
-   ['COUNTING RECORDS &mdash; totals, not comparable across seasons'],
+   ['COUNTING RECORDS &middot; totals, not comparable across seasons'],
    ['Most points in a season',ROWS,r=>r.pf,1,pts,'s'],
    ['Fewest points in a season',ROWS,r=>r.pf,0,pts,'s'],
-   ['CAREER RATES &mdash; 2+ seasons'],
+   ['CAREER RATES &middot; 2+ seasons'],
    ['Best win %',q,m=>m.winpct,1,m=>pc(m.winpct),'c'],
    ['Worst win %',q,m=>m.winpct,0,m=>pc(m.winpct),'c'],
    ['Best average finish',q,m=>m.avgPlace,0,m=>f2(m.avgPlace),'c'],
@@ -4088,13 +4246,13 @@ function drawRecords(){
    ['Worst power index',q,m=>m.cpi,0,m=>f1(m.cpi),'c'],
    ['Luckiest career',q,m=>m.luck,1,m=>f2(m.luck),'c'],
    ['Unluckiest career',q,m=>m.luck,0,m=>f2(m.luck),'c'],
-   ['CAREER TOTALS &mdash; short careers included'],
+   ['CAREER TOTALS &middot; short careers included'],
    ['Most career points',M,m=>m.pf,1,m=>m.pf.toFixed(0),'c'],
    ['Most playoff wins',M,m=>m.poW,1,m=>m.poW,'c']];
   const who=(x,kind)=>kind==='s'?x.mgr:x.name;
   const narrowed=SEL.size<ALLNAMES.length;
   let h=narrowed
-    ?`<p class="dim" style="margin:4px 0 0;font-size:13px">${SEL.size?`Filtered to <b>${SEL.size} of ${ALLNAMES.length}</b> managers.`:'<b>No managers selected</b> &mdash; pick some with the filter at the top.'} League records held by anyone outside the selection are named under each table.</p>`
+    ?`<p class="dim" style="margin:4px 0 0;font-size:13px">${SEL.size?`Filtered to <b>${SEL.size} of ${ALLNAMES.length}</b> managers.`:'<b>No managers selected.</b> Pick some with the filter at the top.'} League records held by anyone outside the selection are named under each table.</p>`
     :'';
   let open=false;
   B.forEach(([t,all,k,d,val,kind])=>{
@@ -4161,7 +4319,7 @@ function drawSeason(y){
     let inner=gg.map(g=>{
       const aw=g.pa>g.pb,vd=g.void;
       const side=(t,m,p,win)=>`<div class="side ${vd?'':(win?'w':'lo')}" data-team="${esc(t)}"><span class="sd">${seedOf[t]||''}</span><span class="tn">${esc(t)}<small>${esc(m)}</small></span><span class="sc">${p.toFixed(2)}</span></div>`;
-      return `<div class="game${vd?' void':''}" data-g="${esc(g.ta)}|${esc(g.tb)}"><div class="gh">${vd?'Final — VOID':esc(g.rnd)}</div>${side(g.ta,g.ma,g.pa,aw)}${side(g.tb,g.mb,g.pb,!aw)}</div>`;}).join('');
+      return `<div class="game${vd?' void':''}" data-g="${esc(g.ta)}|${esc(g.tb)}"><div class="gh">${vd?'Final · VOID':esc(g.rnd)}</div>${side(g.ta,g.ma,g.pa,aw)}${side(g.tb,g.mb,g.pb,!aw)}</div>`;}).join('');
     if(wi===0&&byes.length) inner+=byes.map(b=>`<div class="game" data-g="${esc(b.team)}"><div class="gh">First-round bye</div>
       <div class="side bye" data-team="${esc(b.team)}"><span class="sd">${b.seed}</span><span class="tn">${esc(b.team)}<small>${esc(b.mgr)}</small></span><span class="sc">—</span></div></div>`).join('');
     cols+=`<div class="round" data-wk="${wk}"><h4>Week ${wk}</h4>${inner}</div>`;});
@@ -4176,7 +4334,7 @@ function drawSeason(y){
         <button data-link="y=${y}" data-link-hash="seasons" style="padding:7px 13px;margin-left:6px">&#128279; Copy link</button></div></div>
       <div class="scroll"><table id="tS"></table></div></div>
     <div class="card"><div class="card-h"><h3>${y} bracket</h3>
-      <span class="sub">${c.co?'Final voided — title split':'Hover a team to trace its run · click to lock it'}</span>
+      <span class="sub">${c.co?'Final voided · title split':'Hover a team to trace its run · click to lock it'}</span>
       <span class="sub" id="brkTrace" style="color:var(--brass)"></span>
       <div class="right"><button id="brkShare" style="padding:7px 13px">&#8593; Share the bracket</button></div></div>
       <div class="card-b"><div class="brk"><svg class="conn" id="conn" aria-hidden="true"></svg><div class="brk-in" id="brkIn">${cols}</div></div></div></div>`;
@@ -4184,12 +4342,12 @@ function drawSeason(y){
    {h:'Seed',f:r=>r.seed,c:'num',k:r=>r.seed,asc:1},
    {h:'Team',f:r=>esc(r.team),c:'nm',k:r=>r.team,asc:1},
    {h:'Manager',f:r=>mlink(r.mgr),k:r=>r.mgr,asc:1},
-   {h:'W-L-T',f:r=>`<span class="mono">${r.w}-${r.l}-${r.t}</span>`,k:r=>r.w},
+   {h:'W-L-T',f:r=>`<span class="mono">${r.w}–${r.l}–${r.t}</span>`,k:r=>r.w},
    {h:'PF',f:r=>f(r.pf),c:'num',k:r=>r.pf},{h:'PA',f:r=>f(r.pa),c:'num',k:r=>r.pa},
    {h:'PPG',f:r=>f(r.ppg),c:'num',k:r=>r.ppg},
    {h:'Power idx',f:r=>f(r.pi,1),c:'num',k:r=>r.pi},
-   {h:'Z',f:r=>(r.z>=0?'+':'')+r.z.toFixed(2),c:'num',k:r=>r.z,t:'Standard deviations from that season\u2019s mean PPG. Power index says how much better; Z says how far clear of the pack, which matters more in a tightly bunched year.'},
-   {h:'Luck',f:r=>f(r.luck),c:'num',k:r=>r.luck},
+   {h:'Z',f:r=>sg(r.z,2),c:'num',k:r=>r.z,t:'Standard deviations from that season\u2019s mean PPG. Power index says how much better; Z says how far clear of the pack, which matters more in a tightly bunched year.'},
+   {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck},
    {h:'Moves',f:r=>r.mv==null?'—':r.mv,c:'num',k:r=>r.mv},
    {h:'Finish',f:r=>r.place===1?`<span class="chip y">${r.co?'Co-champion':'Champion'}</span>`:ord(r.place),c:'num',k:r=>r.place,asc:1},
   ],rs,{sort:0,dir:'asc',cls:r=>(r.place===1?'champ ':'')});
@@ -4220,7 +4378,7 @@ function drawSchedule(y){
       gs.map(g=>{const vd=isVoid(y,g.wk,g.ta,g.tb), aw=g.aa>g.ab, dim=vd?' void':'';
         const side=(t,pt,pr,win)=>`<div class="side ${vd?'':(win?'w':'lo')}"><span class="tn">${esc(t)}<small>${esc(MG[t]||'')} · proj ${pr.toFixed(1)}</small></span>
           <span class="sc">${pt.toFixed(2)}</span>${pt===hi?'<span class="chip y" style="margin-left:6px">high</span>':pt===lo?'<span class="chip" style="margin-left:6px;border-color:var(--neg);color:var(--neg)">low</span>':''}</div>`;
-        return `<div class="game${dim}"><div class="gh">${vd?(label(g)||'Week '+w)+' — VOID':(label(g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${side(g.ta,g.aa,g.pa,aw)}${side(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
+        return `<div class="game${dim}"><div class="gh">${vd?(label(g)||'Week '+w)+' · VOID':(label(g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${side(g.ta,g.aa,g.pa,aw)}${side(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
       + by.map(b=>`<div class="game"><div class="gh">${byeName(K,b)}</div><div class="side bye"><span class="tn">${esc(b.t)}<small>${esc(MG[b.t]||'')}</small></span><span class="sc">${b.a.toFixed(2)}</span></div></div>`).join('')
       +`</div></details>`;});
   $('#schedPane').innerHTML=out+'</div></div>';
@@ -4235,7 +4393,7 @@ function hiTeam(t){
   $$('#brkIn .game').forEach(g=>g.classList.toggle('hi',!!x&&(g.dataset.g||'').split('|').includes(x)));
   $$('#conn path').forEach(p=>{const on=!!x&&p.dataset.team===x;
     p.setAttribute('stroke',on?'var(--brass)':'var(--rule)');p.setAttribute('stroke-width',on?2.4:1.4);});
-  const b=$('#brkTrace'); if(b)b.textContent=LOCKTEAM?('tracing '+LOCKTEAM+' — click to clear'):'';
+  const b=$('#brkTrace'); if(b)b.textContent=LOCKTEAM?('tracing '+LOCKTEAM+' · click to clear'):'';
 }
 function drawConnectors(gs){
   const svg=$('#conn'),wrap=$('#brkIn'); if(!svg||!wrap)return;
@@ -4267,7 +4425,7 @@ const REGG=[];           /* regular-season meetings across every loaded game log
 (D.wkYears||[]).forEach(y=>{const K=D.wk[y];
   K.games.filter(g=>g.br==='').forEach(g=>
     REGG.push({y,wk:g.wk,ma:K.mgr[g.ta],mb:K.mgr[g.tb],pa:g.aa,pb:g.ab,lab:y+' week '+g.wk}));});
-const REGYRS=(D.wkYears||[]).join(' and ');
+const REGYRS=yearList(D.wkYears||[]);
 const POG=D.games.filter(g=>!g.void).map(g=>({y:g.y,ma:g.ma,mb:g.mb,pa:g.pa,pb:g.pb,lab:g.y+' '+g.rnd}));
 function tally(list){const t={};
   list.forEach(g=>{const w=g.pa>g.pb?g.ma:g.mb,l=g.pa>g.pb?g.mb:g.ma;
@@ -4275,7 +4433,7 @@ function tally(list){const t={};
   return t;}
 const MX={reg:{t:tally(REGG),g:REGG,
    title:'Regular-season head-to-head',
-   note:REGYRS+' only — '+REGG.length+' games. The remaining seasons\' game logs have not been loaded yet, so this grid is thin by necessity, not by design.'},
+   note:REGYRS+' only, '+REGG.length+' games. The remaining seasons’ game logs have not been loaded yet, so this grid is thin by necessity, not by design.'},
   po:{t:tally(POG),g:POG,
    title:'Playoff head-to-head',
    /* counted, not typed: the totals and the year range move on their own when a season lands */
@@ -4303,9 +4461,9 @@ function drawMtx(){
          of those makes the grid noisier instead of clearer. Inline, not a class:
          .sweep is already taken by the scope and snipe masthead animations. */
       const clean=(v[0]===0||v[1]===0)&&(v[0]+v[1])>=5;
-      h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${diverge(rate,.5)};color:${inkOn(rate,.5)}${clean?';font-weight:800':''}">${v[0]}-${v[1]}</span></td>`;});
-    h+=`<td><span style="font-weight:600">${tw+tl?tw+'-'+tl:''}</span></td></tr>`;});
-  $('#tMtx').innerHTML=h+'</tbody>';
+      h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${diverge(rate,.5)};color:${inkOn(rate,.5)}${clean?';font-weight:800':''}">${v[0]}–${v[1]}</span></td>`;});
+    h+=`<td><span style="font-weight:600">${tw+tl?tw+'–'+tl:''}</span></td></tr>`;});
+  $('#tMtx').innerHTML=h+'</tbody>'; fillEmpty($('#tMtx'));
   $$('#tMtx td[data-a]').forEach(td=>{const a=td.dataset.a,b=td.dataset.b,v=src.t[a+'|'+b];
     const g=src.g.filter(x=>(x.ma===a&&x.mb===b)||(x.ma===b&&x.mb===a))
       .sort((x,y)=>x.y-y.y||(x.wk||0)-(y.wk||0));
@@ -4347,7 +4505,7 @@ drawMtx(); REDRAW.push(drawMtx);
     const rows=[['Seasons','seasons',0],['Titles','titles',1],['Podiums','podium',0],['Playoff apps','apps',0],
       ['Win %','winpct',3],['Avg finish','avgPlace',2],['PPG','ppg',2],['Power index','cpi',1],
       ['Luck','luck',2],['Playoff W','poW',0]];
-    const cell=(m,k,d)=>k==='winpct'?pct(m[k]):(d?(+m[k]).toFixed(d):m[k]);
+    const cell=(m,k,d)=>k==='winpct'?pct(m[k]):k==='luck'?sg(m[k],d):(d?(+m[k]).toFixed(d):m[k]);
     const better=(k,x,y)=>k==='avgPlace'?x<y:x>y;
     {const sh=$('#cmpShare'); if(sh)sh.onclick=()=>shareH2H($('#cmpA').value,$('#cmpB').value,sh);}
     {const rv=$('#cmpRiv'); if(rv)rv.onclick=()=>{const a=$('#cmpA').value,b=$('#cmpB').value;
@@ -4363,7 +4521,7 @@ drawMtx(); REDRAW.push(drawMtx);
         ${(()=>{const all=MX.all.t[a.name+'|'+b.name];
           if(!all)return '<p class="dim" style="margin:0;font-size:13px">These two have never met in any game on record.</p>';
           let o=`<div style="font-family:Fraunces,serif;font-size:30px;font-weight:900;color:var(--brass);line-height:1">${all[0]}–${all[1]}</div>
-            <div class="dim" style="font-size:12px;margin-bottom:8px">${esc(a.name)}'s all-time record</div>`;
+            <div class="dim" style="font-size:12px;margin-bottom:8px">${esc(a.name)}’s all-time record</div>`;
           splits.slice(0,2).forEach(([lab,k])=>{const v=MX[k].t[a.name+'|'+b.name];
             o+=`<div style="font-size:12px;border-top:1px solid var(--rule-2);padding:4px 0"><span class="dim">${lab}</span> <b>${v?v[0]+'–'+v[1]:'—'}</b></div>`;});
           o+=MX.all.g.filter(x=>(x.ma===a.name&&x.mb===b.name)||(x.ma===b.name&&x.mb===a.name))
@@ -4536,15 +4694,15 @@ function drawCareerRace(){
     const vsProj=s.pts-s.proj;
     return `<b style="color:${l.c}">${l.y}</b> &middot; ${esc(l.team)}
       <br><span style="opacity:.7">After week ${s.w}</span>
-      <br>Position <b>${ord(p.rank)}</b> of ${l.K.teams.length} &middot; record <b>${p.wins}-${s.w-p.wins}</b>
+      <br>Position <b>${ord(p.rank)}</b> of ${l.K.teams.length} &middot; record <b>${p.wins}–${s.w-p.wins}</b>
       <br>${s.win?'<b style="color:var(--brass)">WON</b>':'<span style="color:var(--neg)">lost</span>'} ${s.pts.toFixed(2)}&ndash;${s.oppPts.toFixed(2)} vs ${esc(s.opp)}
-      <br>Proj ${s.proj.toFixed(1)} (${vsProj>=0?'+':''}${vsProj.toFixed(1)}) &middot; PF ${p.pf.toFixed(1)}`;
+      <br>Proj ${s.proj.toFixed(1)} (${sg(vsProj,1)}) &middot; PF ${p.pf.toFixed(1)}`;
   }
   function crFinTip(l){
     const last=l.R[l.R.length-1];
     return `<b style="color:${l.c}">${l.y}</b> &middot; ${esc(l.team)}
       <br><span style="opacity:.7">Final placing</span>
-      <br>Regular season <b>${last.wins}-${l.R.length-last.wins}</b> &middot; ${last.pf.toFixed(2)} PF
+      <br>Regular season <b>${last.wins}–${l.R.length-last.wins}</b> &middot; ${last.pf.toFixed(2)} PF
       <br>Finished <b>${ord(l.fin)}</b> from the ${ord(l.seedRank)} seed
       <br>${l.moved>0?'<b style="color:var(--brass)">+'+l.moved+' in the postseason</b>':l.moved<0?'<span style="color:var(--neg)">'+l.moved+' in the postseason</span>':'held its seed'}`;
   }
@@ -4753,7 +4911,7 @@ async function makeShareCard(name){
 
   /* stat row */
   const tiles=[
-    ['RECORD',`${m.w}-${m.l}${m.t?'-'+m.t:''}`],
+    ['RECORD',`${m.w}–${m.l}${m.t?'–'+m.t:''}`],
     ['WIN %',pct(m.winpct).replace('%','')],
     ['POWER IDX',m.cpi.toFixed(1)],
     ['TITLES',String(m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):0)]
@@ -4854,7 +5012,7 @@ async function makeH2HCard(an,bn){
     x.fillStyle=P.accent; x.font='900 176px "Big Shoulders Display",sans-serif';
     x.fillText(`${rec[0]}\u2013${rec[1]}`,S/2,510);
     x.fillStyle=P.dim; x.font='400 27px "IBM Plex Sans",sans-serif';
-    x.fillText(`all-time, from ${esc(an)}'s side`,S/2,556);
+    x.fillText(`all-time, from ${esc(an)}’s side`,S/2,556);
   }else{
     x.fillStyle=P.dim; x.font='400 40px "IBM Plex Sans",sans-serif';
     x.fillText('They have never met.',S/2,500);
@@ -5056,7 +5214,7 @@ async function makeSeasonCard(y){
     x.fillText(cardClip(x,r.team,COL.rec-COL.tm-90),COL.tm,ty);
     x.textAlign='right';
     x.fillStyle=P.dim; x.font='400 24px "IBM Plex Mono",monospace';
-    x.fillText(r.w+'-'+r.l+(r.t?'-'+r.t:''),COL.rec,ty);
+    x.fillText(r.w+'–'+r.l+(r.t?'–'+r.t:''),COL.rec,ty);
     x.fillStyle=P.ink; x.fillText(r.pf.toFixed(2),COL.pf,ty);
   });
 
@@ -5078,7 +5236,7 @@ async function makeSeasonCard(y){
     ? (champTeams.indexOf(bestRec.team)>=0
         ? 'Led the league in scoring and in record. No argument to be had.'
         : 'Led the league in scoring. Best record was '+cardClip(x,bestRec.team,420)+
-          ' at '+bestRec.w+'-'+bestRec.l+(bestRec.t?'-'+bestRec.t:'')+'.')
+          ' at '+bestRec.w+'–'+bestRec.l+(bestRec.t?'–'+bestRec.t:'')+'.')
     : 'Most points: '+cardClip(x,most.team,420)+'  ·  '+most.pf.toFixed(2)+
       ', and finished '+ord(most.place)+'.';
   x.fillText(line2,S/2,botY+86);
@@ -5194,7 +5352,7 @@ async function makeBracketCard(y){
     x.save(); x.clip(); x.fillStyle=P.rule; x.fillRect(o.x,o.y,o.w,GH); x.restore();
     const dead=it.bye?false:isVoid(y,it.g.wk,it.g.ta,it.g.tb);
     x.textAlign='left'; x.fillStyle=P.dim; x.font='500 13px "IBM Plex Mono",monospace';
-    x.fillText((it.bye?(o.ci===0?'FIRST-ROUND BYE':'BYE'):it.g.rnd.toUpperCase()+(dead?' — VOID':''))
+    x.fillText((it.bye?(o.ci===0?'FIRST-ROUND BYE':'BYE'):it.g.rnd.toUpperCase()+(dead?' · VOID':''))
       .split('').join(' '),o.x+13,o.y+19);
     if(it.bye)side(it.bye.team,null,null,o.x,o.y+GH,o.w,true,false);
     else{
@@ -5359,7 +5517,7 @@ function bigRecords(){
         ' – '+Math.min(close.pa,close.pb).toFixed(2)+' '+(close.pa>close.pb?close.tb:close.ta)+'.'});
   if(szPF)R.push({k:'Most points in a season',v:szPF.pf.toFixed(2),who:szPF.mgr,
     when:szPF.team+'  ·  '+szPF.y,sub:szPF.ppg.toFixed(2)+' a game across '+szPF.g+' games. Finished '+ord(szPF.place)+'.'});
-  if(szW)R.push({k:'Best season record',v:szW.w+'-'+szW.l+(szW.t?'-'+szW.t:''),who:szW.mgr,
+  if(szW)R.push({k:'Best season record',v:szW.w+'–'+szW.l+(szW.t?'–'+szW.t:''),who:szW.mgr,
     when:szW.team+'  ·  '+szW.y,sub:szW.pf.toFixed(2)+' points for. Finished '+ord(szW.place)+' of '+szW.teams+'.'});
   if(szPI)R.push({k:'Highest power index, one season',v:szPI.pi.toFixed(1),who:szPI.mgr,
     when:szPI.team+'  ·  '+szPI.y,sub:'The strongest single season the league has recorded.'});
@@ -5374,11 +5532,11 @@ function bigRecords(){
         :'Last one in '+mostT.lastTitle+'. '+mostT.podium+' podium finishes in all.'});
   }
   if(bestPct)R.push({k:'Best career win rate',v:pct(bestPct.winpct),who:bestPct.name,
-    when:bestPct.w+'-'+bestPct.l+(bestPct.t?'-'+bestPct.t:'')+'  ·  '+bestPct.g+' games',
+    when:bestPct.w+'–'+bestPct.l+(bestPct.t?'–'+bestPct.t:'')+'  ·  '+bestPct.g+' games',
     sub:'Across '+bestPct.seasons+' seasons, '+bestPct.first+' to '+bestPct.last+'.'});
   if(mostApp)R.push({k:'Most playoff appearances',v:String(mostApp.apps),who:mostApp.name,
     when:mostApp.apps+' of '+mostApp.seasons+' seasons',
-    sub:mostApp.poW+'-'+mostApp.poL+' once they got there.'});
+    sub:mostApp.poW+'–'+mostApp.poL+' once they got there.'});
   BIGRECS=R; return R;
 }
 async function makeRecordCard(i){
@@ -5522,7 +5680,7 @@ async function makeRivalryCard(an,bn){
   x.fillStyle=P.accent; x.font='900 100px "Big Shoulders Display",sans-serif';
   x.fillText(aw+'–'+bw,S/2,402);
   x.fillStyle=P.dim; x.font='400 25px "IBM Plex Sans",sans-serif';
-  x.fillText(cardClip(x,'every meeting on record, from '+an+"'s side",S-140),S/2,444);
+  x.fillText(cardClip(x,'every meeting on record, from '+an+'’s side',S-140),S/2,444);
 
   /* "every meeting" has to mean every meeting: the rows shrink to fit rather than the
      list being cut short. The longest rivalry on record runs to 11 games. */
@@ -5565,13 +5723,13 @@ function roastLines(name){
   if(mine.length){
     const worst=mine.reduce((a,b)=>b.pi<a.pi?b:a);
     out.push(['Worst season',worst.y+' as '+worst.team,
-      ord(worst.place)+' of '+worst.teams+' at '+worst.w+'-'+worst.l+(worst.t?'-'+worst.t:'')+
+      ord(worst.place)+' of '+worst.teams+' at '+worst.w+'–'+worst.l+(worst.t?'–'+worst.t:'')+
       ', power index '+worst.pi.toFixed(1)+'.']);
   }
   if(!m.titles)out.push(['Titles','none in '+m.seasons+' season'+(m.seasons===1?'':'s'),
     m.podium?m.podium+' podium finish'+(m.podium===1?'':'es')+' and not one of them the top step.':'Never once on the podium.']);
   else if(m.lastTitle&&LAST-m.lastTitle>=2)out.push(['Last title',String(m.lastTitle),
-    (LAST-m.lastTitle)+' seasons ago. A long time to keep bringing it up.']);
+    nOf(LAST-m.lastTitle,'season')+' ago. A long time to keep bringing it up.']);
   /* the opponent they have lost to most */
   let worstOpp=null;
   M.forEach(o=>{
@@ -5590,10 +5748,10 @@ function roastLines(name){
   if(m.luck>=0.5)out.push(['Luck','+'+m.luck.toFixed(2)+' wins',
     'The scoring earned about '+m.pythW.toFixed(1)+' wins. The record says '+m.w+'. The schedule did the work.']);
   else if(m.vsWinPct!=null&&m.vsWinPct<0.5)out.push(['Against good teams',pct(m.vsWinPct),
-    m.vsWinW+'-'+m.vsWinL+' against winning teams, '+pct(m.vsSubPct)+' against everyone else. Beats who they are supposed to beat.']);
+    m.vsWinW+'–'+m.vsWinL+' against winning teams, '+pct(m.vsSubPct)+' against everyone else. Beats who they are supposed to beat.']);
   if(m.apps<m.seasons)out.push(['Missed the playoffs',
-    (m.seasons-m.apps)+' of '+m.seasons+' seasons',
-    'In the bracket '+m.apps+' time'+(m.apps===1?'':'s')+', '+m.poW+'-'+m.poL+' once there.']);
+    (m.seasons-m.apps)+' of '+nOf(m.seasons,'season'),
+    'In the bracket '+m.apps+' time'+(m.apps===1?'':'s')+', '+m.poW+'–'+m.poL+' once there.']);
   if(m.floor!=null)out.push(['Floor',m.floor.toFixed(1),
     'The worst version of this manager, on the same scale where 100 is league average.']);
   return {m:m,lines:out.slice(0,5)};
@@ -5607,8 +5765,8 @@ async function makeRoastCard(name){
   cardFit(x,name.toUpperCase(),S-140,116,44,900,'"Big Shoulders Display",sans-serif');
   x.fillText(name.toUpperCase(),S/2,232);
   x.fillStyle=P.dim; x.font='400 28px "IBM Plex Sans",sans-serif';
-  x.fillText(R.m.seasons+' season'+(R.m.seasons===1?'':'s')+'  ·  '+R.m.w+'-'+R.m.l+
-    (R.m.t?'-'+R.m.t:''),S/2,280);
+  x.fillText(R.m.seasons+' season'+(R.m.seasons===1?'':'s')+'  ·  '+R.m.w+'–'+R.m.l+
+    (R.m.t?'–'+R.m.t:''),S/2,280);
 
   /* measure first: a fact that runs off the bottom of the card is worth less than one
      fewer fact that fits, so entries are dropped from the end until the stack clears
@@ -5823,9 +5981,9 @@ function archiveMoments(){
   });
   /* season-level oddities */
   ROWS.forEach(r=>{
-    if(r.luck<=-3.2) out.push({wk:null,y:r.y,html:`${esc(r.team)} finished <b>${r.w}-${r.l}</b> in ${r.y} `+
+    if(r.luck<=-3.2) out.push({wk:null,y:r.y,html:`${esc(r.team)} finished <b>${r.w}–${r.l}</b> in ${r.y} `+
       `while the scoring earned about <b>${r.pythW.toFixed(1)}</b> wins. The schedule took the rest.`});
-    if(r.luck>=3.2) out.push({wk:null,y:r.y,html:`${esc(r.team)} banked <b>${r.w}-${r.l}</b> in ${r.y} `+
+    if(r.luck>=3.2) out.push({wk:null,y:r.y,html:`${esc(r.team)} banked <b>${r.w}–${r.l}</b> in ${r.y} `+
       `on scoring worth about <b>${r.pythW.toFixed(1)}</b> wins. Nobody gave it back.`});
     if(r.place===1&&r.seed>=4) out.push({wk:null,y:r.y,html:`${esc(r.team)} went into the ${r.y} playoffs `+
       `as the <b>${ord(r.seed)} seed</b> and came out with the title.`});
@@ -6040,10 +6198,10 @@ function drawWeekly(YR){
     const vsProj=s.pts-s.proj;
     return `<b>${esc(t)}</b> &middot; ${esc(MG[t])}
       <br><span style="opacity:.7">After week ${s.w}</span>
-      <br>Position <b>${ord(p.rank)}</b> of 10 &middot; record <b>${p.wins}-${s.w-p.wins}</b>
+      <br>Position <b>${ord(p.rank)}</b> of 10 &middot; record <b>${p.wins}–${s.w-p.wins}</b>
       <br>${s.win?'<b style="color:var(--brass)">WON</b>':'<span style="color:var(--neg)">lost</span>'} ${s.pts.toFixed(2)}&ndash;${s.oppPts.toFixed(2)} vs ${esc(s.opp)}
       <br>${scoreRank===1?'<b>top score of the week</b>':ord(scoreRank)+' highest that week'} &middot; beat ${s.ap} of 9
-      <br>Proj ${s.proj.toFixed(1)} (${vsProj>=0?'+':''}${vsProj.toFixed(1)}) &middot; PF ${p.pf.toFixed(1)}`;
+      <br>Proj ${s.proj.toFixed(1)} (${sg(vsProj,1)}) &middot; PF ${p.pf.toFixed(1)}`;
   }
   function nearestWeek(clientX){
     const r=$('#race svg').getBoundingClientRect();
@@ -6064,9 +6222,9 @@ function drawWeekly(YR){
     const pby=K5.byes.filter(b=>b.t===t); pby.forEach(b=>{ppf+=b.a;});
     return `<b>${esc(t)}</b> &middot; ${esc(MG[t])}
       <br><span style="opacity:.7">Final placing</span>${l.tied?' <span style="color:var(--brass)">&#9670; shared</span>':''}
-      <br>Regular season <b>${wins}-${losses}</b> &middot; ${last.pf.toFixed(2)} PF
+      <br>Regular season <b>${wins}–${losses}</b> &middot; ${last.pf.toFixed(2)} PF
       <br>Finished <b>${ord(l.fin.rank)}</b> from the ${ord(l.seedRank)} seed
-      <br>${pog.length?`Postseason <b>${pw}-${pl}</b>${vd?` <span style="color:var(--brass)">+${vd} void</span>`:''} &middot; ${ppf.toFixed(2)} PF`:(pby.length?`Postseason <b>0-0</b> &middot; bye only &middot; ${ppf.toFixed(2)} PF`:'Did not play the postseason')}
+      <br>${pog.length?`Postseason <b>${pw}–${pl}</b>${vd?` <span style="color:var(--brass)">+${vd} void</span>`:''} &middot; ${ppf.toFixed(2)} PF`:(pby.length?`Postseason <b>0–0</b> &middot; bye only &middot; ${ppf.toFixed(2)} PF`:'Did not play the postseason')}
       <br>${mv>0?'<b style="color:var(--brass)">+'+mv+' in the postseason</b>':mv<0?'<span style="color:var(--neg)">'+mv+' in the postseason</span>':'held its seed'}`;
   }
   $$('#race .rd').forEach(c=>{
@@ -6108,11 +6266,11 @@ function drawWeekly(YR){
   function drawAP(){table($('#tAP'),[
    {h:'Team',f:r=>esc(r.t),c:'nm',k:r=>r.t,asc:1},
    {h:'Manager',f:r=>mlink(r.m),k:r=>r.m,asc:1},
-   {h:'Real W-L',f:r=>`<span class="mono">${r.real}-${WKS.length-r.real}</span>`,c:'num',k:r=>r.real},
-   {h:'All-play W-L',f:r=>`<span class="mono">${r.apw}-${r.apl}</span>`,c:'num',k:r=>r.appct,t:'Record if you had played every team every week'},
+   {h:'Real W-L',f:r=>`<span class="mono">${r.real}–${WKS.length-r.real}</span>`,c:'num',k:r=>r.real},
+   {h:'All-play W-L',f:r=>`<span class="mono">${r.apw}–${r.apl}</span>`,c:'num',k:r=>r.appct,t:'Record if you had played every team every week'},
    {h:'All-play %',f:r=>pct(r.appct),c:'num',k:r=>r.appct},
    {h:'Deserved W',f:r=>f(r.exp,1),c:'num',k:r=>r.exp},
-   {h:'Luck',f:r=>f(r.luck),c:'num',k:r=>r.luck,t:'Real wins minus all-play expected wins — the cleanest luck measure there is'},
+   {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck,t:'Real wins minus all-play expected wins, the cleanest luck measure there is'},
    {h:'',f:r=>dbar(r.luck,3.2,pol(r.luck)),k:r=>r.luck},
    {h:'High',f:r=>f(r.hi),c:'num',k:r=>r.hi},
    {h:'Low',f:r=>f(r.lo),c:'num',k:r=>r.lo},
@@ -6122,9 +6280,9 @@ function drawWeekly(YR){
     t:'Week σ as a percentage of the team\u2019s own average, so a high scorer and a low scorer can be compared fairly.'},
    {h:'SoS',f:r=>r.fm?f(r.fm.sos,1):'—',c:'num',k:r=>r.fm?r.fm.sos:null,
     t:'Strength of schedule: the average season PPG of the opponents actually faced.'},
-   {h:'vs neutral',f:r=>r.fm?(r.fm.sos-r.fm.sosBase>=0?'+':'')+(r.fm.sos-r.fm.sosBase).toFixed(2):'—',
+   {h:'vs neutral',f:r=>r.fm?sg(r.fm.sos-r.fm.sosBase,2):'—',
     c:'num',k:r=>r.fm?r.fm.sos-r.fm.sosBase:null,
-    t:'How much harder or easier than a perfectly balanced schedule — facing every other team once. Positive means a tougher road than anyone else got.'},
+    t:'How much harder or easier than a perfectly balanced schedule, one that faces every other team once. Positive means a tougher road than anyone else got.'},
    {h:'',f:r=>r.fm?dbar(r.fm.sos-r.fm.sosBase,3,pol(r.fm.sos-r.fm.sosBase)):'',k:r=>r.fm?r.fm.sos-r.fm.sosBase:null},
   ],ap,{rank:1,sort:4});}
   drawAP(); push(drawAP);
@@ -6167,7 +6325,7 @@ function drawWeekly(YR){
       gs.map(g=>{const vd=isVoid(YR,g.wk,g.ta,g.tb), aw=g.aa>g.ab;
         const s=(t,p,pr,win)=>`<div class="side ${vd?'':(win?'w':'lo')}"><span class="tn">${esc(t)}<small>${esc(MG[t])} · proj ${pr.toFixed(1)}</small></span>
           <span class="sc">${p.toFixed(2)}</span>${p===hi?'<span class="chip y" style="margin-left:6px">high</span>':p===lo?'<span class="chip" style="margin-left:6px;border-color:var(--neg);color:var(--neg)">low</span>':''}</div>`;
-        return `<div class="game${vd?' void':''}"><div class="gh"><button data-receipt="${YR}|${g.wk}|${esc(g.ta)}" title="Make a shareable card of this result" aria-label="Make a shareable card of this result" style="float:right;background:none;border:0;box-shadow:none;color:var(--brass);font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:0 2px;margin:0 -2px 0 8px;min-height:0">&#8593; Share</button>${vd?(roundName(YR,K5,g)||'Week '+w)+' — VOID':(roundName(YR,K5,g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${s(g.ta,g.aa,g.pa,aw)}${s(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
+        return `<div class="game${vd?' void':''}"><div class="gh"><button data-receipt="${YR}|${g.wk}|${esc(g.ta)}" title="Make a shareable card of this result" aria-label="Make a shareable card of this result" style="float:right;background:none;border:0;box-shadow:none;color:var(--brass);font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;padding:0 2px;margin:0 -2px 0 8px;min-height:0">&#8593; Share</button>${vd?(roundName(YR,K5,g)||'Week '+w)+' · VOID':(roundName(YR,K5,g)||'Week '+w)+' · margin '+Math.abs(g.aa-g.ab).toFixed(2)}</div>${s(g.ta,g.aa,g.pa,aw)}${s(g.tb,g.ab,g.pb,!aw)}</div>`;}).join('')
       + by.map(b=>`<div class="game"><div class="gh">${byeName(K5,b)}</div><div class="side bye"><span class="tn">${esc(b.t)}<small>${esc(MG[b.t])} · proj ${b.p.toFixed(1)}</small></span><span class="sc">${b.a.toFixed(2)}</span></div></div>`).join('')}</div>`;
   }
   $$('#wkSel button').forEach(b=>b.onclick=()=>drawWk(+b.dataset.w));
@@ -6206,26 +6364,26 @@ syncFilter();
 (function(){
   const R=[
   ['SCORING'],
-  ['PPG / PPGA','Points per game scored and allowed.','<code>PF ÷ games</code>. Season length varies — 13 games in 2017, 15 in 2021, 14 elsewhere — so raw PF is never used for cross-era rate or quality comparisons. It appears only in the Record Book, under a clearly labelled counting-record heading where the game count is shown alongside it.'],
-  ['Power Index','Scoring strength, era-proofed.','<code>100 × (PPG ÷ that season\'s league-average PPG)</code>. 100 is average, 112 is 12% above the field. League scoring rose about 12% across the decade, which is why this and not PF is the headline number.'],
-  ['Z-score','How far above the field, in that league\'s own units of spread.','<code>(PPG − league avg) ÷ population SD of PPG</code> that season. Rewards dominating a tight league. Above +1.5 is genuinely dominant.'],
+  ['PPG / PPGA','Points per game scored and allowed.','<code>PF ÷ games</code>. Season length varies (13 games in 2017, 15 in 2021, 14 elsewhere), so raw PF is never used for cross-era rate or quality comparisons. It appears only in the Record Book, under a clearly labelled counting-record heading where the game count is shown alongside it.'],
+  ['Power Index','Scoring strength, era-proofed.','<code>100 × (PPG ÷ that season’s league-average PPG)</code>. 100 is average, 112 is 12% above the field. League scoring rose about 12% across the decade, which is why this and not PF is the headline number.'],
+  ['Z-score','How far above the field, in that league’s own units of spread.','<code>(PPG − league avg) ÷ population SD of PPG</code> that season. Rewards dominating a tight league. Above +1.5 is genuinely dominant.'],
   ['LUCK'],
   ['Pythagorean win %','The record your points deserved.','<code>PF^k ÷ (PF^k + PA^k)</code>, k = 2.37, the standard fantasy exponent.'],
   ['Luck','Wins you did not earn, or were robbed of.','<code>(Wins + &frac12; ties) − Pythagorean wins</code>. Positive means you won more than your scoring justified. Over one season it is noise; over ten it is a pattern.'],
-  ['All-play record','The luck-free record.','Every week, count how many of the other teams you outscored — <code>weeks × opponents</code> games a season, so 126 in a 14-week year and 135 in the 15-week 2021 season. Exact ties count as neither a win nor a loss, so three team-seasons show one game fewer: 2022 week 3, and 2023 weeks 5 and 8. This removes the schedule entirely — it is what your scoring alone was worth. Computed for every season with a loaded game log.'],
-  ['All-play luck','The sharpest luck measure available.','<code>Real wins − (all-play win % × weeks played)</code> — 14 in most seasons, 15 in 2021, 13 in 2017. Unlike Pythagorean it needs no model at all, just the weekly scores.'],
+  ['All-play record','The luck-free record.','Every week, count how many of the other teams you outscored: <code>weeks × opponents</code> games a season, so 126 in a 14-week year and 135 in the 15-week 2021 season. Exact ties count as neither a win nor a loss, so three team-seasons show one game fewer: 2022 week 3, and 2023 weeks 5 and 8. This removes the schedule entirely. It is what your scoring alone was worth. Computed for every season with a loaded game log.'],
+  ['All-play luck','The sharpest luck measure available.','<code>Real wins − (all-play win % × weeks played)</code>. That is 14 weeks in most seasons, 15 in 2021, 13 in 2017. Unlike Pythagorean it needs no model at all, just the weekly scores.'],
   ['CAREER'],
   ['Career power index','Career scoring strength.','Games-weighted mean of season power indexes, so a long career outweighs one hot year.'],
-  ['Std dev','Steady or streaky.','Population standard deviation of a manager\'s season power indexes. Low is a metronome, high is boom-or-bust.'],
+  ['Std dev','Steady or streaky.','Population standard deviation of a manager’s season power indexes. Low is a metronome, high is boom-or-bust.'],
   ['Form / trend','Better or worse than their own history.','Form is mean power index over 2023–2025. Trend is form minus career index.'],
-  ['Expected titles','A neutral baseline for rings.','<code>Σ (½)^(games needed to win)</code> across playoff appearances. A coin flip every round, so a 4-team bracket gives every qualifier 0.25 — but in a 6-team bracket the top two seeds skip a round and are worth 0.25 while seeds 3–6 are worth 0.125. It still sums to exactly 1.00 per season, so it stays neutral while pricing the bye that a top seed actually earned.'],
+  ['Expected titles','A neutral baseline for rings.','<code>Σ (½)^(games needed to win)</code> across playoff appearances. A coin flip every round, so a 4-team bracket gives every qualifier 0.25, but in a 6-team bracket the top two seeds skip a round and are worth 0.25 while seeds 3–6 are worth 0.125. It still sums to exactly 1.00 per season, so it stays neutral while pricing the bye that a top seed actually earned.'],
   ['Title share','Championships, honestly counted.','1.0 for an outright title, 0.5 each for the two 2022 co-champions.'],
   ['POWER RANKINGS'],
-  ['Power score','Forward-looking strength, not a career résumé.','Season weight <code>λ^(2025 − year)</code> applied to games played; weighted mean power index shrunk toward 100 by <code>N ÷ (N + 25)</code> where N is weighted games. Uses scoring only — record carries luck, scoring does not.'],
+  ['Power score','Forward-looking strength, not a career résumé.','Season weight <code>λ^(2025 − year)</code> applied to games played; weighted mean power index shrunk toward 100 by <code>N ÷ (N + 25)</code> where N is weighted games. Uses scoring only: record carries luck, scoring does not.'],
   ['Projected win rate','What the score implies.','<code>score^k ÷ (score^k + 100^k)</code> against a league-average opponent, same exponent as everywhere else.'],
-  ['Outlook','Regression flag.','Built from last season\'s luck. A manager whose record beat their scoring is flagged to fall; one whose scoring beat their record is flagged to bounce. Regression to the mean is the most reliable prediction in fantasy.'],
+  ['Outlook','Regression flag.','Built from last season’s luck. A manager whose record beat their scoring is flagged to fall; one whose scoring beat their record is flagged to bounce. Regression to the mean is the most reliable prediction in fantasy.'],
   ['WEEK-BY-WEEK SEASONS'],
-  ['Points vs projection','Did you beat the number.','Season actual points minus the sum of weekly projections. Captures start/sit calls and waiver hits that the projection did not see — plus a large amount of noise. Read it in points per week, not totals.'],
+  ['Points vs projection','Did you beat the number.','Season actual points minus the sum of weekly projections. Captures start/sit calls and waiver hits that the projection did not see, plus a large amount of noise. Read it in points per week, not totals.'],
   ['Rivalry score','Which fixture deserves a rivalry week.','<code>meetings × balance × closeness</code>, where balance is <code>1 − |W−L| ÷ meetings</code> and closeness is <code>100 ÷ (10 + average margin)</code>. Rewards fixtures that are frequent, even, and tight. Computed within the selected season.'],
   ['STILL MISSING'],
   ['Weekly data before 2021','All-play, race charts and true strength of schedule for 2015–2020.','Needs the weekly game log for those six seasons. Everything the Week by Week section does extends backwards the day each one lands.'],
@@ -6251,7 +6409,7 @@ syncFilter();
      {h:'Partners',f:r=>r.partners,c:'num',k:r=>r.partners,t:'Distinct managers they have made at least one deal with'},
      {h:'Players in',f:r=>r.pin,c:'num',k:r=>r.pin},
      {h:'Players out',f:r=>r.pout,c:'num',k:r=>r.pout},
-     {h:'Net',f:r=>(r.pin-r.pout>=0?'+':'')+(r.pin-r.pout),c:'num',k:r=>r.pin-r.pout,t:'Players received minus players sent. Positive = consolidates, negative = spreads talent out.'},
+     {h:'Net',f:r=>sg(r.pin-r.pout,0),c:'num',k:r=>r.pin-r.pout,t:'Players received minus players sent. Positive = consolidates, negative = spreads talent out.'},
      {h:'Busiest',f:r=>r.busyY?`${r.busyY} <span class="dim">(${r.busyN})</span>`:'—',c:'num',k:r=>r.busyN},
     ],TR.mgr.filter(r=>vis(r.name)),{rank:1,sort:2});
   }
@@ -6270,7 +6428,7 @@ syncFilter();
         const t=Math.min(1,n/MXP), bg=mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85);
         h+=`<td data-a="${esc(a)}" data-b="${esc(b)}"><span style="background:${bg};color:${pickInk(bg)}">${n}</span></td>`;});
       h+=`<td><span style="font-weight:600">${tot||''}</span></td></tr>`;});
-    $('#tTrMtx').innerHTML=h+'</tbody>';
+    $('#tTrMtx').innerHTML=h+'</tbody>'; fillEmpty($('#tTrMtx'));
     $$('#tTrMtx td[data-a]').forEach(td=>{
       const a=td.dataset.a,b=td.dataset.b;
       const ds=TR.log.filter(x=>(x.ma===a&&x.mb===b)||(x.ma===b&&x.mb===a)).sort((x,y)=>x.y-y.y);
@@ -6297,7 +6455,7 @@ syncFilter();
         const bg3=mix(cssv('--surface'),cssv('--brass'),Math.pow(t,.7)*.85);
         h+=`<td data-m="${esc(m)}" data-y="${y}"><span style="background:${bg3};color:${pickInk(bg3)}">${n}</span></td>`;});
       h+=`<td><span style="font-weight:600">${tot||''}</span></td></tr>`;});
-    $('#tTrYr').innerHTML=h+'</tbody>';
+    $('#tTrYr').innerHTML=h+'</tbody>'; fillEmpty($('#tTrYr'));
     $$('#tTrYr td[data-m]').forEach(td=>{
       const m=td.dataset.m, y=+td.dataset.y;
       const ds=TR.log.filter(x=>x.y===y&&(x.ma===m||x.mb===m));
@@ -6348,7 +6506,7 @@ const STORY=(function(){
     if(ch&&!ch.co){const cr=rs.find(r=>r.team===ch.teams[0]);
       if(cr&&cr.seed>cr.spots/2)push(30+cr.seed*8,
         cr.seed===cr.spots?'In by the skin of their teeth':'Won it from the back half',ch.mgrs[0],
-        `Went <b>${cr.w}-${cr.l}${cr.t?'-'+cr.t:''}</b>, made the ${cr.spots}-team bracket as the <b>${ord(cr.seed)} seed</b>, and won the whole thing.`);
+        `Went <b>${cr.w}–${cr.l}${cr.t?'–'+cr.t:''}</b>, made the ${cr.spots}-team bracket as the <b>${ord(cr.seed)} seed</b>, and won the whole thing.`);
       const topPI=rs.reduce((a,b)=>b.pi>a.pi?b:a);
       if(cr&&cr.seed===1&&topPI.team===cr.team)push(46,'Wire to wire',ch.mgrs[0],
         `Top seed, top scorer, champion. Led the league at <b>${one(cr.pi)}</b> power index and never gave the bracket a chance to argue.`);}
@@ -6357,22 +6515,22 @@ const STORY=(function(){
     const bestNo=rs.filter(r=>r.place!==1).reduce((a,b)=>(!a||b.pi>a.pi)?b:a,null);
     const champR=ch?rs.find(r=>r.team===ch.teams[0]):null;
     if(bestNo&&champR&&bestNo.pi-champR.pi>=6)push(24+(bestNo.pi-champR.pi),'Best team, no title',bestNo.mgr,
-      `Led the league at <b>${one(bestNo.pi)}</b> power index &mdash; ${one(bestNo.pi-champR.pi)} clear of the team that actually won it &mdash; and finished ${ord(bestNo.place)}.`);
+      `Led the league at <b>${one(bestNo.pi)}</b> power index, ${one(bestNo.pi-champR.pi)} clear of the team that actually won it, and finished ${ord(bestNo.place)}.`);
 
     /* the luck extremes */
     const lk=rs.reduce((a,b)=>b.luck>a.luck?b:a), ul=rs.reduce((a,b)=>b.luck<a.luck?b:a);
     if(lk.luck>=2.5)push(38+lk.luck*6,'Wins nobody earned',lk.mgr,
-      `Won <b>${lk.w}</b> games on scoring worth about ${one(lk.pythW)} &mdash; ${S(lk.luck)} wins of pure schedule${lk.place===1?', and a title to go with them':''}.`);
+      `Won <b>${lk.w}</b> games on scoring worth about ${one(lk.pythW)}: ${S(lk.luck)} wins of pure schedule${lk.place===1?', and a title to go with them':''}.`);
     if(ul.luck<=-2.5)push(38+(-ul.luck)*6,'Robbed',ul.mgr,
-      `${ul.pf>ul.pa?`Outscored the league by <b>${S(ul.pf-ul.pa)}</b> points`:`Scored ${S(ul.pf)}`} and still went <b>${ul.w}-${ul.l}</b>, finishing ${ord(ul.place)} of ${ul.teams}.`);
+      `${ul.pf>ul.pa?`Outscored the league by <b>${S(ul.pf-ul.pa)}</b> points`:`Scored ${S(ul.pf)}`} and still went <b>${ul.w}–${ul.l}</b>, finishing ${ord(ul.place)} of ${ul.teams}.`);
 
     /* a season of scoring nobody else was close to */
     const hi=rs.reduce((a,b)=>b.pi>a.pi?b:a), lo=rs.reduce((a,b)=>b.pi<a.pi?b:a);
     const second=rs.filter(r=>r!==hi).reduce((a,b)=>b.pi>a.pi?b:a);
     if(hi.pi>=115)push(30+(hi.pi-100),'Scoring machine',hi.mgr,
-      `<b>${one(hi.pi)}</b> power index &mdash; ${one(hi.pi-100)}% clear of the field, and ${one(hi.pi-second.pi)} clear of the next best team. Finished ${ord(hi.place)}.`);
+      `<b>${one(hi.pi)}</b> power index, ${one(hi.pi-100)}% clear of the field, and ${one(hi.pi-second.pi)} clear of the next best team. Finished ${ord(hi.place)}.`);
     if(lo.pi<=85)push(28+(100-lo.pi),'The floor',lo.mgr,
-      `<b>${one(lo.pi)}</b> power index, ${S(lo.ppg)} a game in a league averaging ${S(lo.lg)}. Went ${lo.w}-${lo.l}${lo.t?'-'+lo.t:''}.`);
+      `<b>${one(lo.pi)}</b> power index, ${S(lo.ppg)} a game in a league averaging ${S(lo.lg)}. Went ${lo.w}–${lo.l}${lo.t?'–'+lo.t:''}.`);
 
     /* a final that came down to nothing */
     const fin=gs.find(g=>g.rnd==='Final');
@@ -6383,7 +6541,7 @@ const STORY=(function(){
     /* the biggest gap between where you started and where you ended */
     const sw=rs.filter(r=>r.sf!=null).reduce((a,b)=>(b.sf>(a?a.sf:-99)?b:a),null);
     if(sw&&sw.sf>=3)push(26+sw.sf*4,'Rose from the pack',sw.mgr,
-      `In as the ${ord(sw.seed)} seed, out in ${ord(sw.place)} &mdash; a ${sw.sf}-place climb once the bracket started.`);
+      `In as the ${ord(sw.seed)} seed, out in ${ord(sw.place)}: a ${sw.sf}-place climb once the bracket started.`);
 
     /* every season gets something, even a quiet one */
     if(!cands.length&&ch)push(1,'Champion',ch.mgrs.join(' & '),
@@ -6413,7 +6571,7 @@ function openStories(){
       ${st.champ?`<span class="n" style="margin-top:7px;padding-top:7px;border-top:1px solid var(--rule-2);color:var(--ink-3);font-size:11.5px">Champion: ${esc(st.champ)}</span>`:''}
     </button>`;}).join('')+`</div>`;
   $$('#mBody .hlc').forEach(b=>b.onclick=()=>{const y=+b.dataset.goy;closeMgr();jumpSeason(y);});
-  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus();
+  ov.classList.add('on'); document.body.style.overflow='hidden'; $('#mX').focus(); tabTitle($('#mTitle').textContent.trim());
 }
 $('#storiesBtn').onclick=openStories;
 function jumpSeason(y){

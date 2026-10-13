@@ -22,6 +22,8 @@ say "verify"
 # arithmetic on top of it has not moved. A changed formula has NO symptom -- the page
 # renders, every other check passes, and the site shows a confident wrong number.
 python3 test_numbers.py || { echo "  !! computed numbers moved unexpectedly — refusing"; exit 1; }
+# house rules for the words on the page (no em dashes in the writing, and so on)
+python3 test_copy.py || { echo "  !! the page copy breaks a house rule - refusing"; exit 1; }
 if command -v node >/dev/null 2>&1; then
   python3 - <<'PY'
 import re,io
@@ -84,6 +86,7 @@ fi
 # never ship a file that isn't named exactly index.html, or that looks truncated
 [ -s index.html ] || { echo "index.html missing/empty"; exit 1; }
 grep -q '</html>' index.html || { echo "index.html looks truncated"; exit 1; }
+[ -s 404.html ] && grep -q '</html>' 404.html || { echo "404.html missing or truncated (mksite.py writes it)"; exit 1; }
 printf '  %s bytes\n' "$(wc -c < index.html | tr -d ' ')"
 
 [ $PUSH -eq 1 ] || { say "done (build only — pass --push to deploy)"; exit 0; }
@@ -106,6 +109,8 @@ ls -1t "$CLONE/past"/index-*.html 2>/dev/null | tail -n +11 | while read -r old;
 printf '  %s snapshots kept\n' "$(ls -1 "$CLONE/past"/index-*.html 2>/dev/null | wc -l | tr -d ' ')"
 
 cp index.html "$CLONE/index.html"          # same name, overwrite in place; never delete first
+# the not-found page. Vercel serves a 404.html from the root for any address that is not there
+[ -s 404.html ] && cp 404.html "$CLONE/404.html"
 [ -f og.png ] && cp og.png "$CLONE/og.png"   # default link-preview card, served from the root
 for f in og-*.png; do [ -f "$f" ] && cp "$f" "$CLONE/$f"; done   # one card per theme
 mkdir -p "$CLONE/t"                          # per-theme preview shims; see mkog.js
@@ -120,7 +125,7 @@ mkdir -p "$CLONE/src" "$CLONE/src/page"
 cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py mkfonts.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
-         test_numbers.py numbers.lock.json \
+         test_numbers.py numbers.lock.json test_copy.py \
          eslint.config.js package.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \
@@ -135,7 +140,7 @@ done
 # the six self-hosted typefaces and their licences; the page and the worker both name them
 mkdir -p "$CLONE/fonts"
 cp fonts/*.woff2 fonts/OFL-*.txt "$CLONE/fonts/"
-git -C "$CLONE" add -A index.html og.png og-*.png t src favicon.svg favicon-32.png \
+git -C "$CLONE" add -A index.html 404.html og.png og-*.png t src favicon.svg favicon-32.png \
   apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts
 if git -C "$CLONE" diff --cached --quiet; then
   echo "  index.html unchanged — nothing to deploy"; exit 0

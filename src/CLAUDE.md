@@ -12,9 +12,10 @@ python3 mksite.py     # site_data.json        → index.html AND sw.js
 
 Both, in that order, after any source change. `mksite.py` prints the byte count.
 
-## Never edit `index.html`, `sw.js` or `site_data.json`
+## Never edit `index.html`, `404.html`, `sw.js` or `site_data.json`
 
-They are build artifacts. `sw.js` (the offline copy that makes the site installable) is
+They are build artifacts. `404.html` (the not-found page) is written by `mksite.py` from
+`page/404.html` plus the six theme-token blocks it lifts out of `site.css`. `sw.js` (the offline copy that makes the site installable) is
 written by `mksite.py` alongside `index.html`, and its version string is a hash of the
 page — hand-edit it and the next build silently discards the change. `manifest.webmanifest`
 sitting next to it *is* hand-written; that asymmetry is easy to trip over. Every change goes into `mksite.py` (the site) or
@@ -37,6 +38,7 @@ an editor and a linter can read:
 | `page/scripts.html` | the `<script>` wrapper, and the `__JS__` placeholder |
 | `page/site.js` | ~280 KB — the whole page's behaviour |
 | `page/sw.js` | the offline worker, with `__VERSION__`; its `CORE` list names the six font files |
+| `page/404.html` | the not-found page, with `__TOKENS__`. Standalone: it does **not** load `site.css`, only the theme tokens, so it has its own small `.nf-*` stylesheet inline |
 
 Until 14 Sep 2026 all of that was five giant raw strings inside `mksite.py`, which was
 6,664 lines. Editing CSS inside a Python string meant no highlighting, no autocomplete
@@ -113,12 +115,62 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
    a ~15 GB download whose only benefit here is the Simulator). Do not suggest it again;
    the iOS Simulator tools will fail, and WebKit is the substitute.
 
-6. `node test_rules.js` after touching the League rules card. It asserts all 35 of
+6. `python3 test_copy.py` after touching any wording. It fails on an em dash in the writing
+   (see "House style" below). `deploy.sh` gates on it.
+
+7. `node test_rules.js` after touching the League rules card. It asserts all 35 of
    Yahoo's scoring categories are present in BOTH places the rules are drawn, and that
    the six non-default values still carry their "(default N)" note. A category dropped
    from that card is invisible by eye -- the card still looks complete.
 
 Do not report a fix as working on the strength of the code reading correctly.
+
+## House style: the words and the numbers
+
+Brian asked (12 Oct 2026) for everything on the page to look like time was spent on it. The
+pass that followed found that the big things already did and the small things did not. These
+are the rules that came out of it. Most are enforced; all of them are easy to undo by accident.
+
+**No em dashes in the writing.** Not in a sentence, a heading, a label, a tooltip, a share
+card or the link-preview text. He had them all removed once (Sep 2026) and about 85 crept
+back, nearly all in copy written afterwards. Use a full stop, a colon, a comma, brackets or
+`&middot;`. The lone `—` that marks an empty table cell is fine. `test_copy.py` enforces this.
+
+**Numbers go through the helpers at the top of `page/site.js`, never a bare `toFixed`:**
+
+| Helper | Gives | Instead of |
+|---|---|---|
+| `sg(v,d,suffix)` | `+1.23`, `−1.23`, `0.00` — a real minus (U+2212), a plus on a gain, no sign on zero | `(v>=0?'+':'')+v.toFixed(d)`, which prints `+0.00` and a hyphen |
+| `ty(html)` / `tyMinus(html)` | fixes a string that is already formatted: real minus, and `9–5` for a record. Text nodes only, never an attribute | hand-editing each cell. `table()` runs `ty` on every `c:'num'` cell and `showTip` runs `tyMinus` |
+| `nOf(n,'season')` | `1 season`, `2 seasons` | `n+' seasons'` |
+| `yearList(a)` / `yearSpan(a)` | `2021–2025`, or `2021, 2023 and 2025` | `a.join(' and ')` |
+| `ord(n)` | `21st`, `11th` | the old one-liner, which printed `21th` |
+
+A win-loss record is written with an **en dash** (`${w}–${l}`), everywhere. Luck is a
+**signed** quantity in every table. Team names are data and are never touched: `ty` is built
+so `“Close”~~~ 0.33-0.42` survives, and the curly-apostrophe pass skipped all twelve team
+names that contain one.
+
+**No stock browser furniture.** Selection colour, dropdown arrows, scrollbars, the text
+cursor, the search box and list bullets are all restyled from the theme tokens (search
+`the browser's own furniture` in `site.css`). Three traps:
+
+- Do **not** add `::-webkit-scrollbar`. Defining it makes Safari on a Mac swap its overlay
+  scrollbars for permanent ones and every table card grows a bar. Standard
+  `scrollbar-width` / `scrollbar-color` only.
+- `select` uses `appearance:none` with the arrow drawn as a `background-image`. A later
+  `background:` shorthand on a select would erase the arrow and leave nothing. Set
+  `background-color` instead.
+- No regex lookbehind in `site.js`. Safari before 16.4 cannot parse one, and a parse error
+  kills the whole page, not one feature.
+
+**A `title=""` attribute becomes the site's own tooltip automatically** (delegated from the
+document, so it covers markup drawn later). Just write `title="..."`; do not also `bindTip`.
+
+**A table with no rows explains itself.** `fillEmpty(tableEl)` runs after every draw; call it
+after any new hand-built table's `innerHTML`.
+
+**Never type a colour into `page/404.html` either.** It reads the same tokens as the masthead.
 
 ## The numbers tripwire
 

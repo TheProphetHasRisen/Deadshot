@@ -54,6 +54,7 @@ def _fill(s):
 #   page/scripts.html  the <script> wrapper, and __JS__
 #   page/site.js       the whole page's behaviour
 #   page/sw.js         the offline worker, with __VERSION__
+#   page/404.html      the not-found page, with __TOKENS__ (see the end of this file)
 PAGE = os.path.join(HERE, 'page')
 
 
@@ -82,4 +83,21 @@ open('index.html','w').write(out)
 # old build. A content hash changes whenever anything changes.
 _blob = out.encode('utf-8')
 open('sw.js','w').write(SW.replace('__VERSION__', _hashlib.sha1(_blob).hexdigest()[:12]))
+
+# ---- the not-found page ------------------------------------------------------------------
+# A mistyped address used to get the host's own bare "NOT_FOUND". Vercel serves a 404.html
+# from the root of the site instead when there is one. It is a small page of its own: only
+# the six theme-token blocks are lifted out of site.css (so it comes up in whichever theme
+# the reader last chose, with no colour written into it), plus the font faces with absolute
+# paths, because a 404 can be served at any depth and "fonts/x.woff2" would resolve wrongly.
+_tokens = _re.findall(r'(?m)^:root(?:,:root)?(?:\[data-skin="[a-z]+"\])?\{[^}]*\}', _part('site.css'))
+# six themes, six blocks. If a stylesheet refactor changes that, fail here rather than ship a
+# not-found page with no colours.
+assert len(_tokens) == 6, 'expected 6 theme token blocks in site.css, found %d' % len(_tokens)
+_nf = _fill(_part('404.html').replace(
+    '__TOKENS__', _part('fonts.css').replace('url(fonts/', 'url(/fonts/') + '\n'.join(_tokens)))
+_left = set(_re.findall(r'__[A-Z][A-Z0-9_]*__', _nf))
+assert not _left, 'unfilled placeholder(s) in 404.html: ' + ', '.join(sorted(_left))
+open('404.html','w').write(_nf)
+
 print("bytes", len(_blob))

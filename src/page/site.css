@@ -582,7 +582,10 @@ details.expl>p,details.expl .plain{margin-top:9px}
 @media(max-width:700px){.rules{grid-template-columns:1fr;gap:16px}}
 .rules h4{font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
   color:var(--brass);font-weight:600;margin:0 0 6px}
-.rules ul{margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+.rules ul{margin:0;padding-left:0;list-style:none;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+/* a crosshair tick for a bullet, the same mark as the masthead reticle and the nav */
+.rules li{position:relative;padding-left:15px}
+.rules li::before{content:"+";position:absolute;left:0;top:0;font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--brass-2)}
 .rules li b{color:var(--ink)}
 /* ================= THE PHARAOH ================= */
 .pharaoh{position:fixed;inset:0;z-index:500;pointer-events:none;display:none;overflow:hidden;
@@ -1085,6 +1088,12 @@ tr.off{opacity:.3}
 .sec-head h2{font-size:clamp(22px,3vw,30px);font-weight:700;letter-spacing:-.012em;font-variation-settings:"opsz" 72;color:var(--head-ink)}
 .sec-head .rule-note{margin-left:auto;font-size:10.5px;font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);text-align:right}
 .lede{color:var(--ink-2);max-width:70ch;margin:14px 0 22px;font-size:14.5px}
+/* no last line of one stranded word in the paragraphs people actually read */
+.lede,.foot-grid p,.rules li,.tip{text-wrap:pretty}
+/* The masthead is a sight picture, so the pointer over it is a crosshair. Anything in it that
+   is a real control keeps the hand. */
+.mast{cursor:crosshair}
+.mast a,.mast button{cursor:pointer}
 .lede strong{color:var(--ink);font-weight:600}
 .card{background:var(--surface);border:1px solid var(--rule);border-radius:var(--card-r);box-shadow:var(--shadow);overflow:hidden;color:var(--ink)}
 .card+.card{margin-top:20px}
@@ -1121,6 +1130,10 @@ th.s::after{content:"\2195";opacity:.28;margin-left:4px;font-size:9px}
 th.s.asc::after{content:"\2191";opacity:1;color:var(--brass)}
 th.s.desc::after{content:"\2193";opacity:1;color:var(--brass)}
 tbody tr:hover{background:var(--hover)}
+/* the one row a table shows when it has nothing to show */
+tbody tr.tbl-empty:hover{background:none}
+tr.tbl-empty td{padding:26px 14px;text-align:center;white-space:normal;border-bottom:0;color:var(--ink-3);font-size:12.5px}
+tr.tbl-empty td b{color:var(--ink-2)}
 td.nm{font-weight:600}
 td.tm{color:var(--ink-2);font-style:italic}
 .rk{color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:11.5px;width:26px;text-align:right}
@@ -1164,11 +1177,58 @@ button.on{background:var(--brass-wash);border-color:var(--brass-2);color:var(--b
 .pills{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .pills button{padding:5px 11px;font-weight:600}
 input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;padding:0;border:0;width:180px;cursor:pointer}
+/* ---- the browser's own furniture, made to match ---------------------------------------
+   Every one of these used to be whatever the browser ships: a grey highlight when you drag
+   across text, the operating system's dropdown arrow, default grey scrollbars inside every
+   table card, a blue text cursor. Each is small. Together they are the difference between
+   a page that was finished and one that was merely built. All of it reads the theme tokens,
+   so it follows all six skins with no colour written down here. */
+::selection{background:var(--brass);color:var(--surface)}
+html{accent-color:var(--brass);caret-color:var(--brass);scrollbar-color:var(--brass-2) var(--ground)}
+/* standard properties only. ::-webkit-scrollbar is deliberately not used: defining it makes
+   Safari on a Mac swap its overlay scrollbars for permanent ones, and every card grows a bar */
+.scroll,.brk,.ov,.modal-b{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+/* the dropdown arrow: two hairline gradients in the control's own ink, so it needs no image
+   and no colour. background-image only -- the base rule above owns background-color. */
+select{-webkit-appearance:none;appearance:none;padding-right:26px;text-overflow:ellipsis;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 14px) 53%,calc(100% - 9px) 53%;background-size:5px 5px;background-repeat:no-repeat}
+select:hover,select:focus-visible{color:var(--brass)}
+select option{color:var(--ink);background:var(--surface)}
+/* the search box: square like every other control (iOS rounds it into a pill), a placeholder
+   in the site's own dim ink, and a hairline cross instead of the browser's grey blob */
+input[type=search]{-webkit-appearance:none;appearance:none}
+input::placeholder{color:var(--ink-3);opacity:1;font-style:italic;letter-spacing:.02em}
+input[type=search]::-webkit-search-decoration{-webkit-appearance:none}
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;width:11px;height:11px;margin-left:6px;cursor:pointer;
+  background:linear-gradient(45deg,transparent 44%,var(--ink-2) 44% 56%,transparent 56%),linear-gradient(-45deg,transparent 44%,var(--ink-2) 44% 56%,transparent 56%)}
+input:focus-visible,select:focus-visible{border-color:var(--brass-2)}
 input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--rule);border-radius:2px}
 input[type=range]::-moz-range-track{height:4px;background:var(--rule);border-radius:2px}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--brass);margin-top:-5.5px;border:0}
 input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--brass);border:0}
-footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 46px;color:var(--ink-3);font-size:12px}
+footer{border-top:1px solid var(--rule);margin-top:60px;padding:30px 0 50px;color:var(--ink-3);font-size:12px}
+/* The sign-off. It used to be one grey paragraph; it is now the mark, the name, what the book
+   holds, where the numbers came from and what it is set in -- the things a made object says
+   about itself on its last page. */
+.foot-top{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.foot-mark{width:36px;height:36px;flex:none}
+.foot-word{font-family:var(--wordmark);font-weight:900;font-size:28px;line-height:1;letter-spacing:.045em;text-transform:uppercase;color:var(--head-ink)}
+.foot-word em{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;font-size:15px;letter-spacing:0;text-transform:none;color:var(--brass);margin-left:4px}
+.foot-line{margin-top:7px;font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.14em}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:14px 40px}
+.foot-k{font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--brass);margin-bottom:6px}
+.foot-grid p{margin:0;line-height:1.65;max-width:70ch}
+.foot-grid a{color:var(--ink-2);text-decoration:underline;text-decoration-color:var(--brass-2);text-underline-offset:2px}
+.foot-grid a:hover{color:var(--brass)}
+@media(max-width:720px){.foot-grid{grid-template-columns:minmax(0,1fr);gap:20px}.foot-word{font-size:24px}.foot-line{letter-spacing:.09em;line-height:1.7}}
+/* Scope pins a little block of sight markings to the bottom-left corner of the window. Cards
+   cover it as they scroll past; the footer has no background, so at the very end of the page
+   its last lines sat on top of them. Lift the footer clear. */
+[data-skin="scope"] footer{padding-bottom:124px}
+/* shown only with JavaScript off, when nothing else on the page can draw */
+.nojs{margin:0;padding:18px 20px;background:var(--surface);border-bottom:1px solid var(--rule);color:var(--ink-2);font-size:14px;text-align:center}
+.nojs b{color:var(--ink)}
 .tip{position:fixed;pointer-events:none;z-index:120;background:var(--surface);color:var(--ink);border:1px solid var(--brass-2);padding:7px 10px;border-radius:3px;font-size:12px;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.28);opacity:0;transition:opacity .1s;max-width:min(290px,calc(100vw - 16px))}
 .tip b{color:var(--brass)}
 .tip.on{opacity:1}
