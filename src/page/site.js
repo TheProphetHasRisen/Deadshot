@@ -251,7 +251,7 @@ $('#f1').textContent=SEA.length;$('#f2').textContent=M.length;$('#f3').textConte
 $('#nextYr').textContent=LAST+1;
 
 /* nav */
-const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
+const SECS=[...(D.live?[['live',String(D.live.year)]]:[]),['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
  ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],
  ['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],
  ['records','Records'],['method','Method']];
@@ -4791,3 +4791,61 @@ function pharaoh(){
 
 glossify();
 
+
+/* ============ the live season ==========================================================
+   2026 so far, in its own section and kept out of everything else until it is finished.
+   Every manager is shown whatever the filter says: it is a ten-team standings table. */
+(function(){
+  const L=D.live; if(!L){const s=$('#live'); if(s)s.remove(); return;}
+  const mg=t=>L.mgr[t]||'', tm=t=>`<b>${esc(t)}</b> <span class="dim">${esc(mg(t))}</span>`;
+  const st={}; L.standings.forEach(r=>{st[r.team]=r;});
+  const recOf=t=>{const r=st[t]; return r?r.w+'–'+r.l+(r.t?'–'+r.t:''):'';};
+  const done=L.weeks[L.weeks.length-1];
+  $('#lvNote').innerHTML=`Through week ${done} of ${L.regWeeks}<br>As of ${esc(L.asOf)}`;
+  $('#lvStSub').textContent=`after week ${done} · top 6 make the playoffs`;
+  table($('#tLive'),[
+    {h:'Team',f:r=>tm(r.team),k:r=>r.team},
+    {h:'W–L',f:r=>r.w+'–'+r.l+(r.t?'–'+r.t:''),c:'num',k:r=>r.w+r.t/2},
+    {h:'PF',f:r=>f(r.pf),c:'num',k:r=>r.pf},
+    {h:'PA',f:r=>f(r.pa),c:'num',k:r=>r.pa},
+    {h:'Streak',f:r=>esc(r.streak.replace(/^([WL])/,'$1 ')),k:r=>(r.streak[0]==='W'?1:-1)*+r.streak.slice(1)},
+    {h:'All-play',f:r=>r.apW+'–'+r.apL,c:'num',k:r=>r.apW/(r.apW+r.apL),t:'Record if every team had played every other team every week'},
+    {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck,t:'Real wins minus all-play expected wins. Plus means the schedule has helped.'},
+    {h:'Moves',f:r=>String(r.moves),c:'num',k:r=>r.moves},
+  ],L.standings,{rank:1,sort:-1,cls:r=>r.rank===6?'lv-cut':''});
+  /* up next */
+  const ups=L.upcoming; if(ups.length){
+    $('#lvUpH').textContent='Week '+ups[0].wk+' · up next';
+    $('#tLiveUp').innerHTML='<tbody>'+ups.map(g=>{const fa=g.pa>=g.pb;
+      return `<tr><td>${tm(g.ta)} <span class="dim">${recOf(g.ta)}</span></td><td class="num">${fa?'<b>':''}${f(g.pa)}${fa?'</b>':''}</td>
+        <td class="num">${!fa?'<b>':''}${f(g.pb)}${!fa?'</b>':''}</td><td>${tm(g.tb)} <span class="dim">${recOf(g.tb)}</span></td></tr>`;}).join('')+'</tbody>';
+  }else $('#tLiveUp').closest('.card').remove();
+  /* results, a week at a time */
+  let wk=done;
+  const drawWk=()=>{
+    $('#lvWk').innerHTML=L.weeks.map(w=>`<button data-lw="${w}" class="${w===wk?'on':''}">${w}</button>`).join('');
+    $$('#lvWk button').forEach(b=>b.onclick=()=>{wk=+b.dataset.lw; drawWk();});
+    const gs=L.games.filter(g=>g.wk===wk);
+    $('#tLiveWk').innerHTML='<thead><tr><th>Winner</th><th class="num">Score</th><th class="num">Projected</th><th>Loser</th></tr></thead><tbody>'+gs.map(g=>{
+      const aw=g.aa>g.ab, W=aw?g.ta:g.tb, Lo=aw?g.tb:g.ta, ws=aw?g.aa:g.ab, ls=aw?g.ab:g.aa, wp=aw?g.pa:g.pb, lp=aw?g.pb:g.pa;
+      const upset=wp!=null&&lp!=null&&wp<lp;
+      return `<tr><td>${tm(W)}${upset?' <span class="lv-up">upset</span>':''}</td><td class="num">${f(ws)}–${f(ls)}</td><td class="num dim">${wp==null?'—':f(wp)+'–'+f(lp)}</td><td>${tm(Lo)}</td></tr>`;}).join('')+'</tbody>';
+  };
+  drawWk();
+  /* trades */
+  $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
+  $('#tLiveTr').innerHTML='<tbody>'+L.trades.slice().reverse().map(x=>`<tr><td class="dim">${esc(x.d)}</td><td><b>${esc(x.ta)}</b> got ${esc(x.ga.join(', '))}<br><b>${esc(x.tb)}</b> got ${esc(x.gb.join(', '))}</td></tr>`).join('')+'</tbody>';
+  /* the draft: one column per team in draft order, one row per round */
+  let dy=String(L.year);
+  const drawDr=()=>{
+    $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('');
+    $$('#lvDy button').forEach(b=>b.onclick=()=>{dy=b.dataset.dy; drawDr();});
+    const P=L.draft[dy], order=P.filter(p=>p[0]<=10).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
+    const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
+    let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
+    for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
+      return p?`<td><span class="lv-pos lv-${esc(p[4].toLowerCase())}">${esc(p[4])}</span> ${esc(p[2])} <span class="dim">${p[0]}</span></td>`:'<td></td>';}).join('')+'</tr>';}
+    $('#tLiveDr').innerHTML=h+'</tbody>';
+  };
+  drawDr();
+})();

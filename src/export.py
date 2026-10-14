@@ -249,3 +249,53 @@ for y in sorted(WKALL):
     ap=WKALL[y]['allplay']
     best=max(ap,key=lambda t:ap[t]['pct'])
     print("  ",y,"best all-play:",best,ap[best]['w'],'-',ap[best]['l'],"| top rivalry:",WKALL[y]['rivals'][0]['a'],"vs",WKALL[y]['rivals'][0]['b'])
+
+# ---- the live season ----------------------------------------------------------------------
+# 2026 is shown in its own section and kept OUT of the record book (rows, careers, champions,
+# head to head) until it is finished: half a season would drag every career rate around.
+# Week 5 was not in the screenshots; its scores come from the standings totals minus weeks
+# 1-4, and its pairings from whose points-for matches whose points-against. check_2026.py
+# proves the same arithmetic reconciles every record, streak, PF and PA.
+try:
+    import season2026 as S26
+except ImportError:
+    S26 = None
+if S26:
+    ST = S26.STANDINGS2026_WK5
+    games = [dict(wk=w, ta=a, aa=sa, pa=pa_, tb=b, ab=sb, pb=pb_) for (w, a, sa, pa_, b, sb, pb_, br) in S26.W2026]
+    pf = {t: 0.0 for t in ST}; pa = {t: 0.0 for t in ST}
+    for g in games:
+        pf[g['ta']] += g['aa']; pa[g['ta']] += g['ab']; pf[g['tb']] += g['ab']; pa[g['tb']] += g['aa']
+    done = max(g['wk'] for g in games)
+    if done < 5:
+        w5f = {t: round(ST[t][4] - pf[t], 2) for t in ST}; w5a = {t: round(ST[t][5] - pa[t], 2) for t in ST}
+        used = set()
+        for t in ST:
+            if t in used: continue
+            o = [x for x in ST if x != t and x not in used and abs(w5f[x] - w5a[t]) < .005 and abs(w5a[x] - w5f[t]) < .005]
+            assert len(o) == 1, 'week 5 cannot be recovered for ' + t
+            used |= {t, o[0]}
+            games.append(dict(wk=5, ta=t, aa=w5f[t], pa=None, tb=o[0], ab=w5f[o[0]], pb=None))
+    weeks = sorted({g['wk'] for g in games})
+    # all-play: every week, how many of the other nine each team outscored
+    ap = {t: [0, 0] for t in ST}
+    for wk in weeks:
+        sc = {}
+        for g in games:
+            if g['wk'] == wk: sc[g['ta']] = g['aa']; sc[g['tb']] = g['ab']
+        for t, v in sc.items():
+            ap[t][0] += sum(1 for o, ov in sc.items() if o != t and v > ov)
+            ap[t][1] += sum(1 for o, ov in sc.items() if o != t and v < ov)
+    stand = []
+    for t, (rank, w, l, tie, f, a, streak, waiver, moves) in sorted(ST.items(), key=lambda kv: kv[1][0]):
+        g = w + l + tie
+        stand.append(dict(rank=rank, team=t, mgr=S26.MGR2026.get(t), w=w, l=l, t=tie, pf=f, pa=a, streak=streak,
+                          waiver=waiver, moves=moves, apW=ap[t][0], apL=ap[t][1],
+                          luck=(w + tie / 2) - g * ap[t][0] / (ap[t][0] + ap[t][1]) if ap[t][0] + ap[t][1] else None))
+    up = [dict(wk=wk, ta=a, pa=pa_, tb=b, pb=pb_) for wk, lst in S26.UPCOMING2026.items() for (a, pa_, b, pb_) in lst]
+    out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
+                       trades=[dict(d=d, ta=a, ga=ga, tb=b, gb=gb) for (d, a, ga, b, gb) in S26.TRADES2026],
+                       draft={'2026': [list(p) for p in S26.DRAFT2026], '2025': [list(p) for p in S26.DRAFT2025]},
+                       asOf='Oct 14, 2026')
+    json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
+    print('live 2026: weeks', weeks, '| teams', len(stand))

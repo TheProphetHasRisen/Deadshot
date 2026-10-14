@@ -1421,3 +1421,14 @@ table.mtx thead th.rw{z-index:6;background:var(--surface-2)}
 .totop .ar{font-size:14px;line-height:1}
 @media(max-width:560px){.totop{right:12px;bottom:12px;padding:10px 14px;font-size:10px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---- the live season ------------------------------------------------------------------ */
+.lv-tag{display:inline-block;vertical-align:middle;margin-left:8px;padding:2px 8px;border:1px solid var(--brass-2);border-radius:2px;
+  font:600 10px "IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);background:var(--brass-wash)}
+#live .card{margin-bottom:16px}
+#live td b{font-weight:600}
+tr.lv-cut td{border-bottom:2px dashed var(--brass-2)}
+.lv-up{font:600 9.5px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);border:1px solid var(--brass-2);border-radius:2px;padding:0 4px;margin-left:4px}
+.lv-draft td,.lv-draft th{font-size:12px;white-space:nowrap}
+.lv-draft thead th{font-size:10px;text-align:left}
+.lv-pos{display:inline-block;min-width:26px;font:600 9.5px "IBM Plex Mono",monospace;color:var(--ink-3)}
