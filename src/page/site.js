@@ -1523,7 +1523,7 @@ function spotlight(){
   dots.forEach(c=>{const sel=on.has(c.dataset.mgr);
     c.setAttribute('opacity',!any?1:(sel?1:.12));
     c.setAttribute('r',sel?(c.dataset.champ?7.4:5.8):(c.dataset.champ?6:4.2));
-    c.setAttribute('stroke',sel?'var(--brass)':(c.dataset.champ?'var(--brass)':+c.dataset.pl<=3?'var(--brass-2)':'var(--ink-3)'));});
+    c.setAttribute('stroke',sel?'var(--brass)':(+c.dataset.pl<=3?'var(--brass)':'var(--ink-3)'));});
   const box=$('#stripTrails');
   if(box){
     box.innerHTML=[...on].map(m=>{
@@ -2089,7 +2089,7 @@ function drawStrip(){
     bands+=`<line x1="${xs(i)}" x2="${xs(i)}" y1="${ys(Math.max(...rs.map(r=>r.pi)))}" y2="${ys(Math.min(...rs.map(r=>r.pi)))}" stroke="var(--rule)" stroke-width="1"/>`;
     rs.forEach((r,k)=>{const off=(k%2?1:-1)*Math.floor(k/2)*5.4, on=vis(r.mgr);
       dots+= on
-        ? `<circle cx="${xs(i)+off}" cy="${ys(r.pi)}" r="${r.place===1?6:4.2}" fill="${r.place===1?'var(--brass)':'var(--surface)'}" stroke="${r.place===1?'var(--brass)':r.place<=3?'var(--brass-2)':'var(--ink-3)'}" stroke-width="${r.place===1?2:1.6}" data-k="${y}|${esc(r.mgr)}" data-pl="${r.place}" data-mgr="${esc(r.mgr)}" data-yr="${y}" ${r.place===1?'data-champ="1"':''} style="cursor:pointer"/>`
+        ? `<circle cx="${xs(i)+off}" cy="${ys(r.pi)}" r="${r.place===1?6:4.2}" fill="${r.place<=3?'var(--brass)':'var(--surface)'}" stroke="${r.place<=3?'var(--brass)':'var(--ink-3)'}" fill-opacity="${r.place===2?.55:r.place===3?.28:1}" stroke-width="${r.place===1?2:1.6}" data-k="${y}|${esc(r.mgr)}" data-pl="${r.place}" data-mgr="${esc(r.mgr)}" data-yr="${y}" ${r.place===1?'data-champ="1"':''} style="cursor:pointer"/>`
         : `<circle cx="${xs(i)+off}" cy="${ys(r.pi)}" r="2" fill="var(--rule)" stroke="none"/>`;});
   });
   const lab=SEA.map((y,i)=>`<text x="${xs(i)}" y="${H-P.b+19}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${y}</text>`).join('');
@@ -4814,14 +4814,15 @@ glossify();
   const seg=on=>{$('#lvSegBook').classList.toggle('on',!on); $('#lvSegLive').classList.toggle('on',on);};
   const show=mode=>{V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
     seg(mode==='pg'); tabTitle(mode?L.year+' Live':'');
+    $('#lvGo').textContent=mode==='pg'?'\u2190 Back to the record book':'Open 2026 \u2192';
     if(mode==='ov'){document.body.style.overflow='hidden'; V.scrollTop=0; $('#lvClose').focus();} else document.body.style.overflow='';
     if(mode==='pg')scrollTo(0,0);
     if(mode)history.replaceState(null,'',location.pathname+location.search+'#'+L.year); else if(location.hash==='#'+L.year)history.replaceState(null,'',location.pathname+location.search);};
-  $('#lvOpen').onclick=()=>show('ov');
+  $('#lvOpen').onclick=()=>show(document.body.classList.contains('lv-pg')?null:'pg');
   $('#lvClose').onclick=()=>show(null);
   $('#lvSegLive').onclick=()=>show('pg'); $('#lvSegBook').onclick=()=>show(null);
   addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('lv-ov'))show(null);});
-  if(location.hash==='#'+L.year)setTimeout(()=>show('ov'),0);
+  if(location.hash==='#'+L.year)setTimeout(()=>show('pg'),0);
   const mg=t=>L.mgr[t]||'', tm=t=>`<b>${esc(t)}</b> <span class="dim">${esc(mg(t))}</span>`;
   const st={}; L.standings.forEach(r=>{st[r.team]=r;});
   const recOf=t=>{const r=st[t]; return r?r.w+'–'+r.l+(r.t?'–'+r.t:''):'';};
@@ -4865,11 +4866,15 @@ glossify();
   let dy=String(L.year), view='order';
   const POS=['QB','RB','WR','TE','K','DEF'], on=new Set();
   const DP=L.draftPts||{};
+  /* the one or two biggest steals and busts at each position, called out on the board */
+  const tops=J=>{const by={}; Object.entries(J).forEach(([pk,v])=>{if(v.fr==null)return; (by[v.pos]=by[v.pos]||[]).push({pk:+pk,...v});});
+    const t={}; Object.values(by).forEach(a=>{a.filter(x=>x.steal).sort((x,y)=>y.d-x.d).slice(0,2).forEach(x=>{t[x.pk]='STEAL';});
+      a.filter(x=>x.bust).sort((x,y)=>x.d-y.d).slice(0,2).forEach(x=>{t[x.pk]='BUST';});}); return t;};
   const judge=P=>{   /* drafted as the Nth at his position, finished Mth: steal, bust or neither */
     const n={}, out={}; const pts=DP[dy]||{};
     P.slice().sort((a,b)=>a[0]-b[0]).forEach(p=>{n[p[4]]=(n[p[4]]||0)+1; const v=pts[p[2]]||[null,null];
       const dr=n[p[4]], fr=v[1], d=fr==null?null:dr-fr;
-      out[p[0]]={dr,fr,pts:v[0],d,steal:d!=null&&fr<dr&&(d>=8||(fr*2<=dr&&d>=3)),bust:d!=null&&fr>dr&&dr<=36&&(-d>=12||(fr>=dr*2.5&&-d>=6))};});
+      out[p[0]]={pos:p[4],dr,fr,pts:v[0],d,steal:d!=null&&fr<dr&&(d>=8||(fr*2<=dr&&d>=3)),bust:d!=null&&fr>dr&&dr<=36&&(-d>=12||(fr>=dr*2.5&&-d>=6))};});
     return out;};
   const drawDr=()=>{
     $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('')+
@@ -4878,10 +4883,11 @@ glossify();
     $$('#lvDy button[data-dy]').forEach(b=>b.onclick=()=>{dy=b.dataset.dy; drawDr();});
     $$('#lvDy button[data-dv]').forEach(b=>b.onclick=()=>{view=b.dataset.dv; drawDr();});
     $$('#lvDy button[data-dp]').forEach(b=>b.onclick=()=>{const p=b.dataset.dp; on.has(p)?on.delete(p):on.add(p); drawDr();});
-    const P=L.draft[dy], J=judge(P), wk=(DP.weeks||{})[dy], partial=+dy===L.year;
+    const P=L.draft[dy], J=judge(P), T=tops(J), wk=(DP.weeks||{})[dy], partial=+dy===L.year;
     const mark=p=>{const v=J[p[0]]; if(v.fr==null)return '';
       const cls=v.steal?'lv-steal':v.bust?'lv-bust':'lv-fin';
-      return ` <span class="${cls}" title="Drafted ${p[4]}${v.dr}, ${partial?'running':'finished'} ${p[4]}${v.fr} with ${f(v.pts,1)} points">${v.steal?'▲ ':v.bust?'▼ ':''}${p[4]}${v.fr}</span>`;};
+      const big=T[p[0]]?` <span class="lv-big lv-big-${T[p[0]]==='STEAL'?'s':'b'}">${T[p[0]]==='STEAL'?'Top steal':'Top bust'}</span>`:'';
+      return big+` <span class="${cls}" title="Drafted ${p[4]}${v.dr}, ${partial?'running':'finished'} ${p[4]}${v.fr} with ${f(v.pts,1)} points">${v.steal?'▲ ':v.bust?'▼ ':''}${p[4]}${v.fr}</span>`;};
     const dim=p=>on.size&&!on.has(p[4]);
     const mg=t=>L.mgr[t]?L.mgr[t].split(' ').slice(-1)[0]:'';
     if(view==='team'){
@@ -4889,12 +4895,12 @@ glossify();
       const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
       let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
       for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
-        return p?`<td class="${dim(p)?'lv-dim':''}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</td>`:'<td></td>';}).join('')+'</tr>';}
+        return p?`<td class="${dim(p)?'lv-dim':''}${T[p[0]]?' lv-hl-'+(T[p[0]]==='STEAL'?'s':'b'):''}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</td>`:'<td></td>';}).join('')+'</tr>';}
       $('#tLiveDr').innerHTML=h+'</tbody>';
     }else{
       $('#tLiveDr').innerHTML='<thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Taken</th><th>'+(partial?'Running':'Finished')+'</th><th class="num">Points</th></tr></thead><tbody>'+
         P.slice().sort((a,b)=>a[0]-b[0]).map(p=>{const v=J[p[0]];
-          return `<tr class="${dim(p)?'lv-dim':''}${p[0]%10===0?' lv-rd':''}"><td class="dim">${Math.ceil(p[0]/10)}.${String((p[0]-1)%10+1).padStart(2,'0')} <span class="lv-ov">${p[0]}</span></td>
+          return `<tr class="${dim(p)?'lv-dim':''}${p[0]%10===0?' lv-rd':''}${T[p[0]]?' lv-hl-'+(T[p[0]]==='STEAL'?'s':'b'):''}"><td class="dim">${Math.ceil(p[0]/10)}.${String((p[0]-1)%10+1).padStart(2,'0')} <span class="lv-ov">${p[0]}</span></td>
             <td>${esc(p[1])} <span class="dim">${esc(mg(p[1]))}</span></td><td><b>${esc(p[2])}</b> <span class="dim">${esc(p[3])}</span></td>
             <td><span class="lv-pos">${esc(p[4])}${v.dr}</span></td><td>${mark(p)}</td><td class="num">${v.pts==null?'—':f(v.pts,1)}</td></tr>`;}).join('')+'</tbody>';
     }
@@ -4905,6 +4911,7 @@ glossify();
     const ln=x=>`<tr><td><b>${esc(x.p[2])}</b> <span class="dim">${esc(x.p[1])}</span></td><td class="num">pick ${x.p[0]} · ${x.p[4]}${x.v.dr}</td><td class="num"><b>${x.p[4]}${x.v.fr}</b></td><td class="num">${f(x.v.pts,1)}</td></tr>`;
     const tp={}; P.forEach(p=>{const v=J[p[0]]; if(v.pts!=null&&(!on.size||on.has(p[4])))tp[p[1]]=(tp[p[1]]||0)+v.pts;});
     const tr=Object.entries(tp).sort((a,b)=>b[1]-a[1]);
+    $('#lvSbHow').textContent='How a pick is judged: each player is ranked at his position by the order he was drafted (the 12th running back taken is RB12) and again by the points he scored under Deadshot\u2019s scoring, against every player in the NFL at that position. A steal finished well above where he was taken: 8 or more places, or twice as high. A bust was a top-36 pick at his position who finished 12 or more places below it, or two and a half times as low. Kickers and defenses are judged the same way. The board names the top one or two of each at every position.';
     $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs finished at his position';
     $('#tLiveSb').innerHTML=`<thead><tr><th>Steals</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${st.map(ln).join('')}</tbody>`+
       `<thead><tr><th>Busts</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${bu.map(ln).join('')}</tbody>`+

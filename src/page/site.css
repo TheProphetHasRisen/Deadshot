@@ -1468,3 +1468,14 @@ body.lv-pg .lv-view-h{display:none}
 .lv-draft tr.lv-rd td{border-bottom:1px solid var(--rule)}
 .lv-draft .lv-ov{font-size:10px;color:var(--ink-3)}
 .lv-tag{text-shadow:none!important;-webkit-text-stroke:0}
+/* in 2026 the switch bar stays at the top, so the way back and what you are looking at are always on screen */
+body.lv-pg nav{display:none}
+body.lv-pg .lv-strip{position:sticky;top:0;z-index:40;box-shadow:0 2px 10px -6px rgba(0,0,0,.35)}
+body.lv-pg .lv-go{color:var(--brass)}
+/* the draft's headline picks */
+.lv-big{font:700 9px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;padding:1px 5px;border-radius:2px;margin-left:4px;white-space:nowrap}
+.lv-big-s{background:var(--pos);color:var(--surface)}
+.lv-big-b{background:var(--neg);color:var(--surface)}
+.lv-draft .lv-hl-s td,.lv-draft td.lv-hl-s{box-shadow:inset 3px 0 0 var(--pos)}
+.lv-draft .lv-hl-b td,.lv-draft td.lv-hl-b{box-shadow:inset 3px 0 0 var(--neg)}
+.lv-draft tr.lv-hl-s td+td,.lv-draft tr.lv-hl-b td+td{box-shadow:none}
