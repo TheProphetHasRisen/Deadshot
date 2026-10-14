@@ -1072,6 +1072,10 @@ section{padding:52px 0 6px;scroll-margin-top:96px}
 #askIn:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
 .ask-k{font:600 10px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--brass);margin-bottom:6px}
 .ask-ex{display:flex;flex-wrap:wrap;gap:6px}
+.ask-grp{margin-bottom:14px}
+.ask-grp:last-child{margin-bottom:2px}
+.scroll+.scroll .ask-t{margin-top:16px}
+.ask-t td:first-child{white-space:nowrap}
 .ask-ex button{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:13px;letter-spacing:0;padding:6px 11px}
 .ask-card{border:1px solid var(--rule);border-radius:var(--card-r);background:var(--surface-2);padding:16px 18px}
 .ask-h{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;line-height:1.2;color:var(--head-ink);font-variation-settings:"opsz" 36}

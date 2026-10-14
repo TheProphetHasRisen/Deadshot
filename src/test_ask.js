@@ -103,6 +103,24 @@ const CASES = [
   ['who beats their projection the most', o => /Beat the projection most often/.test(o.sub) || o.sub],
   ['Wu by week', o => o.title === 'Nathan Wu' && /Week 1/.test(o.body) || o.title],
   ['Burke by season', o => o.kind === 'Season by season' || o.kind],
+  // ---- more kinds of question
+  ['longest winning streak', (o, T) => o.big === T.longestRun('W') + ' wins in a row' || `${o.big} want ${T.longestRun('W')}`],
+  ['Kaiper longest losing streak', (o, T) => o.big === T.longestRun('L', 'Shane Kaiper') + ' losses in a row' || `${o.big} want ${T.longestRun('L', 'Shane Kaiper')}`],
+  ['who has never beaten Alpert', (o, T) => o.title.includes(T.neverBeaten('Wesley Alpert').length === 1 ? T.neverBeaten('Wesley Alpert')[0] : T.neverBeaten('Wesley Alpert').length + ' managers') || `${o.title} want ${T.neverBeaten('Wesley Alpert')}`],
+  ['who has Berger never beaten', (o, T) => o.title.startsWith('Brian Berger has never beaten') || o.title],
+  ['who does Alpert own', o => o.title.startsWith('Wesley Alpert owns') || o.title],
+  ['Burke nemesis', o => /owns Brian Burke$/.test(o.title) || o.title],
+  ['how often does the 1 seed win', (o, T) => o.big === T.seedTitles(1) + (T.seedTitles(1) === 1 ? ' title' : ' titles') + ' in ' + T.seedN(1) + ' seasons' || `${o.big} want ${T.seedTitles(1)}`],
+  ['every seed', o => o.title === 'Every seed' || o.title],
+  ['does the best team win', (o, T) => o.title === 'The top seed won ' + T.seedTitles(1) + ' of ' + DATA.seasons.length || `${o.title}`],
+  ['Burke team names', (o, T) => o.kind === 'Team names' && o.big.startsWith(T.teamNames('Brian Burke') + ' name') || `${o.kind} ${o.big}`],
+  ['Wu trades', (o, T) => o.big === T.tradeCount('Nathan Wu') + ' trades' || `${o.big} want ${T.tradeCount('Nathan Wu')}`],
+  ['most weekly high scores', (o, T) => o.title === T.mostTops() || `${o.title} want ${T.mostTops()}`],
+  ['bad beats', (o, T) => o.title === T.badBeats() || `${o.title} want ${T.badBeats()}`],
+  ['who won the Diggs trade', o => (o.soon || []).some(s => /Who won a trade/.test(s)) || JSON.stringify(o.soon)],
+  ['Burke vs Kaiper', o => /Inside the matchup/.test(o.body) && /biggest win/.test(o.body) || 'no matchup detail'],
+  ['Krueger', o => /Inside the numbers/.test(o.body) && /Longest winning streak/.test(o.body) || 'no career detail'],
+  ['who won 2023', o => /Most weekly high scores/.test(o.body) || 'no season detail'],
   // ---- things it must not pretend to know
   ['who drafted Justin Jefferson', o => (o.soon || []).some(s => /Draft/.test(s)) || JSON.stringify(o.soon)],
   ['worst injury luck', o => (o.soon || []).some(s => /Injury/.test(s)) || JSON.stringify(o.soon)],
@@ -153,6 +171,18 @@ const CASES = [
         l.sort((a, b) => worst ? a.p - b.p || b.l - a.l : b.p - a.p || b.w - a.w); return l[0].n; },
       mostCount: (f, set) => { const by = {}; GL.filter(r => (set === 'all' || (set === 'po') === r.po) && f(r)).forEach(r => { by[r.mgr] = (by[r.mgr] || 0) + 1; }); return Object.entries(by).sort((a, b) => b[1] - a[1])[0][0]; },
       topSl: (f, set) => Math.max(...GL.filter(r => (set === 'all' || (set === 'po') === r.po) && f(r)).map(r => r.pts)),
+      longestRun: (type, n) => { let best = 0; const by = {}; GL.filter(r => !r.po && (!n || r.mgr === n)).forEach(r => (by[r.y + '|' + r.mgr] = by[r.y + '|' + r.mgr] || []).push(r));
+        Object.values(by).forEach(a => { a.sort((x, z) => x.wk - z.wk); let c = 0; a.forEach(r => { const res = r.pts === r.opts ? 'T' : r.pts > r.opts ? 'W' : 'L'; c = res === type ? c + 1 : 0; if (c > best) best = c; }); }); return best; },
+      neverBeaten: n => { const w = {}; reg.concat(po).filter(g => g.ma === n || g.mb === n).forEach(g => { const o = g.ma === n ? g.mb : g.ma, oWon = (g.ma === o) === (g.pa > g.pb); w[o] = (w[o] || 0) + (oWon ? 1 : 0); }); return Object.keys(w).filter(o => w[o] === 0); },
+      seedTitles: k => R.filter(r => r.seed === k && r.place === 1).reduce((s, r) => s + r.share, 0),
+      seedN: k => R.filter(r => r.seed === k).length,
+      teamNames: n => new Set(R.filter(r => r.mgr === n).map(r => r.team)).size,
+      tradeCount: n => D.trade.log.filter(x => x.ma === n || x.mb === n).length,
+      mostTops: () => { const c = {}; const wk = {}; GL.filter(r => !r.po).forEach(r => (wk[r.y + '|' + r.wk] = wk[r.y + '|' + r.wk] || []).push(r));
+        Object.values(wk).forEach(a => { const top = a.slice().sort((x, z) => z.pts - x.pts)[0]; c[top.mgr] = (c[top.mgr] || 0) + 1; }); return Object.entries(c).sort((a, b) => b[1] - a[1])[0][0]; },
+      badBeats: () => { const c = {}; const wk = {}; GL.filter(r => !r.po).forEach(r => (wk[r.y + '|' + r.wk] = wk[r.y + '|' + r.wk] || []).push(r));
+        Object.values(wk).forEach(a => a.forEach(r => { const beat = a.filter(x => x.pts < r.pts).length; if (beat >= (a.length - 1) / 2 && r.pts < r.opts) c[r.mgr] = (c[r.mgr] || 0) + 1; }));
+        return Object.entries(c).sort((a, b) => b[1] - a[1])[0][0]; },
       signed: v => (Math.abs(v).toFixed(2) === '0.00' ? '' : v > 0 ? '+' : '−') + Math.abs(v).toFixed(2),
     };
     return cases.map(([q, src]) => {

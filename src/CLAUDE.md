@@ -203,6 +203,18 @@ type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
   as counts. A one-manager answer always shows the layer underneath: the same seasons with the
   slice taken out, and the league rank in the slice (4+ games). Week-based and projection
   questions mean the regular season unless playoffs are named; the rest use every game.
+- **The third layer is the detail under every answer**: a career gets "Inside the numbers"
+  (best and worst season, highest and lowest score, weekly highs and lows, streaks, nemesis,
+  favorite opponent, trades, team names); a head to head gets "Inside the matchup" (each
+  side's scoring, biggest wins, closest game, playoffs apart, current run, by season); a
+  season gets its one-game records. Other kinds of question: streaks, "who has never beaten
+  X" / "who has X never beaten", "who does X own", seeds ("how often does the 1 seed win",
+  "every seed"), "does the best team win", team names, one manager's trades, weekly high and
+  low scores, bad beats (lost while outscoring half the league) and lucky wins.
+- **Typo repair never rewrites a word the patterns use**: the vocabulary is filled from
+  `parse`'s own source, so a new pattern word is protected automatically.
+- **Who won a trade** needs each player's points before and after; it is answered with what
+  is coming until `D.playerStats` exists. That is the natural next layer once Yahoo lands.
 - **Adding a slice** is three edits: the phrase in `parse` (the block above `/* weeks */`),
   the test in `inSlice`, the words in `sliceLine`. Then a case in `test_ask.js` whose answer is
   computed from its own independent game log, not from ask.js.

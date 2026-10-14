@@ -149,10 +149,10 @@ const Ask=(()=>{
       say:'Waiver claims come with the Yahoo connection. Season totals of roster moves are here now: try "most roster moves".'},
     {re:/\b(started|starter|starters|starting lineup|lineup|lineups|benched|bench points|start sit|start or sit)\b/,has:()=>!!D.lineups,
       say:'Lineups (who started, who sat) come with the Yahoo connection.'},
+    {re:/\b(who won (?:the |that |this )?trades?|won (?:the |that )?trade|trade winners?|best trades?|worst trades?|lopsided trades?|fleeced|robbery)\b/,has:()=>!!D.playerStats,
+      say:'Who won a trade (each player\u2019s points before and after it) comes with the Yahoo connection. The deals themselves are here now.'},
     {re:/\b(yards|touchdowns|tds|receptions|targets|carries|fantasy points)\b/,has:()=>!!D.playerStats,
       say:'Player stats come with the Yahoo connection.'},
-    {re:/\b(streak|streaks|in a row|straight wins|straight losses)\b/,has:()=>false,
-      say:'Win streaks are not tallied yet.'},
   ];
   const STOP=new Set(('a an the of in on at for to from by with and or but is was were are be been do did does has have had '+
     'what whats which who whom whose how many much when where why ever all time all-time history overall '+
@@ -169,6 +169,7 @@ const Ask=(()=>{
      before anything else reads it. Each pair is (what gets typed, what it means). Kept dry
      on purpose: these translate, they do not editorialise. */
   const SAY=[
+    [/\b(does the best team (?:win|ever win)|best team wins?|how often does the best team win|does the top seed win)\b/g,' bestteamwins '],
     [/\b(goat|greatest of all time|best manager|best owner|top dog|king of the league|winningest)\b/g,' most titles '],
     [/\b(worst manager|worst owner|sucks|sucked|trash|garbage|bum|scrub)\b/g,' worst win percentage '],
     [/\b(robbed|screwed|cursed|snake ?bit|snakebitten|hard done by)\b/g,' unluckiest '],
@@ -187,8 +188,10 @@ const Ask=(()=>{
     [/\b(worst finish(?:er|ers)?|fades|fade|collapses|collapse|worst down the stretch)\b/g,' worst record last 4 weeks '],
     [/\b(most upsets|upset king|giant killer)\b/g,' most wins as underdog '],
     [/\b(gets upset|got upset|upset the most|most upset losses)\b/g,' most losses as favorite '],
-    [/\b(bad beat|bad beats|tough luck losses?|unlucky losses?)\b/g,' most losses scoring 130+ '],
-    [/\b(lucky wins?|stole wins?|backdoor wins?)\b/g,' most wins scoring under 110 '],
+    [/\b(bad beat|bad beats|tough luck losses?|unlucky losses?|robbed weeks?)\b/g,' most losses above the median '],
+    [/\b(lucky wins?|stole wins?|backdoor wins?|stolen wins?|ugly wins?)\b/g,' most wins below the median '],
+    [/\b(nemesis|nemeses|kryptonite|bogeyman|bogey team|toughest opponent|hardest opponent|cant beat|can not beat|cannot beat)\b/g,' who owns '],
+    [/\b(punching bag|punching bags|favou?rite victim|favou?rite victims|easiest opponent|easy wins? against|owns the most|bullies the most)\b/g,' victims '],
   ];
   /* Typos. Every word the reader knows -- names, team names, players, measures and the
      ordinary words of a question -- is the dictionary. A word it does not know is swapped
@@ -203,6 +206,10 @@ const Ask=(()=>{
   Object.values(GAMEMET).forEach(g=>g.syn.forEach(p=>p.split(' ').forEach(w=>addV(w,'met'))));
   Object.keys(PLAINTEAMS).forEach(k=>k.split(' ').forEach(w=>addV(w,'team')));
   STOP.forEach(w=>addV(w,'word'));
+  /* every word inside the reader's own patterns is known by definition: "names" must not be
+     "corrected" to a player called James, nor "weekly" to "weeks". Pulled from the pattern
+     source itself so a new pattern can never be forgotten here. */
+  String(parseSrc()).replace(/\\[a-z]/g,' ').match(/[a-z]{3,}/g).forEach(w=>{if(!VOCAB.has(w))VOCAB.set(w,'word');});
   /* the words that carry a question's meaning outrank a team name that happens to be one
      slip away: "sart" is "start", not the Poison Dart Frogs */
   ('start starts finish finisher fade fades upset upsets stretch closer choke choker robbed goat fraud owns clutch '+
@@ -247,6 +254,7 @@ const Ask=(()=>{
   const say=t=>{SAY.forEach(([re,to])=>{t=t.replace(re,to);}); return t.replace(/\s+/g,' ');};
 
   /* ---------------------------------------------------------------- the reader */
+  function parseSrc(){return parse.toString();}
   function parse(text){
     const q={raw:text,mgrs:[],teams:[],players:[],years:[],weeks:[],metrics:[],game:null,types:null,final:false,
       want:null,per:null,career:false,h2h:false,amb:null,soon:[],notes:[],missing:[],ignored:[],sl:{},split:null};
@@ -328,6 +336,19 @@ const Ask=(()=>{
     else if(eat(/ (?:after|coming off|following) (?:a )?(?:win|wins|victory|w) /))sl.prev='W';
     if(eat(/ (?:in wins|in his wins|when (?:they|he) won|in victories) /))sl.res='W';
     else if(eat(/ (?:in losses|in his losses|when (?:they|he) lost|in defeats) /))sl.res='L';
+    if(eat(/ (?:weekly high scores?|weekly highs?|high scores? of the week|top scores? of the week|highest scorer of the week|top scorer of the week|weeks top score|top scorer|most points that week|week high) /))sl.top=true;
+    else if(eat(/ (?:weekly low scores?|weekly lows?|low scores? of the week|lowest scorer of the week|bottom scorer of the week|lowest score of the week|week low) /))sl.bottom=true;
+    if(eat(/ (?:above the median|above median|top half(?: of the league)?(?: that week)?|outscored half the league) /))sl.above=true;
+    else if(eat(/ (?:below the median|below median|bottom half(?: of the league)?(?: that week)?) /))sl.below=true;
+    if((m=eat(/ (?:longest |biggest |best |worst |current )?(win|winning|losing|loss|lose) ?streaks? /)))q.streak=/^(win|winning)$/.test(m[1])?'W':'L';
+    else if(eat(/ (?:longest |current )?streaks? /))q.streak='W';
+    if(eat(/ never (?:beaten|beat|won against|got a win against|has a win over|have beaten|has beaten|beats) /))q.never=true;
+    if(eat(/ (?:team names?|teams names|team name history|names of (?:his|their) teams|his teams|their teams|team history) /))q.teamNames=true;
+    if(eat(/ victims /)||/ who does [a-z]+(?: [a-z]+)? own /.test(q.said))q.victims=true;
+    if(eat(/ bestteamwins /))q.bestWin=true;
+    if((m=eat(/ (?:the )?(?:no |number |#)?(1|2|3|4|5|6|one|two|three|four|five|six|top|first|second|third|fourth|fifth|sixth) seeds? /)))
+      q.seedQ={top:1,first:1,second:2,third:3,fourth:4,fifth:5,sixth:6}[m[1]]||num(m[1]);
+    else if(eat(/ (?:by seed|each seed|every seed|seeds|seeding results) /))q.seedQ='all';
     if(eat(/ (?:by week|each week|week by week|per week|every week) /))q.split='wk';
     else if(eat(/ (?:by season|each season|every season|per season|season by season|year by year|by year|each year) /))q.split='y';
     /* weeks */
@@ -384,8 +405,10 @@ const Ask=(()=>{
   const scopeLine=(yrs,types)=>{
     const s=yrs.length?(yrs.length===1?String(yrs[0]):yearList(yrs)):'all '+nOf(SEA.length,'season')+', '+SEA[0]+'–'+LAST;
     return s+(types==='po'?' · playoffs':types==='reg'?' · regular season':'');};
-  const tbl=(head,rows)=>`<div class="scroll"><table class="ask-t">${head.some(Boolean)?`<thead><tr>${head.map((h,i)=>`<th${i?' class="num"':''}>${h}</th>`).join('')}</tr></thead>`:''}<tbody>${
-    rows.map(r=>'<tr>'+r.map((c,i)=>`<td${i?' class="num"':''}>${c}</td>`).join('')+'</tr>').join('')}</tbody></table></div>`;
+  const isNum=c=>/^[\s\u2212+\-]*[\d.,]+(?:[\u2013\-][\d.,]+)*(?:%|[ \u00a0](?:wins?|games?|a game|points?))?\s*(?:<span class="dim">[^<]*<\/span>)?$/.test(String(c).replace(/<(?!\/?span)[^>]+>/g,'').trim());
+  const tbl=(head,rows)=>{const num=head.map((h,i)=>i>0&&rows.length&&rows.every(r=>r[i]==null||r[i]===''||isNum(r[i])));
+    return `<div class="scroll"><table class="ask-t">${head.some(Boolean)?`<thead><tr>${head.map((h,i)=>`<th${num[i]?' class="num"':''}>${h}</th>`).join('')}</tr></thead>`:''}<tbody>${
+    rows.map(r=>'<tr>'+r.map((c,i)=>`<td${num[i]?' class="num"':''}>${c}</td>`).join('')+'</tr>').join('')}</tbody></table></div>`;};
   const go=(label,run,primary)=>({label,run,primary:!!primary});
   /* where each measure lives on the page */
   const SECNAME={champions:'Champions',alltime:'the All-Time Table',power:'Power Index',luck:'the Luck Ledger',advanced:'Advanced',
@@ -416,6 +439,12 @@ const Ask=(()=>{
       out.choose=q.amb; return out;}
     if(q.players.length)return player(q,out);
     if(q.teams.length)return team(q,out,yrs);
+    if(q.seedQ&&!q.mgrs.length)return seeds(q,out,yrs);
+    if(q.bestWin)return bestWins(q,out,yrs);
+    if(q.streak)return streaks(q,out,yrs);
+    if(q.never&&q.mgrs.length===1)return never(q,out,yrs);
+    if(q.teamNames&&q.mgrs.length===1)return teamNames(q,out);
+    if(q.victims&&q.mgrs.length===1)return owners(q,out,yrs);
     if(sliced(q))return ledger(q,out,yrs);
     if(q.mgrs.length>=2)return pair(q,out,yrs);
     if(q.mgrs.length===1&&q.h2h&&(q.want||/ who /.test(q.said))&&!q.metrics.length&&!q.game)return owners(q,out,yrs);
@@ -466,6 +495,7 @@ const Ask=(()=>{
       if(ks.length===1&&val(ks[0],o)!=null&&val(ks[0],o)!==undefined){out.big=show(ks[0],val(ks[0],o),o);
         if(MET[ks[0]].rate||ks[0]==='luck'){const pool=careerPool(ks[0],yrs);
           const rank=rankOf(pool,n,ks[0]); if(rank)out.sub+=' · '+rank;}}
+      if(ks.length===1&&ks[0]==='trades')return tradeCard(n,out,yrs);
       out.body=tbl(['','Value'],rows);
       out.acts=[mgrAct(n),secAct(MET[ks[0]].sec)];
     }else{
@@ -473,7 +503,7 @@ const Ask=(()=>{
       const p=poLine(n,yrs);
       out.body=tbl(['','Value'],[['Win %',pct(o.winpct)],['Points per game',F2(o.ppg)],['Power index',F1(o.cpi)],['Luck',sg(o.luck,2)+' wins'],
         ['Podium finishes',String(o.podium)],['Playoff appearances',String(o.apps)],['Playoff record',p.g?rec(p.w,p.l):'—'],
-        ['Average finish',F2(o.avgPlace)],['Best finish',o.best===1?'Champion':ord(o.best)]]);
+        ['Average finish',F2(o.avgPlace)],['Best finish',o.best===1?'Champion':ord(o.best)]])+inside(n,yrs);
       out.acts=[mgrAct(n),secAct('alltime')];
     }
     return out;
@@ -574,6 +604,27 @@ const Ask=(()=>{
     const last=games.slice().sort((x,y)=>y.y-x.y||(y.wk||0)-(x.wk||0)).slice(0,6);
     out.body=tbl(['Game','Winner','Score'],last.map(g=>{const aw=g.pa>g.pb;
       return [esc(g.lab),esc((aw?g.ma:g.mb).split(' ').slice(-1)[0]),F2(Math.max(g.pa,g.pb))+'–'+F2(Math.min(g.pa,g.pb))];}));
+    /* the layer under a head to head: each side's scoring, the biggest wins, the closest
+       game, the playoffs on their own, the current run and season by season */
+    const gl=games1().filter(r=>r.mgr===a&&r.oppMgr===b&&(!yrs.length||yrs.includes(r.y))&&(key==='all'||(key==='po')===r.po));
+    if(gl.length){
+      const x=tot(gl), A=a.split(' ').slice(-1)[0], B=b.split(' ').slice(-1)[0];
+      const m=r=>r.pts-r.opts, when=r=>r.y+(r.po?' '+(r.rnd||'playoffs'):' week '+r.wk);
+      const aw=gl.filter(r=>r.win).sort((r,z)=>m(z)-m(r))[0], bw=gl.filter(r=>!r.win&&!r.tie).sort((r,z)=>m(r)-m(z))[0];
+      const cl=gl.slice().sort((r,z)=>Math.abs(m(r))-Math.abs(m(z)))[0];
+      const seq=gl.slice().sort((r,z)=>z.y-r.y||(z.po?1:0)-(r.po?1:0)||z.wk-r.wk);
+      let run=0; const lw=seq[0].win; for(const r of seq){if(!r.tie&&r.win===lw)run++; else break;}
+      const po=tot(gl.filter(r=>r.po)), rg=tot(gl.filter(r=>!r.po));
+      const L=[[A+' scores',F2(x.ppg)+' a game'],[B+' scores',F2(x.papg)+' a game']];
+      if(rg.g&&po.g){L.push(['Regular season',rec(rg.w,rg.l,rg.t)]); L.push(['Playoffs',rec(po.w,po.l,po.t)]);}
+      if(aw)L.push([A+'’s biggest win',F2(m(aw))+' <span class="dim">'+esc(when(aw))+', '+F2(aw.pts)+'–'+F2(aw.opts)+'</span>']);
+      if(bw)L.push([B+'’s biggest win',F2(-m(bw))+' <span class="dim">'+esc(when(bw))+', '+F2(bw.opts)+'–'+F2(bw.pts)+'</span>']);
+      if(cl&&gl.length>1)L.push(['Closest game',F2(Math.abs(m(cl)))+' <span class="dim">'+esc(when(cl))+', won by '+esc(cl.win?A:B)+'</span>']);
+      L.push(['Current run',(lw?A:B)+' has won the last '+(run===1?'one':run)]);
+      const ys=[...new Set(gl.map(r=>r.y))].sort((p,p2)=>p-p2);
+      if(ys.length>1)L.push(['By season',ys.map(y=>{const t=tot(gl.filter(r=>r.y===y)); return y+' '+rec(t.w,t.l,t.t);}).join(' · ')]);
+      out.body+=tbl(['Inside the matchup',''],L);
+    }
     if(games.length>6)out.notes.push('The six most recent of '+games.length+' meetings.');
     if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(D.wkYears||[])+'; playoff games for every season.');
     out.acts=[h2hAct(a,b),mgrAct(a)]; return out;
@@ -581,6 +632,7 @@ const Ask=(()=>{
   /* "who owns Kaiper": everybody's record against one manager, best first */
   function owners(q,out,yrs){
     const n=q.mgrs[0], key=q.types==='po'?'po':q.types==='reg'?'reg':'all';
+    if(q.victims)return victims(q,out,yrs,n,key);
     const lo=q.want==='lo'||q.want==='worst';
     const vs={};
     MX[key].g.filter(g=>(g.ma===n||g.mb===n)&&(!yrs.length||yrs.includes(g.y))).forEach(g=>{
@@ -618,9 +670,14 @@ const Ask=(()=>{
     Object.values(run).forEach(a=>{a.sort((x,z)=>x.wk-z.wk); a.forEach((r,i)=>{r.prev=i?(a[i-1].pts>a[i-1].opts?'W':'L'):null;});});
     rows.forEach(r=>{const o=rowOf[r.y+'|'+r.oppMgr]; r.oppPct=o?(o.w+o.t/2)/o.g:null; r.oppPO=o?o.po:null;
       r.win=r.pts>r.opts; r.tie=r.pts===r.opts;});
+    /* where each score ranked in its own week: the week's high and low, and the median line */
+    const wkOf={}; rows.filter(r=>!r.po).forEach(r=>(wkOf[r.y+'|'+r.wk]=wkOf[r.y+'|'+r.wk]||[]).push(r));
+    Object.values(wkOf).forEach(a=>{const sorted=a.slice().sort((x,z)=>z.pts-x.pts);
+      a.forEach(r=>{r.wkRank=sorted.findIndex(x=>x===r)+1; r.wkN=a.length; r.top=r.wkRank===1; r.bottom=r.wkRank===a.length;
+        const beat=a.filter(x=>x.pts<r.pts).length; r.above=beat>=(a.length-1)/2;});});
     return GLC=rows;
   }
-  const WEEKISH=s=>s.from!=null||s.to!=null||s.lastN||s.half||s.prev||s.dog||s.fav;
+  const WEEKISH=s=>s.from!=null||s.to!=null||s.lastN||s.half||s.prev||s.dog||s.fav||s.top||s.bottom||s.above||s.below;
   function sliced(q){const s=q.sl;
     if(Object.keys(s).length||q.metrics.some(k=>k==='beatproj'||k==='vsproj')||(q.game==='upset'))return true;
     if(q.split==='wk'&&q.mgrs.length)return true;
@@ -645,6 +702,8 @@ const Ask=(()=>{
     if(s.oppWin===true&&!(r.oppPct>.5))return false; if(s.oppWin===false&&!(r.oppPct<.5))return false;
     if(s.oppPO===true&&!r.oppPO)return false; if(s.oppPO===false&&r.oppPO!==false)return false;
     if(s.prev&&r.prev!==s.prev)return false;
+    if(s.top&&!r.top)return false; if(s.bottom&&!r.bottom)return false;
+    if(s.above&&!(r.po?false:r.above))return false; if(s.below&&!(r.po?false:!r.above))return false;
     if(s.res==='W'&&!r.win)return false; if(s.res==='L'&&(r.win||r.tie))return false;
     return true;}
   function tot(rs){let w=0,l=0,t=0,pts=0,opp=0,exp=0,expG=0,expW=0,bp=0,bpN=0,vp=0,hi=-Infinity,lo=Infinity;
@@ -669,7 +728,7 @@ const Ask=(()=>{
   /* "how many", "how often" and "most ..." questions about a slice are counts; otherwise the
      measure named, and a record when none is */
   const lmOf=q=>{const k=q.metrics.find(k=>['ppg','pf','pa','allplay','luck','beatproj','vsproj','diff','wins','losses'].includes(k));
-    const counting=/ (?:how many|how often|number of|count) /.test(q.said)||(/^(most|least|fewest)$/.test(q.wantWord||'')&&!q.metrics.length&&/ (?:games|times|weeks) /.test(q.said));
+    const counting=/ (?:how many|how often|number of|count) /.test(q.said)||(/^(most|least|fewest)$/.test(q.wantWord||'')&&!q.metrics.length&&(/ (?:games|times|weeks) /.test(q.said)||Object.keys(q.sl).length>0));
     if(k==='wins'||k==='losses')return q.want||counting?k:'pct';
     if(!k&&counting)return 'n';
     return {ppg:'ppg',pf:'ppg',pa:'papg',allplay:'ap',luck:'luck',beatproj:'bp',vsproj:'vp',diff:'margin'}[k]||'pct';};
@@ -688,6 +747,8 @@ const Ask=(()=>{
     if(s.oppWin===true)bits.push('Against winning teams'); if(s.oppWin===false)bits.push('Against losing teams');
     if(s.oppPO===true)bits.push('Against playoff teams'); if(s.oppPO===false)bits.push('Against non-playoff teams');
     if(s.prev)bits.push('After a '+(s.prev==='L'?'loss':'win'));
+    if(s.top)bits.push('Top score of the week'); if(s.bottom)bits.push('Lowest score of the week');
+    if(s.above)bits.push('Outscored half the league or more'); if(s.below)bits.push('Outscored under half the league');
     if(s.res)bits.push(s.res==='W'?'In wins':'In losses');
     if(!bits.length)return set==='reg'?'Every regular-season game':set==='po'?'Every playoff game':'Every game';
     bits.push(set==='reg'?'regular season':set==='po'?'playoffs':'all games');
@@ -695,7 +756,8 @@ const Ask=(()=>{
   const MINGAMES=4;
 
   function ledger(q,out,yrs){
-    const set=gameSet(q), all=games1(), lm=LM[lmOf(q)];
+    const set=gameSet(q), all=games1(), noun=q.sl.top?'weekly high score':q.sl.bottom?'weekly low score':'game';
+    const lm=lmOf(q)==='n'?{...LM.n,count:true,lab:noun==='game'?'Games':noun.replace(/^./,c=>c.toUpperCase())+'s',s:x=>nOf(x.g,noun)}:LM[lmOf(q)];
     const pool=all.filter(r=>inSlice(r,q,yrs,set));
     if(q.game)return sliceGames(q,out,pool,set);
     const seasonsCovered=[...new Set(all.filter(r=>!r.po).map(r=>r.y))];
@@ -737,8 +799,8 @@ const Ask=(()=>{
       const rest=all.filter(r=>r.mgr===n&&sz.includes(r.y)&&(set==='all'||(set==='po')===r.po)&&!inSlice(r,q,yrs,set)), xr=tot(rest);
       const i=ranked.findIndex(o=>o.n===n);
       const ctx=[];
-      if(xr.g)ctx.push([set==='all'?'His other games':'The rest of those seasons',lm===LM.n?nOf(xr.g,'game'):lm.s(xr)+' <span class="dim">'+nOf(xr.g,'game')+'</span>']);
-      if(lm===LM.n&&x.g+xr.g)out.big=x.g+' of '+(x.g+xr.g)+' <span class="dim">'+pct(x.g/(x.g+xr.g))+' of his games</span>';
+      if(xr.g)ctx.push([set==='all'?'His other games':'The rest of those seasons',lm.count?nOf(xr.g,'game'):lm.s(xr)+' <span class="dim">'+nOf(xr.g,'game')+'</span>']);
+      if(lm.count&&x.g+xr.g)out.big=x.g+' of '+(x.g+xr.g)+' <span class="dim">'+pct(x.g/(x.g+xr.g))+' of his games</span>';
       if(i>=0)ctx.push(['League rank in this slice',ord(i+1)+' of '+ranked.length+' <span class="dim">'+MINGAMES+'+ games</span>']);
       const lg=tot(pool); if(lmOf(q)!=='pct'&&lg.g)ctx.push(['League average in this slice',lm.s(lg)]);
       if(q.split==='wk'){
@@ -757,7 +819,7 @@ const Ask=(()=>{
     const lo=q.want==='lo'||q.want==='worst';
     const list=lo?ranked.slice().reverse():ranked;
     out.title=list.length?list[0].n:'Nobody has '+MINGAMES+' games in that slice';
-    const many=lm===LM.n||lm===LM.wins||lm===LM.losses;
+    const many=lm.count||lm===LM.wins||lm===LM.losses;
     if(list.length){out.big=lm.s(list[0].x); out.sub=(lm.top?lm.top[lo?1:0]:(many?(lo?'Fewest ':'Most '):(lo?'Worst ':'Best '))+lm.lab.toLowerCase())+' · managers with '+MINGAMES+'+ games · '+nOf(pool.length,'team-game')+' in the slice';
       out.body=tbl(['','Manager','Games',lm.lab],list.slice(0,8).map((o,i)=>[String(i+1),mlink(o.n),String(o.x.g),lm.s(o.x)]));
       out.acts=[mgrAct(list[0].n),secAct('weekly')];}
@@ -786,6 +848,158 @@ const Ask=(()=>{
     return out;
   }
 
+  /* ================================================ more kinds of question */
+  /* every run of wins (or losses) inside a regular season, longest first */
+  const RUNC={};
+  function runs(type){
+    if(RUNC[type])return RUNC[type];
+    const out=[], by={};
+    games1().filter(r=>!r.po).forEach(r=>(by[r.y+'|'+r.mgr]=by[r.y+'|'+r.mgr]||[]).push(r));
+    Object.values(by).forEach(a=>{a.sort((x,z)=>x.wk-z.wk); let cur=null;
+      a.forEach(r=>{const res=r.tie?'T':r.win?'W':'L';
+        if(res===type){if(cur){cur.to=r.wk;cur.n++;}else cur={mgr:r.mgr,y:r.y,from:r.wk,to:r.wk,n:1};}
+        else{if(cur)out.push(cur); cur=null;}});
+      if(cur){cur.live=true; out.push(cur);}});
+    return RUNC[type]=out.sort((a,b)=>b.n-a.n||b.y-a.y||a.from-b.from);}
+  const runTxt=x=>x.y+', weeks '+x.from+'–'+x.to+(x.live?' (to the end of the regular season)':'');
+  function streaks(q,out,yrs){
+    const type=q.streak, word=type==='W'?'winning':'losing';
+    let list=runs(type).filter(x=>!yrs.length||yrs.includes(x.y));
+    if(q.mgrs.length)list=list.filter(x=>q.mgrs.includes(x.mgr));
+    out.kind='Longest '+word+' streaks · regular season';
+    if(!list.length){out.title='No '+word+' streaks on record'; return out;}
+    const top=list[0];
+    out.title=top.mgr; out.big=top.n+' '+(type==='W'?'wins':'losses')+' in a row';
+    out.sub=runTxt(top);
+    const tied=list.filter(x=>x.n===top.n).length; if(tied>1)out.sub+=' · '+(tied===2?'one other run':(tied-1)+' other runs')+' as long';
+    out.body=tbl(['','Manager','When','Games'],list.slice(0,8).map((x,i)=>[String(i+1),mlink(x.mgr),esc(runTxt(x)),String(x.n)]));
+    if(q.mgrs.length===1){const o=runs(type==='W'?'L':'W').filter(x=>x.mgr===q.mgrs[0]&&(!yrs.length||yrs.includes(x.y)))[0];
+      if(o)out.notes.push('Longest '+(type==='W'?'losing':'winning')+' run: '+nOf(o.n,'game')+', '+runTxt(o)+'.');}
+    out.notes.push('Counted inside each regular season, '+yearList(D.wkYears||[])+'. Earlier seasons have no game-by-game log.');
+    out.acts=[weekAct(top.y,top.from),mgrAct(top.mgr)]; return out;}
+
+  /* "who has never beaten Alpert" and "who has Alpert never beaten" */
+  function never(q,out,yrs){
+    const n=q.mgrs[0], key=q.types==='po'?'po':q.types==='reg'?'reg':'all';
+    const iN=q.said.indexOf(' never '), at=Math.min(...[q.said.indexOf(' '+lastOf(n)),q.said.indexOf(' '+firstOf(n))].filter(i=>i>=0));
+    const beaten=iN>=0&&at>iN;                       /* the named manager comes after "never beaten" */
+    const vs={};
+    MX[key].g.filter(g=>(g.ma===n||g.mb===n)&&(!yrs.length||yrs.includes(g.y))).forEach(g=>{
+      const o=g.ma===n?g.mb:g.ma, nWon=(g.ma===n)===(g.pa>g.pb);
+      const r=vs[o]=vs[o]||{o,nw:0,ow:0}; nWon?r.nw++:r.ow++;});
+    const list=Object.values(vs).filter(r=>beaten?r.ow===0:r.nw===0).sort((a,b)=>beaten?b.nw-a.nw:b.ow-a.ow);
+    out.kind='Head to head · '+(key==='po'?'playoffs':key==='reg'?'regular season':'every game on record');
+    const sur=x=>x.split(' ').slice(-1)[0];
+    if(beaten){
+      out.title=list.length?(list.length===1?list[0].o+' has':nOf(list.length,'manager')+' have')+' never beaten '+n:'Everyone who has played '+n+' has beaten him';
+      if(list.length)out.body=tbl(['Manager','Record v '+esc(sur(n))],list.map(r=>[mlink(r.o),rec(r.ow,r.nw)]));
+    }else{
+      out.title=list.length?n+' has never beaten '+(list.length===1?list[0].o:nOf(list.length,'manager')):n+' has beaten everyone he has played';
+      if(list.length)out.body=tbl(['Opponent',esc(sur(n))+'’s record'],list.map(r=>[mlink(r.o),rec(r.nw,r.ow)]));
+    }
+    const nm=MG.filter(m=>m!==n&&!vs[m]).length;
+    if(nm)out.notes.push(n+' has never played '+nOf(nm,'manager')+' in a game on record.');
+    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(D.wkYears||[])+'; playoff games for every season.');
+    out.acts=[list.length?h2hAct(n,list[0].o):mgrAct(n),mgrAct(n)]; return out;}
+
+  /* "who does Alpert own": the named manager's best matchups */
+  function victims(q,out,yrs,n,key){
+    const vs={};
+    MX[key].g.filter(g=>(g.ma===n||g.mb===n)&&(!yrs.length||yrs.includes(g.y))).forEach(g=>{
+      const o=g.ma===n?g.mb:g.ma, nWon=(g.ma===n)===(g.pa>g.pb);
+      const r=vs[o]=vs[o]||{name:o,w:0,l:0}; nWon?r.w++:r.l++;});
+    const list=Object.values(vs).filter(r=>r.w+r.l>=3).sort((a,b)=>b.w/(b.w+b.l)-a.w/(a.w+a.l)||b.w-a.w);
+    out.kind='Head to head · '+n+'’s best matchups';
+    if(!list.length){out.title=n+' has not played anyone three times'; out.acts=[mgrAct(n)]; return out;}
+    out.title=n+' owns '+list[0].name; out.big=rec(list[0].w,list[0].l);
+    out.sub=n+'’s record against each opponent · 3+ meetings · '+scopeLine(yrs,q.types);
+    out.body=tbl(['','Opponent','Record','Win %'],list.slice(0,8).map((r,i)=>[String(i+1),mlink(r.name),rec(r.w,r.l),pct(r.w/(r.w+r.l))]));
+    out.acts=[h2hAct(n,list[0].name),mgrAct(n)]; return out;}
+
+  /* seeds: how each one has done in the bracket */
+  function seeds(q,out,yrs){
+    const rs=ROWS.filter(r=>!yrs.length||yrs.includes(r.y)), by={};
+    rs.forEach(r=>(by[r.seed]=by[r.seed]||[]).push(r));
+    const line=k=>{const a=by[k]||[]; return {k,a,n:a.length,titles:a.filter(r=>r.place===1).reduce((x,r)=>x+r.share,0),
+      finals:a.filter(r=>r.place<=2).length,po:a.filter(r=>r.po).length,avg:a.length?a.reduce((x,r)=>x+r.place,0)/a.length:null};};
+    const fin=r=>r.place===1?(r.co?'Co-champion':'Champion'):ord(r.place);
+    out.kind='Seeds · '+scopeLine(yrs);
+    if(q.seedQ!=='all'){const L=line(q.seedQ);
+      out.title='The '+ord(q.seedQ)+' seed';
+      if(!L.n){out.big='Never used'; return out;}
+      out.big=titleTxt(L.titles)+(L.titles===1?' title':' titles')+' in '+nOf(L.n,'season');
+      out.sub='Reached the final '+(L.finals===1?'once':nOf(L.finals,'time'))+' · made the playoffs '+L.po+' of '+L.n+' · average finish '+F2(L.avg);
+      out.body=tbl(['Year','Manager','Team','Record','Finish'],L.a.slice().sort((a,b)=>b.y-a.y).map(r=>[String(r.y),mlink(r.mgr),esc(r.team),rec(r.w,r.l,r.t),fin(r)]));
+    }else{
+      const ks=Object.keys(by).map(Number).sort((a,b)=>a-b);
+      out.title='Every seed'; out.sub='Titles, finals and average finish by regular-season seed';
+      out.body=tbl(['Seed','Seasons','Titles','Finals','Avg finish'],ks.map(k=>{const L=line(k); return [ord(k),String(L.n),titleTxt(L.titles),String(L.finals),F2(L.avg)];}));}
+    out.acts=[secAct('seasons')]; return out;}
+
+  /* does the best team win: the top seed and the top scorer, year by year */
+  function bestWins(q,out,yrs){
+    const ys=SEA.filter(y=>!yrs.length||yrs.includes(y)); let s1=0,pf=0;
+    const lines=ys.map(y=>{const rs=ROWS.filter(r=>r.y===y), top=rs.find(r=>r.seed===1), hp=rs.slice().sort((a,b)=>b.pf-a.pf)[0], ch=rs.filter(r=>r.place===1);
+      if(top&&top.place===1)s1+=top.share; if(hp&&hp.place===1)pf+=hp.share;
+      const f=r=>' <span class="dim">'+(r.place===1?'won it':ord(r.place))+'</span>';
+      return [String(y),top?mlink(top.mgr)+f(top):'—',hp?mlink(hp.mgr)+f(hp):'—',ch.map(r=>mlink(r.mgr)).join(' &amp; ')];});
+    out.kind='Does the best team win?'; out.title='The top seed won '+titleTxt(s1)+' of '+ys.length;
+    out.big=pct(s1/ys.length); out.sub='The team that scored the most points won '+titleTxt(pf)+' of '+ys.length;
+    out.body=tbl(['Year','Top seed','Most points','Champion'],lines);
+    if(ys.includes(2022))out.notes.push('2022 counts as half a title each: the final was voided and the title split.');
+    out.acts=[secAct('seasons')]; return out;}
+
+  /* every name a manager's team has gone by */
+  function teamNames(q,out){
+    const n=q.mgrs[0], rs=(rowsOf[n]||[]).slice().sort((a,b)=>a.y-b.y);
+    out.kind='Team names'; out.title=n; out.big=nOf(new Set(rs.map(r=>r.team)).size,'name')+' in '+nOf(rs.length,'season');
+    out.body=tbl(['Year','Team','Record','Finish'],rs.map(r=>[String(r.y),esc(r.team),rec(r.w,r.l,r.t),r.place===1?(r.co?'Co-champion':'Champion'):ord(r.place)]));
+    out.acts=[mgrAct(n)]; return out;}
+
+  /* one manager's trading: partners, players in and out, the deals themselves */
+  function tradeCard(n,out,yrs){
+    const deals=D.trade.log.filter(x=>(x.ma===n||x.mb===n)&&(!yrs.length||yrs.includes(x.y)));
+    const partners={}, byY={};
+    deals.forEach(x=>{const o=x.ma===n?x.mb:x.ma; partners[o]=(partners[o]||0)+1; byY[x.y]=(byY[x.y]||0)+1;});
+    const inn=deals.reduce((t,x)=>t+(x.ma===n?x.pb:x.pa).length,0), outp=deals.reduce((t,x)=>t+(x.ma===n?x.pa:x.pb).length,0);
+    const top=Object.entries(partners).sort((a,b)=>b[1]-a[1]);
+    out.kind='Trades · '+(yrs.length?yearList(yrs):yearList(D.trade.years||[])); out.title=n; out.big=nOf(deals.length,'trade');
+    out.sub=nOf(top.length,'trading partner')+' · '+inn+' players in, '+outp+' out'+(deals.length?' · by season: '+Object.entries(byY).map(([y,c])=>y+' '+c).join(', '):'');
+    if(deals.length)out.body=tbl(['Partner','Deals'],top.slice(0,6).map(([o,c])=>[mlink(o),String(c)]))+
+      tbl(['When','The deal'],deals.slice().sort((a,b)=>b.y-a.y).slice(0,8).map(x=>['<span style="white-space:nowrap">'+x.d+', '+x.y+'</span>',dealTxt(x)]));
+    if(!D.playerStats)out.notes.push('Who won each of these (every player’s points before and after) comes with the Yahoo connection.');
+    out.acts=[secAct('trades-sec'),mgrAct(n)]; return out;}
+
+  /* the layer under a career: best and worst seasons, biggest game, weekly highs, streaks,
+     the opponent he cannot beat and the one he always does, trades, team names */
+  function inside(n,yrs){
+    const rs=rowsFor(n,yrs); if(!rs.length)return '';
+    const best=rs.slice().sort((a,b)=>b.pi-a.pi)[0], worst=rs.slice().sort((a,b)=>a.pi-b.pi)[0];
+    const fin=r=>r.place===1?(r.co?'co-champion':'champion'):ord(r.place);
+    const gl=games1().filter(r=>r.mgr===n&&(!yrs.length||yrs.includes(r.y)));
+    const hiG=gl.slice().sort((a,b)=>b.pts-a.pts)[0], loG=gl.filter(r=>!r.po).sort((a,b)=>a.pts-b.pts)[0];
+    const when=r=>r.y+(r.po?' '+(r.rnd||'playoffs'):' week '+r.wk);
+    const reg=gl.filter(r=>!r.po);
+    const wr=runs('W').find(x=>x.mgr===n&&(!yrs.length||yrs.includes(x.y))), lr=runs('L').find(x=>x.mgr===n&&(!yrs.length||yrs.includes(x.y)));
+    const vs={};
+    MX.all.g.filter(g=>(g.ma===n||g.mb===n)&&(!yrs.length||yrs.includes(g.y))).forEach(g=>{const o=g.ma===n?g.mb:g.ma, nWon=(g.ma===n)===(g.pa>g.pb);
+      const r=vs[o]=vs[o]||{o,w:0,l:0}; nWon?r.w++:r.l++;});
+    const opp=Object.values(vs).filter(r=>r.w+r.l>=3), wp=r=>r.w/(r.w+r.l);
+    const nem=opp.slice().sort((a,b)=>wp(a)-wp(b)||b.l-a.l)[0], vic=opp.slice().sort((a,b)=>wp(b)-wp(a)||b.w-a.w)[0];
+    const deals=D.trade.log.filter(x=>(x.ma===n||x.mb===n)&&(!yrs.length||yrs.includes(x.y)));
+    const pc={}; deals.forEach(x=>{const o=x.ma===n?x.mb:x.ma; pc[o]=(pc[o]||0)+1;}); const tp=Object.entries(pc).sort((a,b)=>b[1]-a[1])[0];
+    const L=[['Best season',best.y+' '+esc(best.team)+' <span class="dim">'+F1(best.pi)+' power index, '+fin(best)+'</span>']];
+    if(worst!==best)L.push(['Worst season',worst.y+' '+esc(worst.team)+' <span class="dim">'+F1(worst.pi)+', '+fin(worst)+'</span>']);
+    if(hiG)L.push(['Highest score',F2(hiG.pts)+' <span class="dim">'+esc(when(hiG))+' v '+esc(hiG.oppMgr)+'</span>']);
+    if(loG)L.push(['Lowest score',F2(loG.pts)+' <span class="dim">'+esc(when(loG))+' v '+esc(loG.oppMgr)+'</span>']);
+    if(reg.length)L.push(['Weekly high scores',reg.filter(r=>r.top).length+' <span class="dim">and '+reg.filter(r=>r.bottom).length+' weekly lows, in '+reg.length+' logged weeks</span>']);
+    if(wr)L.push(['Longest winning streak',nOf(wr.n,'game')+' <span class="dim">'+esc(runTxt(wr))+'</span>']);
+    if(lr)L.push(['Longest losing streak',nOf(lr.n,'game')+' <span class="dim">'+esc(runTxt(lr))+'</span>']);
+    if(nem&&wp(nem)<.5)L.push(['Nemesis',mlink(nem.o)+' <span class="dim">'+rec(nem.w,nem.l)+'</span>']);
+    if(vic&&wp(vic)>.5)L.push(['Favorite opponent',mlink(vic.o)+' <span class="dim">'+rec(vic.w,vic.l)+'</span>']);
+    if(deals.length)L.push(['Trades',deals.length+(tp?' <span class="dim">most with '+esc(tp[0])+' ('+tp[1]+')</span>':'')]);
+    const names=new Set(rs.map(r=>r.team)).size; if(names>1)L.push(['Team names',String(names)]);
+    return tbl(['Inside the numbers',''],L);}
   const dealTxt=x=>esc(x.ma)+' sent '+esc(x.pa.join(', '))+' to '+esc(x.mb)+' for '+esc(x.pb.join(', '));
 
   /* a season */
@@ -806,7 +1020,19 @@ const Ask=(()=>{
       ['Runner-up',esc(c.runner||'—'),''],['Third',esc(c.third||'—'),''],
       line('Top seed',seed1,seed1?rec(seed1.w,seed1.l,seed1.t):''),
       line('Best power index',hiPI,hiPI?F1(hiPI.pi):''),line('Luckiest',lucky,lucky?sg(lucky.luck,2)+' wins':''),
-      ['Last place',esc(c.last||'—'),'']]);
+      ['Last place',esc(c.last||'—'),'']].concat((()=>{
+        /* the season's single-game records, for the years with a game log */
+        const L=[], gl=games1().filter(r=>r.y===y&&!r.po);
+        const unl=rs.slice().sort((a,b)=>a.luck-b.luck)[0]; if(unl)L.push(line('Unluckiest',unl,sg(unl.luck,2)+' wins'));
+        if(gl.length){const hi=gl.slice().sort((a,b)=>b.pts-a.pts)[0], lo=gl.slice().sort((a,b)=>a.pts-b.pts)[0];
+          const bl=gl.filter(r=>r.win).sort((a,b)=>(b.pts-b.opts)-(a.pts-a.opts))[0];
+          const hs={}; gl.filter(r=>r.top).forEach(r=>{hs[r.mgr]=(hs[r.mgr]||0)+1;}); const hm=Object.entries(hs).sort((a,b)=>b[1]-a[1])[0];
+          L.push(['Highest score',mlink(hi.mgr),F2(hi.pts)+' <span class="dim">week '+hi.wk+'</span>']);
+          L.push(['Lowest score',mlink(lo.mgr),F2(lo.pts)+' <span class="dim">week '+lo.wk+'</span>']);
+          if(bl)L.push(['Biggest blowout',mlink(bl.mgr)+' <span class="dim">over '+esc(bl.oppMgr)+'</span>',F2(bl.pts-bl.opts)+' <span class="dim">week '+bl.wk+'</span>']);
+          if(hm)L.push(['Most weekly high scores',mlink(hm[0]),String(hm[1])]);}
+        const ty=(D.trade.byYear||{})[y]; if(ty){const tm=Object.entries(ty).sort((a,b)=>b[1]-a[1])[0]; L.push(['Most trades',mlink(tm[0]),String(tm[1])]);}
+        return L;})()));
     out.acts=[seasonAct(y),...(c.mgrs||[]).slice(0,1).map(mgrAct)]; out.acts[0].primary=true; if(out.acts[1])out.acts[1].primary=false;
     return out;
   }
@@ -854,9 +1080,10 @@ const Ask=(()=>{
     const ts=p.trades.slice().sort((a,b)=>a.y-b.y);
     out.big=ts.length?'Traded '+(ts.length===1?'once':ts.length===2?'twice':ts.length+' times'):'No trades on record';
     out.sub='In the trade logs for '+yearList(D.trade.years||[]);
-    if(ts.length)out.body=tbl(['When','From','To','Deal'],ts.map(x=>{const fromA=x.pa.includes(n);
-      return [x.d+' '+x.y,mlink(fromA?x.ma:x.mb),mlink(fromA?x.mb:x.ma),dealTxt(x)];}));
-    if(!D.playerStats)out.notes.push('His fantasy points, who drafted him and his injury history come with the Yahoo connection.');
+    if(ts.length)out.body=tbl(['When','The deal'],ts.map(x=>{const fromA=x.pa.includes(n), got=fromA?x.mb:x.ma, gave=fromA?x.ma:x.mb;
+      return ['<span style="white-space:nowrap">'+x.d+', '+x.y+'</span>',
+        '<b>'+mlink(got)+'</b> got '+esc((fromA?x.pa:x.pb).join(', '))+'<br><b>'+mlink(gave)+'</b> got '+esc((fromA?x.pb:x.pa).join(', '))];}));
+    if(!D.playerStats)out.notes.push('Who won each trade (every player\u2019s points before and after it), and his scoring, draft and injury history, come with the Yahoo connection.');
     out.acts=[secAct('trades-sec')]; return out;
   }
 
@@ -867,13 +1094,23 @@ const Ask=(()=>{
     return [a&&b?a.split(' ').slice(-1)[0]+' vs '+b.split(' ').slice(-1)[0]:null,'who has the most titles','luckiest season ever',
       'highest scoring week','who won '+(LAST-2),act[2]?act[2].name.split(' ')[0]+' in the playoffs':null,'most trades',
       pl?pl+' trade':null,'week 1 '+LAST,'unluckiest manager'].filter(Boolean);};
+  const GROUPS=()=>{
+    const act=M.filter(m=>m.last===LAST).sort(bySeasons).map(m=>m.name.split(' ').slice(-1)[0]);
+    const [a,b,c,d]=act, pl=PNAMES.slice().sort((x,y)=>PL[y].trades.length-PL[x].trades.length)[0];
+    return [['Head to head',[`${a} vs ${b}`,`who owns ${c}`,`who has never beaten ${d}`,`who does ${b} own`,`${c} vs ${d} in close games`]],
+      ['Leaders',['who has the most titles','unluckiest manager','best win percentage','most trades','most weekly high scores']],
+      ['Inside a season',[`${a} record in weeks 1-4`,'best start','who fades',`${b} record after a loss`,`${c} by week`]],
+      ['Situations',['most upsets','bad beats','lucky wins','record when scoring under 100','who beats their projection the most']],
+      ['One game',['highest scoring week','biggest blowout','biggest upset','longest winning streak','longest losing streak']],
+      ['Seasons and teams',['who won '+(LAST-2),'does the best team win','how often does the 1 seed win','every seed',`${a} team names`]],
+      ['Players and trades',[pl?pl+' trade':null,`${c} trades`,`${a} and ${b} trades`].filter(Boolean)]];};
+
   let LAST_OUT=null;
   function render(){
     const inp=$('#askIn'), box=$('#askOut'); if(!inp||!box)return;
     const txt=inp.value.trim();
     if(!txt){LAST_OUT=null;
-      box.innerHTML=`<div class="ask-k">Try one</div><div class="ask-ex">${EXAMPLES().map(e=>`<button type="button" data-ask="${esc(e)}">${esc(e)}</button>`).join('')}</div>
-        <p class="ask-note">Names, seasons, weeks, team names and the players in the trade logs all work. Player stats, drafts and injuries arrive with the Yahoo connection.</p>`;
+      box.innerHTML=GROUPS().map(([h,qs])=>`<div class="ask-grp"><div class="ask-k">${esc(h)}</div><div class="ask-ex">${qs.map(e=>`<button type="button" data-ask="${esc(e)}">${esc(e)}</button>`).join('')}</div></div>`).join('');
       $$('[data-ask]',box).forEach(b=>b.onclick=()=>{inp.value=b.dataset.ask; inp.focus(); render();});
       return;}
     let out;
@@ -907,7 +1144,7 @@ const Ask=(()=>{
   function open(pre){
     RETFOCUS=document.activeElement;
     $('#mTitle').textContent='Ask the record book';
-    $('#mSub').textContent='Plain English · the same numbers as the page';
+    $('#mSub').textContent='';
     $('#mBody').innerHTML=`<div class="ask"><div class="ask-in"><input id="askIn" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"
       aria-label="Ask the record book" placeholder="e.g. ${esc(EXAMPLES()[0]||'who has the most titles')}"></div><div id="askOut" aria-live="polite"></div></div>`;
     ov.classList.add('on'); document.body.style.overflow='hidden'; tabTitle('Ask the record book');
