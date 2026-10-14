@@ -81,6 +81,28 @@ const CASES = [
   ["kevin's superb optimal team", o => o.kind.startsWith('Team') || o.kind],
   ['Stefon Diggs', o => o.kind === 'Player' && o.title === 'Stefon Diggs' || `${o.kind} ${o.title}`],
   ['diggs trade', o => o.title === 'Stefon Diggs' || o.title],
+  // ---- slices of games: weeks, situations, opponents, projections (the onion layers)
+  ['Wu record in weeks 1-4 of regular season', (o, T) => o.title === 'Nathan Wu' && o.big.startsWith(T.sl('Nathan Wu', r => r.wk <= 4, 'reg')) || `${o.title} ${o.big} want ${T.sl('Nathan Wu', r => r.wk <= 4, 'reg')}`],
+  ['wu record first 4 weeks', (o, T) => o.big.startsWith(T.sl('Nathan Wu', r => r.wk <= 4, 'reg')) || o.big],
+  ['Kaiper record after a loss', (o, T) => o.big.startsWith(T.sl('Shane Kaiper', r => r.prev === 'L', 'reg')) || `${o.big} want ${T.sl('Shane Kaiper', r => r.prev === 'L', 'reg')}`],
+  ['Burke record in close games', (o, T) => o.big.startsWith(T.sl('Brian Burke', r => Math.abs(r.pts - r.opts) < 10, 'all')) || `${o.big} want ${T.sl('Brian Burke', r => Math.abs(r.pts - r.opts) < 10, 'all')}`],
+  ['Alpert record against winning teams', (o, T) => o.big.startsWith(T.sl('Wesley Alpert', r => r.oppPct > .5, 'all')) || `${o.big} want ${T.sl('Wesley Alpert', r => r.oppPct > .5, 'all')}`],
+  ['Krueger record as an underdog', (o, T) => o.big.startsWith(T.sl('Kevin Krueger', r => r.proj < r.oproj, 'reg')) || `${o.big} want ${T.sl('Kevin Krueger', r => r.proj < r.oproj, 'reg')}`],
+  ['berger record in the second half of the season', (o, T) => o.big.startsWith(T.sl('Brian Berger', r => r.wk > Math.ceil(r.last / 2), 'reg')) || o.big],
+  ['Cossu record last 3 weeks of the regular season', (o, T) => o.big.startsWith(T.sl('Chris Cossu', r => r.wk > r.last - 3, 'reg')) || o.big],
+  ['how often does Wu score 150+', (o, T) => o.big.startsWith(T.count('Nathan Wu', r => r.pts >= 150, 'all') + ' of ') || `${o.big} want ${T.count('Nathan Wu', r => r.pts >= 150, 'all')}`],
+  ['wu record when scoring under 110', (o, T) => o.big.startsWith(T.sl('Nathan Wu', r => r.pts < 110, 'all')) || o.big],
+  ['best start', (o, T) => /Weeks 1–4/.test(o.kind) && o.title === T.bestSl(r => r.wk <= 4, 'reg') || `${o.kind} ${o.title} want ${T.bestSl(r => r.wk <= 4, 'reg')}`],
+  ['who fades', (o, T) => /Last 4 weeks/.test(o.kind) && o.title === T.bestSl(r => r.wk > r.last - 4, 'reg', true) || `${o.title} want ${T.bestSl(r => r.wk > r.last - 4, 'reg', true)}`],
+  ['most 150 point games', (o, T) => o.title === T.mostCount(r => r.pts >= 150, 'all') || `${o.title} want ${T.mostCount(r => r.pts >= 150, 'all')}`],
+  ['most upsets', o => /Projected to lose/.test(o.kind) && /win/.test(o.big) || o.kind],
+  ['biggest upset', o => /Biggest upset/.test(o.kind) || o.kind],
+  ['highest score in weeks 1-4', (o, T) => o.big === T.topSl(r => r.wk <= 4, 'reg').toFixed(2) || `${o.big} want ${T.topSl(r => r.wk <= 4, 'reg')}`],
+  ['who owns Burke in close games', o => /owns Brian Burke/.test(o.title) || o.title],
+  ['Berger vs Burke in close games', o => o.title === 'Brian Berger vs Brian Burke' || o.title],
+  ['who beats their projection the most', o => /Beat the projection most often/.test(o.sub) || o.sub],
+  ['Wu by week', o => o.title === 'Nathan Wu' && /Week 1/.test(o.body) || o.title],
+  ['Burke by season', o => o.kind === 'Season by season' || o.kind],
   // ---- things it must not pretend to know
   ['who drafted Justin Jefferson', o => (o.soon || []).some(s => /Draft/.test(s)) || JSON.stringify(o.soon)],
   ['worst injury luck', o => (o.soon || []).some(s => /Injury/.test(s)) || JSON.stringify(o.soon)],
@@ -103,6 +125,14 @@ const CASES = [
     const D = DATA, Mg = D.mgrs, R = D.rows;
     const reg = []; (D.wkYears || []).forEach(y => { const K = D.wk[y]; K.games.filter(g => g.br === '').forEach(g => reg.push({ ma: K.mgr[g.ta], mb: K.mgr[g.tb], pa: g.aa, pb: g.ab })); });
     const po = D.games.filter(g => !g.void).map(g => ({ ma: g.ma, mb: g.mb, pa: g.pa, pb: g.pb }));
+    const GL = []; const rowOf = {}; R.forEach(r => { rowOf[r.y + '|' + r.mgr] = r; });
+    (D.wkYears || []).forEach(y => { const K = D.wk[y]; const reg = K.games.filter(g => g.br === ''); const last = Math.max(...reg.map(g => g.wk));
+      reg.forEach(g => { GL.push({ y, wk: g.wk, last, mgr: K.mgr[g.ta], opp: K.mgr[g.tb], pts: g.aa, opts: g.ab, proj: g.pa, oproj: g.pb, po: false });
+        GL.push({ y, wk: g.wk, last, mgr: K.mgr[g.tb], opp: K.mgr[g.ta], pts: g.ab, opts: g.aa, proj: g.pb, oproj: g.pa, po: false }); }); });
+    D.games.filter(g => !g.void).forEach(g => { GL.push({ y: g.y, wk: g.wk, mgr: g.ma, opp: g.mb, pts: g.pa, opts: g.pb, po: true }); GL.push({ y: g.y, wk: g.wk, mgr: g.mb, opp: g.ma, pts: g.pb, opts: g.pa, po: true }); });
+    const seqs = {}; GL.filter(r => !r.po).forEach(r => (seqs[r.y + '|' + r.mgr] = seqs[r.y + '|' + r.mgr] || []).push(r));
+    Object.values(seqs).forEach(a => { a.sort((x, z) => x.wk - z.wk); a.forEach((r, i) => { r.prev = i ? (a[i - 1].pts > a[i - 1].opts ? 'W' : 'L') : null; }); });
+    GL.forEach(r => { const o = rowOf[r.y + '|' + r.opp]; r.oppPct = o ? (o.w + o.t / 2) / o.g : null; });
     const T = {
       mgr: n => Mg.find(m => m.name === n),
       h2h: (a, b2, k) => { const gs = (k === 'po' ? po : k === 'reg' ? reg : reg.concat(po)).filter(g => (g.ma === a && g.mb === b2) || (g.ma === b2 && g.mb === a));
@@ -116,6 +146,13 @@ const CASES = [
       bigMargin: () => Math.max(...reg.concat(po).map(g => Math.abs(g.pa - g.pb))),
       smallMargin: () => Math.min(...reg.concat(po).map(g => Math.abs(g.pa - g.pb))),
       champ: y => D.champs.find(c => c.y === y).mgrs.join(' & '),
+      sl: (n, f, set) => { const rs = GL.filter(r => r.mgr === n && (set === 'all' || (set === 'po') === r.po) && f(r)); const w = rs.filter(r => r.pts > r.opts).length, t = rs.filter(r => r.pts === r.opts).length; return w + '–' + (rs.length - w - t) + (t ? '–' + t : ''); },
+      count: (n, f, set) => GL.filter(r => r.mgr === n && (set === 'all' || (set === 'po') === r.po) && f(r)).length,
+      bestSl: (f, set, worst) => { const by = {}; GL.filter(r => (set === 'all' || (set === 'po') === r.po) && f(r)).forEach(r => (by[r.mgr] = by[r.mgr] || []).push(r));
+        const l = Object.entries(by).filter(([, rs]) => rs.length >= 4).map(([n, rs]) => ({ n, p: rs.filter(r => r.pts > r.opts).length / rs.length, w: rs.filter(r => r.pts > r.opts).length, l: rs.filter(r => r.pts < r.opts).length }));
+        l.sort((a, b) => worst ? a.p - b.p || b.l - a.l : b.p - a.p || b.w - a.w); return l[0].n; },
+      mostCount: (f, set) => { const by = {}; GL.filter(r => (set === 'all' || (set === 'po') === r.po) && f(r)).forEach(r => { by[r.mgr] = (by[r.mgr] || 0) + 1; }); return Object.entries(by).sort((a, b) => b[1] - a[1])[0][0]; },
+      topSl: (f, set) => Math.max(...GL.filter(r => (set === 'all' || (set === 'po') === r.po) && f(r)).map(r => r.pts)),
       signed: v => (Math.abs(v).toFixed(2) === '0.00' ? '' : v > 0 ? '+' : '−') + Math.abs(v).toFixed(2),
     };
     return cases.map(([q, src]) => {

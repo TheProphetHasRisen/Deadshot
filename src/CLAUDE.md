@@ -191,6 +191,21 @@ type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
 - **How people talk**: the `SAY` list rewrites "goat", "who owns Kaiper", "choker",
   "robbed", "fraud", "smashed" and so on into the plain question. Add to it there.
 - **Ambiguous names ask**: "Brian" and "Watson" are two managers each.
+- **The game log (`games1()`) is the second layer.** One row per team per game: every
+  regular-season game in the logged seasons (both scores, both Yahoo projections, that week's
+  all-play count) and every playoff game. A question with a *slice* goes there: week ranges
+  ("weeks 1-4", "first 4 weeks", "last 3 weeks", "second half", "after week 8"), situations
+  ("close games", "blowouts", "scoring 150+", "under 100", "allowing over 140"), projections
+  ("as an underdog", "favorite", "beat the projection", "points vs projection", "biggest
+  upset"), opponents ("against winning teams", "playoff teams"), sequence ("after a loss"),
+  result ("in wins") and splits ("by week", "by season"). Slices stack (all conditions must
+  hold) and work for one manager, a pair, or a leader board, and with "how many / how often"
+  as counts. A one-manager answer always shows the layer underneath: the same seasons with the
+  slice taken out, and the league rank in the slice (4+ games). Week-based and projection
+  questions mean the regular season unless playoffs are named; the rest use every game.
+- **Adding a slice** is three edits: the phrase in `parse` (the block above `/* weeks */`),
+  the test in `inSlice`, the words in `sliceLine`. Then a case in `test_ask.js` whose answer is
+  computed from its own independent game log, not from ask.js.
 - **When the Yahoo data lands**, three places change: put player names in `D.players` (the
   dictionary picks them up), write the answerer for the new data (drafts, injuries, waivers,
   lineups), and its `SOON` line stops showing on its own once `D.draft` / `D.injuries` /
