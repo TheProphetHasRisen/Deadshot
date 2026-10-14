@@ -1432,3 +1432,7 @@ tr.lv-cut td{border-bottom:2px dashed var(--brass-2)}
 .lv-draft td,.lv-draft th{font-size:12px;white-space:nowrap}
 .lv-draft thead th{font-size:10px;text-align:left}
 .lv-pos{display:inline-block;min-width:26px;font:600 9.5px "IBM Plex Mono",monospace;color:var(--ink-3)}
+/* the live light: a small red lamp that breathes, still under reduced motion */
+.lv-tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px;background:var(--pos);box-shadow:0 0 0 0 var(--pos)}
+@media(prefers-reduced-motion:no-preference){.lv-tag::before{animation:lv-lamp 1.6s ease-in-out infinite}
+  @keyframes lv-lamp{0%,100%{opacity:1;box-shadow:0 0 2px 1px var(--pos)}50%{opacity:.35;box-shadow:0 0 0 0 transparent}}}

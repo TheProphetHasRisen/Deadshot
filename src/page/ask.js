@@ -603,7 +603,7 @@ const Ask=(()=>{
     out.big=rec(w,l); out.sub=(w>l?a+' leads':w<l?b+' leads':'Dead even')+' · '+nOf(games.length,'game')+(yrs.length?' · '+yearList(yrs):'');
     const last=games.slice().sort((x,y)=>y.y-x.y||(y.wk||0)-(x.wk||0)).slice(0,6);
     out.body=tbl(['Game','Winner','Score'],last.map(g=>{const aw=g.pa>g.pb;
-      return [esc(g.lab),esc((aw?g.ma:g.mb).split(' ').slice(-1)[0]),F2(Math.max(g.pa,g.pb))+'–'+F2(Math.min(g.pa,g.pb))];}));
+      return [esc(g.lab),esc((aw?g.ma:g.mb).split(' ').slice(-1)[0]),'<b>'+F2(Math.max(g.pa,g.pb))+'</b>–'+F2(Math.min(g.pa,g.pb))];}));
     /* the layer under a head to head: each side's scoring, the biggest wins, the closest
        game, the playoffs on their own, the current run and season by season */
     const gl=games1().filter(r=>r.mgr===a&&r.oppMgr===b&&(!yrs.length||yrs.includes(r.y))&&(key==='all'||(key==='po')===r.po));
@@ -775,7 +775,7 @@ const Ask=(()=>{
       out.title=a+' vs '+b; out.big=x.g?rec(x.w,x.l,x.t):'Never met in that slice';
       out.sub=nOf(x.g,'game')+(x.g?' · '+a.split(' ').slice(-1)[0]+' scored '+F2(x.ppg)+' a game, '+b.split(' ').slice(-1)[0]+' '+F2(x.papg):'');
       if(x.g)out.body=tbl(['Game','Winner','Score'],rs.slice().sort((r,z)=>z.y-r.y||z.wk-r.wk).slice(0,8).map(r=>[r.y+(r.po?' '+esc(r.rnd||'playoffs'):' week '+r.wk),
-        esc((r.win?a:b).split(' ').slice(-1)[0]),F2(Math.max(r.pts,r.opts))+'–'+F2(Math.min(r.pts,r.opts))]));
+        esc((r.win?a:b).split(' ').slice(-1)[0]),'<b>'+F2(Math.max(r.pts,r.opts))+'</b>–'+F2(Math.min(r.pts,r.opts))]));
       out.acts=[h2hAct(a,b)]; return out;}
     if(q.mgrs.length===1&&q.h2h&&(q.want||/ who /.test(q.said))&&lm===LM.pct){
       const n=q.mgrs[0], vs={};
