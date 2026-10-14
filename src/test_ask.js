@@ -107,7 +107,7 @@ const CASES = [
   ['longest winning streak', (o, T) => o.big === T.longestRun('W') + ' wins in a row' || `${o.big} want ${T.longestRun('W')}`],
   ['Kaiper longest losing streak', (o, T) => o.big === T.longestRun('L', 'Shane Kaiper') + ' losses in a row' || `${o.big} want ${T.longestRun('L', 'Shane Kaiper')}`],
   ['who has never beaten Alpert', (o, T) => o.title.includes(T.neverBeaten('Wesley Alpert').length === 1 ? T.neverBeaten('Wesley Alpert')[0] : T.neverBeaten('Wesley Alpert').length + ' managers') || `${o.title} want ${T.neverBeaten('Wesley Alpert')}`],
-  ['who has Berger never beaten', (o, T) => o.title.startsWith('Brian Berger has never beaten') || o.title],
+  ['who has Berger never beaten', (o, T) => /^Brian Berger has (never beaten|beaten everyone)/.test(o.title) || o.title],
   ['who does Alpert own', o => o.title.startsWith('Wesley Alpert owns') || o.title],
   ['Burke nemesis', o => /owns Brian Burke$/.test(o.title) || o.title],
   ['how often does the 1 seed win', (o, T) => o.big === T.seedTitles(1) + (T.seedTitles(1) === 1 ? ' title' : ' titles') + ' in ' + T.seedN(1) + ' seasons' || `${o.big} want ${T.seedTitles(1)}`],
@@ -142,14 +142,19 @@ const CASES = [
   const results = await p.evaluate(cases => {
     const D = DATA, Mg = D.mgrs, R = D.rows;
     const reg = []; (D.wkYears || []).forEach(y => { const K = D.wk[y]; K.games.filter(g => g.br === '').forEach(g => reg.push({ ma: K.mgr[g.ta], mb: K.mgr[g.tb], pa: g.aa, pb: g.ab })); });
+    if (D.live) D.live.games.forEach(g => reg.push({ ma: D.live.mgr[g.ta], mb: D.live.mgr[g.tb], pa: g.aa, pb: g.ab }));
     const po = D.games.filter(g => !g.void).map(g => ({ ma: g.ma, mb: g.mb, pa: g.pa, pb: g.pb }));
     const GL = []; const rowOf = {}; R.forEach(r => { rowOf[r.y + '|' + r.mgr] = r; });
     (D.wkYears || []).forEach(y => { const K = D.wk[y]; const reg = K.games.filter(g => g.br === ''); const last = Math.max(...reg.map(g => g.wk));
       reg.forEach(g => { GL.push({ y, wk: g.wk, last, mgr: K.mgr[g.ta], opp: K.mgr[g.tb], pts: g.aa, opts: g.ab, proj: g.pa, oproj: g.pb, po: false });
         GL.push({ y, wk: g.wk, last, mgr: K.mgr[g.tb], opp: K.mgr[g.ta], pts: g.ab, opts: g.aa, proj: g.pb, oproj: g.pa, po: false }); }); });
+    if (D.live) D.live.games.forEach(g => { const y = D.live.year, last = D.live.regWeeks, m = D.live.mgr;
+      GL.push({ y, wk: g.wk, last, mgr: m[g.ta], opp: m[g.tb], pts: g.aa, opts: g.ab, proj: g.pa, oproj: g.pb, po: false });
+      GL.push({ y, wk: g.wk, last, mgr: m[g.tb], opp: m[g.ta], pts: g.ab, opts: g.aa, proj: g.pb, oproj: g.pa, po: false }); });
     D.games.filter(g => !g.void).forEach(g => { GL.push({ y: g.y, wk: g.wk, mgr: g.ma, opp: g.mb, pts: g.pa, opts: g.pb, po: true }); GL.push({ y: g.y, wk: g.wk, mgr: g.mb, opp: g.ma, pts: g.pb, opts: g.pa, po: true }); });
     const seqs = {}; GL.filter(r => !r.po).forEach(r => (seqs[r.y + '|' + r.mgr] = seqs[r.y + '|' + r.mgr] || []).push(r));
     Object.values(seqs).forEach(a => { a.sort((x, z) => x.wk - z.wk); a.forEach((r, i) => { r.prev = i ? (a[i - 1].pts > a[i - 1].opts ? 'W' : 'L') : null; }); });
+    if (D.live) D.live.standings.forEach(s => { rowOf[D.live.year + '|' + s.mgr] = { w: s.w, l: s.l, t: s.t, g: s.w + s.l + s.t }; });
     GL.forEach(r => { const o = rowOf[r.y + '|' + r.opp]; r.oppPct = o ? (o.w + o.t / 2) / o.g : null; });
     const T = {
       mgr: n => Mg.find(m => m.name === n),

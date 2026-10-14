@@ -571,7 +571,7 @@ const Ask=(()=>{
     out.sub=lead.lab+(q.game==='score'?' · against '+lead.opp+' ('+F2(lead.o)+')':' · '+F2(lead.hi)+'–'+F2(lead.lo));
     out.body=tbl(['','Manager','Game',q.game==='score'?'Points':'Margin'],top.map((r,i)=>[String(i+1),mlink(r.who),
       esc(r.lab)+' <span class="dim">v '+esc(r.opp)+'</span>',F2(r.v)]));
-    out.notes.push('Covers every playoff game since '+SEA[0]+(q.types==='po'?'':' and the regular seasons with a game log ('+yearList(D.wkYears||[])+')')+'.');
+    out.notes.push('Covers every playoff game since '+SEA[0]+(q.types==='po'?'':' and the regular seasons with a game log ('+yearList(LOGYRS)+')')+'.');
     const wk=lead.lab.match(/^(\d{4}) week (\d+)$/);
     out.acts=[wk?weekAct(+wk[1],+wk[2]):seasonAct(lead.y),mgrAct(lead.who)];
     return out;
@@ -599,7 +599,7 @@ const Ask=(()=>{
     out.kind='Head to head · '+(key==='po'?'playoffs':key==='reg'?'regular season':'every game on record');
     out.title=a+' vs '+b;
     if(!games.length){out.big='Never met'; out.sub='No game between them on record'+(yrs.length?' in '+yearList(yrs):'')+'.';
-      out.notes.push('Regular-season games are on record for '+yearList(D.wkYears||[])+'; playoff games for every season.'); out.acts=[h2hAct(a,b)]; return out;}
+      out.notes.push('Regular-season games are on record for '+yearList(LOGYRS)+'; playoff games for every season.'); out.acts=[h2hAct(a,b)]; return out;}
     out.big=rec(w,l); out.sub=(w>l?a+' leads':w<l?b+' leads':'Dead even')+' · '+nOf(games.length,'game')+(yrs.length?' · '+yearList(yrs):'');
     const last=games.slice().sort((x,y)=>y.y-x.y||(y.wk||0)-(x.wk||0)).slice(0,6);
     out.body=tbl(['Game','Winner','Score'],last.map(g=>{const aw=g.pa>g.pb;
@@ -626,7 +626,7 @@ const Ask=(()=>{
       out.body+=tbl(['Inside the matchup',''],L);
     }
     if(games.length>6)out.notes.push('The six most recent of '+games.length+' meetings.');
-    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(D.wkYears||[])+'; playoff games for every season.');
+    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(LOGYRS)+'; playoff games for every season.');
     out.acts=[h2hAct(a,b),mgrAct(a)]; return out;
   }
   /* "who owns Kaiper": everybody's record against one manager, best first */
@@ -646,7 +646,7 @@ const Ask=(()=>{
     out.title=lo?n+' owns '+top.name:top.name+' owns '+n;
     out.big=rec(top.w,top.l); out.sub=(lo?'The worst record against '+n:'The best record against '+n)+' · 3+ meetings · '+scopeLine(yrs,q.types);
     out.body=tbl(['','Manager','Record v '+esc(n.split(' ').slice(-1)[0]),'Win %'],list.slice(0,6).map((r,i)=>[String(i+1),mlink(r.name),rec(r.w,r.l),pct(r.w/(r.w+r.l))]));
-    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(D.wkYears||[])+'; playoff games for every season.');
+    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(LOGYRS)+'; playoff games for every season.');
     out.acts=[h2hAct(top.name,n),mgrAct(n)]; return out;
   }
   /* ================================================ the game log: one row per team per game
@@ -663,11 +663,16 @@ const Ask=(()=>{
         const ra=((K.race||{})[t]||[]).find(x=>x.w===g.wk);
         rows.push({y,wk:g.wk,last,team:t,mgr:K.mgr[t],opp:o,oppMgr:K.mgr[o],pts:p,opts:op,proj:pr,oproj:opr,po:false,
           ap:ra?ra.ap:null,apN:K.teams.length-1});}));});
+    /* the live season, week by week as it is played */
+    if(D.live){const L=D.live, y=L.year, last=L.regWeeks;
+      L.games.forEach(g=>[[g.ta,g.aa,g.pa,g.tb,g.ab,g.pb],[g.tb,g.ab,g.pb,g.ta,g.aa,g.pa]].forEach(([t,p,pr,o,op,opr])=>
+        rows.push({y,wk:g.wk,last,team:t,mgr:L.mgr[t],opp:o,oppMgr:L.mgr[o],pts:p,opts:op,proj:pr,oproj:opr,po:false,ap:null,apN:L.standings.length-1,live:true})));}
     D.games.filter(g=>!g.void).forEach(g=>[[g.ta,g.ma,g.pa,g.tb,g.mb,g.pb],[g.tb,g.mb,g.pb,g.ta,g.ma,g.pa]].forEach(([t,mg,p,o,om,op])=>
       rows.push({y:g.y,wk:g.wk,team:t,mgr:mg,opp:o,oppMgr:om,pts:p,opts:op,proj:null,oproj:null,po:true,rnd:g.rnd})));
     /* what came the week before, and how good the opponent was that season */
     const run={}; rows.filter(r=>!r.po).forEach(r=>(run[r.y+'|'+r.mgr]=run[r.y+'|'+r.mgr]||[]).push(r));
     Object.values(run).forEach(a=>{a.sort((x,z)=>x.wk-z.wk); a.forEach((r,i)=>{r.prev=i?(a[i-1].pts>a[i-1].opts?'W':'L'):null;});});
+    if(D.live)D.live.standings.forEach(t=>{rowOf[D.live.year+'|'+t.mgr]={w:t.w,l:t.l,t:t.t,g:t.w+t.l+t.t,po:null};});
     rows.forEach(r=>{const o=rowOf[r.y+'|'+r.oppMgr]; r.oppPct=o?(o.w+o.t/2)/o.g:null; r.oppPO=o?o.po:null;
       r.win=r.pts>r.opts; r.tie=r.pts===r.opts;});
     /* where each score ranked in its own week: the week's high and low, and the median line */
@@ -875,7 +880,7 @@ const Ask=(()=>{
     out.body=tbl(['','Manager','When','Games'],list.slice(0,8).map((x,i)=>[String(i+1),mlink(x.mgr),esc(runTxt(x)),String(x.n)]));
     if(q.mgrs.length===1){const o=runs(type==='W'?'L':'W').filter(x=>x.mgr===q.mgrs[0]&&(!yrs.length||yrs.includes(x.y)))[0];
       if(o)out.notes.push('Longest '+(type==='W'?'losing':'winning')+' run: '+nOf(o.n,'game')+', '+runTxt(o)+'.');}
-    out.notes.push('Counted inside each regular season, '+yearList(D.wkYears||[])+'. Earlier seasons have no game-by-game log.');
+    out.notes.push('Counted inside each regular season, '+yearList(LOGYRS)+'. Earlier seasons have no game-by-game log.');
     out.acts=[weekAct(top.y,top.from),mgrAct(top.mgr)]; return out;}
 
   /* "who has never beaten Alpert" and "who has Alpert never beaten" */
@@ -899,7 +904,7 @@ const Ask=(()=>{
     }
     const nm=MG.filter(m=>m!==n&&!vs[m]).length;
     if(nm)out.notes.push(n+' has never played '+nOf(nm,'manager')+' in a game on record.');
-    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(D.wkYears||[])+'; playoff games for every season.');
+    if(key!=='po')out.notes.push('Regular-season games are on record for '+yearList(LOGYRS)+'; playoff games for every season.');
     out.acts=[list.length?h2hAct(n,list[0].o):mgrAct(n),mgrAct(n)]; return out;}
 
   /* "who does Alpert own": the named manager's best matchups */
@@ -1041,11 +1046,11 @@ const Ask=(()=>{
   function week(q,out,yrs){
     const w=q.weeks[0];
     let y=yrs.length?yrs[yrs.length-1]:null;
-    const logged=D.wkYears||[];
+    const logged=LOGYRS;
     if(!y){y=logged[logged.length-1]; out.notes.push('No season given, so this is '+y+'.');}
     if(!logged.includes(y)){out.kind='Week '+w; out.title='No week-by-week log for '+y;
       out.sub='Weekly results are on record for '+yearList(logged)+'.'; out.acts=[seasonAct(y)]; return out;}
-    const K=D.wk[y], gs=K.games.filter(g=>g.wk===w);
+    const K=D.live&&y===D.live.year?{games:D.live.games.map(g=>({...g,br:''})),mgr:D.live.mgr}:D.wk[y], gs=K.games.filter(g=>g.wk===w);
     if(!gs.length){out.kind='Week '+w; out.title=y+' has no week '+w; out.sub='It ran to week '+Math.max(...K.games.map(g=>g.wk))+'.'; return out;}
     const mine=q.mgrs.length?gs.filter(g=>q.mgrs.includes(K.mgr[g.ta])||q.mgrs.includes(K.mgr[g.tb])):gs;
     out.kind='Week '+w+', '+y+(gs[0].br==='C'?' · playoffs':'');

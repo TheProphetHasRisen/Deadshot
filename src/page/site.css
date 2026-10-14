@@ -1436,3 +1436,27 @@ tr.lv-cut td{border-bottom:2px dashed var(--brass-2)}
 .lv-tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:1px;background:var(--pos);box-shadow:0 0 0 0 var(--pos)}
 @media(prefers-reduced-motion:no-preference){.lv-tag::before{animation:lv-lamp 1.6s ease-in-out infinite}
   @keyframes lv-lamp{0%,100%{opacity:1;box-shadow:0 0 2px 1px var(--pos)}50%{opacity:.35;box-shadow:0 0 0 0 transparent}}}
+/* the strip under the masthead, and the 2026 view it opens */
+.lv-strip{background:var(--surface);border-bottom:1px solid var(--rule)}
+.lv-strip[hidden]{display:none}
+.lv-strip-in{max-width:var(--max);margin:0 auto;padding:8px 22px;display:flex;gap:12px;align-items:center}
+.lv-open{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:10px;border:0;background:none;padding:4px 0;text-align:left;font:13px "IBM Plex Sans",system-ui,sans-serif;letter-spacing:0;color:var(--ink-2);cursor:pointer}
+.lv-open .lv-tag{margin-left:0;flex:none}
+.lv-strip-txt{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-strip-txt b{color:var(--ink);font-weight:600}
+.lv-go{flex:none;font:600 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--brass)}
+.lv-open:hover .lv-go{text-decoration:underline}
+.lv-seg{flex:none;display:flex}
+.lv-seg button{border-radius:0;padding:5px 10px}
+.lv-seg button+button{border-left:0}
+.lv-view[hidden]{display:none}
+body.lv-ov .lv-view{position:fixed;inset:0;z-index:60;overflow-y:auto;overscroll-behavior:contain;background:var(--ground);padding-bottom:40px}
+body.lv-pg main#main{display:none}
+body.lv-pg .lv-view{padding-top:8px}
+.lv-view-h{display:flex;justify-content:space-between;align-items:center;padding:16px 0 4px}
+body.lv-pg .lv-view-h{display:none}
+@media(max-width:720px){.lv-strip-next{display:none}.lv-strip-in{padding:6px 16px;gap:6px;flex-wrap:wrap}.lv-open{flex:1 1 100%}.lv-seg{flex:1 1 100%}.lv-seg button{flex:1;padding:6px 8px;font-size:10.5px}}
+/* the draft board: pick a position to light it up */
+.lv-draft td.lv-dim{opacity:.22}
+.lv-first{font:600 9px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);margin-left:4px}
+.lv-gap{display:inline-block;width:10px}

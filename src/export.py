@@ -292,6 +292,19 @@ if S26:
         stand.append(dict(rank=rank, team=t, mgr=S26.MGR2026.get(t), w=w, l=l, t=tie, pf=f, pa=a, streak=streak,
                           waiver=waiver, moves=moves, apW=ap[t][0], apL=ap[t][1],
                           luck=(w + tie / 2) - g * ap[t][0] / (ap[t][0] + ap[t][1]) if ap[t][0] + ap[t][1] else None))
+    # games are games: 2026's count toward career win-loss, points and all-play now. Anything
+    # that needs a finished season (titles, finishes, seeds, power index) waits.
+    byname = {m['name']: m for m in out['mgrs']}
+    for r in stand:
+        m = byname.get(r['mgr'])
+        if not m: continue
+        g = r['w'] + r['l'] + r['t']
+        m['live'] = dict(w=r['w'], l=r['l'], t=r['t'], pf=r['pf'], pa=r['pa'])
+        m['w'] += r['w']; m['l'] += r['l']; m['t'] += r['t']; m['g'] += g
+        m['pf'] += r['pf']; m['pa'] += r['pa']; m['ppg'] = m['pf'] / m['g']
+        m['winpct'] = (m['w'] + m['t'] / 2) / m['g']
+        if m.get('apW') is not None:
+            m['apW'] += r['apW']; m['apL'] += r['apL']; m['apPct'] = m['apW'] / (m['apW'] + m['apL'])
     up = [dict(wk=wk, ta=a, pa=pa_, tb=b, pb=pb_) for wk, lst in S26.UPCOMING2026.items() for (a, pa_, b, pb_) in lst]
     out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
                        trades=[dict(d=d, ta=a, ga=ga, tb=b, gb=gb) for (d, a, ga, b, gb) in S26.TRADES2026],

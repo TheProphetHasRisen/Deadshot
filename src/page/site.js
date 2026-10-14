@@ -51,6 +51,8 @@ const surname=n=>n.split(' ').slice(-1)[0];
 /* seasons played, then surname A-Z — a stated rule, not a hand-placed order */
 const bySeasons=(a,b)=>b.seasons-a.seasons||surname(a.name).localeCompare(surname(b.name))||a.name.localeCompare(b.name);
 const ALLNAMES=M.map(m=>m.name);
+/* every season with a game-by-game log, the live one included */
+const LOGYRS=[...(D.wkYears||[]),...(D.live?[D.live.year]:[])];
 /* ---- global manager filter ---- */
 const REDRAW=[];
 let SEL=new Set(ACTIVE);            /* first visit shows the current managers only */
@@ -251,7 +253,7 @@ $('#f1').textContent=SEA.length;$('#f2').textContent=M.length;$('#f3').textConte
 $('#nextYr').textContent=LAST+1;
 
 /* nav */
-const SECS=[...(D.live?[['live',String(D.live.year)]]:[]),['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
+const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
  ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],
  ['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],
  ['records','Records'],['method','Method']];
@@ -2473,7 +2475,9 @@ const REGG=[];           /* regular-season meetings across every loaded game log
 (D.wkYears||[]).forEach(y=>{const K=D.wk[y];
   K.games.filter(g=>g.br==='').forEach(g=>
     REGG.push({y,wk:g.wk,ma:K.mgr[g.ta],mb:K.mgr[g.tb],pa:g.aa,pb:g.ab,lab:y+' week '+g.wk}));});
-const REGYRS=yearList(D.wkYears||[]);
+/* the live season's games are games: they count in head to head from the week they are played */
+if(D.live)D.live.games.forEach(g=>REGG.push({y:D.live.year,wk:g.wk,ma:D.live.mgr[g.ta],mb:D.live.mgr[g.tb],pa:g.aa,pb:g.ab,lab:D.live.year+' week '+g.wk}));
+const REGYRS=yearList(LOGYRS);
 const POG=D.games.filter(g=>!g.void).map(g=>({y:g.y,ma:g.ma,mb:g.mb,pa:g.pa,pb:g.pb,lab:g.y+' '+g.rnd}));
 function tally(list){const t={};
   list.forEach(g=>{const w=g.pa>g.pb?g.ma:g.mb,l=g.pa>g.pb?g.mb:g.ma;
@@ -4796,7 +4800,25 @@ glossify();
    2026 so far, in its own section and kept out of everything else until it is finished.
    Every manager is shown whatever the filter says: it is a ten-team standings table. */
 (function(){
-  const L=D.live; if(!L){const s=$('#live'); if(s)s.remove(); return;}
+  const L=D.live; if(!L){const s=$('#lvView'); if(s)s.remove(); return;}
+  /* two ways in, while Brian decides which stays: the strip under the masthead opens 2026
+     full screen over the page (the X or Escape brings you back), and the switch swaps the
+     whole page between the record book and 2026 */
+  const V=$('#lvView'), strip=$('#lvStrip'); strip.hidden=false;
+  const lead=L.standings[0], nx=L.upcoming[0];
+  $('#lvStripTxt').innerHTML=`Week ${L.weeks[L.weeks.length-1]} of ${L.regWeeks} · <b>${esc(lead.team)}</b> lead${L.standings.filter(r=>r.w===lead.w&&r.l===lead.l).length>1?' on points':''} at ${lead.w}–${lead.l}`+
+    (nx?`<span class="lv-strip-next"> · Week ${nx.wk}: ${esc(nx.ta)} v ${esc(nx.tb)}</span>`:'');
+  const seg=on=>{$('#lvSegBook').classList.toggle('on',!on); $('#lvSegLive').classList.toggle('on',on);};
+  const show=mode=>{V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
+    seg(mode==='pg'); tabTitle(mode?L.year+' Live':'');
+    if(mode==='ov'){document.body.style.overflow='hidden'; V.scrollTop=0; $('#lvClose').focus();} else document.body.style.overflow='';
+    if(mode==='pg')scrollTo(0,0);
+    if(mode)history.replaceState(null,'',location.pathname+location.search+'#'+L.year); else if(location.hash==='#'+L.year)history.replaceState(null,'',location.pathname+location.search);};
+  $('#lvOpen').onclick=()=>show('ov');
+  $('#lvClose').onclick=()=>show(null);
+  $('#lvSegLive').onclick=()=>show('pg'); $('#lvSegBook').onclick=()=>show(null);
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('lv-ov'))show(null);});
+  if(location.hash==='#'+L.year)setTimeout(()=>show('ov'),0);
   const mg=t=>L.mgr[t]||'', tm=t=>`<b>${esc(t)}</b> <span class="dim">${esc(mg(t))}</span>`;
   const st={}; L.standings.forEach(r=>{st[r.team]=r;});
   const recOf=t=>{const r=st[t]; return r?r.w+'–'+r.l+(r.t?'–'+r.t:''):'';};
@@ -4836,16 +4858,31 @@ glossify();
   $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
   $('#tLiveTr').innerHTML='<tbody>'+L.trades.slice().reverse().map(x=>`<tr><td class="dim">${esc(x.d)}</td><td><b>${esc(x.ta)}</b> got ${esc(x.ga.join(', '))}<br><b>${esc(x.tb)}</b> got ${esc(x.gb.join(', '))}</td></tr>`).join('')+'</tbody>';
   /* the draft: one column per team in draft order, one row per round */
-  let dy=String(L.year);
+  let dy=String(L.year), pos='All';
+  const POS=['All','QB','RB','WR','TE','K','DEF'];
   const drawDr=()=>{
-    $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('');
-    $$('#lvDy button').forEach(b=>b.onclick=()=>{dy=b.dataset.dy; drawDr();});
+    $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('')+
+      '<span class="lv-gap"></span>'+POS.map(p=>`<button data-dp="${p}" class="${p===pos?'on':''}">${p}</button>`).join('');
+    $$('#lvDy button[data-dy]').forEach(b=>b.onclick=()=>{dy=b.dataset.dy; drawDr();});
+    $$('#lvDy button[data-dp]').forEach(b=>b.onclick=()=>{pos=b.dataset.dp; drawDr();});
     const P=L.draft[dy], order=P.filter(p=>p[0]<=10).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
+    /* the first player taken at each position, and the order each position went in */
+    const posRank={}, seen={}; P.slice().sort((a,b)=>a[0]-b[0]).forEach(p=>{seen[p[4]]=(seen[p[4]]||0)+1; posRank[p[0]]=seen[p[4]];});
     const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
     let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
     for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
-      return p?`<td><span class="lv-pos lv-${esc(p[4].toLowerCase())}">${esc(p[4])}</span> ${esc(p[2])} <span class="dim">${p[0]}</span></td>`:'<td></td>';}).join('')+'</tr>';}
+      if(!p)return '<td></td>';
+      const pr=posRank[p[0]], dim=pos!=='All'&&p[4]!==pos;
+      return `<td class="${dim?'lv-dim':''}"><span class="lv-pos">${esc(p[4])}${pos===p[4]?pr:''}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${pr===1&&p[4]!=='K'&&p[4]!=='DEF'?`<span class="lv-first">1st ${esc(p[4])}</span>`:''}</td>`;}).join('')+'</tr>';}
     $('#tLiveDr').innerHTML=h+'</tbody>';
+    /* risers and fallers: the players in both drafts, and how far their pick moved */
+    const ys=Object.keys(L.draft).sort(), a=L.draft[ys[0]], z=L.draft[ys[ys.length-1]];
+    const at={}; a.forEach(p=>{at[p[2]]=p[0];});
+    const mv=z.filter(p=>at[p[2]]!=null&&(pos==='All'||p[4]===pos)).map(p=>({n:p[2],pos:p[4],was:at[p[2]],now:p[0],d:at[p[2]]-p[0]}));
+    const up=mv.filter(m=>m.d>0).sort((x,y)=>y.d-x.d).slice(0,6), dn=mv.filter(m=>m.d<0).sort((x,y)=>x.d-y.d).slice(0,6);
+    const ln=m=>`<tr><td><span class="lv-pos">${esc(m.pos)}</span> ${esc(m.n)}</td><td class="num dim">${m.was} → ${m.now}</td><td class="num"><b>${m.d>0?'+':'−'}${Math.abs(m.d)}</b></td></tr>`;
+    $('#tLiveMv').innerHTML=`<thead><tr><th>Rose most, ${ys[0]} to ${ys[ys.length-1]}</th><th class="num">Pick</th><th class="num">Moved</th></tr></thead><tbody>${up.map(ln).join('')}</tbody>`+
+      `<thead><tr><th>Fell most</th><th class="num">Pick</th><th class="num">Moved</th></tr></thead><tbody>${dn.map(ln).join('')}</tbody>`;
   };
   drawDr();
 })();
