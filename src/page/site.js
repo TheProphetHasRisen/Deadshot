@@ -4808,9 +4808,17 @@ glossify();
      full screen over the page (the X or Escape brings you back), and the switch swaps the
      whole page between the record book and 2026 */
   const V=$('#lvView'), strip=$('#lvStrip'); strip.hidden=false;
-  const lead=L.standings[0], nx=L.upcoming[0];
-  $('#lvStripTxt').innerHTML=`Week ${L.weeks[L.weeks.length-1]} of ${L.regWeeks} · <b>${esc(lead.team)}</b> lead${L.standings.filter(r=>r.w===lead.w&&r.l===lead.l).length>1?' on points':''} at ${lead.w}–${lead.l}`+
-    (nx?`<span class="lv-strip-next"> · Week ${nx.wk}: ${esc(nx.ta)} v ${esc(nx.tb)}</span>`:'');
+  const lead=L.standings[0];
+  /* the strip is a ticker: the standings lead, then each of the coming week's matchups with
+     Yahoo's projections, one at a time. Hover or focus holds it; reduced motion just swaps. */
+  const tick=[`Week ${L.weeks[L.weeks.length-1]} of ${L.regWeeks} · <b>${esc(lead.team)}</b> lead${L.standings.filter(r=>r.w===lead.w&&r.l===lead.l).length>1?' on points':''} at ${lead.w}–${lead.l}`]
+    .concat(L.upcoming.map(g=>{const fa=g.pa>=g.pb;
+      return `Week ${g.wk} · ${fa?'<b>':''}${esc(g.ta)} ${f(g.pa)}${fa?'</b>':''} <span class="dim">v</span> ${!fa?'<b>':''}${f(g.pb)} ${esc(g.tb)}${!fa?'</b>':''} <span class="dim">projected</span>`;}));
+  const tx=$('#lvStripTxt'); let ti=0, hold=false;
+  tx.innerHTML=`<span class="lv-tk">${tick[0]}</span>`;
+  const strip0=$('#lvStrip'); strip0.addEventListener('mouseenter',()=>{hold=true;}); strip0.addEventListener('mouseleave',()=>{hold=false;});
+  if(tick.length>1)setInterval(()=>{if(hold||document.hidden)return; ti=(ti+1)%tick.length;
+    const s=document.createElement('span'); s.className='lv-tk lv-tk-in'; s.innerHTML=tick[ti]; tx.replaceChildren(s);},3800);
   const seg=on=>{$('#lvSegBook').classList.toggle('on',!on); $('#lvSegLive').classList.toggle('on',on);};
   const show=mode=>{V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
     seg(mode==='pg'); tabTitle(mode?L.year+' Live':'');
@@ -4886,7 +4894,7 @@ glossify();
     const P=L.draft[dy], J=judge(P), T=tops(J), wk=(DP.weeks||{})[dy], partial=+dy===L.year;
     const mark=p=>{const v=J[p[0]]; if(v.fr==null)return '';
       const cls=v.steal?'lv-steal':v.bust?'lv-bust':'lv-fin';
-      const big=T[p[0]]?` <span class="lv-big lv-big-${T[p[0]]==='STEAL'?'s':'b'}">${T[p[0]]==='STEAL'?'Top steal':'Top bust'}</span>`:'';
+      const big=T[p[0]]?` <span class="lv-big lv-big-${T[p[0]]==='STEAL'?'s':'b'}">${document.body.classList.contains('lv-fx')?(T[p[0]]==='STEAL'?'Heater':'Ice cold'):(T[p[0]]==='STEAL'?'Top steal':'Top bust')}</span>`:'';
       return big+` <span class="${cls}" title="Drafted ${p[4]}${v.dr}, ${partial?'running':'finished'} ${p[4]}${v.fr} with ${f(v.pts,1)} points">${v.steal?'▲ ':v.bust?'▼ ':''}${p[4]}${v.fr}</span>`;};
     const dim=p=>on.size&&!on.has(p[4]);
     const mg=t=>L.mgr[t]?L.mgr[t].split(' ').slice(-1)[0]:'';

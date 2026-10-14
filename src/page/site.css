@@ -1479,3 +1479,18 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-draft .lv-hl-s td,.lv-draft td.lv-hl-s{box-shadow:inset 3px 0 0 var(--pos)}
 .lv-draft .lv-hl-b td,.lv-draft td.lv-hl-b{box-shadow:inset 3px 0 0 var(--neg)}
 .lv-draft tr.lv-hl-s td+td,.lv-draft tr.lv-hl-b td+td{box-shadow:none}
+.lv-tk{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+@media(prefers-reduced-motion:no-preference){.lv-tk-in{animation:lv-tk .45s ease-out}
+  @keyframes lv-tk{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}}
+/* ice and fire on the draft board: a proposal, switched on by body.lv-fx while Brian decides */
+body.lv-fx .lv-draft td.lv-hl-b{position:relative;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--neg) 70%,white),inset 0 0 14px color-mix(in srgb,var(--neg) 45%,transparent),0 0 10px color-mix(in srgb,var(--neg) 40%,transparent);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--neg) 22%,transparent),color-mix(in srgb,white 18%,transparent) 45%,color-mix(in srgb,var(--neg) 14%,transparent))}
+body.lv-fx .lv-draft td.lv-hl-s{position:relative;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pos) 80%,yellow),inset 0 -10px 16px -6px color-mix(in srgb,var(--pos) 55%,transparent),0 0 12px color-mix(in srgb,var(--pos) 45%,transparent);
+  background:linear-gradient(0deg,color-mix(in srgb,var(--pos) 26%,transparent),transparent 70%)}
+body.lv-fx .lv-big-b::before{content:"\2744\FE0E  "}
+body.lv-fx .lv-big-s::before{content:"\1F525  "}
+body.lv-fx .lv-big-b{background:color-mix(in srgb,var(--neg) 85%,white)}
+body.lv-fx .lv-big-s{background:linear-gradient(90deg,var(--pos),color-mix(in srgb,var(--pos) 60%,yellow))}
+@media(prefers-reduced-motion:no-preference){
+  body.lv-fx .lv-draft td.lv-hl-s{animation:lv-fire 1.8s ease-in-out infinite}
+  @keyframes lv-fire{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08) saturate(1.15)}}}
