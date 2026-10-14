@@ -1061,12 +1061,44 @@ section{padding:52px 0 6px;scroll-margin-top:96px}
    On a phone the whole control bar collapses behind one summary line -- this button is
    exempted from that, so it stays reachable without expanding anything first. */
 #rulesBtn{border-color:var(--brass-2);color:var(--brass);font-weight:600}
+/* ---- Ask the record book ----------------------------------------------------------- */
+#askBtn{display:inline-flex;align-items:center;gap:7px;border-color:var(--brass-2);color:var(--brass);font-weight:600;margin-left:auto}
+#askBtn svg{width:13px;height:13px;flex:none}
+#askBtn kbd{font:600 10px "IBM Plex Mono",monospace;border:1px solid var(--rule);border-radius:2px;padding:0 5px;line-height:15px;color:var(--ink-3);margin-left:2px}
+#askBtn:hover{border-color:var(--brass);background:var(--hover)}
+.ask-in{position:sticky;top:-1px;z-index:1;background:var(--surface);padding:0 0 12px}
+/* 16px or iOS zooms the whole page the moment the box is tapped */
+#askIn{width:100%;font:500 16px "IBM Plex Sans",system-ui,sans-serif;letter-spacing:0;padding:12px 14px;border:1px solid var(--brass-2);border-radius:3px;background:var(--surface);color:var(--ink)}
+#askIn:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+.ask-k{font:600 10px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--brass);margin-bottom:6px}
+.ask-ex{display:flex;flex-wrap:wrap;gap:6px}
+.ask-ex button{font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:13px;letter-spacing:0;padding:6px 11px}
+.ask-card{border:1px solid var(--rule);border-radius:var(--card-r);background:var(--surface-2);padding:16px 18px}
+.ask-h{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:21px;line-height:1.2;color:var(--head-ink);font-variation-settings:"opsz" 36}
+.ask-big{margin-top:6px;font:700 26px "IBM Plex Mono",monospace;letter-spacing:-.01em;color:var(--brass);font-variant-numeric:tabular-nums}
+.ask-big .dim{font-size:15px;font-weight:500}
+.ask-s{margin-top:5px;font-size:12.5px;color:var(--ink-3)}
+.ask-t{width:100%;margin-top:12px;font-size:13px}
+.ask-t th{font-size:10px}
+.ask-t td{white-space:normal}
+.ask-t td.num{white-space:nowrap}
+@media(max-width:420px){.ask-card{padding:14px 12px}.ask-t{font-size:12px}.ask-t th,.ask-t td{padding:6px 5px}.ask-big{font-size:23px}}
+.ask-note{margin:9px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-3)}
+.ask-warn{color:var(--ink-2)}
+.ask-read{margin:-4px 0 10px;font-size:12px;color:var(--ink-3)}
+.ask-read s{text-decoration-color:var(--ink-3)}
+.ask-read b{color:var(--ink-2)}
+.ask-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ask-acts .go{background:var(--brass-wash);border-color:var(--brass-2);color:var(--brass);font-weight:600}
+@media(hover:hover){.ask-acts .go::after{content:"  \21b5";opacity:.6}}
 #rulesBtn:hover{border-color:var(--brass);background:var(--hover)}
 @media(max-width:760px){
   .fb .fb-in{display:flex;padding:0 16px 9px}
-  .fb:not(.open) .fb-in>*:not(#rulesBtn){display:none}
+  .fb:not(.open) .fb-in>*:not(#rulesBtn):not(#askBtn){display:none}
   .fb.open .fb-in{padding-top:0;padding-bottom:10px}
-  #rulesBtn{width:100%;justify-content:center;min-height:38px}
+  #rulesBtn{flex:1 1 auto;justify-content:center;min-height:38px}
+  #askBtn{flex:0 0 auto;justify-content:center;min-height:38px;margin-left:0;padding-left:14px;padding-right:14px}
+  #askBtn kbd,#askBtn .ask-long{display:none}
 }
 .fb-lab{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-weight:600}
 .fb-count{font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;margin-left:auto}

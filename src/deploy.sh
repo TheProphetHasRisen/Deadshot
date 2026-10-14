@@ -62,13 +62,15 @@ PY
     # read it. node --check only answers "does it parse"; this catches a typo'd name or
     # a duplicate key, which parse fine and then go wrong quietly on the live site.
     if [ -d node_modules/eslint ]; then
-      npx eslint page/site.js page/sw.js --max-warnings 0 \
+      npx eslint page/site.js page/ask.js page/sw.js --max-warnings 0 \
         || { echo "  !! eslint found a problem in the page's JavaScript — refusing"; exit 1; }
       echo "  eslint OK"
     else
       echo "  (eslint not installed — skipping the JavaScript lint)"
     fi
     node test_rules.js || { echo "  !! the League rules card no longer matches Yahoo — refusing"; exit 1; }
+    # the search box: 65 questions with their right answers, worked out independently
+    node test_ask.js || { echo "  !! Ask the record book gave a wrong or no answer — refusing"; exit 1; }
     # the preview cards carry the season counts, so they are redrawn from the fresh build
     say "link previews"
     node mkog.js
@@ -125,7 +127,7 @@ mkdir -p "$CLONE/src" "$CLONE/src/page"
 cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py mkfonts.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
-         test_numbers.py numbers.lock.json test_copy.py \
+         test_numbers.py numbers.lock.json test_copy.py test_ask.js \
          eslint.config.js package.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \

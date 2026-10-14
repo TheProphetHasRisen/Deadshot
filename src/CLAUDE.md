@@ -37,6 +37,7 @@ an editor and a linter can read:
 | `page/body.html` | the markup, and the `__DATA__` placeholder |
 | `page/scripts.html` | the `<script>` wrapper, and the `__JS__` placeholder |
 | `page/site.js` | ~280 KB — the whole page's behaviour |
+| `page/ask.js` | "Ask the record book", the plain-English search. Appended to `site.js` inside the same `<script>`, so it reads the page's globals directly; `eslint.config.js` lists the ones it uses |
 | `page/sw.js` | the offline worker, with `__VERSION__`; its `CORE` list names the six font files |
 | `page/404.html` | the not-found page, with `__TOKENS__`. Standalone: it does **not** load `site.css`, only the theme tokens, so it has its own small `.nf-*` stylesheet inline |
 
@@ -118,7 +119,11 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
 6. `python3 test_copy.py` after touching any wording. It fails on an em dash in the writing
    (see "House style" below). `deploy.sh` gates on it.
 
-7. `node test_rules.js` after touching the League rules card. It asserts all 35 of
+7. `node test_ask.js` after touching the search, the data, or any helper it uses. 65 questions,
+   typos and slang included, each checked against numbers worked out independently from the
+   data, then the box driven with the keyboard and on an iPhone SE. `deploy.sh` gates on it.
+
+8. `node test_rules.js` after touching the League rules card. It asserts all 35 of
    Yahoo's scoring categories are present in BOTH places the rules are drawn, and that
    the six non-default values still carry their "(default N)" note. A category dropped
    from that card is invisible by eye -- the card still looks complete.
@@ -171,6 +176,28 @@ document, so it covers markup drawn later). Just write `title="..."`; do not als
 after any new hand-built table's `innerHTML`.
 
 **Never type a colour into `page/404.html` either.** It reads the same tokens as the masthead.
+
+## Ask the record book (the search)
+
+Brian asked (14 Oct 2026) for the Celtics Hub's search on this site: intuitive, live as you
+type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
+
+- **It reads, it does not compute anything new.** Every answer comes from the same rows,
+  career figures and head-to-head tallies the page shows (`ROWS`, `M`, `MX`, `REGG`, `POG`).
+  A question it cannot answer says so; it never estimates.
+- **Typos**: a word it does not know is swapped for the nearest known word (names, team
+  names, players, measures, ordinary question words), and the answer says "Read X as Y".
+  A name two slips away must keep its first letter. Ties go to a manager, then a measure.
+- **How people talk**: the `SAY` list rewrites "goat", "who owns Kaiper", "choker",
+  "robbed", "fraud", "smashed" and so on into the plain question. Add to it there.
+- **Ambiguous names ask**: "Brian" and "Watson" are two managers each.
+- **When the Yahoo data lands**, three places change: put player names in `D.players` (the
+  dictionary picks them up), write the answerer for the new data (drafts, injuries, waivers,
+  lineups), and its `SOON` line stops showing on its own once `D.draft` / `D.injuries` /
+  `D.waivers` / `D.lineups` / `D.playerStats` exists. Add the new questions to `test_ask.js`
+  with independently computed answers.
+- No Claude/API translator on purpose: it would need a paid API key in a page the whole
+  league opens. That is Brian's call (it costs money), not a technical one.
 
 ## The numbers tripwire
 

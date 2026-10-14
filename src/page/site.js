@@ -24,7 +24,10 @@ const nOf=(n,w)=>n+' '+w+(n===1?'':'s');
    "2021, 2023 and 2025" when they are not. It used to be joined with " and ", which read
    "2021 and 2022 and 2023 and 2024 and 2025". */
 const yearList=a=>{a=[...a];if(!a.length)return '';
-  if(a.length>2&&a.every((y,i)=>!i||y-a[i-1]===1))return a[0]+'–'+a[a.length-1];
+  /* consecutive in the league's own list of seasons counts as a run, so 2016 to 2025 is
+     "2016–2025" and not nine years written out because 2019 is missing from the records */
+  const nx=(x,y)=>SEA.includes(x)&&SEA.includes(y)?SEA.indexOf(y)-SEA.indexOf(x)===1:y-x===1;
+  if(a.length>2&&a.every((y,i)=>!i||nx(a[i-1],y)))return a[0]+'–'+a[a.length-1];
   return a.length===1?String(a[0]):a.slice(0,-1).join(', ')+' and '+a[a.length-1];};
 /* the label under a season filter: "2025 only", or "2021–2025 only · 5 seasons" */
 const yearSpan=a=>a.length===1?a[0]+' only':a[0]+'–'+a[a.length-1]+' only · '+nOf(a.length,'season');

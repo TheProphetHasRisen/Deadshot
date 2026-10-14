@@ -53,6 +53,7 @@ def _fill(s):
 #   page/body.html     the markup, and __DATA__
 #   page/scripts.html  the <script> wrapper, and __JS__
 #   page/site.js       the whole page's behaviour
+#   page/ask.js        "Ask the record book": the plain-English search, appended to site.js
 #   page/sw.js         the offline worker, with __VERSION__
 #   page/404.html      the not-found page, with __TOKENS__ (see the end of this file)
 PAGE = os.path.join(HERE, 'page')
@@ -65,7 +66,9 @@ def _part(name):
 
 HEAD = _part('head.html').replace('__CSS__', _part('fonts.css') + _part('site.css'))
 BODY = _part('body.html')
-JS = _part('scripts.html').replace('__JS__', _part('site.js'))
+# ask.js (the record book's search) runs in the same <script>, after site.js, so it can read
+# the page's own data and helpers directly
+JS = _part('scripts.html').replace('__JS__', _part('site.js') + '\n' + _part('ask.js'))
 SHELL_TOP = _part('shell.html')
 SW = _part('sw.js')
 

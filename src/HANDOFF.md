@@ -93,6 +93,8 @@ node --check /tmp/site.js
 | `page/sw.js` | the offline worker, with `__VERSION__` |
 | `site_data.json` | Build artifact. Do not edit by hand. |
 | `404.html` | Build artifact: the not-found page, written by `mksite.py` from `page/404.html`. |
+| `page/ask.js` | "Ask the record book", the plain-English search. See CLAUDE.md. |
+| `test_ask.js` | The search's questions and their independently computed answers. `deploy.sh` gates on it. |
 | `test_copy.py` | House rules for the wording (no em dashes in the writing). `deploy.sh` gates on it. |
 | `index.html` | Build artifact. Do not edit by hand — every change goes in `page/` (or `mksite.py` for the assembly itself). |
 | `sw.js` | Build artifact too — the offline worker, written by `mksite.py` from `page/sw.js`. |

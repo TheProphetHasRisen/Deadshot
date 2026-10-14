@@ -20,7 +20,7 @@ Comments are skipped: they are notes to the next person, not words a reader sees
 import io, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FILES = ['page/body.html', 'page/site.js', 'page/shell.html', 'page/head.html',
+FILES = ['page/body.html', 'page/site.js', 'page/ask.js', 'page/404.html', 'page/shell.html', 'page/head.html',
          'mkog.js', 'manifest.webmanifest']
 
 # what may sit immediately either side of a lone placeholder dash

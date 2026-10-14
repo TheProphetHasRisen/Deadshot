@@ -85,6 +85,26 @@ module.exports = [
     },
   },
   {
+    /* ask.js is appended to site.js inside the same <script> by mksite.py, so it reads
+       site.js's top-level names directly. They are listed here so a typo is still caught;
+       anything NOT listed that no-undef flags is a genuine mistake. */
+    files: ['page/ask.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'script',
+      globals: {
+        ...browser,
+        '$': 'readonly', '$$': 'readonly', 'D': 'readonly', 'LAST': 'readonly', 'M': 'readonly', 'MX': 'readonly', 'POG': 'readonly', 'REGG': 'readonly', 'ROWS': 'readonly', 'SEA': 'readonly', 'SEL': 'readonly', 'byName': 'readonly', 'bySeasons': 'readonly', 'closeMgr': 'readonly', 'drawWeekly': 'readonly', 'esc': 'readonly', 'jumpSeason': 'readonly', 'mlink': 'readonly', 'nOf': 'readonly', 'openMgr': 'readonly', 'ord': 'readonly', 'ov': 'readonly', 'pct': 'readonly', 'rowsOf': 'readonly', 'setSel': 'readonly', 'sg': 'readonly', 'tabTitle': 'readonly', 'tyMinus': 'readonly', 'yearList': 'readonly', RETFOCUS: 'writable',
+      },
+    },
+    linterOptions: { reportUnusedDisableDirectives: true },
+    rules: {
+      'no-undef': 'error', 'no-dupe-keys': 'error', 'no-unreachable': 'error', 'no-const-assign': 'error',
+      'no-self-assign': 'error', 'no-cond-assign': 'error', 'use-isnan': 'error', 'valid-typeof': 'error',
+      'no-unused-vars': ['warn', { args: 'none', caughtErrors: 'none', varsIgnorePattern: '^_' }],
+    },
+  },
+  {
     files: ['page/sw.js'],
     languageOptions: {
       ecmaVersion: 2022,
