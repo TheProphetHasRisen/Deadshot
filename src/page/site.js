@@ -1523,7 +1523,7 @@ function spotlight(){
   dots.forEach(c=>{const sel=on.has(c.dataset.mgr);
     c.setAttribute('opacity',!any?1:(sel?1:.12));
     c.setAttribute('r',sel?(c.dataset.champ?7.4:5.8):(c.dataset.champ?6:4.2));
-    c.setAttribute('stroke',sel?'var(--brass)':(c.dataset.champ?'var(--brass)':'var(--ink-3)'));});
+    c.setAttribute('stroke',sel?'var(--brass)':(c.dataset.champ?'var(--brass)':+c.dataset.pl<=3?'var(--brass-2)':'var(--ink-3)'));});
   const box=$('#stripTrails');
   if(box){
     box.innerHTML=[...on].map(m=>{
@@ -1531,7 +1531,10 @@ function spotlight(){
       if(mine.length<2)return '';
       return `<path d="${mine.map((c,i)=>(i?'L':'M')+c.getAttribute('cx')+','+c.getAttribute('cy')).join(' ')}"
         fill="none" stroke="var(--brass)" stroke-width="2.4" stroke-linejoin="round"
-        style="filter:drop-shadow(0 0 5px var(--glow))"/>`;}).join('');
+        style="filter:drop-shadow(0 0 5px var(--glow))"/>`+
+        /* the podium finishes, labelled on the line itself: 1st, 2nd, 3rd */
+        mine.filter(c=>+c.dataset.pl<=3).map(c=>`<text x="${c.getAttribute('cx')}" y="${+c.getAttribute('cy')-11}" text-anchor="middle"
+          font-size="9.5" font-weight="700" fill="var(--brass)" font-family="IBM Plex Mono,monospace">${ord(+c.dataset.pl)}</text>`).join('');}).join('');
   }
   const lbl=$('#stripWho');
   if(lbl)lbl.textContent=on.size?[...on].join('  ·  ')+(PICK.size?'   (click to release)':''):'';
@@ -2086,7 +2089,7 @@ function drawStrip(){
     bands+=`<line x1="${xs(i)}" x2="${xs(i)}" y1="${ys(Math.max(...rs.map(r=>r.pi)))}" y2="${ys(Math.min(...rs.map(r=>r.pi)))}" stroke="var(--rule)" stroke-width="1"/>`;
     rs.forEach((r,k)=>{const off=(k%2?1:-1)*Math.floor(k/2)*5.4, on=vis(r.mgr);
       dots+= on
-        ? `<circle cx="${xs(i)+off}" cy="${ys(r.pi)}" r="${r.place===1?6:4.2}" fill="${r.place===1?'var(--brass)':'var(--surface)'}" stroke="${r.place===1?'var(--brass)':'var(--ink-3)'}" stroke-width="${r.place===1?2:1.6}" data-k="${y}|${esc(r.mgr)}" data-mgr="${esc(r.mgr)}" data-yr="${y}" ${r.place===1?'data-champ="1"':''} style="cursor:pointer"/>`
+        ? `<circle cx="${xs(i)+off}" cy="${ys(r.pi)}" r="${r.place===1?6:4.2}" fill="${r.place===1?'var(--brass)':'var(--surface)'}" stroke="${r.place===1?'var(--brass)':r.place<=3?'var(--brass-2)':'var(--ink-3)'}" stroke-width="${r.place===1?2:1.6}" data-k="${y}|${esc(r.mgr)}" data-pl="${r.place}" data-mgr="${esc(r.mgr)}" data-yr="${y}" ${r.place===1?'data-champ="1"':''} style="cursor:pointer"/>`
         : `<circle cx="${xs(i)+off}" cy="${ys(r.pi)}" r="2" fill="var(--rule)" stroke="none"/>`;});
   });
   const lab=SEA.map((y,i)=>`<text x="${xs(i)}" y="${H-P.b+19}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${y}</text>`).join('');
@@ -4858,31 +4861,54 @@ glossify();
   $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
   $('#tLiveTr').innerHTML='<tbody>'+L.trades.slice().reverse().map(x=>`<tr><td class="dim">${esc(x.d)}</td><td><b>${esc(x.ta)}</b> got ${esc(x.ga.join(', '))}<br><b>${esc(x.tb)}</b> got ${esc(x.gb.join(', '))}</td></tr>`).join('')+'</tbody>';
   /* the draft: one column per team in draft order, one row per round */
-  let dy=String(L.year), pos='All';
-  const POS=['All','QB','RB','WR','TE','K','DEF'];
+  /* ---- the draft: in draft order or by team, any mix of positions, and how each pick turned out ---- */
+  let dy=String(L.year), view='order';
+  const POS=['QB','RB','WR','TE','K','DEF'], on=new Set();
+  const DP=L.draftPts||{};
+  const judge=P=>{   /* drafted as the Nth at his position, finished Mth: steal, bust or neither */
+    const n={}, out={}; const pts=DP[dy]||{};
+    P.slice().sort((a,b)=>a[0]-b[0]).forEach(p=>{n[p[4]]=(n[p[4]]||0)+1; const v=pts[p[2]]||[null,null];
+      const dr=n[p[4]], fr=v[1], d=fr==null?null:dr-fr;
+      out[p[0]]={dr,fr,pts:v[0],d,steal:d!=null&&fr<dr&&(d>=8||(fr*2<=dr&&d>=3)),bust:d!=null&&fr>dr&&dr<=36&&(-d>=12||(fr>=dr*2.5&&-d>=6))};});
+    return out;};
   const drawDr=()=>{
     $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('')+
-      '<span class="lv-gap"></span>'+POS.map(p=>`<button data-dp="${p}" class="${p===pos?'on':''}">${p}</button>`).join('');
+      '<span class="lv-gap"></span>'+[['order','Draft order'],['team','By team']].map(([k,t])=>`<button data-dv="${k}" class="${k===view?'on':''}">${t}</button>`).join('')+
+      '<span class="lv-gap"></span>'+POS.map(p=>`<button data-dp="${p}" class="${on.has(p)?'on':''}">${p}</button>`).join('');
     $$('#lvDy button[data-dy]').forEach(b=>b.onclick=()=>{dy=b.dataset.dy; drawDr();});
-    $$('#lvDy button[data-dp]').forEach(b=>b.onclick=()=>{pos=b.dataset.dp; drawDr();});
-    const P=L.draft[dy], order=P.filter(p=>p[0]<=10).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
-    /* the first player taken at each position, and the order each position went in */
-    const posRank={}, seen={}; P.slice().sort((a,b)=>a[0]-b[0]).forEach(p=>{seen[p[4]]=(seen[p[4]]||0)+1; posRank[p[0]]=seen[p[4]];});
-    const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
-    let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
-    for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
-      if(!p)return '<td></td>';
-      const pr=posRank[p[0]], dim=pos!=='All'&&p[4]!==pos;
-      return `<td class="${dim?'lv-dim':''}"><span class="lv-pos">${esc(p[4])}${pos===p[4]?pr:''}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${pr===1&&p[4]!=='K'&&p[4]!=='DEF'?`<span class="lv-first">1st ${esc(p[4])}</span>`:''}</td>`;}).join('')+'</tr>';}
-    $('#tLiveDr').innerHTML=h+'</tbody>';
-    /* risers and fallers: the players in both drafts, and how far their pick moved */
-    const ys=Object.keys(L.draft).sort(), a=L.draft[ys[0]], z=L.draft[ys[ys.length-1]];
-    const at={}; a.forEach(p=>{at[p[2]]=p[0];});
-    const mv=z.filter(p=>at[p[2]]!=null&&(pos==='All'||p[4]===pos)).map(p=>({n:p[2],pos:p[4],was:at[p[2]],now:p[0],d:at[p[2]]-p[0]}));
-    const up=mv.filter(m=>m.d>0).sort((x,y)=>y.d-x.d).slice(0,6), dn=mv.filter(m=>m.d<0).sort((x,y)=>x.d-y.d).slice(0,6);
-    const ln=m=>`<tr><td><span class="lv-pos">${esc(m.pos)}</span> ${esc(m.n)}</td><td class="num dim">${m.was} → ${m.now}</td><td class="num"><b>${m.d>0?'+':'−'}${Math.abs(m.d)}</b></td></tr>`;
-    $('#tLiveMv').innerHTML=`<thead><tr><th>Rose most, ${ys[0]} to ${ys[ys.length-1]}</th><th class="num">Pick</th><th class="num">Moved</th></tr></thead><tbody>${up.map(ln).join('')}</tbody>`+
-      `<thead><tr><th>Fell most</th><th class="num">Pick</th><th class="num">Moved</th></tr></thead><tbody>${dn.map(ln).join('')}</tbody>`;
+    $$('#lvDy button[data-dv]').forEach(b=>b.onclick=()=>{view=b.dataset.dv; drawDr();});
+    $$('#lvDy button[data-dp]').forEach(b=>b.onclick=()=>{const p=b.dataset.dp; on.has(p)?on.delete(p):on.add(p); drawDr();});
+    const P=L.draft[dy], J=judge(P), wk=(DP.weeks||{})[dy], partial=+dy===L.year;
+    const mark=p=>{const v=J[p[0]]; if(v.fr==null)return '';
+      const cls=v.steal?'lv-steal':v.bust?'lv-bust':'lv-fin';
+      return ` <span class="${cls}" title="Drafted ${p[4]}${v.dr}, ${partial?'running':'finished'} ${p[4]}${v.fr} with ${f(v.pts,1)} points">${v.steal?'▲ ':v.bust?'▼ ':''}${p[4]}${v.fr}</span>`;};
+    const dim=p=>on.size&&!on.has(p[4]);
+    const mg=t=>L.mgr[t]?L.mgr[t].split(' ').slice(-1)[0]:'';
+    if(view==='team'){
+      const order=P.filter(p=>p[0]<=10).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
+      const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
+      let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
+      for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
+        return p?`<td class="${dim(p)?'lv-dim':''}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</td>`:'<td></td>';}).join('')+'</tr>';}
+      $('#tLiveDr').innerHTML=h+'</tbody>';
+    }else{
+      $('#tLiveDr').innerHTML='<thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Taken</th><th>'+(partial?'Running':'Finished')+'</th><th class="num">Points</th></tr></thead><tbody>'+
+        P.slice().sort((a,b)=>a[0]-b[0]).map(p=>{const v=J[p[0]];
+          return `<tr class="${dim(p)?'lv-dim':''}${p[0]%10===0?' lv-rd':''}"><td class="dim">${Math.ceil(p[0]/10)}.${String((p[0]-1)%10+1).padStart(2,'0')} <span class="lv-ov">${p[0]}</span></td>
+            <td>${esc(p[1])} <span class="dim">${esc(mg(p[1]))}</span></td><td><b>${esc(p[2])}</b> <span class="dim">${esc(p[3])}</span></td>
+            <td><span class="lv-pos">${esc(p[4])}${v.dr}</span></td><td>${mark(p)}</td><td class="num">${v.pts==null?'—':f(v.pts,1)}</td></tr>`;}).join('')+'</tbody>';
+    }
+    /* the verdicts: biggest steals, biggest busts, and whose draft has scored the most */
+    const rows=P.map(p=>({p,v:J[p[0]]})).filter(x=>x.v.fr!=null&&(!on.size||on.has(x.p[4])));
+    const st=rows.filter(x=>x.v.fr<=24&&x.v.d>0).sort((a,b)=>b.v.d-a.v.d).slice(0,8);
+    const bu=rows.filter(x=>x.v.dr<=24&&x.v.d<0).sort((a,b)=>a.v.d-b.v.d).slice(0,8);
+    const ln=x=>`<tr><td><b>${esc(x.p[2])}</b> <span class="dim">${esc(x.p[1])}</span></td><td class="num">pick ${x.p[0]} · ${x.p[4]}${x.v.dr}</td><td class="num"><b>${x.p[4]}${x.v.fr}</b></td><td class="num">${f(x.v.pts,1)}</td></tr>`;
+    const tp={}; P.forEach(p=>{const v=J[p[0]]; if(v.pts!=null&&(!on.size||on.has(p[4])))tp[p[1]]=(tp[p[1]]||0)+v.pts;});
+    const tr=Object.entries(tp).sort((a,b)=>b[1]-a[1]);
+    $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs finished at his position';
+    $('#tLiveSb').innerHTML=`<thead><tr><th>Steals</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${st.map(ln).join('')}</tbody>`+
+      `<thead><tr><th>Busts</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${bu.map(ln).join('')}</tbody>`+
+      `<thead><tr><th>Best drafts</th><th class="num"></th><th class="num">Rank</th><th class="num">Points</th></tr></thead><tbody>${tr.map(([t,v],i)=>`<tr><td><b>${esc(t)}</b> <span class="dim">${esc(L.mgr[t]||'')}</span></td><td></td><td class="num">${ord(i+1)}</td><td class="num">${f(v,1)}</td></tr>`).join('')}</tbody>`;
   };
   drawDr();
 })();

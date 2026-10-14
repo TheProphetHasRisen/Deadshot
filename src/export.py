@@ -309,6 +309,8 @@ if S26:
     out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
                        trades=[dict(d=d, ta=a, ga=ga, tb=b, gb=gb) for (d, a, ga, b, gb) in S26.TRADES2026],
                        draft={'2026': [list(p) for p in S26.DRAFT2026], '2025': [list(p) for p in S26.DRAFT2025]},
-                       asOf='Oct 14, 2026')
+                       asOf='Oct 14, 2026',
+                       # every drafted player's points under league scoring, and his finish at his position
+                       draftPts=(json.load(open('draft_points.json')) if os.path.exists('draft_points.json') else None))
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))

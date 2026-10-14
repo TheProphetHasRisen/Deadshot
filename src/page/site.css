@@ -1060,7 +1060,7 @@ section{padding:52px 0 6px;scroll-margin-top:96px}
    dialog, because nobody scrolls to the bottom of a long page to check a scoring rule.
    On a phone the whole control bar collapses behind one summary line -- this button is
    exempted from that, so it stays reachable without expanding anything first. */
-#rulesBtn{border-color:var(--brass-2);color:var(--brass);font-weight:600}
+#rulesBtn{font-weight:400}
 /* ---- Ask the record book ----------------------------------------------------------- */
 #askBtn{display:inline-flex;align-items:center;gap:7px;border-color:var(--brass-2);color:var(--brass);font-weight:600;margin-left:auto}
 #askBtn svg{width:13px;height:13px;flex:none}
@@ -1460,3 +1460,11 @@ body.lv-pg .lv-view-h{display:none}
 .lv-draft td.lv-dim{opacity:.22}
 .lv-first{font:600 9px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--brass);margin-left:4px}
 .lv-gap{display:inline-block;width:10px}
+.lv-steal,.lv-bust,.lv-fin{font:600 10px "IBM Plex Mono",monospace;letter-spacing:.03em;white-space:nowrap}
+.lv-steal{color:var(--pos)}
+.lv-bust{color:var(--neg)}
+.lv-fin{color:var(--ink-3);font-weight:500}
+.lv-draft tr.lv-dim td{opacity:.22}
+.lv-draft tr.lv-rd td{border-bottom:1px solid var(--rule)}
+.lv-draft .lv-ov{font-size:10px;color:var(--ink-3)}
+.lv-tag{text-shadow:none!important;-webkit-text-stroke:0}

@@ -226,6 +226,16 @@ type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
 - No Claude/API translator on purpose: it would need a paid API key in a page the whole
   league opens. That is Brian's call (it costs money), not a technical one.
 
+## The live season (2026)
+
+`season2026.py` holds the live season typed from Brian's screenshots until Yahoo connects;
+`check_2026.py` reconciles it (records, streaks, PF, PA, both drafts as snake orders).
+`export.py` writes it as `D.live`, kept OUT of rows/careers-by-season/champions, but its
+games DO count in head to head, career W-L/PF/PA/PPG/all-play and the search's game log.
+`draft_points.py` scores every drafted player from Sleeper's public weekly stats with the
+league's own scoring and writes `draft_points.json` (re-run it weekly in season); the draft
+board's steals, busts and best drafts come from that.
+
 ## The numbers tripwire
 
 `python3 test_numbers.py` pins every computed number -- power index, Z, pythagorean
