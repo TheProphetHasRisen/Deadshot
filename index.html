@@ -1573,7 +1573,6 @@ body.lv-pg .lv-go{color:var(--brass)}
 /* a trade card's managers, each with his team in brackets, in the reading face rather than the small mono */
 .card-h .trmg{font-size:13px;color:var(--ink);overflow-wrap:anywhere}
 .lv-rk{font-family:"IBM Plex Mono",monospace;font-size:12px;white-space:nowrap}
-.lv-trtiles .tile b.lv-rks{font-size:13.5px;white-space:normal;line-height:1.45;letter-spacing:0}
 </style>
 </head>
 <body>
@@ -7018,18 +7017,15 @@ glossify();
           <td class="num lv-rk">${p.rkPre==null&&p.rkPost==null?'—':rk(p.rkPre)+(anyS?' <span class="dim">→</span> '+rk(p.rkPost):'')}</td><td class="num">${chg(p.chg)}</td></tr>`;}).join('')}
         <tr class="lv-trs"><td>Side</td><td class="num">${f(sum(p=>p.pre),1)}</td><td class="num">${anyS?f(sum(pg),1):'—'}</td><td></td><td class="num">${chg(anyS?sum(p=>p.chg):null)}</td></tr></tbody></table></div></div>`;};
     const st=t=>L.standings.find(r=>r.team===t);
-    /* each side's players by rank at their positions: TE6 v WR52 */
-    const ranks=(x,k)=>{const one=a=>a.map(p=>p[k]==null?'—':esc(p.pos)+p[k]).join(' · ');
-      return `<b class="${x.a.length+x.b.length>2?'lv-rks':''}">${one(x.a)} <i>v</i> ${one(x.b)}</b>`;};
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
       const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):'wk 1', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
       let tiles;
       if(n){const aw=x.aPost/n, bw=x.bPost/n, pl=aw>=bw?x.ta:x.tb, fl=x.aChg>=x.bChg?x.ta:x.tb, gap=Math.abs(x.aChg-x.bChg), wpw=gap/PPW, left=Math.max(0,L.regWeeks-done);
         tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>
-          <div class="tile"><span>At their positions, since</span>${ranks(x,'rkPost')}<div class="lv-tx">rank among every NFL player there, ${ws.replace('wk ',n>1?'weeks ':'week ')}</div></div>
+          <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${esc(fl)} ${sg(gap,1)} a game</div></div>
           <div class="tile"><span>In wins, to ${esc(fl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">${left?f(wpw*left,1)+' over the '+nOf(left,'week')+' left':'season over'}</div></div>`;}
       else tiles=`<div class="tile"><span>Points a game before</span><b>${f(x.aPre,1)} <i>v</i> ${f(x.bPre,1)}</b><div class="lv-tx">each side’s players, added up</div></div>
-          <div class="tile"><span>At their positions, before</span>${ranks(x,'rkPre')}<div class="lv-tx">rank among every NFL player there, ${wb.replace('wk ',x.wk>2?'weeks ':'week ')}</div></div>
+          <div class="tile"><span>Against own form ${gl('xform')}</span><b>—</b><div class="lv-tx">no games since the deal yet</div></div>
           <div class="tile"><span>In wins ${gl('war')}</span><b>—</b><div class="lv-tx">no games since the deal yet</div></div>`;
       const J=(...x)=>x.map(v=>`<span class="nw">${v}</span>`).join(' · ');   /* on a phone, break only between the pieces */
       const row=(t,F)=>{const r=st(t), b=F.before, a=F.since;
