@@ -25,11 +25,11 @@ W2026 = [(1, 'The Curse', 114.72, 108.83, 'SNIPES', 106.86, 123.06, ''),
  (5, "It's a Love Story", 116.4, 120.55, 'SNIPES', 149.34, 132.54, ''),
  (5, 'Hench', 125.34, 129.88, 'Medellin', 120.08, 126.5, ''),
  (5, 'Kabul Gearing Bombers', 148.5, 132.24, 'Stegostompem', 179.16, 123.15, '')]
-UPCOMING2026 = {6: [('The Curse', 117.86, 'Hench', 138.68, 0.0, 0.0, 'midevent'),
-     ('DylansVillans', 125.19, "Poe's Palace", 138.4, 0.0, 0.0, 'midevent'),
-     ("It's a Love Story", 119.67, 'Medellin', 108.96, 0.0, 0.0, 'midevent'),
-     ('SNIPES', 129.61, 'Kabul Gearing Bombers', 120.71, 0.0, 0.0, 'midevent'),
-     ('Stegostompem', 124.54, 'U gotta BO-lieve', 130.14, 0.0, 0.0, 'midevent')]}
+UPCOMING2026 = {6: [('The Curse', 117.5, 'Hench', 138.62, 0.0, 0.0, 'midevent'),
+     ('DylansVillans', 124.84, "Poe's Palace", 138.54, 0.0, 0.0, 'midevent'),
+     ("It's a Love Story", 119.22, 'Medellin', 108.91, 0.0, 0.0, 'midevent'),
+     ('SNIPES', 129.83, 'Kabul Gearing Bombers', 120.49, 0.0, 0.0, 'midevent'),
+     ('Stegostompem', 124.6, 'U gotta BO-lieve', 130.23, 0.0, 0.0, 'midevent')]}
 STANDINGS2026_WK5 = {'DylansVillans': (3, 3, 2, 0, 690.3, 606.7, 'L1', 7, 10),
  'Hench': (5, 3, 2, 0, 613.98, 698.02, 'W3', 5, 19),
  "It's a Love Story": (10, 1, 4, 0, 591.36, 662.32, 'L4', 10, 9),
@@ -206,7 +206,7 @@ TRADEPOS = {'Ashton Jeanty': 'RB',
  'Rome Odunze': 'WR',
  'Tyler Warren': 'TE'}
 # when Yahoo was read (Pacific time, where the league lives)
-ASOF = 'Oct 15, 2026, 1:03 pm PT'
+ASOF = 'Oct 15, 2026, 2:39 pm PT'
 # every player on every roster every week: (week, team, player, position, slot, points);
 # slot BN is the bench and IR injured reserve, anything else started
 ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),
@@ -1064,19 +1064,19 @@ ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),
  (6, 'Kabul Gearing Bombers', 'Tony Pollard', 'RB', 'BN', 0.0),
  (6, 'Kabul Gearing Bombers', 'Zach Charbonnet', 'RB', 'IR', 0.0),
  (6, 'Medellin', 'Bhayshul Tuten', 'RB', 'RB', 0.0),
+ (6, 'Medellin', 'Caleb Williams', 'QB', 'QB', 0.0),
  (6, 'Medellin', 'DeVonta Smith', 'WR', 'WR', 0.0),
  (6, 'Medellin', 'Eddy Pineiro', 'K', 'K', 0.0),
  (6, 'Medellin', 'Garrett Wilson', 'WR', 'WR', 0.0),
  (6, 'Medellin', 'Omarion Hampton', 'RB', 'RB', 0.0),
- (6, 'Medellin', 'Patrick Mahomes', 'QB', 'QB', 0.0),
  (6, 'Medellin', 'Romeo Doubs', 'WR', 'W/R/T', 0.0),
  (6, 'Medellin', 'Steelers', 'DEF', 'DEF', 0.0),
  (6, 'Medellin', 'Trey McBride', 'TE', 'TE', 0.0),
- (6, 'Medellin', 'Caleb Williams', 'QB', 'BN', 0.0),
  (6, 'Medellin', "Ja'Marr Chase", 'WR', 'BN', 0.0),
  (6, 'Medellin', 'Jacoby Brissett', 'QB', 'BN', 0.0),
  (6, 'Medellin', 'Jeremiyah Love', 'RB', 'BN', 0.0),
  (6, 'Medellin', 'Pat Freiermuth', 'TE', 'BN', 0.0),
+ (6, 'Medellin', 'Patrick Mahomes', 'QB', 'BN', 0.0),
  (6, 'Medellin', 'TreVeyon Henderson', 'RB', 'BN', 0.0),
  (6, "Poe's Palace", 'Chiefs', 'DEF', 'DEF', 0.0),
  (6, "Poe's Palace", 'Christian McCaffrey', 'RB', 'RB', 0.0),
