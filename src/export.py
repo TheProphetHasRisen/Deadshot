@@ -98,7 +98,9 @@ WKALL={}
 for YR,(GAMES,BYES,TRD) in SRC.items():
     reg=[g for g in GAMES if g[7]=='']
     teams=sorted({g[1] for g in GAMES}|{g[4] for g in GAMES})
-    mgr={t:(D.MANAGERS.get(YR) or MGRS_LIVE.get(YR, {}))[t] for t in teams}
+    # the live season's games carry its own team names, so its own manager list names them (the record
+    # book's copy only exists once the final is written, and test_writer.py writes a made-up one)
+    mgr={t:(MGRS_LIVE.get(YR) or D.MANAGERS.get(YR))[t] for t in teams}
     tw={t:{} for t in teams}
     for (w,ta,aa,pa,tb,ab,pb,br) in reg:
         tw[ta][w]=dict(pts=aa,proj=pa,opp=tb,oppPts=ab)

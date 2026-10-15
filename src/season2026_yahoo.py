@@ -25,14 +25,14 @@ W2026 = [(1, 'The Curse', 114.72, 108.83, 'SNIPES', 106.86, 123.06, ''),
  (5, "It's a Love Story", 116.4, 120.55, 'SNIPES', 149.34, 132.54, ''),
  (5, 'Hench', 125.34, 129.88, 'Medellin', 120.08, 126.5, ''),
  (5, 'Kabul Gearing Bombers', 148.5, 132.24, 'Stegostompem', 179.16, 123.15, '')]
-UPCOMING2026 = {6: [('The Curse', 117.68, 'Hench', 138.63, 0.0, 0.0, 'midevent'),
-     ('DylansVillans', 124.78, "Poe's Palace", 138.42, 0.0, 0.0, 'midevent'),
-     ("It's a Love Story", 119.47, 'Medellin', 109.48, 0.0, 0.0, 'midevent'),
-     ('SNIPES', 129.68, 'Kabul Gearing Bombers', 120.61, 0.0, 0.0, 'midevent'),
-     ('Stegostompem', 124.37, 'U gotta BO-lieve', 130.31, 0.0, 0.0, 'midevent')]}
+UPCOMING2026 = {6: [('The Curse', 117.86, 'Hench', 138.68, 0.0, 0.0, 'midevent'),
+     ('DylansVillans', 125.19, "Poe's Palace", 138.4, 0.0, 0.0, 'midevent'),
+     ("It's a Love Story", 119.67, 'Medellin', 108.96, 0.0, 0.0, 'midevent'),
+     ('SNIPES', 129.61, 'Kabul Gearing Bombers', 120.71, 0.0, 0.0, 'midevent'),
+     ('Stegostompem', 124.54, 'U gotta BO-lieve', 130.14, 0.0, 0.0, 'midevent')]}
 STANDINGS2026_WK5 = {'DylansVillans': (3, 3, 2, 0, 690.3, 606.7, 'L1', 7, 10),
  'Hench': (5, 3, 2, 0, 613.98, 698.02, 'W3', 5, 19),
- "It's a Love Story": (10, 1, 4, 0, 591.36, 662.32, 'L4', 10, 8),
+ "It's a Love Story": (10, 1, 4, 0, 591.36, 662.32, 'L4', 10, 9),
  'Kabul Gearing Bombers': (1, 3, 2, 0, 719.16, 655.2, 'L1', 6, 12),
  'Medellin': (6, 3, 2, 0, 611.3, 561.96, 'L2', 8, 4),
  "Poe's Palace": (2, 3, 2, 0, 714.2, 726.58, 'W1', 4, 11),
@@ -40,7 +40,8 @@ STANDINGS2026_WK5 = {'DylansVillans': (3, 3, 2, 0, 690.3, 606.7, 'L1', 7, 10),
  'Stegostompem': (7, 2, 3, 0, 727.04, 743.38, 'W2', 3, 17),
  'The Curse': (4, 3, 2, 0, 625.42, 626.52, 'W2', 2, 9),
  'U gotta BO-lieve': (9, 2, 3, 0, 621.48, 630.72, 'L2', 1, 6)}
-MOVES2026 = [('Oct 15', '1:52 pm', 'SNIPES', [('Blake Grupe', 'LAR', 'K', 'FA')], [('Jason Myers', 'SEA', 'K')]),
+MOVES2026 = [('Oct 15', '4:00 pm', "It's a Love Story", [('Christian Kirk', 'SF', 'WR', 'FA')], []),
+ ('Oct 15', '1:52 pm', 'SNIPES', [('Blake Grupe', 'LAR', 'K', 'FA')], [('Jason Myers', 'SEA', 'K')]),
  ('Oct 15', '1:11 pm', 'U gotta BO-lieve', [('Jalen Hurts', 'PHI', 'QB', 'FA')], []),
  ('Oct 15', '1:11 pm', 'U gotta BO-lieve', [], [('Courtland Sutton', 'DEN', 'WR')]),
  ('Oct 15', '1:11 pm', 'DylansVillans', [('Panthers', 'CAR', 'DEF', 'FA')], [('Falcons', 'ATL', 'DEF')]),
@@ -205,7 +206,7 @@ TRADEPOS = {'Ashton Jeanty': 'RB',
  'Rome Odunze': 'WR',
  'Tyler Warren': 'TE'}
 # when Yahoo was read (Pacific time, where the league lives)
-ASOF = 'Oct 15, 2026, 1:00 pm PT'
+ASOF = 'Oct 15, 2026, 1:03 pm PT'
 # every player on every roster every week: (week, team, player, position, slot, points);
 # slot BN is the bench and IR injured reserve, anything else started
 ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),
@@ -1039,6 +1040,7 @@ ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),
  (6, "It's a Love Story", 'Rams', 'DEF', 'DEF', 0.0),
  (6, "It's a Love Story", 'Tucker Kraft', 'TE', 'TE', 0.0),
  (6, "It's a Love Story", 'Aaron Jones Sr.', 'RB', 'BN', 0.0),
+ (6, "It's a Love Story", 'Christian Kirk', 'WR', 'IR', 0.0),
  (6, "It's a Love Story", 'Dontayvion Wicks', 'WR', 'BN', 0.0),
  (6, "It's a Love Story", 'Josh Jacobs', 'RB', 'BN', 0.0),
  (6, "It's a Love Story", 'RJ Harvey', 'RB', 'BN', 0.0),

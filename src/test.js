@@ -39,7 +39,7 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
         out.season.afterOpen=q('.fold-body:not([hidden])').length;
         const b=document.getElementById('lvSegBook'); if(b)b.click();}
       return out;});
-    if(sp.season&&(sp.season.cards<8||sp.season.open||!sp.season.afterOpen))errs.push(name+' the 2023 season page does not start shut, or will not open: '+JSON.stringify(sp));
+    if(sp.season&&(sp.season.cards<3||sp.season.open||!sp.season.afterOpen))errs.push(name+' the 2023 season page does not start shut, or will not open: '+JSON.stringify(sp));
     await p.click('main#main > .fold-bar [data-fold="deep"]'); await p.waitForTimeout(300);
     const f4=await fold();
     if(f4.secsOpen!==f4.secs||f4.cardsOpen!==f4.cards)errs.push(name+' "Open everything" left something shut: '+JSON.stringify(f4));

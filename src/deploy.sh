@@ -157,8 +157,9 @@ cp fonts/*.woff2 fonts/OFL-*.txt "$CLONE/fonts/"
 # the Yahoo sign-in it uses out of this public repo
 mkdir -p "$CLONE/.github/workflows"
 cp ci/update.yml "$CLONE/.github/workflows/update.yml"
+cp ci/checks.yml "$CLONE/.github/workflows/checks.yml"      # the check on every publish
 cp ci/site.gitignore "$CLONE/.gitignore"
-git -C "$CLONE" add .gitignore .github/workflows/update.yml
+git -C "$CLONE" add .gitignore .github/workflows/update.yml .github/workflows/checks.yml
 git -C "$CLONE" add -A index.html 404.html og.png og-*.png t src favicon.svg favicon-32.png \
   apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts art
 if git -C "$CLONE" diff --cached --quiet; then
