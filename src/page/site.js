@@ -2394,9 +2394,10 @@ drawRecords(); REDRAW.push(drawRecords);
   if(!t||!w)return;
   const sync=()=>{const open=!w.hidden;
     t.innerHTML=open?'Hide the record book &#9652;':'Show the record book &#9662;';
-    t.classList.toggle('on',open);
+    t.classList.toggle('on',open); t.setAttribute('aria-expanded',open?'true':'false');
     if(c)c.textContent=open?'':`${$$('#recs .card').length||21} tables`;};
   t.onclick=()=>{w.hidden=!w.hidden;sync();};
+  t._set=v=>{w.hidden=!v; sync();};
   sync();
 })();
 
@@ -2512,6 +2513,7 @@ function hiTeam(t){
 }
 function drawConnectors(gs){
   const svg=$('#conn'),wrap=$('#brkIn'); if(!svg||!wrap)return;
+  if(!wrap.getBoundingClientRect().width)return;   /* not laid out (another page is showing): keep what is drawn */
   const W=wrap.scrollWidth,H=wrap.scrollHeight;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.setAttribute('width',W); svg.setAttribute('height',H);
   const box=wrap.getBoundingClientRect();
@@ -2997,10 +2999,12 @@ function wantOpen(el){
   if(el.matches('section'))return true;
   return mode==='deep'||(!r.matches('main#main')&&!isSub(el));
 }
-function afterReveal(el){
-  requestAnimationFrame(()=>{window.dispatchEvent(new Event('resize'));
-    if(el&&(el.querySelector&&el.querySelector('#race')||el.closest&&el.closest('#weekly'))){
-      const b=$$('#wkYears button.on')[0]; if(b&&typeof drawWeekly==='function')drawWeekly(+b.dataset.wy);}});}
+/* A shut box keeps its full width out of sight (site.css, .fold-body[hidden]), so a chart drawn while
+   it is shut measures right and nothing has to be redrawn when it opens. Redrawing on open used to
+   reset whatever the reader had picked (the week, the race locks, an open trade card). */
+const FOLDMEM=new Map();   /* what the reader opened, by box, so a box redrawn later comes back the same */
+function foldKey(c){const sc=c.closest('section'), h=c.querySelector(':scope > .card-h h3');
+  return (c.id||'')+'|'+(sc?sc.id:'')+'|'+(h?h.textContent.replace(/\d+/g,'#').trim():'');}
 function makeCollapsible(card,open){
     if(card.dataset.collapseBound)return; card.dataset.collapseBound='1';
     const head=card.querySelector(':scope > .card-h'); if(!head)return;
@@ -3009,19 +3013,21 @@ function makeCollapsible(card,open){
     card.appendChild(wrap);
     const also=()=>{const x=card.getAttribute('data-collapse-also'), e=x?$(x):null; if(e)e.setAttribute('data-fold-sub',''); return e;};
     also();
+    /* the button goes on the header itself, never inside a part of it that gets redrawn (the week pills) */
     const btn=document.createElement('button');
     btn.type='button'; btn.className='fold-btn';
-    btn.style.cssText='padding:5px 11px;font-size:11px;white-space:nowrap';
-    const host=head.querySelector(':scope > .right')||head;
-    if(host===head)btn.style.marginLeft='auto';
-    host.appendChild(btn);
+    btn.style.cssText='padding:5px 11px;font-size:11px;white-space:nowrap;margin-left:auto';
+    head.appendChild(btn); card._foldBtn=btn;
+    const title=()=>{const h=head.querySelector('h3'); return h?h.textContent.trim():'';};
     const sync=()=>{const o=!wrap.hidden;
       btn.innerHTML=o?'Hide &#9652;':'Show &#9662;';
       btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false');
+      btn.setAttribute('aria-label',(o?'Hide ':'Show ')+title());
       const extra=also(); if(extra)extra.hidden=!o;};
-    card._fold=v=>{wrap.hidden=!v; sync(); if(v)afterReveal(card);};
+    card._fold=v=>{wrap.hidden=!v; FOLDMEM.set(foldKey(card),!!v); sync();};
     btn.onclick=()=>card._fold(wrap.hidden);
-    wrap.hidden=!(open||card.getAttribute('data-collapse')==='open'||wantOpen(card));
+    const k=foldKey(card);
+    wrap.hidden=!(open||card.getAttribute('data-collapse')==='open'||(FOLDMEM.has(k)?FOLDMEM.get(k):wantOpen(card)));
     sync();
 }
 /* a section folds below its heading: the lede, the cards, everything */
@@ -3036,7 +3042,7 @@ function makeSectionFold(sec,open){
   head.appendChild(btn);
   const sync=()=>{const o=!body.hidden; btn.innerHTML=o?'Hide<span class="sf-w"> section</span> &#9652;':'Show<span class="sf-w"> section</span> &#9662;';
     btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false'); sec.classList.toggle('sec-shut',!o);};
-  sec._fold=v=>{body.hidden=!v; sync(); if(v)afterReveal(sec);};
+  sec._fold=v=>{body.hidden=!v; sync();};
   btn.onclick=()=>sec._fold(body.hidden);
   body.hidden=!(open||wantOpen(sec));
   sync();
@@ -3056,8 +3062,10 @@ function reveal(el){
 function foldAll(root,mode){   /* mode: 'sections', 'deep' (sections and every card), or null (shut everything) */
   if(!root)return;
   root.dataset.foldAll=mode||'';
-  $$('section',root).forEach(sc=>{if(sc._fold)sc._fold(wantOpen(sc));});
-  $$('.card',root).forEach(c=>{if(c._fold)c._fold(wantOpen(c));});
+  /* opening only opens: "Open all sections" leaves a card the reader opened alone */
+  $$('section',root).forEach(sc=>{if(sc._fold&&(!mode||wantOpen(sc)))sc._fold(wantOpen(sc));});
+  $$('.card',root).forEach(c=>{if(c._fold&&(!mode||wantOpen(c)))c._fold(wantOpen(c));});
+  const rt=$('#recsToggle'); if(rt&&rt._set&&root.contains(rt)&&mode!=='sections')rt._set(mode==='deep');
 }
 window.dsOpenAll=()=>{$$(FOLD_ROOTS).forEach(x=>foldAll(x,'deep'));};
 function foldSweep(root){
@@ -4284,11 +4292,14 @@ function applyUrlState(){
       const sy=$$(`#yrPills button[data-y="${y}"]`)[0];
       if(sy&&typeof drawSeason==='function')drawSeason(y);
     }
-    const wk=parseInt(q.get('w'),10);
-    if(wk){const wb=$$('#wkSel button[data-w="'+wk+'"]')[0]; if(wb)wb.click();}
+    const wk=parseInt(q.get('w'),10), open=[];   /* the boxes a shared link is about, opened for whoever follows it */
+    if(wk){const wb=$$('#wkSel button[data-w="'+wk+'"]')[0]; if(wb){wb.click(); open.push($('#wkSel'));}}
+    if(y&&location.hash==='#seasons')open.push(...$$('#seasonPane .card').slice(0,2));
     const m=q.get('m');
     if(m){const b=$$('#crPick button[data-cm]').filter(x=>x.dataset.cm===m)[0];
-      if(b){CRMGR=m;CRLOCK.clear();drawCareerRace();}}
+      if(b){CRMGR=m;CRLOCK.clear();drawCareerRace(); open.push($('#crPick'));}}
+    if(open.length)foldSweep($('#main'));
+    open.forEach(el=>{const c=el&&el.closest('.card'); if(c)reveal(c);});
     if(location.hash){const t=document.querySelector(location.hash);
       if(t)setTimeout(()=>t.scrollIntoView(),60);}
   }catch(e){}
@@ -4801,7 +4812,8 @@ function openStories(){
 }
 $('#storiesBtn').onclick=openStories;
 function jumpSeason(y){
-  drawSeason(y);
+  drawSeason(y); foldSweep($('#seasons'));   /* the redrawn boxes are bound now, so they can be opened */
+  $$('#seasonPane .card').slice(0,2).forEach(c=>reveal(c));   /* its standings and bracket, opened */
   const el=$('#seasons'); if(el)el.scrollIntoView({behavior:'smooth'});
 }
 
@@ -5132,6 +5144,7 @@ let openSeason=null;
   if(sel)sel.onchange=()=>{const y=+sel.value; if(y)openSeason(y);};
   const bk=$('#lvSegBook'); if(bk)bk.addEventListener('click',close);
   const lv=$('#lvSegLive'); if(lv)lv.addEventListener('click',close);
+  const lo=$('#lvOpen'); if(lo)lo.addEventListener('click',close);   /* the ticker's "Open 2026" from a season page */
   const ob=$('#syOpenBtn'); if(ob)ob.onclick=()=>{const b=$('#yrPills button.on'); openSeason(b?+b.dataset.y:SEA[SEA.length-1]);};
   const m=/^#(\d{4})$/.exec(location.hash); if(m&&+m[1]!==LIVEY)setTimeout(()=>openSeason(+m[1]),0);
 })();
@@ -5163,7 +5176,9 @@ glossify();
    2026 so far, in its own section and kept out of everything else until it is finished.
    Every manager is shown whatever the filter says: it is a ten-team standings table. */
 (function(){
-  const L=D.live; if(!L){const s=$('#lvView'); if(s)s.remove(); return;}
+  /* no live season, or one with no games yet (next preseason): no 2026 page, rather than an error that
+     would stop everything drawn after this point */
+  const L=D.live; if(!L||!L.standings||!L.standings.length||!L.weeks||!L.weeks.length){const s=$('#lvView'); if(s)s.remove(); return;}
   /* two ways in, while Brian decides which stays: the strip under the masthead opens 2026
      full screen over the page (the X or Escape brings you back), and the switch swaps the
      whole page between the record book and 2026 */
@@ -5203,13 +5218,14 @@ glossify();
       picks:X.picks||[], picksKD:X.picksKD||[], gone:X.gone||[], goneKD:X.goneKD||[], hits:X.hits||[], injAvg:X.injAvg};}
   $('#lvH').innerHTML=FINAL?String(L.year):`${L.year} <span class="lv-tag">Live</span>`;
   $('#lvLede').textContent=FINAL?`${L.year} as Yahoo has it: every lineup, move, trade and pick, graded exactly the way the season being played is.`
-    :'The season so far. It joins the record book, the career tables and the head-to-head grid once the final is played.';
+    :'The season so far. Its games already count in head to head; it joins the career tables and the rest of the record book once the final is played.';
   const mg=t=>L.mgr[t]||'', tm=t=>`<b>${esc(t)}</b> <span class="dim">${esc(mg(t))}</span>`;
   const st={}; L.standings.forEach(r=>{st[r.team]=r;});
   const recOf=t=>{const r=st[t]; return r?r.w+'–'+r.l+(r.t?'–'+r.t:''):'';};
   const done=L.weeks[L.weeks.length-1];
   $('#lvNote').innerHTML=FINAL?`Regular season, ${nOf(L.regWeeks,'week')}<br>from Yahoo`:`Through week ${done} of ${L.regWeeks}<br>As of ${esc(L.asOf)}`;
-  $('#lvStSub').textContent=FINAL?'end of the regular season · top 6 made the playoffs':`after week ${done} · top 6 make the playoffs`;
+  const SPOTS=((D.champs||[]).find(c=>c.y===L.year)||{}).spots||6;   /* 2021 had a four-team bracket */
+  $('#lvStSub').textContent=FINAL?`end of the regular season · top ${SPOTS} made the playoffs`:`after week ${done} · top ${SPOTS} make the playoffs`;
   table($('#tLive'),[
     {h:'Team',f:r=>tm(r.team),k:r=>r.team},
     {h:'W–L',f:r=>r.w+'–'+r.l+(r.t?'–'+r.t:''),c:'num',k:r=>r.w+r.t/2},
@@ -5219,7 +5235,7 @@ glossify();
     {h:'All-play',f:r=>r.apW+'–'+r.apL,c:'num',k:r=>r.apW/(r.apW+r.apL),t:'Record if every team had played every other team every week'},
     {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck,t:'Real wins minus all-play expected wins. Plus means the schedule has helped.'},
     {h:'Moves',f:r=>String(r.moves),c:'num',k:r=>r.moves},
-  ],L.standings,{rank:1,sort:-1,cls:r=>r.rank===6?'lv-cut':''});
+  ],L.standings,{rank:1,sort:-1,cls:r=>r.rank===SPOTS?'lv-cut':''});
   /* up next and results: the same matchup cards as Week by Week in the record book */
   const GRID='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:12px">';
   const ups=L.upcoming; $('#tLiveUp').closest('.card').hidden=!ups.length; if(ups.length){
@@ -5522,6 +5538,7 @@ glossify();
   roots.forEach(r=>{foldSweep(r); foldBar(r);});
   const mo=new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){
     if(n.nodeType!==1||!foldRoot(n))continue;
+    const hc=m.target.closest&&m.target.closest('.card'); if(hc&&hc._foldBtn&&!hc._foldBtn.isConnected){const h=hc.querySelector(':scope > .card-h'); if(h)h.appendChild(hc._foldBtn);}
     const p=n.parentElement;
     if(p&&p._fold&&p.matches('section')&&!n.matches('.sec-head,.sec-fold')){const f=p.querySelector(':scope > .sec-fold'); if(f){f.appendChild(n);}}
     if(n.matches('section'))makeSectionFold(n); n.querySelectorAll('section').forEach(sc=>makeSectionFold(sc));

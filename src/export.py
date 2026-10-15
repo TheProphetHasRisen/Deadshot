@@ -304,19 +304,15 @@ if S26:
         stand.append(dict(rank=rank, team=t, mgr=S26.MGR2026.get(t), w=w, l=l, t=tie, pf=f, pa=a, streak=streak,
                           waiver=waiver, moves=moves, apW=ap[t][0], apL=ap[t][1],
                           luck=(w + tie / 2) - g * ap[t][0] / (ap[t][0] + ap[t][1]) if ap[t][0] + ap[t][1] else None))
-    # games are games: 2026's count toward career win-loss, points and all-play now. Anything
-    # that needs a finished season (titles, finishes, seeds, power index) waits.
+    # The career tables count finished seasons only, like titles, seasons and the power index. Adding
+    # 2026's games to some career columns (win-loss, points, all-play) and not others (luck, deserved
+    # wins, games clear) made every table that shows both stop adding up (adversarial review, 15 Oct
+    # 2026). 2026's games count in head to head, which is labelled 2021-2026, and on its own page; the
+    # season joins the careers when the final is written. Each manager carries his 2026 so far, apart.
     byname = {m['name']: m for m in out['mgrs']}
     for r in stand:
         m = byname.get(r['mgr'])
-        if not m: continue
-        g = r['w'] + r['l'] + r['t']
-        m['live'] = dict(w=r['w'], l=r['l'], t=r['t'], pf=r['pf'], pa=r['pa'])
-        m['w'] += r['w']; m['l'] += r['l']; m['t'] += r['t']; m['g'] += g
-        m['pf'] += r['pf']; m['pa'] += r['pa']; m['ppg'] = m['pf'] / m['g']
-        m['winpct'] = (m['w'] + m['t'] / 2) / m['g']
-        if m.get('apW') is not None:
-            m['apW'] += r['apW']; m['apL'] += r['apL']; m['apPct'] = m['apW'] / (m['apW'] + m['apL'])
+        if m: m['live'] = dict(w=r['w'], l=r['l'], t=r['t'], pf=r['pf'], pa=r['pa'])
     def _files():
         if not os.path.exists('yahoo_raw/2026/teams.json'): return None
         import teamfile

@@ -267,6 +267,7 @@ const Ask=(()=>{
     /* names first: team names carry digits and ordinary words ("12th Man Records") */
     const at={};                     /* where each manager was named, to keep their order */
     for(const e of ENT){
+      if(!e.p||!e.p.trim())continue;   /* a name with no letters left after cleaning would never be eaten */
       let i;
       while((i=t.indexOf(' '+e.p+' '))>=0){
         if(e.t==='mgr'){if(!q.mgrs.includes(e.v)){q.mgrs.push(e.v); at[e.v]=i;}}
@@ -413,23 +414,25 @@ const Ask=(()=>{
   /* where each measure lives on the page */
   const SECNAME={champions:'Champions',alltime:'the All-Time Table',power:'Power Index',luck:'the Luck Ledger',advanced:'Advanced',
     weekly:'Week by Week',seasons:'Seasons','trades-sec':'the Trade Market',records:'the Record Book',h2h:'Head to Head'};
-  const toSection=id=>()=>{
+  /* every jump is into the record book: leave a season page or the 2026 page first */
+  const toBook=()=>{if(document.body.classList.contains('sy-pg')||document.body.classList.contains('lv-pg')){const b=$('#lvSegBook'); if(b)b.click();}};
+  const toSection=id=>()=>{ toBook();
     if(id==='records'){const w=$('#recsWrap'),t=$('#recsToggle'); if(w&&t&&!w.classList.contains('open')&&t.getAttribute('aria-expanded')!=='true')t.click();}
     const el=document.getElementById(id); if(el)el.scrollIntoView({behavior:'smooth'});};
   const secAct=id=>go('Go to '+(SECNAME[id]||id),toSection(id));
   const mgrAct=n=>go('Open '+n+'’s page',()=>openMgr(n),true);
-  const seasonAct=y=>go('Go to the '+y+' season',()=>jumpSeason(y));
-  const weekAct=(y,w)=>go('Go to week '+w+', '+y,()=>{
+  const seasonAct=y=>go('Go to the '+y+' season',()=>{toBook(); jumpSeason(y);});
+  const weekAct=(y,w)=>go('Go to week '+w+', '+y,()=>{ toBook();
     if(typeof drawWeekly==='function')drawWeekly(y);
     const b=$('#wkSel button[data-w="'+w+'"]'); if(b)b.click();
     const el=$('#wkSel'); (el&&el.closest('.card')||$('#weekly')).scrollIntoView({behavior:'smooth'});},true);
-  const h2hAct=(a,b)=>go('Open in Head to Head',()=>{
+  const h2hAct=(a,b)=>go('Open in Head to Head',()=>{ toBook();
     const hidden=[a,b].filter(n=>!SEL.has(n));
     if(hidden.length)setSel([...SEL,...hidden]);
     /* the pickers are rebuilt on the redraw that follows a filter change */
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       const A=$('#cmpA'),B=$('#cmpB'); if(A&&B){A.value=a;B.value=b; if(A.onchange)A.onchange();}
-      $('#h2h').scrollIntoView({behavior:'smooth'});}));},true);
+      const pk=$('#cmpA'); ((pk&&pk.closest('.card'))||$('#h2h')).scrollIntoView({behavior:'smooth'});}));},true);
 
   /* ---------------------------------------------------------------- answers */
   function answer(q){

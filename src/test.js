@@ -43,6 +43,15 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
     await p.click('main#main > .fold-bar [data-fold="deep"]'); await p.waitForTimeout(300);
     const f4=await fold();
     if(f4.secsOpen!==f4.secs||f4.cardsOpen!==f4.cards)errs.push(name+' "Open everything" left something shut: '+JSON.stringify(f4));
+    /* Week by Week keeps its controls and the reader's place when a box in it opens (a redraw on every
+       open once deleted the scoreboard's Show button and snapped trade cards shut) */
+    const wk=await p.evaluate(()=>{const sc=document.querySelector('#wkSel').closest('.card');
+      const b9=[...document.querySelectorAll('#wkSel button')].find(x=>x.dataset.w==='3'); if(b9)b9.click();
+      const tc=document.querySelector('#trades .card'); if(tc&&tc._fold)tc._fold(true);
+      return {btn:!!sc.querySelector(':scope > .card-h .fold-btn'), week:(document.querySelector('#wkSel button.on')||{}).dataset?.w};});
+    await p.waitForTimeout(250);
+    const wk2=await p.evaluate(()=>({trade:!!document.querySelector('#trades .card .fold-body:not([hidden])'), week:(document.querySelector('#wkSel button.on')||{}).dataset?.w}));
+    if(!wk.btn||wk2.week!==wk.week||!wk2.trade)errs.push(name+' Week by Week lost a control or the reader\'s place on opening a box: '+JSON.stringify({wk,wk2}));
     console.log(name+' folding', JSON.stringify({start:f0, sections:f1.secsOpen, season:sp.season}));
     // structural checks
     const r=await p.evaluate(()=>({
