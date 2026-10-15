@@ -305,6 +305,10 @@ if S26:
         m['winpct'] = (m['w'] + m['t'] / 2) / m['g']
         if m.get('apW') is not None:
             m['apW'] += r['apW']; m['apL'] += r['apL']; m['apPct'] = m['apW'] / (m['apW'] + m['apL'])
+    def _files():
+        if not os.path.exists('yahoo_raw/2026/teams.json'): return None
+        import teamfile
+        return json.loads(json.dumps(teamfile.build(), default=str))
     def _wire():
         if not os.path.exists('draft_points.json'): return None
         import wire2026; dp = json.load(open('draft_points.json'))
@@ -317,6 +321,8 @@ if S26:
                        asOf='Oct 14, 2026',
                        # trades and the waiver wire graded by what each player has scored since (wire2026.py)
                        wire=_wire(),
+                       # the team files and playoff odds, from every season Yahoo reaches (teamfile.py)
+                       files=_files(),
                        # every drafted player's points under league scoring, and his finish at his position
                        draftPts=({k: v for k, v in json.load(open('draft_points.json')).items() if not k.startswith('allwk')}
                                  if os.path.exists('draft_points.json') else None))

@@ -1515,3 +1515,6 @@ body.lv-pg .lv-go{color:var(--brass)}
 /* a trade card's managers, each with his team in brackets, in the reading face rather than the small mono */
 .card-h .trmg{font-size:13px;color:var(--ink);overflow-wrap:anywhere}
 .lv-rk{font-family:"IBM Plex Mono",monospace;font-size:12px;white-space:nowrap}
+/* the team file: up/down numbers at reading size, not the board's small mono */
+.lv-file b.lv-steal,.lv-file b.lv-bust{font:inherit;font-weight:700}
+.lv-file .sub-h{margin:18px 0 8px}

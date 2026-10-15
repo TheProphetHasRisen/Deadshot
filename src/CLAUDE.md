@@ -236,7 +236,7 @@ type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
 **Yahoo is connected (15 Oct 2026).** Each week, after the games:
 
 ```bash
-python3 yahoo_fetch.py 2026      # raw replies into yahoo_raw/2026 (gitignored cache)
+python3 yahoo_fetch.py 2026      # raw replies into yahoo_raw/2026 (gitignored cache); --extras = schedule + rankings only
 python3 yahoo_to_2026.py         # -> season2026_yahoo.py (generated, committed)
 python3 draft_points.py          # re-score every player from Sleeper for ranks and pools
 python3 export.py && python3 mksite.py
@@ -247,6 +247,13 @@ standings, moves, trades (with exact times) and weekly rosters replace the typed
 Yahoo has them; the typed lists stay as the fallback, along with the two drafts and the contested
 waiver claims (not in Yahoo's API). Every typed game, pick, add, drop and trade matched Yahoo.
 Times are US Eastern; a move counts from the first Sunday 1:00 pm Eastern kickoff after it.
+`teamfile.py` builds the 2026 **team files** (each manager against the league and his own
+2021-2025: lineup efficiency by brute-checked best lineups, pickups over the bench, patience,
+drops that came back, draft, trades, wins above average) and the **playoff odds** (a regression of
+rest-of-season scoring on early scoring over 2021-2025, then 20,000 simulated finishes of the
+real schedule). It reads yahoo_raw/2021-2026, so on a fresh machine pull every season first
+(`for y in 2021 2022 2023 2024 2025 2026; do python3 yahoo_fetch.py $y; done`, ~1,200 calls).
+`test_teamfile.py` checks it and `deploy.sh` gates on it.
 `ROSTERS2026` (who started each week, Yahoo's official points) drives the trade cards'
 "Started" column and "Points that counted" tile. Yahoo reaches the league for 2021-2026 on
 Brian's account; 2015-2020 are not listed there.

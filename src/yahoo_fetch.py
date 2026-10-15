@@ -3,6 +3,7 @@
 
     python3 yahoo_fetch.py 2026          # everything for 2026, weeks played so far
     python3 yahoo_fetch.py 2026 --weeks 6  # only re-pull the given week's scores and rosters
+    python3 yahoo_fetch.py 2026 --extras   # only the schedule still to play and the season rankings
 
 Read only: it saves Yahoo's replies exactly as they came, and changes nothing on the site.
 yahoo_parse.py turns them into plain tables. Nothing here is committed (yahoo_raw/ is
@@ -45,16 +46,26 @@ def pull(year, only_weeks=None):
         save('transactions', 'league/%s/transactions;count=1000' % K)
     teams = json.load(open('%s/teams.json' % d))['fantasy_content']['league'][1]['teams']
     tkeys = [teams[k]['team'][0][0]['team_key'] for k in teams if k != 'count']
-    weeks = only_weeks or range(1, last + 1)
+    weeks = [] if only_weeks == 'extras' else only_weeks or range(1, last + 1)
     for w in weeks:
         save('scoreboard_w%d' % w, 'league/%s/scoreboard;week=%d' % (K, w))
         for tk in tkeys:
             # who was on each roster that week, where each played (or sat), and his points
             save('roster_%s_w%d' % (tk.split('.')[-1], w),
                  'team/%s/roster;week=%d/players/stats;type=week;week=%d' % (tk, w, w))
+    if not only_weeks or only_weeks == 'extras':
+        # the rest of the schedule (matchups for weeks not played yet), for the playoff odds
+        for w in range(last + 1, int(st['end_week']) + 1):
+            save('scoreboard_w%d' % w, 'league/%s/scoreboard;week=%d' % (K, w))
+        # every position's season leaders under the league's own scoring: where a dropped or
+        # drafted player actually finished. 25 a page, 4 pages a position (K and DEF: 2)
+        for pos, pages in (('QB', 2), ('RB', 4), ('WR', 4), ('TE', 3), ('K', 2), ('DEF', 2)):
+            for pg in range(pages):
+                save('rank_%s_%d' % (pos, pg), 'league/%s/players;position=%s;sort=PTS;sort_type=season;start=%d;count=25/stats;type=season'
+                     % (K, pos, pg * 25))
     print('pulled %d: league %s, %d teams, weeks %s' % (year, K, len(tkeys), list(weeks)))
 
 if __name__ == '__main__':
     yr = int(sys.argv[1])
-    wk = [int(sys.argv[sys.argv.index('--weeks') + 1])] if '--weeks' in sys.argv else None
+    wk = [int(sys.argv[sys.argv.index('--weeks') + 1])] if '--weeks' in sys.argv else 'extras' if '--extras' in sys.argv else None
     pull(yr, wk)

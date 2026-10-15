@@ -1,0 +1,293 @@
+# -*- coding: utf-8 -*-
+"""The 2026 team files: everything Yahoo can say about each manager, against his own history
+(2021 on, the seasons Yahoo reaches) and against the league, plus the playoff-odds model.
+
+    python3 teamfile.py        # prints a summary; export.py calls build() and puts it in D.live.files
+
+Reads only yahoo_raw/<year>/ (yahoo_fetch.py), data.py and season2026.py. Pure Python, no
+numpy. Every figure is defined where it is computed, in words, because the page explains
+each one under a ? mark and test_teamfile.py recomputes the important ones a second way.
+"""
+import os, json, math, random, datetime as dt
+from zoneinfo import ZoneInfo
+import yahoo_parse as P
+import data as D
+import season2026 as S
+
+ET = ZoneInfo('America/New_York')
+LIVE = 2026
+YEARS = [y for y in range(2021, LIVE + 1) if os.path.exists('yahoo_raw/%d/teams.json' % y)]
+FLEX = ('RB', 'WR', 'TE')
+# starting spots league-wide (QB, 2 RB, 2 WR, TE, flex split about 4 RB / 5 WR / 1 TE, K, DEF on 10 teams):
+# a player who finished inside these ranks was a starter-quality player that season
+STARTERS = {'QB': 10, 'RB': 24, 'WR': 25, 'TE': 11, 'K': 10, 'DEF': 10}
+
+def _plain(name):
+    """a team name without emoji or symbols: Yahoo has 'HunchoCamby🥸', the record book 'HunchoCamby'"""
+    return ''.join(ch for ch in (name or '') if ch.isalnum()).lower()
+
+def mgr_of(y, team):
+    book = S.MGR2026 if y == LIVE else D.MANAGERS.get(y, {})
+    if team in book: return book[team]
+    return next((m for t, m in book.items() if _plain(t) == _plain(team)), None)
+
+def settings(y):
+    s = P.load(y, 'settings')['league'][1]['settings'][0]
+    slots = {r['roster_position']['position']: int(r['roster_position']['count']) for r in s['roster_positions']}
+    return dict(slots=slots, po=int(s.get('playoff_start_week') or 15), nteams=int(s.get('num_playoff_teams') or 6))
+
+def week_dates(y):
+    """week -> its Sunday 1:00 pm Eastern kickoff (the lock this site uses for which week a move counts)"""
+    out = {}
+    for w in range(1, 19):
+        f = 'yahoo_raw/%d/scoreboard_w%d.json' % (y, w)
+        if not os.path.exists(f): continue
+        ms = P.items(json.load(open(f))['fantasy_content']['league'][1]['scoreboard']['0']['matchups'])
+        if not ms: continue   # a week with no matchups yet (the bracket is set later)
+        m = ms[0]['matchup']
+        start = dt.date.fromisoformat(m['week_start'])
+        sun = start + dt.timedelta(days=(6 - start.weekday()) % 7)
+        out[w] = dt.datetime(sun.year, sun.month, sun.day, 13, 0, tzinfo=ET)
+    return out
+
+def week_of(locks, ts):
+    t = dt.datetime.fromtimestamp(ts, ET)
+    for w in sorted(locks):
+        if t < locks[w]: return w
+    return max(locks) + 1
+
+def eligible(pos, slot):
+    ps = (pos or '').split(',')
+    if slot == 'W/R/T': return any(p in FLEX for p in ps)
+    return slot in ps
+
+def optimal(players, slots):
+    """the best legal lineup from everyone not on IR: fill each fixed slot with the best eligible
+    player, then the flex with the best of what is left. For this roster shape that greedy order
+    is optimal (the flex takes from the same pool after the fixed slots)."""
+    pool = sorted([p for p in players if p['slot'] != 'IR'], key=lambda p: -(p['pts'] or 0))
+    used, total = set(), 0.0
+    for slot in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'W/R/T'):
+        for _ in range(slots.get(slot, 0)):
+            pick = next((p for p in pool if id(p) not in used and eligible(p['pos'], slot)), None)
+            if pick: used.add(id(pick)); total += pick['pts'] or 0
+    return total
+
+def ranks(y):
+    """{(position, player): season rank at the position, by the league's own scoring}"""
+    out = {}
+    for pos in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF'):
+        n = 0
+        for pg in range(4):
+            f = 'yahoo_raw/%d/rank_%s_%d.json' % (y, pos, pg)
+            if not os.path.exists(f): break
+            for x in P.items(json.load(open(f))['fantasy_content']['league'][1]['players']):
+                n += 1; out[(pos, P.flat(x['player'][0])['name']['full'])] = n
+    return out
+
+def season(y):
+    """everything for one season, keyed by manager"""
+    st = settings(y); slots = st['slots']; locks = week_dates(y)
+    G = [g for g in P.games(y) if g['status'] == 'postevent']
+    R = P.rosters(y); X = [t for t in P.transactions(y) if t['status'] == 'successful']
+    RK = ranks(y)
+    reg = [g for g in G if g['wk'] < st['po']]
+    weeks = sorted({g['wk'] for g in reg})
+    # rosters by (team, week)
+    by = {}
+    for r in R: by.setdefault((r['team'], r['wk']), []).append(r)
+    score = {}
+    for g in G: score[(g['ta'], g['wk'])] = (g['aa'], g['ab'], g['tb']); score[(g['tb'], g['wk'])] = (g['ab'], g['aa'], g['ta'])
+    teams = sorted({g['ta'] for g in G} | {g['tb'] for g in G})
+    M = {}
+    for t in teams:
+        m = mgr_of(y, t)
+        if not m: continue
+        M[m] = dict(team=t, g=0, w=0, l=0, pf=0.0, apw=0, apl=0, act=0.0, opt=0.0, lost_lineup=0, perfect=0,
+                    adds=0, fa=0, wv=0, drops=0, trades=0, pk_pts=0.0, pk_marg=0.0, pk_starts=0, dr_pts=0.0,
+                    drafted_pts=0.0, held=[], pickups=[], gone=[], trade_net=0.0, trade_w=0, trade_l=0, weekly=[])
+    # results, all-play, lineups: regular season only, so seasons compare like for like
+    for wk in weeks:
+        sc = {t: score[(t, wk)][0] for t in teams if (t, wk) in score}
+        for t in teams:
+            m = mgr_of(y, t)
+            if m not in M or (t, wk) not in score: continue
+            me, opp, ot = score[(t, wk)]; Z = M[m]
+            Z['g'] += 1; Z['w'] += me > opp; Z['l'] += me < opp; Z['pf'] += me
+            Z['apw'] += sum(1 for o, v in sc.items() if o != t and me > v); Z['apl'] += sum(1 for o, v in sc.items() if o != t and me < v)
+            pl = by.get((t, wk), [])
+            act = sum(p['pts'] or 0 for p in pl if p['started']); opt = optimal(pl, slots)
+            Z['act'] += act; Z['opt'] += opt
+            if me < opp and opt > opp: Z['lost_lineup'] += 1
+            if opt - act < 0.005: Z['perfect'] += 1
+            Z['weekly'].append(dict(wk=wk, pts=round(me, 2), opp=round(opp, 2), vs=mgr_of(y, ot), opt=round(opt, 2),
+                                    ap=sum(1 for o, v in sc.items() if o != t and me > v)))
+    # who held whom, week by week
+    held = {}
+    for r in R: held.setdefault((r['team'], r['n']), set()).add(r['wk'])
+    def stint(team, n, w0):
+        ws = sorted(w for w in held.get((team, n), ()) if w >= w0)
+        run = []
+        for w in ws:
+            if run and w != run[-1] + 1: break
+            run.append(w)
+        return run
+    def starts(team, n, wks):
+        return [r for w in wks for r in by.get((team, w), []) if r['n'] == n and r['started']]
+    def marginal(team, r):
+        """his points minus the best bench player who could have filled the same slot that week"""
+        bench = [b for b in by.get((team, r['wk']), []) if b['slot'] == 'BN' and eligible(b['pos'], r['slot'])]
+        return (r['pts'] or 0) - max([b['pts'] or 0 for b in bench], default=0)
+    # moves
+    for t in X:
+        if t['kind'] not in ('add', 'drop', 'add/drop', 'trade'): continue
+        w = week_of(locks, t['ts']); d = dt.datetime.fromtimestamp(t['ts'], ET)
+        if t['kind'] == 'trade':
+            sides = {}
+            for p in t['players']: sides.setdefault(p['to'], []).append(p)
+            if len(sides) != 2: continue
+            (ta, pa), (tb, pb) = sides.items()
+            def got(team, ps): return sum((r['pts'] or 0) for p in ps for r in starts(team, p['n'], stint(team, p['n'], w)))
+            va, vb = got(ta, pa), got(tb, pb)
+            for team, mine, theirs in ((ta, va, vb), (tb, vb, va)):
+                m = mgr_of(y, team)
+                if m not in M: continue
+                M[m]['trades'] += 1; M[m]['trade_net'] += mine - theirs
+                M[m]['trade_w'] += mine > theirs; M[m]['trade_l'] += mine < theirs
+            continue
+        for p in t['players']:
+            team = p['to'] if p['move'] == 'add' else p['frm']; m = mgr_of(y, team)
+            if m not in M: continue
+            Z = M[m]
+            if p['move'] == 'add':
+                Z['adds'] += 1; Z['fa' if p['source'] != 'waivers' else 'wv'] += 1
+                run = stint(team, p['n'], w); ss = starts(team, p['n'], run)
+                # kickers and defenses: a team almost never keeps a spare on the bench, so "over the
+                # bench" would credit every point; they count toward points, not toward this
+                kd = (p['pos'] or '').split(',')[0] in ('K', 'DEF')
+                pts = sum(r['pts'] or 0 for r in ss); mg = None if kd else sum(marginal(team, r) for r in ss)
+                Z['pk_pts'] += pts; Z['pk_marg'] += mg or 0; Z['pk_starts'] += 0 if kd else len(ss)
+                Z['pickups'].append(dict(n=p['n'], pos=p['pos'], d=d.strftime('%b %-d'), wk=w, held=len(run), starts=len(ss),
+                                         pts=round(pts, 2), marg=None if mg is None else round(mg, 2), how='claim' if p['source'] == 'waivers' else 'free agent',
+                                         rank=RK.get((p['pos'], p['n']))))
+            elif p['move'] == 'drop':
+                Z['drops'] += 1
+                # how long he had him (weeks on this roster up to the drop), and what came after
+                before = sorted(x for x in held.get((team, p['n']), ()) if x < w)
+                run = []
+                for x in reversed(before):
+                    if run and x != run[-1] - 1: break
+                    run.append(x)
+                if run: Z['held'].append(len(run))
+                after = [r for r in R if r['n'] == p['n'] and r['wk'] >= w and r['team'] != team]
+                counted = sum(r['pts'] or 0 for r in after if r['started'])
+                Z['gone'].append(dict(n=p['n'], pos=p['pos'], d=d.strftime('%b %-d'), wk=w, held=len(run),
+                                      rank=RK.get((p['pos'], p['n'])), counted=round(counted, 2),
+                                      to=sorted({mgr_of(y, r['team']) for r in after if r['started']} - {None})))
+    # the draft: points that counted from each manager's own picks, while he kept them
+    try:
+        for pick, team, n, nfl, pos in P.draft(y):
+            m = mgr_of(y, team)
+            if m in M and n: M[m]['drafted_pts'] += sum(r['pts'] or 0 for r in starts(team, n, stint(team, n, 1)) if r['wk'] < st['po'])
+    except (KeyError, IndexError, FileNotFoundError):
+        pass
+    # the league that season
+    allw = [x['pts'] for Z in M.values() for x in Z['weekly']]
+    mu = sum(allw) / len(allw) if allw else 0
+    sd = math.sqrt(sum((v - mu) ** 2 for v in allw) / len(allw)) if allw else 0
+    ppw = sd / 0.39894 if sd else None   # points a week per win, at an average score (see the In wins ?)
+    for Z in M.values():
+        g = Z['g'] or 1
+        Z['ap'] = Z['apw'] / (Z['apw'] + Z['apl']) if Z['apw'] + Z['apl'] else None
+        # wins above an average team: what this scoring earns against every opponent every week, over .500
+        Z['waa'] = (Z['ap'] - 0.5) * Z['g'] if Z['ap'] is not None else None
+        Z['eff'] = Z['act'] / Z['opt'] if Z['opt'] else None
+        Z['left'] = (Z['opt'] - Z['act']) / g
+        Z['patience'] = sum(Z['held']) / len(Z['held']) if Z['held'] else None
+        Z['pickups'].sort(key=lambda x: (-(x['marg'] if x['marg'] is not None else -999), -x['pts']))
+        # drops that came back: only players who finished as a starter at their position
+        Z['gone'] = sorted([x for x in Z['gone'] if x['rank'] and x['rank'] <= STARTERS.get((x['pos'] or '').split(',')[0], 12)],
+                           key=lambda x: (x['rank'], -x['counted']))
+    eff_avg = sum(Z['act'] for Z in M.values()) / sum(Z['opt'] for Z in M.values()) if M else None
+    opt_avg = sum(Z['opt'] for Z in M.values()) / max(1, sum(Z['g'] for Z in M.values()))
+    for Z in M.values():
+        # wins added by lineup calls, against a manager who set lineups at the league's average
+        # efficiency: (his efficiency - league's) x his best possible points a week, in wins
+        Z['lineup_wins'] = ((Z['eff'] - eff_avg) * Z['opt'] / ppw) if Z['eff'] is not None and ppw else None
+        Z['pickup_wins'] = Z['pk_marg'] / ppw if ppw else None
+    league = dict(year=y, avg=mu, sd=sd, ppw=ppw, eff=eff_avg, opt=opt_avg, weeks=len(weeks),
+                  moves=sum(Z['adds'] for Z in M.values()) / max(1, len(M)),
+                  trades=sum(Z['trades'] for Z in M.values()) // 2, teams=len(M))
+    return M, league
+
+# ------------------------------------------------------------------ the model
+def model(H, played):
+    """Playoff odds. First a regression on every logged season: a team's points a game over weeks
+    1..k (k = weeks played this year) against its points a game over the rest of the regular
+    season. The slope says how much of an early hot or cold start carries on. Then 20,000 runs of
+    the rest of the 2026 schedule, each team scoring around its regressed level with the weekly
+    spread history shows; top six make it, the top two get byes, and the bracket is played out."""
+    xs, ys, resid_w = [], [], []
+    for y in YEARS:
+        if y == LIVE: continue
+        for Z in H[y][0].values():
+            wk = [x['pts'] for x in Z['weekly']]
+            if len(wk) <= played: continue
+            xs.append(sum(wk[:played]) / played); ys.append(sum(wk[played:]) / len(wk[played:]))
+            m = sum(wk) / len(wk); resid_w += [v - m for v in wk]
+    n = len(xs); mx = sum(xs) / n; my = sum(ys) / n
+    sxy = sum((a - mx) * (b - my) for a, b in zip(xs, ys)); sxx = sum((a - mx) ** 2 for a in xs)
+    b = sxy / sxx; a = my - b * mx
+    syy = sum((v - my) ** 2 for v in ys); r = sxy / math.sqrt(sxx * syy)
+    wsd = math.sqrt(sum(v * v for v in resid_w) / len(resid_w))
+    M26 = H[LIVE][0]
+    # the 2026 field: this season's level, scaled to this season's scoring
+    lg_hist = sum(H[y][1]['avg'] for y in YEARS if y != LIVE) / len([y for y in YEARS if y != LIVE])
+    scale = H[LIVE][1]['avg'] / lg_hist
+    level = {m: (a + b * (sum(x['pts'] for x in Z['weekly'][:played]) / played / scale)) * scale for m, Z in M26.items()}
+    # the schedule still to play
+    team_m = {Z['team']: m for m, Z in M26.items()}
+    sched = [(g['wk'], team_m[g['ta']], team_m[g['tb']]) for g in P.games(LIVE) if g['status'] != 'postevent' and g['wk'] < settings(LIVE)['po']]
+    base = {m: [Z['w'], Z['pf']] for m, Z in M26.items()}
+    rnd = random.Random(2026); N = 20000
+    po = {m: 0 for m in M26}; bye = dict(po); title = dict(po); wins = dict(po)
+    for _ in range(N):
+        rec = {m: [v[0], v[1]] for m, v in base.items()}
+        for wk, ta, tb in sched:
+            sa = rnd.gauss(level[ta], wsd); sb = rnd.gauss(level[tb], wsd)
+            rec[ta][1] += sa; rec[tb][1] += sb
+            rec[ta if sa > sb else tb][0] += 1
+        seeds = sorted(rec, key=lambda m: (-rec[m][0], -rec[m][1]))[:6]
+        for m in rec: wins[m] += rec[m][0]
+        for m in seeds: po[m] += 1
+        for m in seeds[:2]: bye[m] += 1
+        play = lambda x, z: x if rnd.gauss(level[x], wsd) > rnd.gauss(level[z], wsd) else z
+        q1, q2 = play(seeds[2], seeds[5]), play(seeds[3], seeds[4])
+        s1, s2 = play(seeds[0], q2), play(seeds[1], q1)
+        title[play(s1, s2)] += 1
+    odds = [dict(mgr=m, team=M26[m]['team'], level=round(level[m], 2), po=po[m] / N, bye=bye[m] / N, title=title[m] / N,
+                 wins=wins[m] / N) for m in M26]
+    odds.sort(key=lambda o: -o['po'])
+    return dict(n=n, a=a, b=b, r=r, wsd=wsd, played=played, runs=N, odds=odds,
+                weeksLeft=len({w for w, _, _ in sched}))
+
+def build():
+    H = {y: season(y) for y in YEARS}
+    played = H[LIVE][1]['weeks']
+    keep = ('g', 'w', 'l', 'pf', 'ap', 'waa', 'eff', 'left', 'lost_lineup', 'perfect', 'adds', 'fa', 'wv', 'drops', 'trades',
+            'pk_pts', 'pk_marg', 'pk_starts', 'patience', 'drafted_pts', 'trade_net', 'trade_w', 'trade_l', 'lineup_wins', 'pickup_wins')
+    out = dict(years=YEARS, league={y: H[y][1] for y in YEARS}, model=model(H, played), files={})
+    for m in H[LIVE][0]:
+        hist = {y: {k: H[y][0][m][k] for k in keep} for y in YEARS if m in H[y][0]}
+        Z = H[LIVE][0][m]
+        out['files'][m] = dict(team=Z['team'], hist=hist, weekly=Z['weekly'], pickups=Z['pickups'][:8], gone=Z['gone'][:8])
+    return out
+
+if __name__ == '__main__':
+    o = build()
+    print('years', o['years'])
+    md = o['model']; print('model: %d team-seasons, slope %.2f, r %.2f, weekly spread %.1f, weeks left %d' % (md['n'], md['b'], md['r'], md['wsd'], md['weeksLeft']))
+    for x in md['odds']: print('  %-16s playoffs %4.0f%%  bye %4.0f%%  title %4.0f%%  wins %.1f' % (x['mgr'], 100 * x['po'], 100 * x['bye'], 100 * x['title'], x['wins']))
+    for y in o['years']: L = o['league'][y]; print(y, 'avg %.1f  lineup eff %.3f  moves/team %.1f  trades %d' % (L['avg'], L['eff'] or 0, L['moves'], L['trades']))
+    m = 'Brian Berger'; f = o['files'][m]
+    for y, h in f['hist'].items(): print(m, y, {k: (round(v, 3) if isinstance(v, float) else v) for k, v in h.items()})
