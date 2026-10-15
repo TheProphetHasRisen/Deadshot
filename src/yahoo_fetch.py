@@ -21,6 +21,7 @@ def league_key(year):
     r = json.dumps(Y.get('users;use_login=1/games;seasons=%d/leagues' % year))
     for m in re.finditer(r'"league_key": "([^"]+)", "league_id": "\d+", "name": "([^"]+)"', r):
         if 'DEAD' in m.group(2).upper():
+            os.makedirs('yahoo_raw', exist_ok=True)   # a fresh machine (the scheduled job's) has none yet
             keys[str(year)] = m.group(1); json.dump(keys, open(KEYS, 'w'), indent=1); return m.group(1)
     raise SystemExit('No Deadshot league found for %d on this Yahoo account' % year)
 
