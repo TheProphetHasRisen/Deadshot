@@ -4898,7 +4898,9 @@ glossify();
       return big+` <span class="${cls}" title="Drafted ${p[4]}${v.dr}, ${partial?'running':'finished'} ${p[4]}${v.fr} with ${f(v.pts,1)} points">${v.steal?'▲ ':v.bust?'▼ ':''}${p[4]}${v.fr}</span>`;};
     const dim=p=>on.size&&!on.has(p[4]);
     const fx=p=>T[p[0]]?' lv-fx lv-fx-'+(T[p[0]]==='STEAL'?'s':'b'):'';
-    const mg=t=>L.mgr[t]?L.mgr[t].split(' ').slice(-1)[0]:'';
+    /* the manager under that year's team name: a 2025 draft uses 2025's names ("Bring back Gmo") */
+    const own=+dy===L.year?L.mgr:Object.fromEntries(ROWS.filter(r=>r.y===+dy).map(r=>[r.team,r.mgr]));
+    const mg=t=>own[t]?own[t].split(' ').slice(-1)[0]:'';
     if(view==='team'){
       const order=P.filter(p=>p[0]<=10).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
       const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));

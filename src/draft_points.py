@@ -58,6 +58,15 @@ for pid, p in P.items():
     if p.get('full_name') and p.get('position') in ('QB', 'RB', 'WR', 'TE', 'K'):
         by_name.setdefault((norm(p['full_name']), p['position']), []).append(pid)
 
+# the name Yahoo's draft room uses, and the one Sleeper files him under
+ALIAS = {'Hollywood Brown': 'Marquise Brown'}
+ANYPOS = {'Travis Hunter'}   # two-way player: Yahoo lists him at WR, Sleeper at CB
+for pick, team, name, nfl, pos in S.DRAFT2025 + S.DRAFT2026:   # score and rank him where he was drafted
+    if name in ANYPOS:
+        for pid, p in P.items():
+            if norm(p.get('full_name') or '') == norm(name) and p.get('active'):
+                pos_of[pid] = pos; by_name.setdefault((norm(name), pos), []).append(pid)
+
 out = {}
 for y, weeks in SEASONS.items():
     tot = {}
@@ -81,7 +90,7 @@ for y, weeks in SEASONS.items():
         if pos == 'DEF':
             pid = {'WAS': 'WAS', 'LAR': 'LAR', 'LAC': 'LAC', 'JAX': 'JAX'}.get(nfl, nfl)
         else:
-            ids = by_name.get((norm(name), pos), [])
+            ids = by_name.get((norm(ALIAS.get(name, name)), pos), [])
             if len(ids) > 1: ids = [i for i in ids if i in tot] or ids
             pid = ids[0] if ids else None
         if not pid: miss.append(name); continue
