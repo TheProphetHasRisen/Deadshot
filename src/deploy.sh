@@ -140,10 +140,11 @@ for f in favicon.svg favicon-32.png apple-touch-icon.png icon-192.png icon-512.p
   [ -f "$f" ] && cp "$f" "$CLONE/$f"           # icons and response headers, served from root
 done
 # the six self-hosted typefaces and their licences; the page and the worker both name them
+mkdir -p "$CLONE/art" && cp art/*.png "$CLONE/art/"   # the draft board's ice and fire banners
 mkdir -p "$CLONE/fonts"
 cp fonts/*.woff2 fonts/OFL-*.txt "$CLONE/fonts/"
 git -C "$CLONE" add -A index.html 404.html og.png og-*.png t src favicon.svg favicon-32.png \
-  apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts
+  apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts art
 if git -C "$CLONE" diff --cached --quiet; then
   echo "  index.html unchanged — nothing to deploy"; exit 0
 fi

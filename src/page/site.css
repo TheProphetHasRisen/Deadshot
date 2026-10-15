@@ -1482,15 +1482,17 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-tk{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 @media(prefers-reduced-motion:no-preference){.lv-tk-in{animation:lv-tk .45s ease-out}
   @keyframes lv-tk{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}}
-/* ice and fire on the draft board: a proposal, switched on by body.lv-fx while Brian decides */
-body.lv-fx .lv-draft td.lv-hl-b{position:relative;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--neg) 70%,white),inset 0 0 14px color-mix(in srgb,var(--neg) 45%,transparent),0 0 10px color-mix(in srgb,var(--neg) 40%,transparent);
-  background:linear-gradient(160deg,color-mix(in srgb,var(--neg) 22%,transparent),color-mix(in srgb,white 18%,transparent) 45%,color-mix(in srgb,var(--neg) 14%,transparent))}
-body.lv-fx .lv-draft td.lv-hl-s{position:relative;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pos) 80%,yellow),inset 0 -10px 16px -6px color-mix(in srgb,var(--pos) 55%,transparent),0 0 12px color-mix(in srgb,var(--pos) 45%,transparent);
-  background:linear-gradient(0deg,color-mix(in srgb,var(--pos) 26%,transparent),transparent 70%)}
-body.lv-fx .lv-big-b::before{content:"\2744\FE0E  "}
-body.lv-fx .lv-big-s::before{content:"\1F525  "}
-body.lv-fx .lv-big-b{background:color-mix(in srgb,var(--neg) 85%,white)}
-body.lv-fx .lv-big-s{background:linear-gradient(90deg,var(--pos),color-mix(in srgb,var(--pos) 60%,yellow))}
-@media(prefers-reduced-motion:no-preference){
-  body.lv-fx .lv-draft td.lv-hl-s{animation:lv-fire 1.8s ease-in-out infinite}
-  @keyframes lv-fire{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08) saturate(1.15)}}}
+/* ice and fire on the draft board: Brian's own banners (art/ice.png, art/fire.png, 14 Oct
+   2026), stretched across the whole pick. The name sits in the banner's light middle and his
+   ICE COLD / STEAL lettering fills the right end. */
+.lv-draft td.lv-fx-b,.lv-draft td.lv-fx-s{background:center/100% 100% no-repeat;padding:12px 34% 12px 22px;box-shadow:none!important}
+.lv-draft td.lv-fx-b{background-image:url(art/ice.png)}
+.lv-draft td.lv-fx-s{background-image:url(art/fire.png)}
+.lv-draft td.lv-fx-b,.lv-draft td.lv-fx-s,.lv-draft td.lv-fx-b *,.lv-draft td.lv-fx-s *{color:#141414;font-weight:600;
+  text-shadow:0 0 2px #fff,0 0 4px #fff,0 0 7px #fff,0 0 10px rgba(255,255,255,.9)}
+.lv-draft td.lv-fx-b .lv-big,.lv-draft td.lv-fx-s .lv-big{display:none}
+/* by team, the columns are narrow: a banner pick gets room, and shows just the name over the art
+   (the drafted and finished ranks are in its hover note) */
+.lv-draft td.lv-fx-b,.lv-draft td.lv-fx-s{min-width:300px}
+.lv-draft td.lv-fx-b>.lv-bust,.lv-draft td.lv-fx-b>.lv-fin,.lv-draft td.lv-fx-b>.dim,
+.lv-draft td.lv-fx-s>.lv-steal,.lv-draft td.lv-fx-s>.lv-fin,.lv-draft td.lv-fx-s>.dim{display:none}
