@@ -182,10 +182,9 @@ const GLOSS={
    `<b>vs .500</b> here is how far above or below even a career sits: +17.6% means winning 67.6% of the time, 17.6 points clear of even.<br><br>`+
    `<b>Weeks above</b> walks each season week by week and asks whether the record was above even <i>at that moment</i>, not just where it finished. 8-6 wire to wire and 8-6 after a 1-5 start are the same record and completely different seasons.<br><br>`+
    `<b>vs winners</b> is the record against opponents who finished that season above .500.`,
- xform:`<b>Change, against his own form</b><br>A traded player’s points a game since the deal, minus the bar his form before it set.<br><br>`+
-   `One game is not a form. So until a player has a few games before the deal, his bar is eased toward what a typical starter at his position scores: it counts as if he had also played <b>3 games at that typical level</b>.<br><br>`+
-   `Example: Isaiah Likely scored 27.8 in his one game before the trade. A typical starting tight end scores about 14.8. His bar is (27.8 + 3 × 14.8) ÷ 4 = <b>18.1</b>, not 27.8. He has scored 14.4 a game since, so his change is <b>−3.7</b>, not −13.4. With 9 games before a deal his own numbers would count for three quarters of the bar.<br><br>`+
-   `A side’s figure adds up its players. Hover over any change to see the bar it was measured against.`,
+ xform:`<b>Change, against his own form</b><br>A traded player’s points a game since the deal, minus his points a game before it.<br><br>`+
+   `<b>+10.5</b> means he is scoring 10.5 a game more for his new team than he was for his old one. A side’s figure adds up its players.<br><br>`+
+   `Early in a season "before" can be a game or two, so one big or small week can swing it. Read it alongside his rank at the position.`,
  war:`<b>In wins</b><br>How many extra wins a points edge is worth.<br><br>`+
    `<b>The easy version.</b> This season an extra 65 points or so a week adds up to about one extra win. So a trade that gives one side 6.5 more points a week than the other is worth about <b>0.1 wins a week</b>, or about <b>1 win over 10 weeks</b>.<br><br>`+
    `<b>Where 65 comes from.</b> Weekly scores this season spread out by about 26 points either side of average (the standard deviation, σ). Near an average score, one more point raises the chance of beating a typical opponent by 0.399 ÷ σ, the height of a bell curve at its middle divided by its spread. Flip that over: σ ÷ 0.399 ≈ 26 ÷ 0.399 ≈ <b>65 points per win</b>. It updates every week as more scores come in.<br><br>`+
@@ -193,8 +192,8 @@ const GLOSS={
  slotx:`<b>Expected, for a draft pick</b><br>What the player who finished at the slot he was drafted at actually scored.<br><br>`+
    `Taken as the 16th receiver? He is held to what this season’s 16th-best receiver has scored. <b>Above or below</b> is his points minus that. <b>Season pace</b> carries the gap so far out to a 17-week season: the gap ÷ weeks played × 17.`,
  xwin:`<b>Wins against the pre-trade pace</b><br>How a team has done since a trade, against how it was playing before it.<br><br>`+
-   `Its pace is its all-play rate before the deal: the share of the league it outscored each week. One week is not a pace, so it is eased toward .500 as if the team had also played <b>3 average weeks</b>. Over the games since, that pace expects <b>pace × games</b> wins; actual wins since minus that is the figure.<br><br>`+
-   `Example: Poe’s Palace outscored 89% of the league in its one week before the Likely trade. Eased, its pace is (0.89 + 3 × 0.5) ÷ 4 = 0.60, so 4 games since expected 2.4 wins. It won 2: <b>−0.4</b>.`,
+   `Its pace is its all-play rate before the deal: the share of the league it outscored each week. Over the games since, that pace expects <b>pace × games</b> wins; actual wins since minus that is the figure. <b>+1.4</b> means 1.4 wins better than the team was playing before.<br><br>`+
+   `A pace from a week or two can be a fluke, so treat early figures loosely.`,
  trade:`<b>Trade counting</b><br>A deal counts once for <i>each</i> side, so both managers get credit for it.<br><br>`+
    `<b>In</b> and <b>out</b> count players, not deals: a three-for-one is 3 in and 1 out for the side receiving three.<br><br>`+
    `Only the seasons whose transaction logs are loaded are counted: 2021 through 2025.`};
@@ -4906,9 +4905,9 @@ glossify();
       const anyS=a.some(p=>p.postG);
       return `<div><div class="sub-h" style="margin:0 0 4px">&rarr; ${esc(t)}</div><div class="scroll"><table class="lv-trt">
         <thead><tr><th>Player</th><th class="num">Before</th><th class="num">Since</th><th class="num">Rank at position</th><th class="num">Change ${gl('xform')}</th></tr></thead><tbody>${
-        a.map(p=>{const rk=r=>r==null?'—':esc(p.pos)+r, tip=p.chg==null||p.base==null?'':` title="${f(pg(p),1)} a game since, against a bar of ${f(p.base,1)}: ${p.preG?f(p.pre,1)+' a game over '+nOf(p.preG,'game')+' before, eased toward '+f(p.typical,1)+' for a typical starting '+esc(p.pos):'a typical starting '+esc(p.pos)}"`;
+        a.map(p=>{const rk=r=>r==null?'—':esc(p.pos)+r;
           return `<tr><td>${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span></td><td class="num">${p.pre==null?'—':f(p.pre,1)}</td><td class="num">${pg(p)==null?'—':f(pg(p),1)}</td>
-          <td class="num lv-rk">${p.rkPre==null&&p.rkPost==null?'—':rk(p.rkPre)+(anyS?' <span class="dim">→</span> '+rk(p.rkPost):'')}</td><td class="num"${tip}>${chg(p.chg)}</td></tr>`;}).join('')}
+          <td class="num lv-rk">${p.rkPre==null&&p.rkPost==null?'—':rk(p.rkPre)+(anyS?' <span class="dim">→</span> '+rk(p.rkPost):'')}</td><td class="num">${chg(p.chg)}</td></tr>`;}).join('')}
         <tr class="lv-trs"><td>Side</td><td class="num">${f(sum(p=>p.pre),1)}</td><td class="num">${anyS?f(sum(pg),1):'—'}</td><td></td><td class="num">${chg(anyS?sum(p=>p.chg):null)}</td></tr></tbody></table></div></div>`;};
     const st=t=>L.standings.find(r=>r.team===t);
     /* each side's players by rank at their positions: TE6 v WR52 */
@@ -4933,11 +4932,11 @@ glossify();
       <div class="right trmg">${esc(mg(x.ta))} <span class="dim">(${esc(x.ta)})</span> &harr; ${esc(mg(x.tb))} <span class="dim">(${esc(x.tb)})</span></div></div>
     <div class="card-b">
       <div class="lv-trg">${ledger(x.ta,x.a)}${ledger(x.tb,x.b)}</div>
-      <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched until Yahoo’s lineups are in. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal, eased toward a typical starter while that form is only a game or two.</p>
+      <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched until Yahoo’s lineups are in. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal.</p>
       <div class="tiles lv-trtiles">${tiles}</div>
       <div class="scroll"><table class="lv-trt lv-trteam"><thead><tr><th>Team</th><th>Now</th><th>Before (${wb})</th><th>Since${ws?' ('+ws+')':''}</th><th class="num">vs pace ${gl('xwin')}</th></tr></thead>
         <tbody>${row(x.ta,x.fa)}${row(x.tb,x.fb)}</tbody></table></div>
-      <p class="lv-trnote">Record · points a week · share of the league outscored. vs pace: wins since against what their form before the deal expected${x.fa.xw!=null?` (${f(x.fa.xw,1)} and ${f(x.fb.xw,1)})`:''}, eased toward .500 while that form is only a week or two.</p>
+      <p class="lv-trnote">Record · points a week · share of the league outscored. vs pace: wins since against what their form before the deal expected${x.fa.xw!=null?` (${f(x.fa.xw,1)} and ${f(x.fb.xw,1)})`:''}.</p>
     </div></div>`;}).join('');
     glossify($('#tLiveTr'));
     const thru=`weeks 1–${WR.played}`;
