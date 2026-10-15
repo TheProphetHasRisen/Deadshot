@@ -1508,3 +1508,5 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-trtiles .tile b i{font-style:normal;font-size:12px;color:var(--ink-3);font-weight:400}
 .lv-tx{font-size:11.5px;color:var(--ink-2);margin-top:2px}
 .lv-trteam .nw{white-space:nowrap}
+/* a trade card's managers, each with his team in brackets, in the reading face rather than the small mono */
+.card-h .trmg{font-size:13px;color:var(--ink);overflow-wrap:anywhere}

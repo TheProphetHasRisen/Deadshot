@@ -4406,7 +4406,7 @@ function drawWeekly(YR){
   const TR=K5.trades.slice().sort((a,b)=>tdate(a)-tdate(b));
   $('#trades').innerHTML=TR.map(t=>`<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(t.ta)} &harr; ${esc(t.tb)}</h3><span class="sub">${esc(t.d)}</span>
-      <div class="right sub">${esc(MG[t.ta]||'')} &harr; ${esc(MG[t.tb]||'')}</div></div>
+      <div class="right trmg">${esc(MG[t.ta]||'')} <span class="dim">(${esc(t.ta)})</span> &harr; ${esc(MG[t.tb]||'')} <span class="dim">(${esc(t.tb)})</span></div></div>
     <div class="card-b" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">
       <div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t.ta)}</div>${t.pa.map(p=>`<div style="font-size:13px">${esc(p)}</div>`).join('')}</div>
       <div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t.tb)}</div>${t.pb.map(p=>`<div style="font-size:13px">${esc(p)}</div>`).join('')}</div>
@@ -4923,7 +4923,7 @@ glossify();
           <td>${a.g?J(a.w+'–'+a.l,f(a.ppg,1),pc(a.ap)):'<span class="dim">no games yet</span>'}</td><td class="num">${F.woe==null?'—':chg(F.woe)}</td></tr>`;};
       return `<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(x.ta)} &harr; ${esc(x.tb)}</h3><span class="sub">${esc(x.d)} · counts from week ${x.wk}</span>
-      <div class="right sub">${esc(mg(x.ta))} &harr; ${esc(mg(x.tb))}</div></div>
+      <div class="right trmg">${esc(mg(x.ta))} <span class="dim">(${esc(x.ta)})</span> &harr; ${esc(mg(x.tb))} <span class="dim">(${esc(x.tb)})</span></div></div>
     <div class="card-b">
       <div class="lv-trg">${ledger(x.ta,x.a)}${ledger(x.tb,x.b)}</div>
       <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}. Started or benched, until Yahoo’s lineups are in.</p>
