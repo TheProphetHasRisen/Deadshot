@@ -341,6 +341,9 @@ if S26:
                        # every drafted player's points under league scoring, and his finish at his position
                        draftPts=({k: v for k, v in json.load(open('draft_points.json')).items() if not k.startswith('allwk')}
                                  if os.path.exists('draft_points.json') else None))
+    # every finished season since Yahoo, packaged like the live one, for the season pages
+    if out['live'].get('files') and out['live']['files'].get('seasons'):
+        out['seasonPages'] = out['live']['files'].pop('seasons')
     # which NFL franchise each manager is, on his whole career against its last ten seasons (nflcomps.py)
     import nflcomps
     out['comps'] = nflcomps.comps(out['rows'], out['games'])

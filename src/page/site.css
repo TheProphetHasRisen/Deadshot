@@ -1534,3 +1534,18 @@ body.sy-pg #syView{padding-top:8px}
 /* the season in progress on the Champions board: same plate, marked as not yet decided */
 .plate.plate-live{background:var(--brass-wash)}
 .plate.plate-live .mgr{color:var(--brass)}
+/* a season page borrowing the 2026 section: the page has its own heading */
+#syView #live>.sec-head,#syView #live>.lede{display:none}
+/* folding: the bar at the top of each page, and a section's own button */
+.fold-bar{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 6px}
+.fold-bar button{padding:7px 14px;font-size:11.5px}
+.sec-head .sec-fold-btn{align-self:center;margin-left:12px;padding:5px 11px;font-size:11px;white-space:nowrap}
+.sec-head h2+.sec-fold-btn{margin-left:auto}
+#syView #live>.fold-bar{display:none}
+section.sec-shut{padding-top:26px}
+@media (max-width:560px){.fold-bar{gap:6px}.fold-bar button{padding:7px 8px;font-size:10.5px;flex:1 1 auto}}
+section.sec-shut>.sec-head{margin-bottom:0}
+/* on a phone the heading and its button share a line, and the small note drops beneath them */
+@media (max-width:560px){.sec-head{flex-wrap:wrap;row-gap:4px}.sec-head .sf-w{display:none}
+  .sec-head .sec-fold-btn{order:1;margin-left:auto}.sec-head .rule-note{order:2;flex-basis:100%;margin-left:0;text-align:left}}
+#lvView .fold-bar{margin-top:4px}

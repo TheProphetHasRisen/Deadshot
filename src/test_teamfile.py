@@ -80,6 +80,25 @@ for y in [2023, TF.LIVE]:
     G = [g for g in P.games(y) if g['status'] == 'postevent' and g['wk'] < st['po']]
     wks = {g['wk'] for g in G}
     PL = INJ.played(y); RP = L['repl']
+    # draft-slot expectation, worked out here from Yahoo's rankings and draft directly
+    import json as _j, os as _o
+    TOTS = {}
+    for pos in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF'):
+        tl = []
+        for pg in range(4):
+            fn = 'yahoo_raw/%d/rank_%s_%d.json' % (y, pos, pg)
+            if not _o.path.exists(fn): break
+            for x in _j.load(open(fn))['fantasy_content']['league'][1]['players'].values():
+                if isinstance(x, dict) and 'player' in x:
+                    for part in x['player'][1:]:
+                        if isinstance(part, dict) and 'player_points' in part: tl.append(float(part['player_points']['total']))
+        TOTS[pos] = tl
+    ng = 17 if y != TF.LIVE else len(wks)
+    seen = {}; TK = {}
+    for pick, tm, pn, nfl, pp in P.draft(y):
+        p0 = (pp or '').split(',')[0]; seen[p0] = seen.get(p0, 0) + 1
+        if pn: TK[pn] = (p0, seen[p0])
+    STARTN = dict(QB=10, RB=24, WR=25, TE=11, K=10, DEF=10)
     pts = {}
     for r in R:
         if r['wk'] in wks and PL(r['n'], r['pos'], r['nfl'], r['wk']): pts.setdefault(r['n'], []).append(r['pts'] or 0)
@@ -90,13 +109,20 @@ for y in [2023, TF.LIVE]:
     for (team, n), rows in stints.items():
         played_rows = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r['wk'])]
         missed = [r for r in rows if r['wk'] != r.get('bye') and (r['slot'] == 'IR' or PL(r['n'], r['pos'], r['nfl'], r['wk']) is False)]
-        if not missed or n not in pts: continue
-        if played_rows: is_starter = 2 * sum(1 for r in played_rows if r['slot'] not in ('BN', 'IR')) >= len(played_rows)
-        else: is_starter = any(r['slot'] == 'IR' for r in rows)
+        if not missed: continue
+        tk = TK.get(n); sp = None
+        if tk:
+            tl = TOTS.get(tk[0], []); sp = (tl[tk[1] - 1] if len(tl) >= tk[1] else (tl[-1] if tl else None))
+            sp = None if sp is None else sp / ng
+        gp = len(pts.get(n, [])); own = sum(pts[n]) / gp if gp else None
+        if own is None and sp is None: continue
+        is_starter = (played_rows and 2 * sum(1 for r in played_rows if r['slot'] not in ('BN', 'IR')) >= len(played_rows)) \
+            or (tk is not None and tk[1] <= STARTN.get(tk[0], 0)) or any(r['slot'] == 'IR' for r in rows)
         if not is_starter: continue
-        ppg = sum(pts[n]) / len(pts[n]); pos = (rows[0]['pos'] or '').split(',')[0]
+        exp = ((own or 0) * gp + sp * 4) / (gp + 4) if sp is not None else own
+        pos = (rows[0]['pos'] or '').split(',')[0]
         m = TF.mgr_of(y, team); g, v = tot.get(m, (0, 0.0))
-        tot[m] = (g + len(missed), v + max(0.0, ppg - RP.get(pos, 0)) * len(missed))
+        tot[m] = (g + len(missed), v + max(0.0, exp - RP.get(pos, 0)) * len(missed))
     for m, Z in M.items():
         g, v = tot.get(m, (0, 0.0))
         if g != Z['inj_g'] or abs(v - Z['inj_val']) > 0.05: bad.append('%d %s missed games %d / %.2f, team file %d / %.2f' % (y, m, g, v, Z['inj_g'], Z['inj_val']))

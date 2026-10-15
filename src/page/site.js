@@ -192,7 +192,8 @@ const GLOSS={
    `Each is scored against its own world (managers against managers, NFL teams against NFL teams), so making the playoffs in a ten-team league and in a 32-team one mean the same thing. Titles and win % count for the most. Then everyone is paired so the overall fit is as close as it can be, each franchise used once.<br><br>`+
    `NFL records, playoffs and Super Bowls are from ESPN.`,
  inj:`<b>Missed games and injury luck</b><br>Yahoo keeps no injury history, so it is worked out week by week from 2021: a rostered player <b>missed</b> a week when his NFL team played (not his bye) and he did not, or when he sat in an IR slot. Injuries, illness and suspensions all count.<br><br>`+
-   `Only <b>regular starters</b> count: players who started at least half the games they played for that team. Each game one missed cost his points a game over a replacement-level starter at his position: the <b>value lost</b>. Turned into wins with points per win.<br><br>`+
+   `<b>Who counts:</b> regular starters. A player who started at least half the games he played for that team, or was <b>drafted as a starter</b> at his position (a top-24 back, say), or sat in an IR slot. So a first-round pick lost in week 2 counts in full.<br><br>`+
+   `<b>What a missed game cost:</b> what he was expected to score, minus a replacement-level starter at his position. For a drafted player the expectation starts at what his draft slot scores (the season’s Nth-best at his position, when he was the Nth taken) and moves toward his own scoring as his games pile up: his slot counts as 4 games of evidence. Undrafted players are valued on their own scoring.<br><br>`+
    `<b>Injury luck</b> is the league’s average loss that season minus his, in wins. Plus means he lost less than most.`,
  val:`<b>Value at position</b><br>Points that counted, against a replacement-level starter at the same position.<br><br>`+
    `For every week a player started, his points minus what a replacement-level player at his position scores a game that season. Replacement level is the first player past the league’s starters in Yahoo’s season rankings: about the 11th quarterback, 25th back, 26th receiver, 12th tight end. A pickup who started 4 weeks at 20 a game when replacement backs scored 10 is worth <b>+40</b>.<br><br>`+
@@ -2979,29 +2980,102 @@ addEventListener('load',()=>setTimeout(a11yTables,80));
 /* Any card marked data-collapse gets a Hide/Show control in its header. Add
    data-collapse-also="#id" when related content sits outside the card, as the trade
    grid does. data-collapse="closed" starts it shut; default is open. */
-function makeCollapsible(card){
+/* ---- folding: every section and every card can be shut, and they all start shut (Brian, Oct 2026).
+   A bar at the top of the record book, the 2026 page and each season page opens every section, opens
+   everything, or shuts everything. Anything the page jumps to (the menu, a search answer, a plate on
+   the Champions board) is opened on the way. Opening a card nudges the drawings that measure
+   themselves (the bracket's connectors, the position chart's medals) to redraw at their real size. */
+const FOLD_ROOTS='main#main,#lvView,#syView';
+function foldRoot(el){return el&&el.closest?el.closest(FOLD_ROOTS):null;}
+/* a page (2026, or a season) is one section, so there its cards are the sections and anything
+   inside a card, or in a grid a card shows and hides, is a subsection */
+const PAGESECS='#live,#season-page';
+function isSub(c){const p=c.parentElement; return !!(p&&(p.closest('.card')||p.closest('[data-fold-sub]')));}
+function wantOpen(el){
+  const r=foldRoot(el), mode=r?r.dataset.foldAll:'';
+  if(!mode)return false;
+  if(el.matches('section'))return true;
+  return mode==='deep'||(!r.matches('main#main')&&!isSub(el));
+}
+function afterReveal(el){
+  requestAnimationFrame(()=>{window.dispatchEvent(new Event('resize'));
+    if(el&&(el.querySelector&&el.querySelector('#race')||el.closest&&el.closest('#weekly'))){
+      const b=$$('#wkYears button.on')[0]; if(b&&typeof drawWeekly==='function')drawWeekly(+b.dataset.wy);}});}
+function makeCollapsible(card,open){
     if(card.dataset.collapseBound)return; card.dataset.collapseBound='1';
-    const head=card.querySelector('.card-h'); if(!head)return;
-    const wrap=document.createElement('div');
-    [...card.children].filter(c=>c!==head).forEach(c=>wrap.appendChild(c));
+    const head=card.querySelector(':scope > .card-h'); if(!head)return;
+    const wrap=document.createElement('div'); wrap.className='fold-body';
+    [...card.childNodes].filter(c=>c!==head).forEach(c=>wrap.appendChild(c));
     card.appendChild(wrap);
-    const extraSel=card.getAttribute('data-collapse-also');
-    const extra=extraSel?$(extraSel):null;
+    const also=()=>{const x=card.getAttribute('data-collapse-also'), e=x?$(x):null; if(e)e.setAttribute('data-fold-sub',''); return e;};
+    also();
     const btn=document.createElement('button');
-    btn.type='button';
+    btn.type='button'; btn.className='fold-btn';
     btn.style.cssText='padding:5px 11px;font-size:11px;white-space:nowrap';
-    const host=head.querySelector('.right')||head;
+    const host=head.querySelector(':scope > .right')||head;
     if(host===head)btn.style.marginLeft='auto';
     host.appendChild(btn);
-    const sync=()=>{const open=!wrap.hidden;
-      btn.innerHTML=open?'Hide &#9652;':'Show &#9662;';
-      btn.classList.toggle('on',open);
-      if(extra)extra.hidden=!open;};
-    btn.onclick=()=>{wrap.hidden=!wrap.hidden;sync();};
-    wrap.hidden=(card.getAttribute('data-collapse')==='closed');
+    const sync=()=>{const o=!wrap.hidden;
+      btn.innerHTML=o?'Hide &#9652;':'Show &#9662;';
+      btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false');
+      const extra=also(); if(extra)extra.hidden=!o;};
+    card._fold=v=>{wrap.hidden=!v; sync(); if(v)afterReveal(card);};
+    btn.onclick=()=>card._fold(wrap.hidden);
+    wrap.hidden=!(open||card.getAttribute('data-collapse')==='open'||wantOpen(card));
     sync();
 }
-$$('.card[data-collapse]').forEach(makeCollapsible);
+/* a section folds below its heading: the lede, the cards, everything */
+function makeSectionFold(sec,open){
+  if(sec.dataset.foldBound||sec.matches(PAGESECS))return; sec.dataset.foldBound='1';
+  const head=sec.querySelector(':scope > .sec-head'); if(!head)return;
+  const body=document.createElement('div'); body.className='sec-fold';
+  /* every node, comments too: the season page leaves a marker comment where its cards go back */
+  [...sec.childNodes].filter(c=>c!==head).forEach(c=>body.appendChild(c));
+  sec.appendChild(body);
+  const btn=document.createElement('button'); btn.type='button'; btn.className='fold-btn sec-fold-btn';
+  head.appendChild(btn);
+  const sync=()=>{const o=!body.hidden; btn.innerHTML=o?'Hide<span class="sf-w"> section</span> &#9652;':'Show<span class="sf-w"> section</span> &#9662;';
+    btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false'); sec.classList.toggle('sec-shut',!o);};
+  sec._fold=v=>{body.hidden=!v; sync(); if(v)afterReveal(sec);};
+  btn.onclick=()=>sec._fold(body.hidden);
+  body.hidden=!(open||wantOpen(sec));
+  sync();
+}
+/* open everything between an element and the top of its page, so a jump lands on something visible */
+function reveal(el){
+  if(!el)return;
+  if(el._fold){const b=el.querySelector(':scope > .sec-fold,:scope > .fold-body'); if(b&&b.hidden)el._fold(true);}
+  for(let n=el.parentElement;n&&n!==document.body;n=n.parentElement){
+    if(n.classList.contains('sec-fold')&&n.hidden&&n.parentElement._fold)n.parentElement._fold(true);
+    if(n.classList.contains('fold-body')&&n.hidden&&n.parentElement._fold)n.parentElement._fold(true);
+    /* a trade card sits in a grid its header card shows and hides */
+    if(n.hasAttribute('data-fold-sub')&&n.hidden){const c=$$('.card[data-collapse-also]').find(k=>$(k.getAttribute('data-collapse-also'))===n); if(c){reveal(c); if(c._fold)c._fold(true);}}}
+}
+{const sIV=window.Element.prototype.scrollIntoView;
+  window.Element.prototype.scrollIntoView=function(...a){if(foldRoot(this))reveal(this); return sIV.apply(this,a);};}
+function foldAll(root,mode){   /* mode: 'sections', 'deep' (sections and every card), or null (shut everything) */
+  if(!root)return;
+  root.dataset.foldAll=mode||'';
+  $$('section',root).forEach(sc=>{if(sc._fold)sc._fold(wantOpen(sc));});
+  $$('.card',root).forEach(c=>{if(c._fold)c._fold(wantOpen(c));});
+}
+window.dsOpenAll=()=>{$$(FOLD_ROOTS).forEach(x=>foldAll(x,'deep'));};
+function foldSweep(root){
+  $$('section',root).forEach(sc=>makeSectionFold(sc));
+  $$('.card',root).forEach(c=>makeCollapsible(c));
+}
+/* the bar: on the record book it sits above the first section; on a page, under its heading */
+function foldBar(root){
+  if(!root)return;
+  const at=root.matches('main#main')?null:root.id==='lvView'?$('#lvLede'):$('#syLede');
+  if(root.matches('main#main')?root.querySelector(':scope > .fold-bar'):(at&&at.nextElementSibling&&at.nextElementSibling.classList.contains('fold-bar')))return;
+  const bar=document.createElement('div'); bar.className='fold-bar';
+  const one=!root.matches('main#main');
+  bar.innerHTML=`<button type="button" data-fold="sections">${one?'Open every card':'Open all sections'}</button><button type="button" data-fold="deep">Open everything</button><button type="button" data-fold="">Close everything</button>`;
+  /* the 2026 page's bar travels with its section when a season page borrows it, so it asks where it is */
+  bar.querySelectorAll('button').forEach(b=>b.onclick=()=>foldAll(foldRoot(bar),b.dataset.fold||null));
+  if(at)at.after(bar); else root.prepend(bar);
+}
 /* ---- Shareable manager card -------------------------------------------------
    Draws a square PNG on a canvas and hands it to the phone's share sheet, which on
    iOS puts it straight into iMessage. Falls back to a download on desktop browsers
@@ -4953,8 +5027,8 @@ function pharaoh(){
     mat($('#tFoClass'),(m,y)=>cls[m+'|'+y]==null?null:cls[m+'|'+y],v=>sg(v,0));
     mat($('#tFoEff'),(m,y)=>FO.mgrs[m][y]?FO.mgrs[m][y].eff:null,v=>pct(v));
     const span=a=>{const r=[]; a.forEach(y=>{const l=r[r.length-1]; if(l&&y===l[1]+1)l[1]=y; else r.push([y,y]);}); return r.map(([p,q])=>p===q?String(p):p+'–'+q).join(', ');};
-    $('#tFoHits').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Games missed</th><th class="num">Points a game</th><th class="num">Value lost</th></tr></thead><tbody>'+
-      (FO.hits||[]).filter(sel).map(h=>`<tr><td>${yr(h.y)}</td><td>${pl(h.n,h.pos)}</td><td>${esc(h.m)}</td><td class="num">${h.missed}</td><td class="num">${f(h.ppg,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')+'</tbody>';
+    $('#tFoHits').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>'+
+      (FO.hits||[]).filter(sel).map(h=>`<tr><td>${yr(h.y)}</td><td>${pl(h.n,h.pos)}</td><td>${esc(h.m)}</td><td class="num">${h.slot?esc(h.slot):'<span class="dim">pickup</span>'}</td><td class="num">${h.missed}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')+'</tbody>';
     fillEmpty($('#tFoHits'));
     $('#tFoLoyal').innerHTML='<thead><tr><th>Player</th><th>Manager</th><th class="num">Seasons</th><th>Which</th><th class="num">Weeks on his roster</th></tr></thead><tbody>'+
       FO.loyal.filter(sel).map(x=>`<tr><td><b>${esc(x.n)}</b></td><td>${esc(x.m)}</td><td class="num">${x.yrs?x.yrs.length:'—'}</td><td class="dim">${x.yrs?span(x.yrs):''}</td><td class="num">${x.wks}</td></tr>`).join('')+'</tbody>';
@@ -4970,6 +5044,9 @@ let openSeason=null;
 (()=>{const V=$('#syView'); if(!V)return;
   const SP=$('#seasonPane'), SC=$('#schedPane'), back=document.createComment('season panes go back here');
   SP.before(back);
+  /* 2021 on, a season page borrows the 2026 section itself and redraws it with that season */
+  const LV=$('#live'), lvBack=document.createComment('the live section goes back here'); if(LV)LV.before(lvBack);
+  let borrowed=false;
   const FO=D.live&&D.live.files&&D.live.files.fo, LIVEY=D.live?D.live.year:null;
   const sel=$('#lvSegYear');
   if(sel){sel.innerHTML='<option value="">Seasons</option>'+(LIVEY?`<option value="${LIVEY}">${LIVEY} (live)</option>`:'')+SEA.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('');}
@@ -5009,8 +5086,8 @@ let openSeason=null;
     const IH=(FO.yHits||{})[y]||[];
     h+=card('syInj',`Missed games, ${y}`,'Regular starters who missed games, and what it cost each team',`<div class="scroll"><table><thead><tr><th>Manager</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
       rows.slice().sort((a,b)=>(a.inj_luck??0)-(b.inj_luck??0)).map(r=>`<tr><td>${mlink(r.m)} <span class="dim">${esc(team(r.m))}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
-      <div class="scroll"><table><thead><tr><th>Hardest hits</th><th>Manager</th><th class="num">Games missed</th><th class="num">Points a game</th><th class="num">Value lost</th></tr></thead><tbody>${
-      IH.map(x=>`<tr><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.m)}</td><td class="num">${x.missed}</td><td class="num">${f(x.ppg,1)}</td><td class="num">${f(x.val,1)}</td></tr>`).join('')}</tbody></table></div>`,'inj');
+      <div class="scroll"><table><thead><tr><th>Hardest hits</th><th>Manager</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+      IH.map(x=>`<tr><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.m)}</td><td class="num">${x.slot?esc(x.slot):'<span class="dim">pickup</span>'}</td><td class="num">${x.missed}</td><td class="num">${x.ppg==null?'<span class="dim">never played</span>':f(x.ppg,1)}</td><td class="num">${f(x.exp,1)}</td><td class="num">${f(x.val,1)}</td></tr>`).join('')}</tbody></table></div>`,'inj');
     const LG=FO.yLeague&&FO.yLeague[y];
     if(LG)h+=card('syLg',`The league in ${y}`,'',`<div class="card-b"><div class="tiles" style="margin:0">
       <div class="tile"><b>${f(LG.avg,1)}</b><span>Average score</span></div><div class="tile"><b>${f(LG.sd,1)}</b><span>Spread</span></div>
@@ -5021,6 +5098,8 @@ let openSeason=null;
   function close(){
     if(!cur)return; cur=null; V.hidden=true; document.body.classList.remove('sy-pg');
     back.after(SP,SC); tabTitle('');
+    $$('#seasonPane .card').forEach(k=>{k.hidden=false;});
+    if(borrowed){lvBack.after(LV); borrowed=false; if(window.drawSeasonView&&D.live)window.drawSeasonView(D.live);}
     if(/^#\d{4}$/.test(location.hash)&&location.hash!=='#'+LIVEY)history.replaceState(null,'',location.pathname+location.search);
     setSeg();}
   openSeason=y=>{
@@ -5035,10 +5114,19 @@ let openSeason=null;
     $('#syH').textContent=String(y);
     $('#syNote').innerHTML=`${rs.length} teams · ${c?c.spots:'?'}-team bracket<br>${FO&&FO.finished.includes(y)?'standings, bracket, schedule and Yahoo':'standings and bracket'}`;
     $('#syLede').innerHTML=c?`<b>${c.teams.map(esc).join(' &amp; ')}</b> (${c.mgrs.map(esc).join(' &amp; ')}) ${c.co?'shared the title':'won it'}${pl(2)&&!c.co?`, over ${esc(pl(2).team)} (${esc(pl(2).mgr)})`:''}${pl(3)?`; ${esc(pl(3).team)} (${esc(pl(3).mgr)}) took third`:''}.`:'';
-    $('#syYahoo').innerHTML=yahooCards(y);
-    $$('#syView .card[data-collapse]').forEach(makeCollapsible);
+    const SB=D.seasonPages&&D.seasonPages[y];
+    if(SB&&LV&&window.drawSeasonView){
+      /* the same section, and the same code, as the 2026 page, drawn with this season */
+      $('#syYahoo').innerHTML=''; $('#syYahoo').append(LV); borrowed=true; window.drawSeasonView(SB);
+      /* its standings are the 2026-style table above; the record book's own copy would repeat them */
+      $$('#seasonPane .card').forEach(k=>{const h=k.querySelector('.card-h h3'); if(h&&/standings$/.test(h.textContent))k.hidden=true;});
+    }else{
+      if(borrowed){lvBack.after(LV); borrowed=false; if(window.drawSeasonView&&D.live)window.drawSeasonView(D.live);}
+      $('#syYahoo').innerHTML=yahooCards(y);
+    }
     const tc=$('#syTr'); if(tc){const g=tc.nextElementSibling; if(g&&g.classList.contains('sy-trades')){g.id='syTrGrid'; tc.setAttribute('data-collapse-also','#syTrGrid');}}
-    $$('#syPanes .card').forEach(k=>{if(!k.hasAttribute('data-collapse')){k.setAttribute('data-collapse','');makeCollapsible(k);}});
+    /* every card on a season page starts shut, each time it opens */
+    foldSweep(V); foldBar(V); foldAll(V,null);
     glossify(V); tabTitle(y+' season');
     history.replaceState(null,'',location.pathname+location.search+'#'+y); scrollTo(0,0); setSeg();};
   if(sel)sel.onchange=()=>{const y=+sel.value; if(y)openSeason(y);};
@@ -5092,7 +5180,8 @@ glossify();
   if(tick.length>1)setInterval(()=>{if(hold||document.hidden)return; ti=(ti+1)%tick.length;
     const s=document.createElement('span'); s.className='lv-tk lv-tk-in'; s.innerHTML=tick[ti]; tx.replaceChildren(s);},3800);
   const seg=on=>{$('#lvSegBook').classList.toggle('on',!on); $('#lvSegLive').classList.toggle('on',on);};
-  const show=mode=>{V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
+  const show=mode=>{if(mode&&V.hidden){foldSweep(V); foldBar(V); foldAll(V,null);}   /* 2026 starts with every card shut, each time it opens */
+    V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
     seg(mode==='pg'); tabTitle(mode?L.year+' Live':'');
     $('#lvGo').textContent=mode==='pg'?'\u2190 Back to the record book':'Open 2026 \u2192';
     if(mode==='ov'){document.body.style.overflow='hidden'; V.scrollTop=0; $('#lvClose').focus();} else document.body.style.overflow='';
@@ -5103,12 +5192,24 @@ glossify();
   $('#lvSegLive').onclick=()=>show('pg'); $('#lvSegBook').onclick=()=>show(null);
   addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('lv-ov'))show(null);});
   if(location.hash==='#'+L.year)setTimeout(()=>show('pg'),0);
+  /* everything below draws one season into the 2026 section: the live one, or a finished season since
+     2021 (D.seasonPages, built by seasonpage.py in the same shape) when its season page borrows this
+     section. Finished seasons get their team-file careers from the Front Office data. */
+  const renderSeason=L=>{
+  const FINAL=!!L.final;
+  if(FINAL&&!L.files){const FO=D.live.files&&D.live.files.fo, X=L.tf||{};
+    L.files={years:FO?FO.years:[], league:D.live.files?D.live.files.league:{}, model:null, injNow:[], injWeek:null,
+      files:Object.fromEntries(Object.entries(X.files||{}).map(([m,F])=>[m,{...F,hist:(FO&&FO.mgrs[m])||{}}])),
+      picks:X.picks||[], picksKD:X.picksKD||[], gone:X.gone||[], goneKD:X.goneKD||[], hits:X.hits||[], injAvg:X.injAvg};}
+  $('#lvH').innerHTML=FINAL?String(L.year):`${L.year} <span class="lv-tag">Live</span>`;
+  $('#lvLede').textContent=FINAL?`${L.year} as Yahoo has it: every lineup, move, trade and pick, graded exactly the way the season being played is.`
+    :'The season so far. It joins the record book, the career tables and the head-to-head grid once the final is played.';
   const mg=t=>L.mgr[t]||'', tm=t=>`<b>${esc(t)}</b> <span class="dim">${esc(mg(t))}</span>`;
   const st={}; L.standings.forEach(r=>{st[r.team]=r;});
   const recOf=t=>{const r=st[t]; return r?r.w+'–'+r.l+(r.t?'–'+r.t:''):'';};
   const done=L.weeks[L.weeks.length-1];
-  $('#lvNote').innerHTML=`Through week ${done} of ${L.regWeeks}<br>As of ${esc(L.asOf)}`;
-  $('#lvStSub').textContent=`after week ${done} · top 6 make the playoffs`;
+  $('#lvNote').innerHTML=FINAL?`Regular season, ${nOf(L.regWeeks,'week')}<br>from Yahoo`:`Through week ${done} of ${L.regWeeks}<br>As of ${esc(L.asOf)}`;
+  $('#lvStSub').textContent=FINAL?'end of the regular season · top 6 made the playoffs':`after week ${done} · top 6 make the playoffs`;
   table($('#tLive'),[
     {h:'Team',f:r=>tm(r.team),k:r=>r.team},
     {h:'W–L',f:r=>r.w+'–'+r.l+(r.t?'–'+r.t:''),c:'num',k:r=>r.w+r.t/2},
@@ -5121,7 +5222,7 @@ glossify();
   ],L.standings,{rank:1,sort:-1,cls:r=>r.rank===6?'lv-cut':''});
   /* up next and results: the same matchup cards as Week by Week in the record book */
   const GRID='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:12px">';
-  const ups=L.upcoming; if(ups.length){
+  const ups=L.upcoming; $('#tLiveUp').closest('.card').hidden=!ups.length; if(ups.length){
     /* once a week's games have kicked off, Yahoo has live scores: show those, with the projection beside them */
     const live=ups.some(g=>g.status==='midevent'&&(g.aa||g.ab));
     $('#lvUpH').textContent='Week '+ups[0].wk+(live?' · live':' · up next');
@@ -5129,7 +5230,7 @@ glossify();
       const on=g.status==='midevent'&&(g.aa||g.ab), lead=on?(g.aa>=g.ab?'a':'b'):null;
       const s=(t,p,sc,k)=>`<div class="side${on&&lead===k?' w':''}"><span class="tn">${esc(t)}<small>${esc(mg(t))} · ${recOf(t)}${on?' · proj '+f(p,1):''}</small></span><span class="sc">${on?f(sc):f(p)}</span></div>`;
       return `<div class="game"><div class="gh">Week ${g.wk} · ${on?'<span class="lv-up" style="margin-left:0">live</span> margin '+f(Math.abs(g.aa-g.ab)):'projected margin '+f(Math.abs(g.pa-g.pb))}</div>${s(g.ta,g.pa,g.aa,'a')}${s(g.tb,g.pb,g.ab,'b')}</div>`;}).join('')+'</div>';
-  }else $('#tLiveUp').closest('.card').remove();
+  }
   /* results, a week at a time */
   let wk=done;
   const drawWk=()=>{
@@ -5177,7 +5278,7 @@ glossify();
       const av=x.aVal/n, bv=x.bVal/n;
       if(Math.abs(av-bv)<0.05)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Even so far at their positions.</div>`;
       const W=av>bv?x.ta:x.tb, hi=Math.max(av,bv), lo=Math.min(av,bv);
-      return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}winning the trade: <b>${sg(hi,1)}</b> a week at their positions to <b>${sg(lo,1)}</b>, about <b>${f((hi-lo)/PPW,2)}</b> wins a week, over the ${nOf(n,'week')} since.</div>`;};
+      return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}${FINAL?'won the trade':'winning the trade'}: <b>${sg(hi,1)}</b> a week at their positions to <b>${sg(lo,1)}</b>, about <b>${f((hi-lo)/PPW,2)}</b> wins a week, over the ${nOf(n,'week')} since.</div>`;};
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
       const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):'wk 1', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
       let tiles;
@@ -5206,7 +5307,7 @@ glossify();
       <div class="lv-trg">${ledger(x.ta,x.a)}${ledger(x.tb,x.b)}</div>
       <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched. Started: weeks in the lineup, of weeks on the roster, before the deal for the old team and since for the new. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal.</p>
       <div class="tiles lv-trtiles">${tiles}</div>
-      <div class="scroll"><table class="lv-trt lv-trteam"><thead><tr><th>Team</th><th>Now</th><th>Before (${wb})</th><th>Since${ws?' ('+ws+')':''}</th><th class="num">vs pace ${gl('xwin')}</th></tr></thead>
+      <div class="scroll"><table class="lv-trt lv-trteam"><thead><tr><th>Team</th><th>${FINAL?'Final':'Now'}</th><th>Before (${wb})</th><th>Since${ws?' ('+ws+')':''}</th><th class="num">vs pace ${gl('xwin')}</th></tr></thead>
         <tbody>${row(x.ta,x.fa)}${row(x.tb,x.fb)}</tbody></table></div>
       <p class="lv-trnote">Record · points a week · share of the league outscored. vs pace: wins since against what their form before the deal expected${x.fa.xw!=null?` (${f(x.fa.xw,1)} and ${f(x.fb.xw,1)})`:''}.</p>
     </div></div>`;}).join('');
@@ -5266,7 +5367,7 @@ glossify();
     $$('#lvDy button[data-dy]').forEach(b=>b.onclick=()=>{dy=b.dataset.dy; drawDr();});
     $$('#lvDy button[data-dv]').forEach(b=>b.onclick=()=>{view=b.dataset.dv; drawDr();});
     $$('#lvDy button[data-dp]').forEach(b=>b.onclick=()=>{const p=b.dataset.dp; on.has(p)?on.delete(p):on.add(p); drawDr();});
-    const P=L.draft[dy], J=judge(P), T=tops(J), wk=(DP.weeks||{})[dy], partial=+dy===L.year;
+    const P=L.draft[dy], J=judge(P), T=tops(J), wk=(DP.weeks||{})[dy], partial=+dy===L.year&&!FINAL;
     const mark=p=>{const v=J[p[0]]; if(v.fr==null)return '';
       const cls=v.steal?'lv-steal':v.bust?'lv-bust':'lv-fin';
       const big=T[p[0]]?` <img class="lv-fxi lv-fxi-${T[p[0]]==='STEAL'?'s':'b'}" src="art/${T[p[0]]==='STEAL'?'fire':'ice'}-i.png" alt="${T[p[0]]==='STEAL'?'Top steal':'Top bust'}" title="${T[p[0]]==='STEAL'?'One of the top steals':'One of the top busts'} at ${p[4]}">`:'';
@@ -5312,19 +5413,20 @@ glossify();
   drawDr();
   /* ---- the 2026 team files and playoff odds (teamfile.py, from Yahoo 2021 on) ---- */
   const TF=L.files;
-  if(!TF){['#lvOddsCard','#lvFileCard','#lvLeagueCard'].forEach(k=>{const e=$(k); if(e)e.remove();});}
-  else{
+  ['#lvOddsCard','#lvFileCard','#lvLeagueCard','#lvInjCard'].forEach(k=>{const e=$(k); if(e)e.hidden=!TF;});
+  if(TF){
     const gl=k=>`<span class="gl" data-gl="${k}" tabindex="0">?</span>`;
     const MD=TF.model, YRS=TF.years, PAST=YRS.filter(y=>y!==L.year);
-    $('#lvOddsSub').textContent=`${MD.runs.toLocaleString()} simulated finishes of the ${nOf(MD.weeksLeft,'week')} left · rerun every week`;
+    $('#lvOddsCard').hidden=!MD;
+    if(MD){$('#lvOddsSub').textContent=`${MD.runs.toLocaleString()} simulated finishes of the ${nOf(MD.weeksLeft,'week')} left · rerun every week`;
     $('#tLiveOdds').innerHTML='<thead><tr><th>Team</th><th class="num">Expected points a week</th><th class="num">Projected wins</th><th class="num">Playoffs</th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
       MD.odds.map(o=>`<tr><td><b>${esc(o.team)}</b> <span class="dim">${esc(o.mgr)}</span></td><td class="num">${f(o.level,1)}</td><td class="num">${f(o.wins,1)}</td>
-        <td class="num"><b>${pct(o.po)}</b></td><td class="num">${pct(o.bye)}</td><td class="num">${pct(o.title)}</td></tr>`).join('')+'</tbody>';
+        <td class="num"><b>${pct(o.po)}</b></td><td class="num">${pct(o.bye)}</td><td class="num">${pct(o.title)}</td></tr>`).join('')+'</tbody>';}
     /* the league, season by season */
     const LG=TF.league;
-    $('#lvLeagueSub').textContent=`every season Yahoo reaches, ${YRS[0]}–${YRS[YRS.length-1]} · regular season · ${L.year} so far`;
+    $('#lvLeagueSub').textContent=`every season Yahoo reaches, ${YRS[0]}–${YRS[YRS.length-1]} · regular season${FINAL?'':' · '+L.year+' so far'}`;
     $('#tLiveLeague').innerHTML='<thead><tr><th>Season</th><th class="num">Average score</th><th class="num">Spread</th><th class="num">Points per win '+gl('war')+'</th><th class="num">Lineup efficiency '+gl('eff')+'</th><th class="num">Adds per team</th><th class="num">Trades</th></tr></thead><tbody>'+
-      YRS.slice().reverse().map(y=>{const g=LG[y]; return `<tr><td>${y}${y===L.year?' <span class="dim">weeks 1–'+g.weeks+'</span>':''}</td><td class="num">${f(g.avg,1)}</td><td class="num">${f(g.sd,1)}</td><td class="num">${g.ppw?f(g.ppw,0):'—'}</td><td class="num">${pct(g.eff)}</td><td class="num">${f(g.moves,1)}</td><td class="num">${g.trades}</td></tr>`;}).join('')+'</tbody>';
+      YRS.slice().reverse().map(y=>{const g=LG[y]; return `<tr><td>${y===L.year?'<b>'+y+'</b>':y}${D.live&&y===D.live.year?' <span class="dim">weeks 1–'+g.weeks+'</span>':''}</td><td class="num">${f(g.avg,1)}</td><td class="num">${f(g.sd,1)}</td><td class="num">${g.ppw?f(g.ppw,0):'—'}</td><td class="num">${pct(g.eff)}</td><td class="num">${f(g.moves,1)}</td><td class="num">${g.trades}</td></tr>`;}).join('')+'</tbody>';
     /* one manager's file */
     const NAMES=Object.keys(TF.files).sort((a,b)=>{const ra=L.standings.find(r=>r.mgr===a), rb=L.standings.find(r=>r.mgr===b); return (ra?ra.rank:99)-(rb?rb.rank:99);});
     let who=NAMES[0];
@@ -5336,7 +5438,7 @@ glossify();
     const drawFile=()=>{
       $('#lvFileMgr').innerHTML=NAMES.map(n=>`<button data-tf="${esc(n)}" class="${n===who?'on':''}">${esc(n.split(' ').slice(-1)[0])}</button>`).join('');
       $$('#lvFileMgr button').forEach(b=>b.onclick=()=>{who=b.dataset.tf; drawFile();});
-      const F=TF.files[who], H=F.hist[L.year], st=L.standings.find(r=>r.mgr===who), od=MD.odds.find(o=>o.mgr===who);
+      const F=TF.files[who], H=F.hist[L.year], st=L.standings.find(r=>r.mgr===who), od=MD?MD.odds.find(o=>o.mgr===who):null;
       const p1=v=>pct(v), n1=v=>f(v,1), n2=v=>f(v,2);
       $('#lvFileSub').textContent=`${F.team} · ${who} · against the league this year and his own ${PAST.filter(y=>F.hist[y]).length?span(PAST.filter(y=>F.hist[y])):'history'}`;
       const best=(k,per,lo)=>{const ys=YRS.filter(y=>F.hist[y]&&F.hist[y][k]!=null&&F.hist[y].g); if(!ys.length)return '—';
@@ -5348,8 +5450,10 @@ glossify();
       $('#lvFile').innerHTML=`<div class="lv-file">
         <div class="tiles lv-trtiles">
           ${tile('Record',st?st.w+'–'+st.l+' · '+ord(st.rank):'—',st?f(st.pf,1)+' points for':'')}
-          ${tile('Playoff odds',od?p1(od.po):'—',od?'bye '+p1(od.bye)+' · title '+p1(od.title):'','model')}
-          ${tile('Projected wins',od?n1(od.wins):'—',od?'expects '+n1(od.level)+' a week from here':'','model')}
+          ${FINAL?(()=>{const rr=ROWS.find(r=>r.y===L.year&&r.mgr===who); return tile('Finished',rr?ord(rr.place):'—',rr?(rr.place===1?'champion':rr.po?'made the playoffs':'missed the playoffs'):'')
+            +tile('Points for',rr?f(rr.pf,1):'—',rr?f(rr.ppg,1)+' a week · power index '+f(rr.pi,1):'');})()
+          :tile('Playoff odds',od?p1(od.po):'—',od?'bye '+p1(od.bye)+' · title '+p1(od.title):'','model')
+          +tile('Projected wins',od?n1(od.wins):'—',od?'expects '+n1(od.level)+' a week from here':'','model')}
           ${tile('Wins above average',H&&H.waa!=null?sg(H.waa,1):'—',cmp(F,'waa',v=>sg(v,1)),'waa')}
         </div>
         <div class="sub-h">Lineup calls</div>
@@ -5399,11 +5503,32 @@ glossify();
       $('#lvInjSub').textContent=`games missed, weeks 1–${L.weeks[L.weeks.length-1]} · Yahoo’s report for week ${TF.injWeek||''}`;
       el.innerHTML=`<div class="sub-h" style="margin:0 0 6px">Missed games so far</div><div class="scroll"><table><thead><tr><th>Team</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
         rows.map(r=>`<tr><td><b>${esc(r.team)}</b> <span class="dim">${esc(r.m)}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
-        <div class="sub-h" style="margin:16px 0 6px">Hardest hits so far</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Games missed</th><th>Weeks</th><th class="num">Points a game</th><th class="num">Value lost</th></tr></thead><tbody>${
-        (TF.hits||[]).map(h=>`<tr><td><b>${esc(h.n)}</b> <span class="lv-pos">${esc(h.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===h.m)||'')} <span class="dim">${esc(h.m)}</span></td><td class="num">${h.missed}</td><td class="dim">${h.wks.join(', ')}</td><td class="num">${f(h.ppg,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')}</tbody></table></div>
-        <div class="sub-h" style="margin:16px 0 6px">Yahoo’s report, week ${TF.injWeek||''}</div><div class="scroll"><table><thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Injury</th><th>On his roster</th></tr></thead><tbody>${
-        NOW.map(x=>`<tr><td>${esc(x.team)} <span class="dim">${esc(x.m||'')}</span></td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td><b>${esc(x.status)}</b></td><td class="dim">${esc(x.injury||'')}</td><td class="${x.slot==='BN'||x.slot==='IR'?'dim':''}">${where(x.slot)}</td></tr>`).join('')}</tbody></table></div>
-        <p class="lv-trnote">Status as Yahoo shows it now: Q questionable, D doubtful, O out, IR injured reserve. Missed games: a regular starter whose NFL team played and he did not.</p>`;
+        <div class="sub-h" style="margin:16px 0 6px">Hardest hits so far</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Drafted as</th><th class="num">Games missed</th><th>Weeks</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+        (TF.hits||[]).map(h=>`<tr><td><b>${esc(h.n)}</b> <span class="lv-pos">${esc(h.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===h.m)||'')} <span class="dim">${esc(h.m)}</span></td><td class="num">${h.slot?esc(h.slot):'<span class="dim">pickup</span>'}</td><td class="num">${h.missed}</td><td class="dim">${h.wks.join(', ')}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)+' <span class="dim">('+nOf(h.g,'game')+')</span>'}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')}</tbody></table></div>
+        ${NOW.length?`        <div class="sub-h" style="margin:16px 0 6px">Yahoo’s report, week ${TF.injWeek||''}</div><div class="scroll"><table><thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Injury</th><th>On his roster</th></tr></thead><tbody>${
+        NOW.map(x=>`<tr><td>${esc(x.team)} <span class="dim">${esc(x.m||'')}</span></td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td><b>${esc(x.status)}</b></td><td class="dim">${esc(x.injury||'')}</td><td class="${x.slot==='BN'||x.slot==='IR'?'dim':''}">${where(x.slot)}</td></tr>`).join('')}</tbody></table></div>`:''}
+        <p class="lv-trnote">${NOW.length?'Status as Yahoo shows it now: Q questionable, D doubtful, O out, IR injured reserve. ':''}Missed games: a regular starter (or a player drafted as one) whose NFL team played and he did not, valued at what he was expected to score.</p>`;
       el.querySelectorAll('table').forEach(fillEmpty); glossify($('#lvInjCard'));}}
   }
+  };
+  renderSeason(L);
+  /* a season page borrows this section and redraws it with its own season; leaving puts 2026 back */
+  window.drawSeasonView=renderSeason;
+})();
+
+/* ---- folding, switched on once the whole page is drawn; boxes drawn later fold as they appear ---- */
+(()=>{
+  const roots=$$(FOLD_ROOTS);
+  roots.forEach(r=>{foldSweep(r); foldBar(r);});
+  const mo=new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){
+    if(n.nodeType!==1||!foldRoot(n))continue;
+    const p=n.parentElement;
+    if(p&&p._fold&&p.matches('section')&&!n.matches('.sec-head,.sec-fold')){const f=p.querySelector(':scope > .sec-fold'); if(f){f.appendChild(n);}}
+    if(n.matches('section'))makeSectionFold(n); n.querySelectorAll('section').forEach(sc=>makeSectionFold(sc));
+    if(n.matches('.card'))makeCollapsible(n); n.querySelectorAll('.card').forEach(c=>makeCollapsible(c));}});
+  roots.forEach(r=>mo.observe(r,{childList:true,subtree:true}));
+  /* a link to a section, from the menu or the address bar, opens it */
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a)return;
+    const t=document.getElementById(a.getAttribute('href').slice(1)); if(t&&foldRoot(t))reveal(t);},true);
+  if(location.hash.length>1){const t=document.getElementById(location.hash.slice(1)); if(t&&foldRoot(t))reveal(t);}
 })();

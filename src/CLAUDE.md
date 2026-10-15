@@ -342,6 +342,13 @@ Grep before you add, and check the fix on a phone as well as a desktop.
   word — `minmax(0,1fr)` will. Fixed with that plus `overflow-wrap:anywhere` on
   `#trades .card-h h3` and `#trades .sub-h`. Names with quotes, ampersands, raw HTML,
   emoji and Arabic were all stress-tested: they render as text and nothing injects.
+- **Everything starts shut** (Brian, 15 Oct 2026). Every `section` on the record book and every
+  `.card` anywhere folds behind its heading, and the 2026 page and each season page shut again every
+  time they open. A bar at the top opens the sections, opens everything, or shuts everything. New
+  sections and cards fold on their own (a watcher binds anything drawn later), so do not add your own
+  Hide button. Anything the page jumps to is opened on the way (`scrollIntoView` is wrapped, and menu
+  links reveal). A browser test that reads or clicks content must call `window.dsOpenAll()` first;
+  hidden text has no layout, so `innerText` and clicks behave differently.
 - **`data-m` is the manager-link attribute** and a global handler turns any click on one
   into `openMgr()`. Four Season Shape buttons already overload it as a metric key. Use a
   different attribute for new controls.

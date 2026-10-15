@@ -17,9 +17,12 @@ one counts the next. Thursday games are not split out.
 import datetime as dt
 
 KICK1 = dt.datetime(2026, 9, 13, 13, 0)   # week 1's Sunday 1:00 pm Eastern kickoff
+YEAR = 2026                                 # grade() resets both for a past season
 
 def when(d, t='12:00 pm'):
-    return dt.datetime.strptime(f'{d} 2026 {t}', '%b %d %Y %I:%M %p')
+    # January and February moves belong to the season that started the September before
+    y = YEAR + 1 if d[:3] in ('Jan', 'Feb') else YEAR
+    return dt.datetime.strptime(f'{d} {y} {t}', '%b %d %Y %I:%M %p')
 
 def week_of(ts):
     w = 1
@@ -55,12 +58,15 @@ def team_form(games, t, w0, w1):
     return dict(w=W, l=L, g=len(pts), ppg=round(sum(pts) / len(pts), 2) if pts else None,
                 ap=round(apw / apn, 4) if apn else None)
 
-def grade(S, wk, played, games=(), allwk=None, repl=None):
+def grade(S, wk, played, games=(), allwk=None, repl=None, year=2026, kick1=None):
     """wk: {player: [points by week, None = no game]}; played: last week with stats;
     games: the season's results; allwk: {pos: every NFL player's weeks}, for ranks."""
+    global YEAR, KICK1
+    YEAR = year
+    KICK1 = kick1 or dt.datetime(2026, 9, 13, 13, 0)
     pts = lambda n, a, b: [x for x in (wk.get(n) or [])[max(a, 1) - 1:min(b, played)] if x is not None]
     # every event oldest first: the draft, then each move and trade in the order Yahoo made them
-    ev = [(dt.datetime(2026, 9, 1), 'draft', (team, name)) for _, team, name, _, _ in S.DRAFT2026]
+    ev = [(dt.datetime(YEAR, 9, 1), 'draft', (team, name)) for _, team, name, _, _ in S.DRAFT2026]
     for i, (d, t, team, adds, drops) in enumerate(reversed(S.MOVES2026)):
         ev.append((when(d, t), 'move', (team, adds, drops, i)))
     for i, tr in enumerate(S.TRADES2026):

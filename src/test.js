@@ -12,6 +12,38 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
     p.on('console',m=>{if(m.type()==='error')errs.push(name+' CONSOLE: '+m.text())});
     await p.goto(FILE);
     await p.waitForTimeout(1200);
+    /* every section and every card starts shut (Brian, Oct 2026), with a bar at the top that opens
+       the sections, opens everything, or shuts everything again */
+    const fold=async()=>p.evaluate(()=>{const q=s=>[...document.querySelectorAll(s)];
+      return {secs:q('main#main .sec-fold').length, secsOpen:q('main#main .sec-fold:not([hidden])').length,
+              cards:q('main#main .fold-body').length, cardsOpen:q('main#main .fold-body:not([hidden])').length,
+              bar:q('main#main > .fold-bar button').length};});
+    const f0=await fold();
+    if(f0.secs<10||f0.secsOpen||f0.cardsOpen||f0.bar!==3)errs.push(name+' the record book does not start shut: '+JSON.stringify(f0));
+    await p.click('main#main > .fold-bar [data-fold="sections"]'); await p.waitForTimeout(150);
+    const f1=await fold();
+    if(f1.secsOpen!==f1.secs||f1.cardsOpen)errs.push(name+' "Open all sections" did not open just the sections: '+JSON.stringify(f1));
+    await p.click('main#main > .fold-bar [data-fold=""]'); await p.waitForTimeout(150);
+    const f2=await fold();
+    if(f2.secsOpen||f2.cardsOpen)errs.push(name+' "Close everything" left something open: '+JSON.stringify(f2));
+    /* a menu link opens the section it points at */
+    await p.evaluate(()=>{const a=document.querySelector('#nav a[data-id="h2h"]'); if(a)a.click();}); await p.waitForTimeout(150);
+    const f3=await p.evaluate(()=>!document.querySelector('#h2h > .sec-fold').hidden);
+    if(!f3)errs.push(name+' the menu link to Head to head did not open it');
+    /* a season page and the 2026 page start shut too, and their bar opens every card */
+    const sp=await p.evaluate(()=>{const out={};
+      if(typeof openSeason==='function'){openSeason(2023);
+        const v=document.querySelector('#syView'), q=s=>[...v.querySelectorAll(s)];
+        out.season={cards:q('.fold-body').length, open:q('.fold-body:not([hidden])').length};
+        v.querySelector('.fold-bar [data-fold="sections"]').click();
+        out.season.afterOpen=q('.fold-body:not([hidden])').length;
+        const b=document.getElementById('lvSegBook'); if(b)b.click();}
+      return out;});
+    if(sp.season&&(sp.season.cards<8||sp.season.open||!sp.season.afterOpen))errs.push(name+' the 2023 season page does not start shut, or will not open: '+JSON.stringify(sp));
+    await p.click('main#main > .fold-bar [data-fold="deep"]'); await p.waitForTimeout(300);
+    const f4=await fold();
+    if(f4.secsOpen!==f4.secs||f4.cardsOpen!==f4.cards)errs.push(name+' "Open everything" left something shut: '+JSON.stringify(f4));
+    console.log(name+' folding', JSON.stringify({start:f0, sections:f1.secsOpen, season:sp.season}));
     // structural checks
     const r=await p.evaluate(()=>({
       board:document.querySelectorAll('.plate').length,
@@ -123,6 +155,13 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
     /* the six real typefaces are our own files under fonts/, so they load with no network */
     if(r.fontsLoaded<6)wkErrs.push(dev+' only '+r.fontsLoaded+' of the typefaces loaded (need 6)');
     if(r.thirdParty.length)wkErrs.push(dev+' fetched from a third party: '+r.thirdParty.join(' '));
+    /* it starts shut on a phone too; the bar's Open everything opens it */
+    const shut=await p.evaluate(()=>document.querySelectorAll('main#main .sec-fold:not([hidden]),main#main .fold-body:not([hidden])').length);
+    if(shut)wkErrs.push(dev+' '+shut+' sections or cards started open');
+    await p.locator('main#main > .fold-bar [data-fold="deep"]').click();
+    await p.waitForTimeout(400);
+    const wide=await p.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+    if(wide>0)wkErrs.push(dev+' with everything open the page scrolls sideways by '+wide+'px');
     /* the manager dossier opens from a name and closes on Escape */
     await p.locator('.mlink').first().click();
     await p.waitForTimeout(400);

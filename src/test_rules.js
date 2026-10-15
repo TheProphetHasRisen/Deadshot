@@ -119,6 +119,9 @@ const FLAGGED_AS_CHANGED = {
   p.on('pageerror', e => errs.push(e.message));
   await p.goto('file://' + path.join(__dirname, 'index.html'));
   await p.waitForTimeout(1300);
+  /* the page starts with every section shut; open it, so both copies are laid out and read alike */
+  await p.evaluate(() => window.dsOpenAll && window.dsOpenAll());
+  await p.waitForTimeout(200);
 
   // both places the rules are drawn: the section at the bottom, and the dialog
   const texts = await p.evaluate(() => {

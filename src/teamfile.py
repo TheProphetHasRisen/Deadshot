@@ -85,11 +85,10 @@ def ranks(y):
                 n += 1; out[(pos, P.flat(x['player'][0])['name']['full'])] = n
     return out
 
-def replacement(y, games):
-    """points a game of a replacement-level player at each position that season: the first one past
-    the league's starters (STARTERS) in Yahoo's season rankings, by the league's own scoring"""
+def pos_totals(y):
+    """{position: season points of every ranked player there, best first}, from Yahoo's rankings"""
     out = {}
-    for pos, n in STARTERS.items():
+    for pos in STARTERS:
         tot = []
         for pg in range(4):
             f = 'yahoo_raw/%d/rank_%s_%d.json' % (y, pos, pg)
@@ -97,8 +96,14 @@ def replacement(y, games):
             for x in P.items(json.load(open(f))['fantasy_content']['league'][1]['players']):
                 pp = P.flat(x['player'][1:]).get('player_points') or {}
                 tot.append(float(pp.get('total') or 0))
-        if len(tot) > n and games: out[pos] = tot[n] / games
+        out[pos] = tot
     return out
+
+def replacement(y, games):
+    """points a game of a replacement-level player at each position that season: the first one past
+    the league's starters (STARTERS) in Yahoo's season rankings, by the league's own scoring"""
+    T = pos_totals(y)
+    return {pos: T[pos][n] / games for pos, n in STARTERS.items() if len(T.get(pos, [])) > n and games}
 
 def season(y):
     """everything for one season, keyed by manager"""
@@ -274,6 +279,17 @@ def season(y):
         PL = injuries.played(y)
     except Exception:
         PL = None
+    # what a drafted player was expected to score a game: what the player who finished at the slot he was
+    # drafted at (the Nth at his position) scored. A pick who barely played is valued mostly on that,
+    # his own scoring counting for more as his games pile up (EXP_G games' worth of the expectation)
+    EXP_G = 4
+    TOT = pos_totals(y); ngames = 17 if y != LIVE else max(1, len(weeks))
+    taken = {d['n']: (d['pos'], d['taken'], d['m']) for d in draft_list}
+    def slot_ppg(n):
+        t = taken.get(n)
+        if not t: return None
+        tot = TOT.get(t[0], [])
+        return tot[t[1] - 1] / ngames if len(tot) >= t[1] else (tot[-1] / ngames if tot else None)
     if PL:
         reg_wks = set(weeks)
         played_pts = {}
@@ -289,14 +305,21 @@ def season(y):
             pl = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r['wk'])]
             miss = [r for r in rows if r['wk'] != r.get('bye') and (r['slot'] == 'IR' or PL(r['n'], r['pos'], r['nfl'], r['wk']) is False)]
             if not miss: continue
-            ppg_w = played_pts.get(n, {})
-            if not ppg_w: continue
-            ppg = sum(ppg_w.values()) / len(ppg_w)
-            starter = (sum(1 for r in pl if r['started']) * 2 >= len(pl)) if pl else any(r['slot'] == 'IR' for r in rows)
+            ppg_w = played_pts.get(n, {}); g = len(ppg_w)
+            ppg = sum(ppg_w.values()) / g if g else None
+            sp = slot_ppg(n)
+            if ppg is None and sp is None: continue
+            # a regular starter: started at least half the games he played for this team, or was drafted
+            # as a starter at his position (a top pick hurt early still counts), or sat in an IR slot
+            t = taken.get(n)
+            drafted_starter = bool(t) and t[1] <= STARTERS.get(t[0], 0)
+            starter = (pl and sum(1 for r in pl if r['started']) * 2 >= len(pl)) or drafted_starter or any(r['slot'] == 'IR' for r in rows)
             if not starter: continue
-            lost = max(0.0, ppg - RP.get(pos, 0)) * len(miss)
+            exp = ((ppg or 0) * g + sp * EXP_G) / (g + EXP_G) if sp is not None else ppg
+            lost = max(0.0, exp - RP.get(pos, 0)) * len(miss)
             Z = M[m]; Z['inj_g'] += len(miss); Z['inj_val'] += lost
-            hits.append(dict(y=y, m=m, n=n, pos=pos, missed=len(miss), ppg=round(ppg, 2), val=round(lost, 2),
+            hits.append(dict(y=y, m=m, n=n, pos=pos, missed=len(miss), ppg=None if ppg is None else round(ppg, 2), g=g,
+                             exp=round(exp, 2), slot=(t[0] + str(t[1])) if t else None, val=round(lost, 2),
                              wks=[r['wk'] for r in miss]))
     hits.sort(key=lambda h: -h['val'])
     inj_avg = sum(Z['inj_val'] for Z in M.values()) / max(1, len(M))
@@ -387,6 +410,9 @@ def build():
     out['gone'] = [g for g in starters_gone(L26['gone_list']) if skill(g)][:12]
     out['goneKD'] = [g for g in starters_gone(L26['gone_list']) if not skill(g)][:6]
     out['fo'] = front_office(H, keep)
+    # every finished season in the live season's shape, for its season page (seasonpage.py)
+    import seasonpage
+    out['seasons'] = {y: seasonpage.bundle(y, H) for y in YEARS if y != LIVE}
     # injuries, 2026: who missed games so far, and Yahoo's report as it stands for the coming week
     out['hits'] = L26['hits'][:12]
     out['injAvg'] = L26['injAvg']
