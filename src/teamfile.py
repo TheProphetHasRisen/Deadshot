@@ -170,17 +170,22 @@ def season(y):
             for p in t['players']: sides.setdefault(p['to'], []).append(p)
             if len(sides) != 2: continue
             (ta, pa), (tb, pb) = sides.items()
-            def got(team, ps): return sum((r['pts'] or 0) for p in ps for r in starts(team, p['n'], stint(team, p['n'], w)))
-            va, vb = got(ta, pa), got(tb, pb)
+            # graded on value at position: each player's points in the weeks he started for his new team
+            # (regular season), minus a replacement-level starter at his position over those same starts,
+            # so a quarterback's big raw totals do not decide every deal
             def detail(team, ps):
                 out = []
                 for p in ps:
-                    ss = starts(team, p['n'], stint(team, p['n'], w))
-                    out.append(dict(n=p['n'], pos=p['pos'], starts=len(ss), counted=round(sum(r['pts'] or 0 for r in ss), 2)))
+                    ss = [r for r in starts(team, p['n'], stint(team, p['n'], w)) if r['wk'] < st['po']]
+                    v = value(ss, p['pos'])
+                    out.append(dict(n=p['n'], pos=p['pos'], starts=len(ss), counted=round(sum(r['pts'] or 0 for r in ss), 2),
+                                    val=None if v is None else round(v, 2)))
                 return out
+            da, db = detail(ta, pa), detail(tb, pb)
+            va, vb = sum(x['val'] or 0 for x in da), sum(x['val'] or 0 for x in db)
             trades_list.append(dict(y=y, d=d.strftime('%b %-d'), wk=w,
-                                    a=dict(m=mgr_of(y, ta), team=ta, got=detail(ta, pa), counted=round(va, 2)),
-                                    b=dict(m=mgr_of(y, tb), team=tb, got=detail(tb, pb), counted=round(vb, 2))))
+                                    a=dict(m=mgr_of(y, ta), team=ta, got=da, counted=round(sum(x['counted'] for x in da), 2), val=round(va, 2)),
+                                    b=dict(m=mgr_of(y, tb), team=tb, got=db, counted=round(sum(x['counted'] for x in db), 2), val=round(vb, 2))))
             for team, mine, theirs in ((ta, va, vb), (tb, vb, va)):
                 m = mgr_of(y, team)
                 if m not in M: continue

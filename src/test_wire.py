@@ -18,6 +18,20 @@ W = site['wire']
 dp = json.load(open('draft_points.json'))
 wk, played = dp['wk2026'], int(dp['weeks']['2026'])
 allwk = dp['allwk2026']
+# replacement level, read straight from Yahoo's season rankings: the first player past the league's
+# starters at each position (10 QB, 24 RB, 25 WR, 11 TE, 10 K, 10 DEF), points a game over weeks played
+import os
+REPL = {}
+for pos, n in dict(QB=10, RB=24, WR=25, TE=11, K=10, DEF=10).items():
+    tot = []
+    for pg in range(4):
+        fn = 'yahoo_raw/2026/rank_%s_%d.json' % (pos, pg)
+        if not os.path.exists(fn): break
+        for x in json.load(open(fn))['fantasy_content']['league'][1]['players'].values():
+            if not isinstance(x, dict) or 'player' not in x: continue
+            for part in x['player'][1:]:
+                if isinstance(part, dict) and 'player_points' in part: tot.append(float(part['player_points']['total']))
+    if len(tot) > n: REPL[pos] = tot[n] / played
 def rank(pos, mine, a, b):
     if mine is None: return None
     pool = []
@@ -81,6 +95,9 @@ for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
             for k, v in (('rosB', len(bef)), ('stB', len(st(bef))), ('rosA', len(aft)), ('stA', len(st(aft))),
                          ('stApts', sum(r[5] or 0 for r in st(aft)))):
                 check(f'{d} {n} {k}', v, P[k], 0.011)
+            if REPL and P.get('stVal') is not None:
+                r0 = REPL[pos.split(',')[0]]
+                check(f'{d} {n} value at position', sum(r[5] or 0 for r in st(aft)) - r0 * len(st(aft)), P['stVal'], 0.02)
         check(f'{d} side {key} against own form', chg if played >= w else None, T[key + 'Chg'], 0.05)
         check(f'{d} side {key} points since', tot, T[key + 'Post'], 0.05)
         check(f'{d} side {key} points that counted', sum(sum(r[5] or 0 for r in getattr(S, 'ROSTERS2026', []) if r[2] == n and r[1] == (ta if key == 'a' else tb) and w <= r[0] <= played and r[4] not in ('BN', 'IR')) for n in names), T[key + 'Started'], 0.05)

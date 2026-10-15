@@ -55,7 +55,7 @@ def team_form(games, t, w0, w1):
     return dict(w=W, l=L, g=len(pts), ppg=round(sum(pts) / len(pts), 2) if pts else None,
                 ap=round(apw / apn, 4) if apn else None)
 
-def grade(S, wk, played, games=(), allwk=None):
+def grade(S, wk, played, games=(), allwk=None, repl=None):
     """wk: {player: [points by week, None = no game]}; played: last week with stats;
     games: the season's results; allwk: {pos: every NFL player's weeks}, for ranks."""
     pts = lambda n, a, b: [x for x in (wk.get(n) or [])[max(a, 1) - 1:min(b, played)] if x is not None]
@@ -134,6 +134,9 @@ def grade(S, wk, played, games=(), allwk=None):
                 # from Yahoo's lineups: how often he started, and the points that counted
                 rb, sb_, pb_ = lineup(n, frm, 1, w - 1); ra, sa_, pa_ = lineup(n, to, w, played)
                 out[-1].update(rosB=rb, stB=sb_, stBpts=pb_, rosA=ra, stA=sa_, stApts=pa_)
+                # value at position: those points, minus a replacement-level starter at his position over the same starts
+                r0 = (repl or {}).get((out[-1]['pos'] or '').split(',')[0])
+                out[-1]['stVal'] = None if r0 is None else round(pa_ - r0 * sa_, 2)
             return out
         def form(t):
             b4, af = team_form(games, t, 1, w - 1), team_form(games, t, w, played)
@@ -150,6 +153,8 @@ def grade(S, wk, played, games=(), allwk=None):
                            fa=form(ta), fb=form(tb),
                            # points that counted: started for the team that got them, since the deal
                            aStarted=round(sum(p['stApts'] for p in A), 2), bStarted=round(sum(p['stApts'] for p in B), 2),
+                           aVal=round(sum(p['stVal'] or 0 for p in A), 2) if repl else None,
+                           bVal=round(sum(p['stVal'] or 0 for p in B), 2) if repl else None,
                            lineups=bool(getattr(S, 'ROSTERS2026', None))))
 
     # how busy each team has been, and the claims that were fought over

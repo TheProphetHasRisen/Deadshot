@@ -197,7 +197,7 @@ const GLOSS={
  war:`<b>In wins</b><br>How many extra wins a points edge is worth.<br><br>`+
    `<b>The easy version.</b> This season an extra 65 points or so a week adds up to about one extra win. So a trade that gives one side 6.5 more points a week than the other is worth about <b>0.1 wins a week</b>, or about <b>1 win over 10 weeks</b>.<br><br>`+
    `<b>Where 65 comes from.</b> Weekly scores this season spread out by about 26 points either side of average (the standard deviation, σ). Near an average score, one more point raises the chance of beating a typical opponent by 0.399 ÷ σ, the height of a bell curve at its middle divided by its spread. Flip that over: σ ÷ 0.399 ≈ 26 ÷ 0.399 ≈ <b>65 points per win</b>. It updates every week as more scores come in.<br><br>`+
-   `On a trade card the edge is the gap between the two sides in <b>points that counted</b> a week since the deal: only the weeks each player was in his new team’s starting lineup. It is the idea behind baseball’s WAR (wins above replacement), measured in what the trade actually put on the scoreboard.`,
+   `On a trade card the edge is the gap between the two sides in <b>value at position</b> a week since the deal: each player’s points in the weeks he started for his new team, over a replacement-level starter at his position. That is baseball’s WAR (wins above replacement) for a trade.`,
  slotx:`<b>Expected, for a draft pick</b><br>What the player who finished at the slot he was drafted at actually scored.<br><br>`+
    `Taken as the 16th receiver? He is held to what this season’s 16th-best receiver has scored. <b>Above or below</b> is his points minus that. <b>Season pace</b> carries the gap so far out to a 17-week season: the gap ÷ weeks played × 17.`,
  xwin:`<b>Wins against the pre-trade pace</b><br>How a team has done since a trade, against how it was playing before it.<br><br>`+
@@ -4891,8 +4891,8 @@ function pharaoh(){
       {h:'Adds',f:r=>r.adds,c:'num',k:r=>r.adds},
       {h:'Pickup value',f:r=>sg(r.val,0),c:'num',k:r=>r.val,t:'Points that counted from his pickups, over a replacement-level starter at each one’s position. Quarterbacks, backs, receivers and tight ends.'},
       {h:'Pickups over bench, wins',f:r=>sg(r.pw,2),c:'num',k:r=>r.pw,t:'What his pickups scored beyond the best bench player who could have filled the same spot, in wins.'},
-      {h:'Trades won–lost',f:r=>r.tw+'–'+r.tl,c:'num',k:r=>r.tw-r.tl,t:'A trade is won by the side whose new players put more points that counted in its lineups for the rest of that season.'},
-      {h:'Trade net',f:r=>sg(r.tn,0),c:'num',k:r=>r.tn,t:'Points that counted from what he got, minus from what he gave, added over every trade.'},
+      {h:'Trades won–lost',f:r=>r.tw+'–'+r.tl,c:'num',k:r=>r.tw-r.tl,t:'A trade is won by the side whose new players added more value at their positions: points in the weeks they started for the new team, over a replacement-level starter at each position, for the rest of that regular season.'},
+      {h:'Trade net',f:r=>sg(r.tn,0),c:'num',k:r=>r.tn,t:'Value at position from what he got, minus from what he gave, added over every trade.'},
       {h:'Patience',f:r=>r.pat==null?'—':f(r.pat,1),c:'num',k:r=>r.pat,t:'Weeks in a row he held a player before dropping him, on average.'},
       {h:'Drops that came back',f:r=>r.gone,c:'num',k:r=>r.gone,t:'Players he cut who finished that season as a starter at their position.'},
     ],rows.filter(r=>vis(r.m)),{rank:1,sort:2});
@@ -4903,10 +4903,10 @@ function pharaoh(){
       FO.picksKD.filter(sel).map(p=>`<tr><td>${yr(p.y)}</td><td>${pl(p.n,p.pos)}</td><td>${esc(p.m)}</td><td class="num">${p.starts}</td><td class="num">${f(p.pts,1)}</td><td class="num">${updn(p.val)}</td></tr>`).join('')+'</tbody>';
     $('#tFoGone').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Dropped by</th><th>When</th><th class="num">Held</th><th class="num">Finished</th><th class="num">Points that counted for others</th><th>For</th></tr></thead><tbody>'+
       FO.gone.filter(sel).map(g=>`<tr><td>${yr(g.y)}</td><td>${pl(g.n,g.pos)}</td><td>${esc(g.m)}</td><td class="dim">${esc(g.d)}</td><td class="num">${nOf(g.held,'wk')}</td><td class="num"><b>${esc(g.pos.split(',')[0])}${g.rank}</b></td><td class="num">${f(g.counted,1)}</td><td>${g.to.map(esc).join(', ')||'<span class="dim">nobody</span>'}</td></tr>`).join('')+'</tbody>';
-    const side=s=>`<b>${esc(last(s.m||s.team))}</b> got ${s.got.map(p=>`${esc(p.n)} <span class="dim">(${p.starts?nOf(p.starts,'start')+', '+f(p.counted,0)+' pts':'never started'})</span>`).join(', ')}`;
-    $('#tFoTrades').innerHTML='<thead><tr><th>Season</th><th>When</th><th>One side</th><th class="num">Counted</th><th>The other</th><th class="num">Counted</th><th>Won by</th></tr></thead><tbody>'+
-      FO.trades.filter(t=>vis(t.a.m)||vis(t.b.m)).slice().reverse().map(t=>{const w=t.a.counted===t.b.counted?null:t.a.counted>t.b.counted?t.a:t.b;
-        return `<tr><td>${yr(t.y)}</td><td class="dim">${esc(t.d)}</td><td class="fo-w">${side(t.a)}</td><td class="num">${f(t.a.counted,1)}</td><td class="fo-w">${side(t.b)}</td><td class="num">${f(t.b.counted,1)}</td><td>${w?`<b>${esc(last(w.m))}</b> <span class="dim">by ${f(Math.abs(t.a.counted-t.b.counted),1)}</span>`:'<span class="dim">even</span>'}</td></tr>`;}).join('')+'</tbody>';
+    const side=s=>`<b>${esc(last(s.m||s.team))}</b> got ${s.got.map(p=>`${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span> <span class="dim">(${p.starts?nOf(p.starts,'start')+', '+f(p.counted,0)+' pts, '+(p.val==null?'':sg(p.val,0)+' at position'):'never started'})</span>`).join(', ')}`;
+    $('#tFoTrades').innerHTML='<thead><tr><th>Season</th><th>When</th><th>One side</th><th class="num">Value</th><th>The other</th><th class="num">Value</th><th>Won by</th></tr></thead><tbody>'+
+      FO.trades.filter(t=>vis(t.a.m)||vis(t.b.m)).slice().reverse().map(t=>{const w=Math.abs(t.a.val-t.b.val)<0.05?null:t.a.val>t.b.val?t.a:t.b;
+        return `<tr><td>${yr(t.y)}</td><td class="dim">${esc(t.d)}</td><td class="fo-w">${side(t.a)}</td><td class="num">${updn(t.a.val)}</td><td class="fo-w">${side(t.b)}</td><td class="num">${updn(t.b.val)}</td><td>${w?`<b>${esc(last(w.m))}</b> <span class="dim">by ${f(Math.abs(t.a.val-t.b.val),1)}</span>`:'<span class="dim">even</span>'}</td></tr>`;}).join('')+'</tbody>';
     $('#tFoSlots').innerHTML='<thead><tr><th>First-round slot</th><th class="num">Titles</th><th class="num">Podiums</th><th class="num">Regular season</th><th class="num">Average finish</th><th>Season by season</th></tr></thead><tbody>'+
       FO.slots.map(s=>{const v=s.seasons, w=v.reduce((t,x)=>t+x.w,0), l=v.reduce((t,x)=>t+x.l,0), pls=v.filter(x=>x.place);
         return `<tr><td><b>${ord(s.slot)} pick</b></td><td class="num">${v.filter(x=>x.place===1).length}</td><td class="num">${v.filter(x=>x.place&&x.place<=3).length}</td><td class="num">${w}–${l}</td><td class="num">${pls.length?f(pls.reduce((t,x)=>t+x.place,0)/pls.length,1):'—'}</td>
@@ -4951,13 +4951,13 @@ let openSeason=null;
     let h=card('syMgr',`The managers in ${y}`,'Regular season · everything Yahoo has on how each team was run',`<div class="scroll"><table><thead><tr><th>Manager</th><th class="num">Record</th><th class="num">All-play</th><th class="num">Wins above average</th><th class="num">Lineup efficiency</th><th class="num">Left on bench, a week</th><th class="num">Lost to the lineup</th><th class="num">Adds</th><th class="num">Pickup value</th><th class="num">Trades won–lost</th><th class="num">Patience</th></tr></thead><tbody>${
       rows.map(r=>`<tr><td>${mlink(r.m)} <span class="dim">${esc(team(r.m))}</span></td><td class="num">${r.w}–${r.l}</td><td class="num">${pct(r.ap)}</td><td class="num">${sg(r.waa,1)}</td><td class="num">${pct(r.eff)}</td><td class="num">${f(r.left,1)}</td><td class="num">${r.lost_lineup}</td><td class="num">${r.adds}</td><td class="num">${sg(r.pk_val||0,0)}</td><td class="num">${r.trade_w}–${r.trade_l}</td><td class="num">${r.patience==null?'—':f(r.patience,1)}</td></tr>`).join('')}</tbody></table></div>`,'waa');
     const T=FO.trades.filter(t=>t.y===y);
-    const side=s=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(s.team)}</div>${s.got.map(p=>`<div style="font-size:13px">${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span><div class="dim" style="font-size:11.5px;margin-bottom:5px">${p.starts?nOf(p.starts,'start')+', '+f(p.counted,1)+' points that counted':'never started for them'}</div></div>`).join('')}</div>`;
-    h+=card('syTr',`Trades in ${y}, graded`,nOf(T.length,'trade')+' · points that counted for each side from the deal to the end of the regular season','',
-      'started')+`<div class="sy-trades" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:20px;margin-top:20px">${T.slice().reverse().map(t=>{
-        const w=t.a.counted===t.b.counted?null:t.a.counted>t.b.counted?t.a:t.b;
+    const side=s=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(s.team)}</div>${s.got.map(p=>`<div style="font-size:13px">${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span><div class="dim" style="font-size:11.5px;margin-bottom:5px">${p.starts?nOf(p.starts,'start')+', '+f(p.counted,1)+' points that counted, '+(p.val==null?'':sg(p.val,1)+' at his position'):'never started for them'}</div></div>`).join('')}</div>`;
+    h+=card('syTr',`Trades in ${y}, graded`,nOf(T.length,'trade')+' · value at position for each side, from the deal to the end of the regular season','',
+      'val')+`<div class="sy-trades" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:20px;margin-top:20px">${T.slice().reverse().map(t=>{
+        const w=Math.abs(t.a.val-t.b.val)<0.05?null:t.a.val>t.b.val?t.a:t.b;
         return `<div class="card" style="margin-top:0"><div class="card-h"><h3>${esc(t.a.team)} &harr; ${esc(t.b.team)}</h3><span class="sub">${esc(t.d)}</span>
           <div class="right trmg">${esc(t.a.m)} &harr; ${esc(t.b.m)}</div></div>
-          <div class="card-b"><div class="lv-verdict"><span class="lv-vlab">Verdict</span> ${w?`<b>${esc(w.team)}</b> (${esc(w.m)}) won it: <b>${f(w.counted,1)}</b> points that counted to <b>${f(w===t.a?t.b.counted:t.a.counted,1)}</b>.`:'Even.'}</div>
+          <div class="card-b"><div class="lv-verdict"><span class="lv-vlab">Verdict</span> ${w?`<b>${esc(w.team)}</b> (${esc(w.m)}) won it: <b>${sg(w.val,1)}</b> at position to <b>${sg(w===t.a?t.b.val:t.a.val,1)}</b> (points that counted ${f(w.counted,1)} to ${f(w===t.a?t.b.counted:t.a.counted,1)}).`:'Even.'}</div>
           <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">${side(t.a)}${side(t.b)}</div></div></div>`;}).join('')}</div>`;
     const P=FO.yPicks[y]||[], G=FO.yGone[y]||[];
     h+=card('syPk',`Best pickups of ${y}`,'Value at his position, in the weeks he started',`<div class="scroll"><table><thead><tr><th>Player</th><th>Manager</th><th>Added</th><th class="num">Starts</th><th class="num">Points that counted</th><th class="num">Value at position</th><th class="num">Finished</th></tr></thead><tbody>${
@@ -5130,18 +5130,24 @@ glossify();
        player started for his new team). Everything below it is the working. */
     const verdict=x=>{const n=x.weeksSince;
       if(!n)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Too early to call: no games since the deal.</div>`;
-      const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n;
-      if(Math.abs(as-bs)<0.05)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Even so far: ${f(as,1)} points that counted a week each.</div>`;
-      const W=as>bs?x.ta:x.tb, hi=Math.max(as,bs), lo=Math.min(as,bs);
-      return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}winning the trade: <b>${f(hi,1)}</b> points that counted a week to <b>${f(lo,1)}</b>, about <b>${f((hi-lo)/PPW,2)}</b> wins a week, over the ${nOf(n,'week')} since.</div>`;};
+      /* value at position, a week: points in started weeks over a replacement-level starter at each position */
+      if(x.aVal==null){const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n, W=as>=bs?x.ta:x.tb;
+        return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ahead: ${f(Math.max(as,bs),1)} points that counted a week to ${f(Math.min(as,bs),1)}.</div>`;}
+      const av=x.aVal/n, bv=x.bVal/n;
+      if(Math.abs(av-bv)<0.05)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Even so far at their positions.</div>`;
+      const W=av>bv?x.ta:x.tb, hi=Math.max(av,bv), lo=Math.min(av,bv);
+      return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}winning the trade: <b>${sg(hi,1)}</b> a week at their positions to <b>${sg(lo,1)}</b>, about <b>${f((hi-lo)/PPW,2)}</b> wins a week, over the ${nOf(n,'week')} since.</div>`;};
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
       const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):'wk 1', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
       let tiles;
       if(n){const aw=x.aPost/n, bw=x.bPost/n, pl=aw>=bw?x.ta:x.tb, fl=x.aChg>=x.bChg?x.ta:x.tb, gap=Math.abs(x.aChg-x.bChg), left=Math.max(0,L.regWeeks-done);
         /* the wins figure is built from points that counted: what each side actually put in its lineups */
-        const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n, sl=as>=bs?x.ta:x.tb, wpw=Math.abs(as-bs)/PPW;
+        const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n;
+        /* the wins figure is built on value at position when it is available, else on points that counted */
+        const av=x.aVal!=null?x.aVal/n:as, bv=x.bVal!=null?x.bVal/n:bs, sl=av>=bv?x.ta:x.tb, wpw=Math.abs(av-bv)/PPW;
         tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>`+
-          (x.lineups?`<div class="tile"><span>Points that counted, a week ${gl('started')}</span><b>${f(as,1)} <i>v</i> ${f(bs,1)}</b><div class="lv-tx">${esc(sl)} ${sg(Math.abs(as-bs),1)} · started weeks only</div></div>`:'')+`
+          (x.lineups?`<div class="tile"><span>Points that counted, a week ${gl('started')}</span><b>${f(as,1)} <i>v</i> ${f(bs,1)}</b><div class="lv-tx">${esc(as>=bs?x.ta:x.tb)} ${sg(Math.abs(as-bs),1)} · started weeks only</div></div>`:'')+
+          (x.aVal!=null?`<div class="tile"><span>Value at position, a week ${gl('val')}</span><b>${sg(av,1)} <i>v</i> ${sg(bv,1)}</b><div class="lv-tx">${esc(sl)} ${sg(Math.abs(av-bv),1)} · over replacement starters</div></div>`:'')+`
           <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${esc(fl)} ${sg(gap,1)} a game${(()=>{const thin=x.a.concat(x.b).filter(p=>p.preG===1).map(p=>p.n.split(' ').slice(-1)[0]); return thin.length?` · ${thin.join(', ')}: one game before the deal`:'';})()}</div></div>
           <div class="tile"><span>In wins, to ${esc(sl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">${left?f(wpw*left,1)+' over the '+nOf(left,'week')+' left':'season over'}</div></div>`;}
       else tiles=`<div class="tile"><span>Points a game before</span><b>${f(x.aPre,1)} <i>v</i> ${f(x.bPre,1)}</b><div class="lv-tx">each side’s players, added up</div></div>

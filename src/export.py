@@ -312,8 +312,12 @@ if S26:
     def _wire():
         if not os.path.exists('draft_points.json'): return None
         import wire2026; dp = json.load(open('draft_points.json'))
+        repl = None
+        if os.path.exists('yahoo_raw/2026/rank_QB_0.json'):
+            import teamfile
+            repl = teamfile.replacement(2026, int(dp['weeks']['2026']))
         return wire2026.grade(S26, dp.get('wk2026') or {}, int(dp['weeks']['2026']), games,
-                              dp.get('allwk2026'))
+                              dp.get('allwk2026'), repl)
     up = [dict(wk=wk, ta=a, pa=pa_, tb=b, pb=pb_) for wk, lst in S26.UPCOMING2026.items() for (a, pa_, b, pb_) in lst]
     out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
                        trades=[dict(d=d, ta=a, ga=ga, tb=b, gb=gb) for (d, a, ga, b, gb) in S26.TRADES2026],
