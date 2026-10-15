@@ -1483,16 +1483,13 @@ body.lv-pg .lv-go{color:var(--brass)}
 @media(prefers-reduced-motion:no-preference){.lv-tk-in{animation:lv-tk .45s ease-out}
   @keyframes lv-tk{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}}
 /* ice and fire on the draft board: Brian's own banners (art/ice.png, art/fire.png, 14 Oct
-   2026), stretched across the whole pick. The name sits in the banner's light middle and his
-   ICE COLD / STEAL lettering fills the right end. */
-.lv-draft td.lv-fx-b,.lv-draft td.lv-fx-s{background:center/100% 100% no-repeat;padding:12px 34% 12px 22px;box-shadow:none!important}
-.lv-draft td.lv-fx-b{background-image:url(art/ice.png)}
-.lv-draft td.lv-fx-s{background-image:url(art/fire.png)}
-.lv-draft td.lv-fx-b,.lv-draft td.lv-fx-s,.lv-draft td.lv-fx-b *,.lv-draft td.lv-fx-s *{color:#141414;font-weight:600;
+   2026). The banner is drawn at its own 10:1 shape, never stretched to the cell, with the
+   name set in its light middle and his ICE COLD / STEAL lettering on the right end. */
+.lv-fxbar{display:inline-flex;align-items:center;gap:7px;box-sizing:border-box;width:330px;max-width:100%;aspect-ratio:10/1;
+  padding:0 34% 0 7%;background:center/100% 100% no-repeat;white-space:nowrap;overflow:hidden;vertical-align:middle}
+.lv-fxbar-b{background-image:url(art/ice.png)}
+.lv-fxbar-s{background-image:url(art/fire.png)}
+.lv-fxbar,.lv-fxbar *{color:#141414!important;font-weight:600;text-overflow:ellipsis;
   text-shadow:0 0 2px #fff,0 0 4px #fff,0 0 7px #fff,0 0 10px rgba(255,255,255,.9)}
-.lv-draft td.lv-fx-b .lv-big,.lv-draft td.lv-fx-s .lv-big{display:none}
-/* by team, the columns are narrow: a banner pick gets room, and shows just the name over the art
-   (the drafted and finished ranks are in its hover note) */
-.lv-draft td.lv-fx-b,.lv-draft td.lv-fx-s{min-width:300px}
-.lv-draft td.lv-fx-b>.lv-bust,.lv-draft td.lv-fx-b>.lv-fin,.lv-draft td.lv-fx-b>.dim,
-.lv-draft td.lv-fx-s>.lv-steal,.lv-draft td.lv-fx-s>.lv-fin,.lv-draft td.lv-fx-s>.dim{display:none}
+.lv-fxbar .lv-pos{font-size:9.5px}
+.lv-fxbar .lv-nm{overflow:hidden;text-overflow:ellipsis;font-size:12.5px}

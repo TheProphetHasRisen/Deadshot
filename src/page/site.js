@@ -4903,13 +4903,14 @@ glossify();
       const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
       let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
       for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
-        return p?`<td class="${dim(p)?'lv-dim':''}${T[p[0]]?' lv-fx-'+(T[p[0]]==='STEAL'?'s':'b'):''}" title="${J[p[0]].fr!=null?'Drafted '+p[4]+J[p[0]].dr+', '+(partial?'running ':'finished ')+p[4]+J[p[0]].fr+' with '+f(J[p[0]].pts,1)+' points':''}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</td>`:'<td></td>';}).join('')+'</tr>';}
+        if(p&&T[p[0]])return `<td class="${dim(p)?'lv-dim':''}" title="Drafted ${p[4]}${J[p[0]].dr}, ${partial?'running':'finished'} ${p[4]}${J[p[0]].fr} with ${f(J[p[0]].pts,1)} points"><span class="lv-fxbar lv-fxbar-${T[p[0]]==='STEAL'?'s':'b'}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span><span class="lv-nm">${esc(p[2])}</span></span></td>`;
+        return p?`<td class="${dim(p)?'lv-dim':''}" title="${J[p[0]].fr!=null?'Drafted '+p[4]+J[p[0]].dr+', '+(partial?'running ':'finished ')+p[4]+J[p[0]].fr+' with '+f(J[p[0]].pts,1)+' points':''}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</td>`:'<td></td>';}).join('')+'</tr>';}
       $('#tLiveDr').innerHTML=h+'</tbody>';
     }else{
       $('#tLiveDr').innerHTML='<thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Taken</th><th>'+(partial?'Running':'Finished')+'</th><th class="num">Points</th></tr></thead><tbody>'+
         P.slice().sort((a,b)=>a[0]-b[0]).map(p=>{const v=J[p[0]];
           return `<tr class="${dim(p)?'lv-dim':''}${p[0]%10===0?' lv-rd':''}${T[p[0]]?' lv-hl-'+(T[p[0]]==='STEAL'?'s':'b'):''}"><td class="dim">${Math.ceil(p[0]/10)}.${String((p[0]-1)%10+1).padStart(2,'0')} <span class="lv-ov">${p[0]}</span></td>
-            <td>${esc(p[1])} <span class="dim">${esc(mg(p[1]))}</span></td><td class="${T[p[0]]?'lv-fx-'+(T[p[0]]==='STEAL'?'s':'b'):''}"><b>${esc(p[2])}</b> <span class="dim">${esc(p[3])}</span></td>
+            <td>${esc(p[1])} <span class="dim">${esc(mg(p[1]))}</span></td><td>${T[p[0]]?`<span class="lv-fxbar lv-fxbar-${T[p[0]]==='STEAL'?'s':'b'}"><span class="lv-nm">${esc(p[2])} ${esc(p[3])}</span></span>`:`<b>${esc(p[2])}</b> <span class="dim">${esc(p[3])}</span>`}</td>
             <td><span class="lv-pos">${esc(p[4])}${v.dr}</span></td><td>${mark(p)}</td><td class="num">${v.pts==null?'—':f(v.pts,1)}</td></tr>`;}).join('')+'</tbody>';
     }
     /* the verdicts: biggest steals, biggest busts, and whose draft has scored the most */
