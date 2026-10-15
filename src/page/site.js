@@ -4872,13 +4872,14 @@ glossify();
      are what a player scored while on the roster, started or benched: Yahoo's lineups are not in yet */
   const WR=L.wire;
   if(WR){
-    const wks=n=>nOf(n,'week');
-    $('#lvTrSub').textContent=nOf(L.trades.length,'trade')+' · each player’s points a game before the deal, and since';
+    $('#lvTrSub').textContent=nOf(L.trades.length,'trade')+' · each player’s points a game before the deal and since, started or benched';
     const side=(t,a)=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t)}</div>${a.map(p=>`<div style="font-size:13px">${esc(p.n)}
-      <div class="dim" style="font-size:11.5px;margin-bottom:5px">${p.pre==null?'no games before':f(p.pre,1)+' a game before'}${p.postG?` · ${f(p.post,1)} since`:''}</div></div>`).join('')}</div>`;
+      <div class="lv-trn">${p.pre==null?'<span class="dim">no games before</span>':`<b>${f(p.pre,1)}</b> <span class="dim">a game before</span>`}${p.postG?(()=>{const a=p.post/p.postG, up=p.pre==null||a>=p.pre;
+        return ` <span class="dim">·</span> <b class="${up?'lv-steal':'lv-bust'}">${p.pre==null?'':up?'▲ ':'▼ '}${f(a,1)}</b> <span class="dim">a game since</span>`;})():''}</div></div>`).join('')}</div>`;
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
       let v;
-      if(x.weeksSince){const lead=x.aPost>=x.bPost?x.ta:x.tb; v=`<b>${esc(lead)}</b> ahead by ${f(Math.abs(x.aPost-x.bPost),1)} points in the ${wks(x.weeksSince)} since: ${f(x.aPost,1)} to ${f(x.bPost,1)}.`;}
+      if(x.weeksSince){const n=x.weeksSince, aw=x.aPost/n, bw=x.bPost/n, lead=aw>=bw?x.ta:x.tb;
+        v=`Since the deal (${n>1?'weeks '+x.wk+'–'+(x.wk+n-1):'week '+x.wk}), ${esc(x.ta)}’s players have scored ${f(aw,1)} a week and ${esc(x.tb)}’s ${f(bw,1)}. <b>${esc(lead)}</b> ahead by ${f(Math.abs(aw-bw),1)} a week.`;}
       else v=`No games since. Before the deal, ${esc(x.ta)}’s side was scoring ${f(x.aPre,1)} a week and ${esc(x.tb)}’s ${f(x.bPre,1)}.`;
       return `<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(x.ta)} &harr; ${esc(x.tb)}</h3><span class="sub">${esc(x.d)}</span>
@@ -4952,14 +4953,19 @@ glossify();
     const rows=P.map(p=>({p,v:J[p[0]]})).filter(x=>x.v.fr!=null&&(!on.size||on.has(x.p[4])));
     const st=rows.filter(x=>x.v.fr<=24&&x.v.d>0).sort((a,b)=>b.v.d-a.v.d).slice(0,8);
     const bu=rows.filter(x=>x.v.dr<=24&&x.v.d<0).sort((a,b)=>a.v.d-b.v.d).slice(0,8);
-    const ln=x=>`<tr><td><b>${esc(x.p[2])}</b> <span class="dim">${esc(x.p[1])}</span></td><td class="num">pick ${x.p[0]} · ${x.p[4]}${x.v.dr}</td><td class="num"><b>${x.p[4]}${x.v.fr}</b></td><td class="num">${f(x.v.pts,1)}</td></tr>`;
-    const tp={}; P.forEach(p=>{const v=J[p[0]]; if(v.pts!=null&&(!on.size||on.has(p[4])))tp[p[1]]=(tp[p[1]]||0)+v.pts;});
+    /* expected: what the player who finished at the slot he was drafted at scored (an RB12 pick
+       "should" score what this year's RB12 did). Pace carries the gap out to a 17-week season */
+    const CV=DP['curve'+dy]||{}, exp=x=>{const c=CV[x.p[4]]; return c&&c[x.v.dr-1]!=null?c[x.v.dr-1]:null;};
+    const pace=v=>partial&&wk?v/wk*17:null;
+    const ln=x=>{const e=exp(x), dv=e==null?null:x.v.pts-e;
+      return `<tr><td><b>${esc(x.p[2])}</b> <span class="dim">${esc(x.p[1])}</span></td><td class="num">pick ${x.p[0]} · ${x.p[4]}${x.v.dr}</td><td class="num"><b>${x.p[4]}${x.v.fr}</b></td><td class="num">${f(x.v.pts,1)}</td><td class="num dim">${e==null?'—':f(e,1)}</td><td class="num"><b>${dv==null?'—':sg(dv,1)}</b></td>${partial?`<td class="num">${dv==null?'—':sg(pace(dv),1)}</td>`:''}</tr>`;};
+    const tp={}, tx={}; P.forEach(p=>{const v=J[p[0]]; if(v.pts!=null&&(!on.size||on.has(p[4]))){tp[p[1]]=(tp[p[1]]||0)+v.pts; const e=exp({p,v}); if(e!=null)tx[p[1]]=(tx[p[1]]||0)+v.pts-e;}});
     const tr=Object.entries(tp).sort((a,b)=>b[1]-a[1]);
     $('#lvSbHow').textContent='How a pick is judged: each player is ranked at his position by the order he was drafted (the 12th running back taken is RB12) and again by the points he scored under Deadshot\u2019s scoring, against every player in the NFL at that position. A steal finished well above where he was taken: 6 or more places, or twice as high. A bust was a top-40 pick at his position who finished 10 or more places below it, or twice as low. Kickers and defenses are judged the same way. The board marks the biggest of each at every position (five at running back and receiver, three at quarterback and tight end, two at kicker and defense), and a fall from an early pick counts for more than the same fall from a late one.';
     $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs finished at his position';
-    $('#tLiveSb').innerHTML=`<thead><tr><th>Steals</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${st.map(ln).join('')}</tbody>`+
-      `<thead><tr><th>Busts</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${bu.map(ln).join('')}</tbody>`+
-      `<thead><tr><th>Best drafts</th><th class="num"></th><th class="num">Rank</th><th class="num">Points</th></tr></thead><tbody>${tr.map(([t,v],i)=>`<tr><td><b>${esc(t)}</b> <span class="dim">${esc(L.mgr[t]||'')}</span></td><td></td><td class="num">${ord(i+1)}</td><td class="num">${f(v,1)}</td></tr>`).join('')}</tbody>`;
+    const hd=t=>`<thead><tr><th>${t}</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th><th class="num" title="What the player who finished at the slot he was drafted at scored">Expected</th><th class="num">Above or below</th>${partial?'<th class="num" title="The gap so far, carried out to a full 17-week season">Season pace</th>':''}</tr></thead>`;
+    $('#tLiveSb').innerHTML=`${hd('Steals')}<tbody>${st.map(ln).join('')}</tbody>${hd('Busts')}<tbody>${bu.map(ln).join('')}</tbody>`+
+      `<thead><tr><th>Best drafts</th><th class="num"></th><th class="num">Rank</th><th class="num">Points</th><th class="num"></th><th class="num">Above or below</th>${partial?'<th class="num">Season pace</th>':''}</tr></thead><tbody>${tr.map(([t,v],i)=>`<tr><td><b>${esc(t)}</b> <span class="dim">${esc(own[t]||'')}</span></td><td></td><td class="num">${ord(i+1)}</td><td class="num">${f(v,1)}</td><td></td><td class="num"><b>${tx[t]==null?'—':sg(tx[t],1)}</b></td>${partial?`<td class="num">${tx[t]==null?'—':sg(pace(tx[t]),1)}</td>`:''}</tr>`).join('')}</tbody>`;
   };
   drawDr();
 })();

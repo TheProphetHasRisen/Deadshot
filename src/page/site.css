@@ -1491,3 +1491,6 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-fxi{width:17px;height:17px;border-radius:3px;vertical-align:-4px;margin:0 2px 0 3px}
 .lv-fxi-b{box-shadow:0 0 0 1px color-mix(in srgb,var(--neg) 55%,transparent),0 0 7px color-mix(in srgb,var(--neg) 45%,transparent)}
 .lv-fxi-s{box-shadow:0 0 0 1px color-mix(in srgb,var(--pos) 55%,transparent),0 0 7px color-mix(in srgb,var(--pos) 45%,transparent)}
+/* 2026 trade cards: a player's points a game before and since, big enough to read at a glance */
+.lv-trn{font-size:12.5px;margin:2px 0 7px}
+.lv-trn b{font:600 13.5px "IBM Plex Mono",monospace}
