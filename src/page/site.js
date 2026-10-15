@@ -52,7 +52,10 @@ const surname=n=>n.split(' ').slice(-1)[0];
 const bySeasons=(a,b)=>b.seasons-a.seasons||surname(a.name).localeCompare(surname(b.name))||a.name.localeCompare(b.name);
 const ALLNAMES=M.map(m=>m.name);
 /* every season with a game-by-game log, the live one included */
-const LOGYRS=[...(D.wkYears||[]),...(D.live?[D.live.year]:[])];
+const LOGYRS=[...new Set([...(D.wkYears||[]),...(D.live?[D.live.year]:[])])];
+/* the live season is in D.wk too (so Week by Week, the records and the Trade Market carry it), but
+   the game ledgers below add it from D.live, with its own week count; they walk only the finished years */
+const PASTWK=(D.wkYears||[]).filter(y=>!D.live||y!==D.live.year);
 /* ---- global manager filter ---- */
 const REDRAW=[];
 let SEL=new Set(ACTIVE);            /* first visit shows the current managers only */
@@ -1591,6 +1594,11 @@ $('#board').innerHTML=D.champs.map(c=>`<button class="plate${c.co?' split':''}" 
   ${CUP}<div class="yr">${c.y}</div><div class="mgr">${c.mgrs.map(esc).join(' &amp; ')}</div>
   <div class="tm">${c.teams.map(esc).join(' / ')}</div>
   <div class="meta">${c.co?'Title split · final voided':`${c.spots}-team bracket · ${c.n} teams`}</div></button>`).join('');
+if(D.live&&D.live.standings&&D.live.standings.length){const L=D.live, ld=L.standings[0], wk=L.weeks[L.weeks.length-1];
+  $('#board').insertAdjacentHTML('beforeend',`<button class="plate plate-live" data-y="${L.year}">
+    <div class="yr">${L.year}</div><div class="mgr">In progress</div>
+    <div class="tm">${esc(ld.team)} leads at ${ld.w}–${ld.l}${ld.mgr?' ('+esc(ld.mgr)+')':''}</div>
+    <div class="meta">Week ${wk} of ${L.regWeeks} · open the live page</div></button>`);}
 $$('#board .plate').forEach(b=>b.onclick=()=>{
   const y=+b.dataset.y;
   /* every year opens its own page (the season pages, further down); the bracket on it traces the winner's run */
@@ -2045,11 +2053,16 @@ drawPiHelp(); REDRAW.push(drawPiHelp);
 function drawHeat(){
   const order=[...M].filter(m=>vis(m.name)).sort(bySeasons);
   const pi={}; ROWS.forEach(r=>pi[r.y+'|'+r.mgr]=r);
-  let h='<thead><tr><th>Manager</th>'+SEA.map(y=>`<th class="num">${y}</th>`).join('')+'<th class="num">Career</th><th class="num">Szns</th></tr></thead><tbody>';
+  /* the season being played, so far: points a game against this season's league average, the same scale */
+  const LV=D.live&&D.live.standings, lvPI={};
+  if(LV){const g=r=>r.w+r.l+r.t, lg=LV.reduce((t,r)=>t+r.pf,0)/LV.reduce((t,r)=>t+g(r),0);
+    LV.forEach(r=>{if(r.mgr&&g(r))lvPI[r.mgr]={pi:100*(r.pf/g(r))/lg,ppg:r.pf/g(r),lg,team:r.team,w:r.w,l:r.l};});}
+  let h='<thead><tr><th>Manager</th>'+SEA.map(y=>`<th class="num">${y}</th>`).join('')+(LV?`<th class="num" title="So far this season, not in the career figure">${D.live.year} <span class="lv-tag" style="font-size:8px;padding:0 4px">so far</span></th>`:'')+'<th class="num">Career</th><th class="num">Szns</th></tr></thead><tbody>';
   order.forEach(m=>{h+=`<tr data-mgr="${esc(m.name)}"><td class="nm">${mlink(m.name)}</td>`;
     SEA.forEach(y=>{const r=pi[y+'|'+m.name];
       h+=r?`<td class="h" data-k="${y}|${esc(m.name)}" data-y="${y}"><span style="background:${diverge(r.pi-100,16)};color:${inkOn(r.pi-100,16)}">${r.pi.toFixed(1)}</span></td>`
           :'<td class="h e"><span>·</span></td>';});
+    if(LV){const r=lvPI[m.name]; h+=r?`<td class="h" title="${esc(r.team)}, ${D.live.year} so far: ${r.ppg.toFixed(2)} a game against the league’s ${r.lg.toFixed(2)}, ${r.w}–${r.l}. Not in the career figure."><span style="background:${diverge(r.pi-100,16)};color:${inkOn(r.pi-100,16)};opacity:.85">${r.pi.toFixed(1)}</span></td>`:'<td class="h e"><span>·</span></td>';}
     h+=`<td class="num"><b>${m.cpi.toFixed(1)}</b></td><td class="num dim">${m.seasons}</td></tr>`;});
   $('#tHeat').innerHTML=h+'</tbody>'; fillEmpty($('#tHeat'));
   $('#piLegend').innerHTML=`<span style="display:inline-block;width:11px;height:11px;background:${diverge(-14,16)};border:1px solid var(--rule);vertical-align:-1px"></span> below average &nbsp;<span style="display:inline-block;width:11px;height:11px;background:${diverge(14,16)};border:1px solid var(--rule);vertical-align:-1px"></span> above`;
@@ -2515,15 +2528,17 @@ function drawConnectors(gs){
       paths+=`<path d="M${x1},${y1} H${mx} V${y2} H${x2}" fill="none" stroke="var(--rule)" stroke-width="1.4" data-team="${esc(t)}"/>`;});});
   svg.innerHTML=paths;
 }
-$('#yrPills').innerHTML=SEA.map(y=>`<button data-y="${y}">${y}</button>`).join('');
-$$('#yrPills button').forEach(b=>b.onclick=()=>{LOCKTEAM=null;drawSeason(+b.dataset.y);});
+$('#yrPills').innerHTML=SEA.map(y=>`<button data-y="${y}">${y}</button>`).join('')
+  +(D.live?`<button data-livey="${D.live.year}" title="The season being played: opens its own page">${D.live.year} <span class="lv-tag" style="font-size:8px;padding:0 4px">live</span></button>`:'');
+$$('#yrPills button[data-y]').forEach(b=>b.onclick=()=>{LOCKTEAM=null;drawSeason(+b.dataset.y);});
+$$('#yrPills button[data-livey]').forEach(b=>b.onclick=()=>{if(typeof openSeason==='function')openSeason(+b.dataset.livey);});
 drawSeason(LAST);
 REDRAW.push(()=>{const on=$$('#yrPills button.on')[0]; if(on)drawSeason(+on.dataset.y);});
 addEventListener('resize',()=>{const on=$$('#yrPills button.on')[0]; if(on)drawConnectors(D.games.filter(g=>g.y===+on.dataset.y));});
 
 /* ============ h2h: regular season, playoffs, combined ============ */
 const REGG=[];           /* regular-season meetings across every loaded game log */
-(D.wkYears||[]).forEach(y=>{const K=D.wk[y];
+PASTWK.forEach(y=>{const K=D.wk[y];
   K.games.filter(g=>g.br==='').forEach(g=>
     REGG.push({y,wk:g.wk,ma:K.mgr[g.ta],mb:K.mgr[g.tb],pa:g.aa,pb:g.ab,lab:y+' week '+g.wk}));});
 /* the live season's games are games: they count in head to head from the week they are played */
@@ -2670,7 +2685,7 @@ drawMtx(); REDRAW.push(drawMtx);
 /* ============ week-by-week, per season ============ */
 const WKYEARS=D.wkYears||[];
 $('#wkYears').innerHTML='<span class="fb-lab" style="margin-right:4px">Season</span>'+
-  SEA.map(y=>WKYEARS.includes(y)
+  SEA.concat(D.live&&WKYEARS.includes(D.live.year)?[D.live.year]:[]).map(y=>WKYEARS.includes(y)
     ? `<button data-wy="${y}">${y}</button>`
     : `<button disabled title="no game log loaded" style="opacity:.32;cursor:not-allowed">${y}</button>`).join('')
   +'<span class="now" id="wkNow"></span>';
@@ -2883,13 +2898,15 @@ function drawTeamIndex(){
   const by={};
   ROWS.forEach(r=>{(by[r.team]=by[r.team]||{yrs:[],mgrs:new Set()});
     by[r.team].yrs.push(r.y); by[r.team].mgrs.add(r.mgr);});
+  /* and the season being played */
+  if(D.live)Object.entries(D.live.mgr).forEach(([t,m])=>{(by[t]=by[t]||{yrs:[],mgrs:new Set()}); if(!by[t].yrs.includes(D.live.year))by[t].yrs.push(D.live.year); by[t].mgrs.add(m);});
   const names=Object.keys(by).sort((a,b)=>a.toLowerCase().localeCompare(b.toLowerCase()));
   host.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:4px 18px">`+
     names.map(t=>{const o=by[t]; const ys=o.yrs.sort((a,b)=>a-b);
       const span=ys.length>1?`${ys[0]}\u2013${ys[ys.length-1]}`:`${ys[0]}`;
       return `<div style="padding:2px 0"><b style="color:var(--ink)">${esc(t)}</b> `+
         `<span class="dim">${esc([...o.mgrs].join(', '))} &middot; ${span}</span></div>`;}).join('')+
-    `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons.</p>`;
+    `</div><p style="margin:10px 0 0;font-size:12px;color:var(--ink-3)">${names.length} teams across ${SEA.length} seasons${D.live?' and '+D.live.year+' so far':''}.</p>`;
 }
 drawTeamIndex(); REDRAW.push(drawTeamIndex);
 /* Screen-reader and keyboard semantics for tables. Doing this centrally rather than in
@@ -4226,9 +4243,11 @@ function drawWeekly(YR){
   const T=K5.teams, MG=K5.mgr, WKS=K5.weeks;
   /* ---- bump chart: league position by week ---- */
   const W=980,H=392,P={t:22,r:158,b:34,l:46};
-  const NCOL=WKS.length+1;                    /* +1 = the FINAL placement column */
+  /* a season still being played has no final placings: no FIN column, no postseason, no medals */
+  const LIVEYR=!!(D.live&&YR===D.live.year);
+  const NCOL=WKS.length+(LIVEYR?0:1);        /* +1 = the FINAL placement column */
   const xs=i=>P.l+i*(W-P.l-P.r)/(NCOL-1);
-  const FINX=xs(NCOL-1), GAPX=(xs(WKS.length-1)+FINX)/2;
+  const FINX=xs(Math.max(0,NCOL-1)), GAPX=(xs(WKS.length-1)+FINX)/2;
   const PLACE={}; ROWS.filter(r=>r.y===YR).forEach(r=>PLACE[r.team]=r.place);
   const ys=r=>P.t+(r-1)*(H-P.t-P.b)/(T.length-1);
   const RANK={}; T.forEach(t=>RANK[t]=[]);
@@ -4245,11 +4264,11 @@ function drawWeekly(YR){
   const cut=(ys(SPOTS)+ys(SPOTS+1))/2;
   grid=`<rect x="${P.l}" y="${P.t-14}" width="${xs(WKS.length-1)-P.l+10}" height="${cut-P.t+14}" fill="var(--band)"/>`+grid+
     `<line x1="${P.l}" x2="${W-P.r}" y1="${cut}" y2="${cut}" stroke="var(--brass-2)" stroke-dasharray="5 4" opacity=".9"/>`+
-    `<line x1="${GAPX}" x2="${GAPX}" y1="${P.t-14}" y2="${H-P.b+4}" stroke="var(--rule)" stroke-dasharray="3 4"/>
-     <text x="${GAPX}" y="${P.t-19}" text-anchor="middle" font-size="9" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace" letter-spacing="1.6">POSTSEASON</text>`;
+    (LIVEYR?'':`<line x1="${GAPX}" x2="${GAPX}" y1="${P.t-14}" y2="${H-P.b+4}" stroke="var(--rule)" stroke-dasharray="3 4"/>
+     <text x="${GAPX}" y="${P.t-19}" text-anchor="middle" font-size="9" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace" letter-spacing="1.6">POSTSEASON</text>`);
   const lines=T.map(t=>{
     const reg=RANK[t].map((p,i)=>(i?'L':'M')+xs(i)+','+ys(p.rank)).join(' ');
-    const endRank=RANK[t][RANK[t].length-1].rank, fp=PLACE[t]||endRank;
+    const endRank=RANK[t][RANK[t].length-1].rank, fp=LIVEYR?endRank:(PLACE[t]||endRank);
     return {t,m:MG[t],d:reg,fin:{rank:fp},seedRank:endRank,moved:endRank-fp};});
   lines.sort((a,b)=>a.fin.rank-b.fin.rank||a.t.localeCompare(b.t));
   /* co-champions share a final placing (2022), so their end dots and labels would
@@ -4261,14 +4280,14 @@ function drawWeekly(YR){
     l.fy=ys(l.fin.rank)+off*11;
     l.fx=FINX+(k>1?off*8:0);
     l.tied=k>1;}));
-  lines.forEach(l=>{l.tail=`M${xs(WKS.length-1)},${ys(l.seedRank)} L${l.fx},${l.fy}`;});
+  lines.forEach(l=>{l.tail=LIVEYR?'':`M${xs(WKS.length-1)},${ys(l.seedRank)} L${l.fx},${l.fy}`;});
   const paths=lines.map(l=>`<path class="rl" d="${l.d}" fill="none" stroke="var(--mid)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" data-t="${esc(l.t)}" data-mgr="${esc(l.m)}"/>`
     +`<path class="rl rt2" d="${l.tail}" fill="none" stroke="var(--mid)" stroke-width="2" stroke-dasharray="4 3" stroke-linecap="round" data-t="${esc(l.t)}" data-mgr="${esc(l.m)}"/>`).join('');
   const hits=lines.map(l=>`<path class="hit" d="${l.d}" fill="none" stroke="transparent" stroke-width="15" data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" style="cursor:pointer;pointer-events:stroke"/>`).join('');
   let dots='';
   lines.forEach(l=>{RANK[l.t].forEach((p,i)=>{
     dots+=`<circle class="rd" cx="${xs(i)}" cy="${ys(p.rank)}" r="4.4" fill="var(--surface)" stroke="var(--mid)" stroke-width="2" data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" data-i="${i}" style="cursor:pointer"/>`;});
-    dots+=`<circle class="rd rf" cx="${l.fx}" cy="${l.fy}" r="5.6" fill="var(--surface)" stroke="var(--brass-2)" stroke-width="2.4" data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" data-fin="1" style="cursor:pointer"/>`;});
+    if(!LIVEYR)dots+=`<circle class="rd rf" cx="${l.fx}" cy="${l.fy}" r="5.6" fill="var(--surface)" stroke="var(--brass-2)" stroke-width="2.4" data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" data-fin="1" style="cursor:pointer"/>`;});
   /* second pass: nothing may sit closer than one line-height to its neighbour */
   const LY=[]; lines.forEach((l,i)=>{let y=l.fy+3.5;
     if(i&&y-LY[i-1]<13)y=LY[i-1]+13; LY.push(y);});
@@ -4276,7 +4295,7 @@ function drawWeekly(YR){
     +lines.map((l,i)=>Math.abs(LY[i]-(l.fy+3.5))>1.5
       ? `<line x1="${l.fx+7}" x2="${W-P.r+9}" y1="${l.fy}" y2="${LY[i]-3.5}" stroke="var(--rule)" stroke-width="1"/>`:'').join('');
   const wl=WKS.map((w,i)=>`<text x="${xs(i)}" y="${H-P.b+20}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">${w}</text>`).join('')
-    +`<text x="${FINX}" y="${H-P.b+20}" text-anchor="middle" font-size="10" fill="var(--brass-2)" font-family="IBM Plex Mono,monospace" letter-spacing="1">FIN</text>`;
+    +(LIVEYR?'':`<text x="${FINX}" y="${H-P.b+20}" text-anchor="middle" font-size="10" fill="var(--brass-2)" font-family="IBM Plex Mono,monospace" letter-spacing="1">FIN</text>`);
   $('#race').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="League position by week for all ${T.length} teams in ${YR}; rank one at the top">
     ${grid}${paths}${dots}${hits}${labs}${wl}
     <text x="${P.l-11}" y="${H-P.b+20}" text-anchor="end" font-size="9.5" fill="var(--ink-3)" font-family="IBM Plex Mono,monospace">WK</text></svg>`;
@@ -4285,7 +4304,7 @@ function drawWeekly(YR){
     const svg=$('#race svg'); if(!svg)return;
     const NS='http://www.w3.org/2000/svg';
     $$('#race .rt').forEach(t=>{
-      const rk=t.dataset.medal; if(!rk)return;
+      const rk=t.dataset.medal; if(!rk||LIVEYR)return;
       const md=MEDAL[+rk]; let w=0; try{w=t.getComputedTextLength();}catch(e){w=t.textContent.length*6.2;}
       const x=+t.getAttribute('x')+w+9, y=+t.getAttribute('y')-3.6;
       const g=document.createElementNS(NS,'g'); g.setAttribute('class','medal'); g.style.pointerEvents='none';
@@ -4298,7 +4317,7 @@ function drawWeekly(YR){
       n.setAttribute('font-family','IBM Plex Mono,monospace');n.textContent=rk;
       g.appendChild(c);g.appendChild(n);svg.appendChild(g);});
   })();
-  {const rs=$('#raceSpots'); if(rs)rs.textContent=`${SPOTS} of ${T.length} teams made it in ${YR}`;}
+  {const rs=$('#raceSpots'); if(rs)rs.textContent=LIVEYR?`${SPOTS} of ${T.length} teams make it; ${YR} so far, through week ${WKS[WKS.length-1]}`:`${SPOTS} of ${T.length} teams made it in ${YR}`;}
   $('#raceLeg').innerHTML=`<span class="fb-lab" style="margin-right:4px">Teams</span>`+
     lines.map(l=>`<button data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" style="padding:4px 9px">${esc(l.t)} <span class="dim">${esc(l.m.split(' ')[0])}</span></button>`).join('')+
     `<button id="raceClear" style="padding:4px 9px">Clear</button>`;
@@ -4487,7 +4506,7 @@ function drawWeekly(YR){
   $('#apSub').textContent=`${YR} · ${WKS.length} weeks × ${T.length-1} opponents = ${WKS.length*(T.length-1)} games`;
 }
 $$('#wkYears button[data-wy]').forEach(b=>b.onclick=()=>drawWeekly(+b.dataset.wy));
-drawWeekly(WKYEARS[WKYEARS.length-1]);
+drawWeekly(PASTWK.length?PASTWK[PASTWK.length-1]:WKYEARS[WKYEARS.length-1]);
 REDRAW.push(()=>{});
 
 $('#spotClear').onclick=()=>{PICK.clear();spotlight();};

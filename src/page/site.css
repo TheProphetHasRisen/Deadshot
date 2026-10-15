@@ -1531,3 +1531,6 @@ body.sy-pg .lv-strip{position:sticky;top:0;z-index:40;box-shadow:0 2px 10px -6px
 body.sy-pg #syView{padding-top:8px}
 #lvSegYear{margin-left:6px;font:600 11px "IBM Plex Mono",monospace;padding:6px 26px 6px 10px}
 #lvInj b.lv-steal,#lvInj b.lv-bust,#syView b.lv-steal,#syView b.lv-bust{font:inherit;font-weight:700}
+/* the season in progress on the Champions board: same plate, marked as not yet decided */
+.plate.plate-live{background:var(--brass-wash)}
+.plate.plate-live .mgr{color:var(--brass)}

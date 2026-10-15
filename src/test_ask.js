@@ -141,11 +141,12 @@ const CASES = [
   /* the truth, worked out from DATA in the page, independently of ask.js */
   const results = await p.evaluate(cases => {
     const D = DATA, Mg = D.mgrs, R = D.rows;
-    const reg = []; (D.wkYears || []).forEach(y => { const K = D.wk[y]; K.games.filter(g => g.br === '').forEach(g => reg.push({ ma: K.mgr[g.ta], mb: K.mgr[g.tb], pa: g.aa, pb: g.ab })); });
+    const PAST = (D.wkYears || []).filter(y => !D.live || y !== D.live.year);
+    const reg = []; PAST.forEach(y => { const K = D.wk[y]; K.games.filter(g => g.br === '').forEach(g => reg.push({ ma: K.mgr[g.ta], mb: K.mgr[g.tb], pa: g.aa, pb: g.ab })); });
     if (D.live) D.live.games.forEach(g => reg.push({ ma: D.live.mgr[g.ta], mb: D.live.mgr[g.tb], pa: g.aa, pb: g.ab }));
     const po = D.games.filter(g => !g.void).map(g => ({ ma: g.ma, mb: g.mb, pa: g.pa, pb: g.pb }));
     const GL = []; const rowOf = {}; R.forEach(r => { rowOf[r.y + '|' + r.mgr] = r; });
-    (D.wkYears || []).forEach(y => { const K = D.wk[y]; const reg = K.games.filter(g => g.br === ''); const last = Math.max(...reg.map(g => g.wk));
+    PAST.forEach(y => { const K = D.wk[y]; const reg = K.games.filter(g => g.br === ''); const last = Math.max(...reg.map(g => g.wk));
       reg.forEach(g => { GL.push({ y, wk: g.wk, last, mgr: K.mgr[g.ta], opp: K.mgr[g.tb], pts: g.aa, opts: g.ab, proj: g.pa, oproj: g.pb, po: false });
         GL.push({ y, wk: g.wk, last, mgr: K.mgr[g.tb], opp: K.mgr[g.ta], pts: g.ab, opts: g.aa, proj: g.pb, oproj: g.pa, po: false }); }); });
     if (D.live) D.live.games.forEach(g => { const y = D.live.year, last = D.live.regWeeks, m = D.live.mgr;

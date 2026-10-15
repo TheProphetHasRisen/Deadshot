@@ -657,7 +657,7 @@ const Ask=(()=>{
   function games1(){
     if(GLC)return GLC;
     const rows=[], rowOf={}; ROWS.forEach(r=>{rowOf[r.y+'|'+r.mgr]=r;});
-    (D.wkYears||[]).forEach(y=>{const K=D.wk[y];
+    PASTWK.forEach(y=>{const K=D.wk[y];
       const reg=K.games.filter(g=>g.br===''), last=Math.max(...reg.map(g=>g.wk));
       reg.forEach(g=>[[g.ta,g.aa,g.pa,g.tb,g.ab,g.pb],[g.tb,g.ab,g.pb,g.ta,g.aa,g.pa]].forEach(([t,p,pr,o,op,opr])=>{
         const ra=((K.race||{})[t]||[]).find(x=>x.w===g.wk);

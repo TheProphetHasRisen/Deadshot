@@ -84,11 +84,21 @@ SRC={2025:(WK25.W2025,WK25.BYES2025,WK25.TRADES2025),2024:(WK24.W2024,WK24.BYES2
      2023:(WK23.W2023,WK23.BYES2023,WK23.TRADES2023),
      2022:(WK22.W2022,WK22.BYES2022,WK22.TRADES2022),
      2021:(WK21.W2021,WK21.BYES2021,WK21.TRADES2021)}
+# the live season joins the weekly layer (its games so far, its trades), so Week by Week, the Trade
+# Market, the records and everything else built on this layer carry 2026 as it is played. It stays
+# out of the season rows, careers-by-season and champions until the final.
+try:
+    import season2026 as _S26
+    if _S26.W2026:
+        SRC[2026]=(_S26.W2026, [], [(d, ga, ta, gb, tb) for (d, ta, ga, tb, gb) in _S26.TRADES2026])
+    MGRS_LIVE={2026: _S26.MGR2026}
+except ImportError:
+    MGRS_LIVE={}
 WKALL={}
 for YR,(GAMES,BYES,TRD) in SRC.items():
     reg=[g for g in GAMES if g[7]=='']
     teams=sorted({g[1] for g in GAMES}|{g[4] for g in GAMES})
-    mgr={t:D.MANAGERS[YR][t] for t in teams}
+    mgr={t:(D.MANAGERS.get(YR) or MGRS_LIVE.get(YR, {}))[t] for t in teams}
     tw={t:{} for t in teams}
     for (w,ta,aa,pa,tb,ab,pb,br) in reg:
         tw[ta][w]=dict(pts=aa,proj=pa,opp=tb,oppPts=ab)
@@ -187,7 +197,7 @@ vs=collections.defaultdict(lambda:[0,0,0,0])   # mgr -> [W vs winners, L vs winn
 def logGame(y,ta,pa_,tb,pb):
     if pa_==pb: return
     for me,mine,opp,theirs in ((ta,pa_,tb,pb),(tb,pb,ta,pa_)):
-        m=D.MANAGERS[y].get(me)
+        m=D.MANAGERS.get(y, {}).get(me)
         if m is None or (y,opp) not in winner: continue
         v=vs[m]; strong=winner[(y,opp)]
         if mine>theirs: v[0 if strong else 2]+=1
