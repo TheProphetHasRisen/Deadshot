@@ -87,6 +87,13 @@ for y, weeks in SEASONS.items():
         for i, (pts, pid) in enumerate(lst): rk[pid] = i + 1
     # what the Nth best at each position scored: the points a pick at that slot "should" have
     out['curve' + str(y)] = {pos: [round(p, 1) for p, _ in lst[:250]] for pos, lst in rank_pos.items()}
+    # the same, a game at a time, for players with at least half the weeks: replacement level is
+    # judged per game, as the players set against it are
+    need = (len(weeks) + 1) // 2; pg = {}
+    for pid, pts in tot.items():
+        ng = len(wk.get(pid, {}))
+        if ng >= need: pg.setdefault('DEF' if pid.isalpha() else pos_of[pid], []).append(pts / ng)
+    out['curvePG' + str(y)] = {pos: [round(v, 2) for v in sorted(l, reverse=True)[:250]] for pos, l in pg.items()}
     draft = S.DRAFT2026 if y == 2026 else S.DRAFT2025
     res, miss = {}, []
     for pick, team, name, nfl, pos in draft:

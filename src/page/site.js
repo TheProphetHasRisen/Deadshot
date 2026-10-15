@@ -182,6 +182,17 @@ const GLOSS={
    `<b>vs .500</b> here is how far above or below even a career sits: +17.6% means winning 67.6% of the time, 17.6 points clear of even.<br><br>`+
    `<b>Weeks above</b> walks each season week by week and asks whether the record was above even <i>at that moment</i>, not just where it finished. 8-6 wire to wire and 8-6 after a 1-5 start are the same record and completely different seasons.<br><br>`+
    `<b>vs winners</b> is the record against opponents who finished that season above .500.`,
+ xform:`<b>Against his own form</b><br>A traded player’s points a game since the deal, minus his points a game before it.<br><br>`+
+   `<b>+10.5</b> means he is scoring 10.5 a game more for his new team than he was for his old one. A side’s figure adds up its players. The side with the bigger figure got more out of the deal than the players’ own numbers promised.<br><br>`+
+   `Points count whether he started or sat on the bench, until Yahoo’s lineups are connected. Weeks he did not play are left out, not counted as zero.`,
+ war:`<b>In wins</b><br>The idea behind WAR (wins above replacement), with each player’s own form as the baseline instead of a replacement player.<br><br>`+
+   `Weekly scores this season spread out by a standard deviation of <b>σ</b> points. At an average score, one extra point lifts the chance of beating a typical opponent by about <b>0.399 ÷ σ</b> (the height of the bell curve at its middle, divided by its spread). So it takes about <b>σ ÷ 0.399</b> extra points a week to add one win: <b>points per win</b>.<br><br>`+
+   `A trade’s wins a week = the gap between the two sides against their own form ÷ points per win. Over the rest of the season, multiply by the regular-season weeks left.<br><br>`+
+   `It assumes an average team and a normal spread of scores, and early in the season σ rests on few weeks.`,
+ slotx:`<b>Expected, for a draft pick</b><br>What the player who finished at the slot he was drafted at actually scored.<br><br>`+
+   `Taken as the 16th receiver? He is held to what this season’s 16th-best receiver has scored. <b>Above or below</b> is his points minus that. <b>Season pace</b> carries the gap so far out to a 17-week season: the gap ÷ weeks played × 17.`,
+ xwin:`<b>Wins against the pre-trade pace</b><br>How a team has done since a trade, against how it was playing before it.<br><br>`+
+   `Before the deal, the team’s all-play rate (the share of the league it outscored each week) is its pace. Over the games since, that pace expects <b>rate × games</b> wins. Actual wins since minus that is the figure shown: <b>+1.4</b> means 1.4 wins better than the team was playing before.`,
  trade:`<b>Trade counting</b><br>A deal counts once for <i>each</i> side, so both managers get credit for it.<br><br>`+
    `<b>In</b> and <b>out</b> count players, not deals: a three-for-one is 3 in and 1 out for the side receiving three.<br><br>`+
    `Only the seasons whose transaction logs are loaded are counted: 2021 through 2025.`};
@@ -4796,6 +4807,14 @@ function pharaoh(){
     buf=(buf+e.key.toLowerCase()).slice(-24);
     if(WORDS.some(w=>buf.endsWith(w))){buf=''; if(!eggOpen())pharaoh();}});})();
 
+/* the Advanced section's write-up of how 2026 is graded: the same words as the ? marks, with this
+   season's own spread of scores and points per win filled in */
+(()=>{const el=$('#gradeHow'), L=D.live; if(!el)return;
+  if(!L||!L.games||!L.games.length){el.closest('.card').remove(); return;}
+  const sc=L.games.flatMap(g=>[g.aa,g.ab]), mu=sc.reduce((a,b)=>a+b,0)/sc.length,
+        sd=Math.sqrt(sc.reduce((a,b)=>a+(b-mu)**2,0)/sc.length);
+  el.innerHTML=['xform','war','xwin','slotx'].map(k=>`<p class="plain" style="margin:0 0 14px">${GLOSS[k]}</p>`).join('')+
+    `<p class="plain" style="margin:0"><b>This season so far</b> (${nOf(L.weeks.length,'week')}, ${sc.length} scores): weekly scores average <b>${f(mu,1)}</b> with σ = <b>${f(sd,1)}</b>, so points per win = ${f(sd,1)} ÷ 0.399 = <b>${f(sd/0.39894,1)}</b>.</p>`;})();
 glossify();
 
 
@@ -4877,32 +4896,35 @@ glossify();
     return Math.sqrt(sc.reduce((a,b)=>a+(b-mu)**2,0)/sc.length)/0.39894;})();
   if(WR){
     $('#lvTrSub').textContent=nOf(L.trades.length,'trade')+' · each player’s points a game before the deal and since, started or benched';
-    const side=(t,a)=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t)}</div>${a.map(p=>`<div style="font-size:13px"${p.repl!=null&&(p.vorPost!=null||p.vorPre!=null)?` title="${sg(p.vorPost!=null?p.vorPost:p.vorPre,1)} a game against a replacement ${p.pos} (${f(p.repl,1)} a game)${p.vorPost!=null?' since the deal':' before the deal'}"`:''}>${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span>
+    const side=(t,a)=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t)}</div>${a.map(p=>`<div style="font-size:13px">${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span>
       <div class="lv-trn">${p.pre==null?'<span class="dim">no games before</span>':`<b>${f(p.pre,1)}</b> <span class="dim">a game before</span>`}${p.postG?(()=>{const a=p.post/p.postG, up=p.pre==null||a>=p.pre;
-        return ` <span class="dim">·</span> <b class="${up?'lv-steal':'lv-bust'}">${p.pre==null?'':up?'▲ ':'▼ '}${f(a,1)}</b> <span class="dim">a game since</span>`;})():''}</div></div>`).join('')}</div>`;
+        return ` <span class="dim">·</span> <b class="${up?'lv-steal':'lv-bust'}">${p.pre==null?'':up?'▲ ':'▼ '}${f(a,1)}</b> <span class="dim">a game since</span>`;})():''}</div>
+      ${p.chg!=null?`<div class="lv-trn"><span class="dim">vs his own form before:</span> <b class="${p.chg>=0?'lv-steal':'lv-bust'}">${sg(p.chg,1)}</b> <span class="dim">a game</span></div>`:''}</div>`).join('')}</div>`;
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
-      const lab=t=>`<span class="lv-lab">${t}</span>`;
+      const lab=(t,g)=>`<span class="lv-lab">${t}${g?`<span class="gl" data-gl="${g}" tabindex="0">?</span>`:''}</span>`;
       let v;
       if(x.weeksSince){const n=x.weeksSince, aw=x.aPost/n, bw=x.bPost/n, lead=aw>=bw?x.ta:x.tb;
         v=`${lab('Points')}Since the deal (${n>1?'weeks '+x.wk+'–'+(x.wk+n-1):'week '+x.wk}), ${esc(x.ta)}’s players have scored <b>${f(aw,1)}</b> a week and ${esc(x.tb)}’s <b>${f(bw,1)}</b>. <b>${esc(lead)}</b> ahead by <b>${f(Math.abs(aw-bw),1)}</b> a week.`;}
       else v=`${lab('Points')}No games since. Before the deal, ${esc(x.ta)}’s side was scoring <b>${f(x.aPre,1)}</b> a week and ${esc(x.tb)}’s <b>${f(x.bPre,1)}</b>.`;
-      /* by position: a tight end's 12 a game is worth more than a receiver's, so each player is set
-         against a replacement-level starter at his spot (VORP). In wins, that gap is WAR */
-      const vl=x.aVor>=x.bVor?x.ta:x.tb, dv=Math.abs(x.aVor-x.bVor), wpw=dv/PPW, left=Math.max(0,L.regWeeks-done);
-      v=`<div class="lv-vd">${v}</div><div class="lv-vd">${lab('By position')}${x.weeksSince?'':'Before the deal, '}${esc(x.ta)}’s side ${x.weeksSince?'is ':'was '}<b>${sg(x.aVor,1)}</b> a game over replacement players, ${esc(x.tb)}’s <b>${sg(x.bVor,1)}</b>. <b>${esc(vl)}</b> ${x.weeksSince?'got':'is getting'} <b>${f(dv,1)}</b> more a game at their positions.</div>`+
-        `<div class="lv-vd">${lab('In wins')}That gap is worth about <b>${f(wpw,2)}</b> wins a week to ${esc(vl)}${left?`, or <b>${f(wpw*left,1)}</b> over the ${nOf(left,'regular-season week')} left`:''}. <span class="dim">(Here an extra ${f(PPW,0)} points a week is worth one win.)</span></div>`;
+      /* against their own form: each player's points a game since the deal minus before it, summed
+         for each side. The gap between the sides, in wins, is the deal's wins added */
+      if(x.aChg!=null){const gl=x.aChg>=x.bChg?x.ta:x.tb, gap=Math.abs(x.aChg-x.bChg), wpw=gap/PPW, left=Math.max(0,L.regWeeks-done);
+        v=`<div class="lv-vd">${v}</div><div class="lv-vd">${lab('Against their own form','xform')}${esc(x.ta)}’s players are scoring <b>${sg(x.aChg,1)}</b> a game against what they were before the deal, ${esc(x.tb)}’s <b>${sg(x.bChg,1)}</b>. <b>${esc(gl)}</b> got <b>${f(gap,1)}</b> a game more out of it.</div>`+
+          `<div class="lv-vd">${lab('In wins','war')}That gap is worth about <b>${f(wpw,2)}</b> wins a week to ${esc(gl)}${left?`, or <b>${f(wpw*left,1)}</b> over the ${nOf(left,'regular-season week')} left`:''}. <span class="dim">(Here an extra ${f(PPW,0)} points a week is worth one win.)</span></div>`;}
+      else v=`<div class="lv-vd">${v}</div>`;
       const st=t=>L.standings.find(r=>r.team===t), pc=v=>v==null?'—':Math.round(v*100)+'%';
       const bio=(t,F)=>{const r=st(t), b=F.before, a=F.since;
         return `<div class="lv-bio"><div class="sub-h" style="margin:0 0 4px">${esc(t)} · now ${r?r.w+'–'+r.l+', '+ord(r.rank):''}</div>
           <div>Before: <b>${b.w}–${b.l}</b>${b.ppg!=null?`, ${f(b.ppg,1)} a week, beat ${pc(b.ap)} of the league`:''}</div>
           <div>Since: ${a.g?`<b>${a.w}–${a.l}</b>, ${f(a.ppg,1)} a week, beat ${pc(a.ap)} of the league`:'<span class="dim">no games yet</span>'}</div>
-          ${F.woe!=null?`<div><b class="${F.woe>=0?'lv-steal':'lv-bust'}">${sg(F.woe,1)}</b> <span class="dim">${Math.abs(F.woe)===1?'win':'wins'} against the pace they were on before (${f(F.xw,1)} expected)</span></div>`:''}</div>`;};
+          ${F.woe!=null?`<div><b class="${F.woe>=0?'lv-steal':'lv-bust'}">${sg(F.woe,1)}</b> <span class="dim">${Math.abs(F.woe)===1?'win':'wins'} against the pace they were on before (${f(F.xw,1)} expected)</span> <span class="gl" data-gl="xwin" tabindex="0">?</span></div>`:''}</div>`;};
       return `<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(x.ta)} &harr; ${esc(x.tb)}</h3><span class="sub">${esc(x.d)}</span>
       <div class="right sub">${esc(mg(x.ta))} &harr; ${esc(mg(x.tb))}</div></div>
     <div class="card-b" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">${side(x.ta,x.a)}${side(x.tb,x.b)}
       <div style="grid-column:1/-1;font-size:13px;border-top:1px solid var(--rule);padding-top:10px">${v}</div>
       ${bio(x.ta,x.fa)}${bio(x.tb,x.fb)}</div></div>`;}).join('');
+    glossify($('#tLiveTr'));
     const thru=`weeks 1–${WR.played}`;
     $('#lvPkSub').textContent='Points he scored for the team that added him, started or not · '+thru;
     $('#tLivePk').innerHTML='<thead><tr><th>Player</th><th>Added by</th><th>When</th><th class="num">Weeks</th><th class="num">Points</th></tr></thead><tbody>'+
@@ -4980,9 +5002,10 @@ glossify();
     const tr=Object.entries(tp).sort((a,b)=>b[1]-a[1]);
     $('#lvSbHow').textContent='How a pick is judged: each player is ranked at his position by the order he was drafted (the 12th running back taken is RB12) and again by the points he scored under Deadshot\u2019s scoring, against every player in the NFL at that position. A steal finished well above where he was taken: 6 or more places, or twice as high. A bust was a top-40 pick at his position who finished 10 or more places below it, or twice as low. Kickers and defenses are judged the same way. The board marks the biggest of each at every position (five at running back and receiver, three at quarterback and tight end, two at kicker and defense), and a fall from an early pick counts for more than the same fall from a late one.';
     $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs finished at his position';
-    const hd=t=>`<thead><tr><th>${t}</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th><th class="num" title="What the player who finished at the slot he was drafted at scored">Expected</th><th class="num">Above or below</th>${partial?'<th class="num" title="The gap so far, carried out to a full 17-week season">Season pace</th>':''}</tr></thead>`;
+    const hd=t=>`<thead><tr><th>${t}</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th><th class="num">Expected <span class="gl" data-gl="slotx" tabindex="0">?</span></th><th class="num">Above or below</th>${partial?'<th class="num">Season pace</th>':''}</tr></thead>`;
     $('#tLiveSb').innerHTML=`${hd('Steals')}<tbody>${st.map(ln).join('')}</tbody>${hd('Busts')}<tbody>${bu.map(ln).join('')}</tbody>`+
       `<thead><tr><th>Best drafts</th><th class="num"></th><th class="num">Rank</th><th class="num">Points</th><th class="num"></th><th class="num">Above or below</th>${partial?'<th class="num">Season pace</th>':''}</tr></thead><tbody>${tr.map(([t,v],i)=>`<tr><td><b>${esc(t)}</b> <span class="dim">${esc(own[t]||'')}</span></td><td></td><td class="num">${ord(i+1)}</td><td class="num">${f(v,1)}</td><td></td><td class="num"><b>${tx[t]==null?'—':sg(tx[t],1)}</b></td>${partial?`<td class="num">${tx[t]==null?'—':sg(pace(tx[t]),1)}</td>`:''}</tr>`).join('')}</tbody>`;
+    glossify($('#tLiveSb'));
   };
   drawDr();
 })();

@@ -128,6 +128,11 @@ Never hardcode a color. Use the CSS custom properties (`--brass`, `--surface`,
    the six non-default values still carry their "(default N)" note. A category dropped
    from that card is invisible by eye -- the card still looks complete.
 
+9. `python3 test_wire.py` after touching the 2026 trades, moves or `wire2026.py`. It recomputes every
+   trade grade (each player before and since, against his own form, both teams' records, all-play
+   and wins against pace) and the top pickups from the raw moves, without importing `wire2026.py`.
+   `deploy.sh` gates on it.
+
 Do not report a fix as working on the strength of the code reading correctly.
 
 ## House style: the words and the numbers
