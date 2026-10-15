@@ -1494,3 +1494,5 @@ body.lv-pg .lv-go{color:var(--brass)}
 /* 2026 trade cards: a player's points a game before and since, big enough to read at a glance */
 .lv-trn{font-size:12.5px;margin:2px 0 7px}
 .lv-trn b{font:600 13.5px "IBM Plex Mono",monospace}
+.lv-bio{font-size:12px;line-height:1.55;border-top:1px solid var(--rule);padding-top:10px}
+.lv-bio b{font:600 12.5px "IBM Plex Mono",monospace}

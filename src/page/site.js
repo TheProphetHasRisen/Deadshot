@@ -4873,7 +4873,7 @@ glossify();
   const WR=L.wire;
   if(WR){
     $('#lvTrSub').textContent=nOf(L.trades.length,'trade')+' · each player’s points a game before the deal and since, started or benched';
-    const side=(t,a)=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t)}</div>${a.map(p=>`<div style="font-size:13px">${esc(p.n)}
+    const side=(t,a)=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t)}</div>${a.map(p=>`<div style="font-size:13px"${p.repl!=null&&(p.vorPost!=null||p.vorPre!=null)?` title="${sg(p.vorPost!=null?p.vorPost:p.vorPre,1)} a game against a replacement ${p.pos} (${f(p.repl,1)} a game)${p.vorPost!=null?' since the deal':' before the deal'}"`:''}>${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span>
       <div class="lv-trn">${p.pre==null?'<span class="dim">no games before</span>':`<b>${f(p.pre,1)}</b> <span class="dim">a game before</span>`}${p.postG?(()=>{const a=p.post/p.postG, up=p.pre==null||a>=p.pre;
         return ` <span class="dim">·</span> <b class="${up?'lv-steal':'lv-bust'}">${p.pre==null?'':up?'▲ ':'▼ '}${f(a,1)}</b> <span class="dim">a game since</span>`;})():''}</div></div>`).join('')}</div>`;
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
@@ -4881,11 +4881,22 @@ glossify();
       if(x.weeksSince){const n=x.weeksSince, aw=x.aPost/n, bw=x.bPost/n, lead=aw>=bw?x.ta:x.tb;
         v=`Since the deal (${n>1?'weeks '+x.wk+'–'+(x.wk+n-1):'week '+x.wk}), ${esc(x.ta)}’s players have scored ${f(aw,1)} a week and ${esc(x.tb)}’s ${f(bw,1)}. <b>${esc(lead)}</b> ahead by ${f(Math.abs(aw-bw),1)} a week.`;}
       else v=`No games since. Before the deal, ${esc(x.ta)}’s side was scoring ${f(x.aPre,1)} a week and ${esc(x.tb)}’s ${f(x.bPre,1)}.`;
+      /* by position: a tight end's 12 a game is worth more than a receiver's, so each player is set
+         against a replacement-level starter at his spot */
+      const vl=x.aVor>=x.bVor?x.ta:x.tb;
+      v+=` <br><span class="dim">By position${x.weeksSince?'':', before the deal'}:</span> ${esc(x.ta)}’s side ${sg(x.aVor,1)} a game over replacement players, ${esc(x.tb)}’s ${sg(x.bVor,1)}. <b>${esc(vl)}</b> ${x.weeksSince?'got':'is getting'} more at their positions.`;
+      const st=t=>L.standings.find(r=>r.team===t), pc=v=>v==null?'—':Math.round(v*100)+'%';
+      const bio=(t,F)=>{const r=st(t), b=F.before, a=F.since;
+        return `<div class="lv-bio"><div class="sub-h" style="margin:0 0 4px">${esc(t)} · now ${r?r.w+'–'+r.l+', '+ord(r.rank):''}</div>
+          <div>Before: <b>${b.w}–${b.l}</b>${b.ppg!=null?`, ${f(b.ppg,1)} a week, beat ${pc(b.ap)} of the league`:''}</div>
+          <div>Since: ${a.g?`<b>${a.w}–${a.l}</b>, ${f(a.ppg,1)} a week, beat ${pc(a.ap)} of the league`:'<span class="dim">no games yet</span>'}</div>
+          ${F.woe!=null?`<div><b class="${F.woe>=0?'lv-steal':'lv-bust'}">${sg(F.woe,1)}</b> <span class="dim">${Math.abs(F.woe)===1?'win':'wins'} against the pace they were on before (${f(F.xw,1)} expected)</span></div>`:''}</div>`;};
       return `<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(x.ta)} &harr; ${esc(x.tb)}</h3><span class="sub">${esc(x.d)}</span>
       <div class="right sub">${esc(mg(x.ta))} &harr; ${esc(mg(x.tb))}</div></div>
     <div class="card-b" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">${side(x.ta,x.a)}${side(x.tb,x.b)}
-      <div style="grid-column:1/-1;font-size:13px;border-top:1px solid var(--rule);padding-top:10px">${v}</div></div></div>`;}).join('');
+      <div style="grid-column:1/-1;font-size:13px;border-top:1px solid var(--rule);padding-top:10px">${v}</div>
+      ${bio(x.ta,x.fa)}${bio(x.tb,x.fb)}</div></div>`;}).join('');
     const thru=`weeks 1–${WR.played}`;
     $('#lvPkSub').textContent='Points he scored for the team that added him, started or not · '+thru;
     $('#tLivePk').innerHTML='<thead><tr><th>Player</th><th>Added by</th><th>When</th><th class="num">Weeks</th><th class="num">Points</th></tr></thead><tbody>'+
