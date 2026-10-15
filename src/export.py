@@ -326,5 +326,8 @@ if S26:
                        # every drafted player's points under league scoring, and his finish at his position
                        draftPts=({k: v for k, v in json.load(open('draft_points.json')).items() if not k.startswith('allwk')}
                                  if os.path.exists('draft_points.json') else None))
+    # which NFL franchise each manager is, on his whole career against its last ten seasons (nflcomps.py)
+    import nflcomps
+    out['comps'] = nflcomps.comps(out['rows'], out['games'])
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))

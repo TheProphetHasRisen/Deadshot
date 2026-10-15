@@ -85,6 +85,21 @@ def ranks(y):
                 n += 1; out[(pos, P.flat(x['player'][0])['name']['full'])] = n
     return out
 
+def replacement(y, games):
+    """points a game of a replacement-level player at each position that season: the first one past
+    the league's starters (STARTERS) in Yahoo's season rankings, by the league's own scoring"""
+    out = {}
+    for pos, n in STARTERS.items():
+        tot = []
+        for pg in range(4):
+            f = 'yahoo_raw/%d/rank_%s_%d.json' % (y, pos, pg)
+            if not os.path.exists(f): break
+            for x in P.items(json.load(open(f))['fantasy_content']['league'][1]['players']):
+                pp = P.flat(x['player'][1:]).get('player_points') or {}
+                tot.append(float(pp.get('total') or 0))
+        if len(tot) > n and games: out[pos] = tot[n] / games
+    return out
+
 def season(y):
     """everything for one season, keyed by manager"""
     st = settings(y); slots = st['slots']; locks = week_dates(y)
@@ -93,6 +108,13 @@ def season(y):
     RK = ranks(y)
     reg = [g for g in G if g['wk'] < st['po']]
     weeks = sorted({g['wk'] for g in reg})
+    # a finished season's rankings cover 17 NFL games; the live one, the weeks played so far
+    RP = replacement(y, 17 if y != LIVE else len(weeks))
+    trades_list, draft_list, picks_list, gone_list = [], [], [], []
+    def value(rows, pos):
+        """points that counted, minus a replacement-level starter at his position in the same starts"""
+        r0 = RP.get((pos or '').split(',')[0])
+        return None if r0 is None else sum((r['pts'] or 0) - r0 for r in rows)
     # rosters by (team, week)
     by = {}
     for r in R: by.setdefault((r['team'], r['wk']), []).append(r)
@@ -105,7 +127,7 @@ def season(y):
         if not m: continue
         M[m] = dict(team=t, g=0, w=0, l=0, pf=0.0, apw=0, apl=0, act=0.0, opt=0.0, lost_lineup=0, perfect=0,
                     adds=0, fa=0, wv=0, drops=0, trades=0, pk_pts=0.0, pk_marg=0.0, pk_starts=0, dr_pts=0.0,
-                    drafted_pts=0.0, held=[], pickups=[], gone=[], trade_net=0.0, trade_w=0, trade_l=0, weekly=[])
+                    drafted_pts=0.0, held=[], pickups=[], gone=[], trade_net=0.0, trade_w=0, trade_l=0, weekly=[], pk_val=0.0)
     # results, all-play, lineups: regular season only, so seasons compare like for like
     for wk in weeks:
         sc = {t: score[(t, wk)][0] for t in teams if (t, wk) in score}
@@ -132,8 +154,9 @@ def season(y):
             if run and w != run[-1] + 1: break
             run.append(w)
         return run
+    played_wks = {g['wk'] for g in G}   # weeks with final scores: a lineup set for a week not yet played is not a start
     def starts(team, n, wks):
-        return [r for w in wks for r in by.get((team, w), []) if r['n'] == n and r['started']]
+        return [r for w in wks if w in played_wks for r in by.get((team, w), []) if r['n'] == n and r['started']]
     def marginal(team, r):
         """his points minus the best bench player who could have filled the same slot that week"""
         bench = [b for b in by.get((team, r['wk']), []) if b['slot'] == 'BN' and eligible(b['pos'], r['slot'])]
@@ -149,6 +172,15 @@ def season(y):
             (ta, pa), (tb, pb) = sides.items()
             def got(team, ps): return sum((r['pts'] or 0) for p in ps for r in starts(team, p['n'], stint(team, p['n'], w)))
             va, vb = got(ta, pa), got(tb, pb)
+            def detail(team, ps):
+                out = []
+                for p in ps:
+                    ss = starts(team, p['n'], stint(team, p['n'], w))
+                    out.append(dict(n=p['n'], pos=p['pos'], starts=len(ss), counted=round(sum(r['pts'] or 0 for r in ss), 2)))
+                return out
+            trades_list.append(dict(y=y, d=d.strftime('%b %-d'), wk=w,
+                                    a=dict(m=mgr_of(y, ta), team=ta, got=detail(ta, pa), counted=round(va, 2)),
+                                    b=dict(m=mgr_of(y, tb), team=tb, got=detail(tb, pb), counted=round(vb, 2))))
             for team, mine, theirs in ((ta, va, vb), (tb, vb, va)):
                 m = mgr_of(y, team)
                 if m not in M: continue
@@ -167,9 +199,12 @@ def season(y):
                 kd = (p['pos'] or '').split(',')[0] in ('K', 'DEF')
                 pts = sum(r['pts'] or 0 for r in ss); mg = None if kd else sum(marginal(team, r) for r in ss)
                 Z['pk_pts'] += pts; Z['pk_marg'] += mg or 0; Z['pk_starts'] += 0 if kd else len(ss)
+                val = value(ss, p['pos'])
+                if (p['pos'] or '').split(',')[0] in ('QB', 'RB', 'WR', 'TE'): Z['pk_val'] += val or 0
                 Z['pickups'].append(dict(n=p['n'], pos=p['pos'], d=d.strftime('%b %-d'), wk=w, held=len(run), starts=len(ss),
                                          pts=round(pts, 2), marg=None if mg is None else round(mg, 2), how='claim' if p['source'] == 'waivers' else 'free agent',
-                                         rank=RK.get((p['pos'], p['n']))))
+                                         rank=RK.get((p['pos'], p['n'])), val=None if val is None else round(val, 2)))
+                picks_list.append(dict(Z['pickups'][-1], y=y, m=m, team=team))
             elif p['move'] == 'drop':
                 Z['drops'] += 1
                 # how long he had him (weeks on this roster up to the drop), and what came after
@@ -179,16 +214,25 @@ def season(y):
                     if run and x != run[-1] - 1: break
                     run.append(x)
                 if run: Z['held'].append(len(run))
-                after = [r for r in R if r['n'] == p['n'] and r['wk'] >= w and r['team'] != team]
+                after = [r for r in R if r['n'] == p['n'] and r['wk'] >= w and r['wk'] in played_wks and r['team'] != team]
                 counted = sum(r['pts'] or 0 for r in after if r['started'])
                 Z['gone'].append(dict(n=p['n'], pos=p['pos'], d=d.strftime('%b %-d'), wk=w, held=len(run),
                                       rank=RK.get((p['pos'], p['n'])), counted=round(counted, 2),
                                       to=sorted({mgr_of(y, r['team']) for r in after if r['started']} - {None})))
+                gone_list.append(dict(Z['gone'][-1], y=y, m=m))
     # the draft: points that counted from each manager's own picks, while he kept them
     try:
+        nt = len(teams); seen = {}
         for pick, team, n, nfl, pos in P.draft(y):
             m = mgr_of(y, team)
-            if m in M and n: M[m]['drafted_pts'] += sum(r['pts'] or 0 for r in starts(team, n, stint(team, n, 1)) if r['wk'] < st['po'])
+            if m not in M or not n: continue
+            ss = [r for r in starts(team, n, stint(team, n, 1)) if r['wk'] < st['po']]
+            got = sum(r['pts'] or 0 for r in ss); M[m]['drafted_pts'] += got
+            p0 = (pos or '').split(',')[0]; seen[p0] = seen.get(p0, 0) + 1
+            val = value(ss, pos)
+            draft_list.append(dict(y=y, pick=pick, rnd=(pick - 1) // nt + 1, slot=(pick - 1) % nt + 1, m=m, n=n, pos=p0,
+                                   taken=seen[p0], rank=RK.get((p0, n)), starts=len(ss), counted=round(got, 2),
+                                   val=None if val is None else round(val, 2)))
     except (KeyError, IndexError, FileNotFoundError):
         pass
     # the league that season
@@ -204,7 +248,7 @@ def season(y):
         Z['eff'] = Z['act'] / Z['opt'] if Z['opt'] else None
         Z['left'] = (Z['opt'] - Z['act']) / g
         Z['patience'] = sum(Z['held']) / len(Z['held']) if Z['held'] else None
-        Z['pickups'].sort(key=lambda x: (-(x['marg'] if x['marg'] is not None else -999), -x['pts']))
+        Z['pickups'].sort(key=lambda x: -(x['val'] if x['val'] is not None else -999))
         # drops that came back: only players who finished as a starter at their position
         Z['gone'] = sorted([x for x in Z['gone'] if x['rank'] and x['rank'] <= STARTERS.get((x['pos'] or '').split(',')[0], 12)],
                            key=lambda x: (x['rank'], -x['counted']))
@@ -215,7 +259,14 @@ def season(y):
         # efficiency: (his efficiency - league's) x his best possible points a week, in wins
         Z['lineup_wins'] = ((Z['eff'] - eff_avg) * Z['opt'] / ppw) if Z['eff'] is not None and ppw else None
         Z['pickup_wins'] = Z['pk_marg'] / ppw if ppw else None
-    league = dict(year=y, avg=mu, sd=sd, ppw=ppw, eff=eff_avg, opt=opt_avg, weeks=len(weeks),
+    # who held whom: weeks on a manager's roster, every player
+    hw = {}
+    for r in R:
+        m = mgr_of(y, r['team'])
+        if m and r['wk'] in weeks: hw[(r['n'], m)] = hw.get((r['n'], m), 0) + 1
+    league = dict(year=y, avg=mu, sd=sd, ppw=ppw, eff=eff_avg, opt=opt_avg, weeks=len(weeks), repl=RP,
+                  trades_list=trades_list, draft_list=draft_list, picks_list=picks_list, gone_list=gone_list,
+                  held=[dict(n=n, m=m, wks=v) for (n, m), v in hw.items()],
                   moves=sum(Z['adds'] for Z in M.values()) / max(1, len(M)),
                   trades=sum(Z['trades'] for Z in M.values()) // 2, teams=len(M))
     return M, league
@@ -275,13 +326,76 @@ def build():
     H = {y: season(y) for y in YEARS}
     played = H[LIVE][1]['weeks']
     keep = ('g', 'w', 'l', 'pf', 'ap', 'waa', 'eff', 'left', 'lost_lineup', 'perfect', 'adds', 'fa', 'wv', 'drops', 'trades',
-            'pk_pts', 'pk_marg', 'pk_starts', 'patience', 'drafted_pts', 'trade_net', 'trade_w', 'trade_l', 'lineup_wins', 'pickup_wins')
-    out = dict(years=YEARS, league={y: H[y][1] for y in YEARS}, model=model(H, played), files={})
+            'pk_pts', 'pk_marg', 'pk_starts', 'patience', 'drafted_pts', 'trade_net', 'trade_w', 'trade_l', 'lineup_wins', 'pickup_wins', 'pk_val')
+    LEAN = ('trades_list', 'draft_list', 'picks_list', 'gone_list', 'held')
+    out = dict(years=YEARS, league={y: {k: v for k, v in H[y][1].items() if k not in LEAN} for y in YEARS}, model=model(H, played), files={})
     for m in H[LIVE][0]:
         hist = {y: {k: H[y][0][m][k] for k in keep} for y in YEARS if m in H[y][0]}
         Z = H[LIVE][0][m]
         out['files'][m] = dict(team=Z['team'], hist=hist, weekly=Z['weekly'], pickups=Z['pickups'][:8], gone=Z['gone'][:8])
+    # 2026, league-wide: pickups by value at position (skill positions; kickers and defenses apart,
+    # since everyone streams them), and drops of players who are finishing as starters
+    L26 = H[LIVE][1]
+    out['picks'] = sorted([p for p in L26['picks_list'] if skill(p) and p['starts']], key=lambda p: -p['val'])[:12]
+    out['picksKD'] = sorted([p for p in L26['picks_list'] if not skill(p) and p['starts'] and p['val'] is not None], key=lambda p: -p['val'])[:6]
+    out['gone'] = [g for g in starters_gone(L26['gone_list']) if skill(g)][:12]
+    out['goneKD'] = [g for g in starters_gone(L26['gone_list']) if not skill(g)][:6]
+    out['fo'] = front_office(H, keep)
     return out
+
+LISTED = {'QB': 50, 'RB': 100, 'WR': 100, 'TE': 75, 'K': 50, 'DEF': 50}   # how deep Yahoo's ranked lists are pulled
+
+def skill(p):
+    return (p['pos'] or '').split(',')[0] in ('QB', 'RB', 'WR', 'TE')
+
+def starters_gone(rows):
+    """drops of players who finished the season as a starter at their position, best finish first"""
+    return sorted([x for x in rows if x['rank'] and x['rank'] <= STARTERS.get((x['pos'] or '').split(',')[0], 12)],
+                  key=lambda x: (x['rank'], -x['counted']))
+
+def front_office(H, keep):
+    """every season Yahoo reaches, for the record book's Front Office section"""
+    fin = [y for y in YEARS if y != LIVE]
+    mgrs = {}
+    for y in YEARS:
+        for m, Z in H[y][0].items():
+            mgrs.setdefault(m, {})[y] = {k: Z[k] for k in keep}
+    allp = [p for y in YEARS for p in H[y][1]['picks_list'] if p['starts'] and p['val'] is not None]
+    trades = [t for y in YEARS for t in H[y][1]['trades_list']]
+    draft = [d for y in YEARS for d in H[y][1]['draft_list']]
+    # what each first-round slot has meant: the manager who drew it, where he finished, his record
+    slots = {}
+    for d in draft:
+        if d['rnd'] != 1 or d['y'] not in fin: continue
+        book = D.MANAGERS[d['y']]; team = next((t for t, mm in book.items() if mm == d['m']), None)
+        order = D.FINAL_PLACE.get(d['y'], []); place = order.index(team) + 1 if team in order else None
+        rec = next(((r[2], r[3]) for r in D.STANDINGS[d['y']] if r[1] == team), (0, 0))
+        slots.setdefault(d['slot'], []).append(dict(y=d['y'], m=d['m'], n=d['n'], place=place, w=rec[0], l=rec[1]))
+    held = {}
+    for y in YEARS:
+        for h in H[y][1]['held']: held[(h['n'], h['m'])] = held.get((h['n'], h['m']), 0) + h['wks']
+    loyal = sorted(({'n': n, 'm': m, 'wks': v} for (n, m), v in held.items()), key=lambda x: -x['wks'])
+    best_owner = {}
+    for x in loyal:
+        if x['n'] not in best_owner: best_owner[x['n']] = x
+    return dict(years=YEARS, finished=fin, mgrs=mgrs,
+                picks=sorted([p for p in allp if skill(p)], key=lambda p: -p['val'])[:25],
+                picksKD=sorted([p for p in allp if not skill(p)], key=lambda p: -p['val'])[:10],
+                gone=[g for g in starters_gone([g for y in YEARS for g in H[y][1]['gone_list']]) if skill(g)][:30],
+                goneKD=[g for g in starters_gone([g for y in YEARS for g in H[y][1]['gone_list']]) if not skill(g)][:10],
+                trades=trades,
+                # drafted as the Nth at his position, finished Mth: the biggest climbs (skill positions) ...
+                draftBest=sorted([d for d in draft if d['rank'] and d['pos'] in ('QB', 'RB', 'WR', 'TE') and d['y'] != LIVE],
+                                 key=lambda d: (-(d['taken'] - d['rank']), -(d['val'] or 0)))[:20],
+                # ... and the biggest falls among the first three rounds (a player outside Yahoo's
+                # ranked list finished worse than the last ranked spot)
+                draftWorst=sorted([dict(d, fell=(d['rank'] or LISTED[d['pos']] + 1) - d['taken']) for d in draft
+                                   if d['rnd'] <= 3 and d['pos'] in ('QB', 'RB', 'WR', 'TE') and d['y'] != LIVE],
+                                  key=lambda d: -d['fell'])[:20],
+                draftByMgr=[dict(m=m, y=y, val=round(sum(d['val'] or 0 for d in draft if d['m'] == m and d['y'] == y), 1))
+                            for m in mgrs for y in YEARS if any(d['m'] == m and d['y'] == y for d in draft)],
+                slots=[dict(slot=k, seasons=v) for k, v in sorted(slots.items())],
+                loyal=list(best_owner.values())[:30])
 
 if __name__ == '__main__':
     o = build()

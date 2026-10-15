@@ -1518,3 +1518,6 @@ body.lv-pg .lv-go{color:var(--brass)}
 /* the team file: up/down numbers at reading size, not the board's small mono */
 .lv-file b.lv-steal,.lv-file b.lv-bust{font:inherit;font-weight:700}
 .lv-file .sub-h{margin:18px 0 8px}
+/* Front Office: long cells (trade sides, a draft slot's seasons) wrap rather than widen the card */
+#front td.fo-w{white-space:normal;min-width:200px;font-size:12.5px}
+#front b.lv-steal,#front b.lv-bust,#tLivePk b.lv-steal,#tLivePk b.lv-bust{font:inherit;font-weight:700}
