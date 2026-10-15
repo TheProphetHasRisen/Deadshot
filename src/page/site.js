@@ -4884,6 +4884,14 @@ glossify();
       const dr=n[p[4]], fr=v[1], d=fr==null?null:dr-fr;
       out[p[0]]={pos:p[4],dr,fr,pts:v[0],d,steal:d!=null&&fr<dr&&(d>=8||(fr*2<=dr&&d>=3)),bust:d!=null&&fr>dr&&dr<=36&&(-d>=12||(fr>=dr*2.5&&-d>=6))};});
     return out;};
+  /* Brian's banners are 10:1 with the light, writable part in the left 55%. Each banner cell
+     is sized so its text fits in that part and the art keeps its own shape, never stretched. */
+  const fitFx=()=>{const c=$$('#tLiveDr td.lv-fx'); if(!c.length||!c[0].offsetWidth)return;
+    c.forEach(td=>{td.style.minWidth=''; td.style.height='';});
+    c.forEach(td=>{const w=td.querySelector('.lv-fxc').offsetWidth+parseFloat(getComputedStyle(td).paddingLeft);
+      td.style.minWidth=Math.ceil(w/.55)+'px';});
+    c.forEach(td=>{td.style.height=Math.round(td.offsetWidth/10)+'px';});};
+  if(window.ResizeObserver){let lw=0; new ResizeObserver(e=>{const w=e[0].contentRect.width; if(w&&w!==lw){lw=w; fitFx();}}).observe($('#tLiveDr'));}
   const drawDr=()=>{
     $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('')+
       '<span class="lv-gap"></span>'+[['order','Draft order'],['team','By team']].map(([k,t])=>`<button data-dv="${k}" class="${k===view?'on':''}">${t}</button>`).join('')+
@@ -4897,22 +4905,23 @@ glossify();
       const big=T[p[0]]?` <span class="lv-big lv-big-${T[p[0]]==='STEAL'?'s':'b'}">${T[p[0]]==='STEAL'?'Top steal':'Top bust'}</span>`:'';
       return big+` <span class="${cls}" title="Drafted ${p[4]}${v.dr}, ${partial?'running':'finished'} ${p[4]}${v.fr} with ${f(v.pts,1)} points">${v.steal?'▲ ':v.bust?'▼ ':''}${p[4]}${v.fr}</span>`;};
     const dim=p=>on.size&&!on.has(p[4]);
+    const fx=p=>T[p[0]]?' lv-fx lv-fx-'+(T[p[0]]==='STEAL'?'s':'b'):'';
     const mg=t=>L.mgr[t]?L.mgr[t].split(' ').slice(-1)[0]:'';
     if(view==='team'){
       const order=P.filter(p=>p[0]<=10).sort((a,b)=>a[0]-b[0]).map(p=>p[1]);
       const rounds=Math.max(...P.map(p=>Math.ceil(p[0]/10)));
       let h='<thead><tr><th></th>'+order.map(t=>`<th>${esc(t)}</th>`).join('')+'</tr></thead><tbody>';
       for(let r=1;r<=rounds;r++){h+=`<tr><th class="dim">R${r}</th>`+order.map(t=>{const p=P.find(x=>x[1]===t&&Math.ceil(x[0]/10)===r);
-        if(p&&T[p[0]])return `<td class="${dim(p)?'lv-dim':''}" title="Drafted ${p[4]}${J[p[0]].dr}, ${partial?'running':'finished'} ${p[4]}${J[p[0]].fr} with ${f(J[p[0]].pts,1)} points"><span class="lv-fxbar lv-fxbar-${T[p[0]]==='STEAL'?'s':'b'}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span><span class="lv-nm">${esc(p[2])}</span></span></td>`;
-        return p?`<td class="${dim(p)?'lv-dim':''}" title="${J[p[0]].fr!=null?'Drafted '+p[4]+J[p[0]].dr+', '+(partial?'running ':'finished ')+p[4]+J[p[0]].fr+' with '+f(J[p[0]].pts,1)+' points':''}"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</td>`:'<td></td>';}).join('')+'</tr>';}
+        return p?`<td class="${dim(p)?'lv-dim':''}${fx(p)}" title="${J[p[0]].fr!=null?'Drafted '+p[4]+J[p[0]].dr+', '+(partial?'running ':'finished ')+p[4]+J[p[0]].fr+' with '+f(J[p[0]].pts,1)+' points':''}"><span class="lv-fxc"><span class="lv-pos">${esc(p[4])}${J[p[0]].dr}</span> ${esc(p[2])} <span class="dim">${p[0]}</span>${mark(p)}</span></td>`:'<td></td>';}).join('')+'</tr>';}
       $('#tLiveDr').innerHTML=h+'</tbody>';
     }else{
       $('#tLiveDr').innerHTML='<thead><tr><th>Pick</th><th>Team</th><th>Player</th><th>Taken</th><th>'+(partial?'Running':'Finished')+'</th><th class="num">Points</th></tr></thead><tbody>'+
         P.slice().sort((a,b)=>a[0]-b[0]).map(p=>{const v=J[p[0]];
-          return `<tr class="${dim(p)?'lv-dim':''}${p[0]%10===0?' lv-rd':''}${T[p[0]]?' lv-hl-'+(T[p[0]]==='STEAL'?'s':'b'):''}"><td class="dim">${Math.ceil(p[0]/10)}.${String((p[0]-1)%10+1).padStart(2,'0')} <span class="lv-ov">${p[0]}</span></td>
-            <td>${esc(p[1])} <span class="dim">${esc(mg(p[1]))}</span></td><td>${T[p[0]]?`<span class="lv-fxbar lv-fxbar-${T[p[0]]==='STEAL'?'s':'b'}"><span class="lv-nm">${esc(p[2])} ${esc(p[3])}</span></span>`:`<b>${esc(p[2])}</b> <span class="dim">${esc(p[3])}</span>`}</td>
+          return `<tr class="${dim(p)?'lv-dim':''}${p[0]%10===0?' lv-rd':''}${T[p[0]]?' lv-fxr lv-hl-'+(T[p[0]]==='STEAL'?'s':'b'):''}"><td class="dim">${Math.ceil(p[0]/10)}.${String((p[0]-1)%10+1).padStart(2,'0')} <span class="lv-ov">${p[0]}</span></td>
+            <td>${esc(p[1])} <span class="dim">${esc(mg(p[1]))}</span></td><td class="${fx(p)}"><span class="lv-fxc"><b>${esc(p[2])}</b> <span class="dim">${esc(p[3])}</span></span></td>
             <td><span class="lv-pos">${esc(p[4])}${v.dr}</span></td><td>${mark(p)}</td><td class="num">${v.pts==null?'—':f(v.pts,1)}</td></tr>`;}).join('')+'</tbody>';
     }
+    fitFx();
     /* the verdicts: biggest steals, biggest busts, and whose draft has scored the most */
     const rows=P.map(p=>({p,v:J[p[0]]})).filter(x=>x.v.fr!=null&&(!on.size||on.has(x.p[4])));
     const st=rows.filter(x=>x.v.fr<=24&&x.v.d>0).sort((a,b)=>b.v.d-a.v.d).slice(0,8);
