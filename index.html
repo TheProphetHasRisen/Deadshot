@@ -1558,6 +1558,10 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-trn b{font:600 13.5px "IBM Plex Mono",monospace}
 .lv-bio{font-size:12px;line-height:1.55;border-top:1px solid var(--rule);padding-top:10px}
 .lv-bio b{font:600 12.5px "IBM Plex Mono",monospace}
+/* the trade verdict: three labelled lines, the labels in the same voice as the side headings */
+.lv-vd{margin:0 0 7px}
+.lv-vd b{font-weight:700}
+.lv-lab{display:inline-block;margin-right:7px;font:600 10px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--brass)}
 </style>
 </head>
 <body>
@@ -6959,20 +6963,26 @@ glossify();
   /* trades and the waiver wire, graded by what each player has scored since (wire2026.py). Points
      are what a player scored while on the roster, started or benched: Yahoo's lineups are not in yet */
   const WR=L.wire;
+  /* points per win: at an average score, one extra point lifts the chance of beating a typical
+     opponent by about 0.4 divided by the spread of weekly scores. Its inverse turns points into wins */
+  const PPW=(()=>{const sc=L.games.flatMap(g=>[g.aa,g.ab]), mu=sc.reduce((a,b)=>a+b,0)/sc.length;
+    return Math.sqrt(sc.reduce((a,b)=>a+(b-mu)**2,0)/sc.length)/0.39894;})();
   if(WR){
     $('#lvTrSub').textContent=nOf(L.trades.length,'trade')+' · each player’s points a game before the deal and since, started or benched';
     const side=(t,a)=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(t)}</div>${a.map(p=>`<div style="font-size:13px"${p.repl!=null&&(p.vorPost!=null||p.vorPre!=null)?` title="${sg(p.vorPost!=null?p.vorPost:p.vorPre,1)} a game against a replacement ${p.pos} (${f(p.repl,1)} a game)${p.vorPost!=null?' since the deal':' before the deal'}"`:''}>${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span>
       <div class="lv-trn">${p.pre==null?'<span class="dim">no games before</span>':`<b>${f(p.pre,1)}</b> <span class="dim">a game before</span>`}${p.postG?(()=>{const a=p.post/p.postG, up=p.pre==null||a>=p.pre;
         return ` <span class="dim">·</span> <b class="${up?'lv-steal':'lv-bust'}">${p.pre==null?'':up?'▲ ':'▼ '}${f(a,1)}</b> <span class="dim">a game since</span>`;})():''}</div></div>`).join('')}</div>`;
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
+      const lab=t=>`<span class="lv-lab">${t}</span>`;
       let v;
       if(x.weeksSince){const n=x.weeksSince, aw=x.aPost/n, bw=x.bPost/n, lead=aw>=bw?x.ta:x.tb;
-        v=`Since the deal (${n>1?'weeks '+x.wk+'–'+(x.wk+n-1):'week '+x.wk}), ${esc(x.ta)}’s players have scored ${f(aw,1)} a week and ${esc(x.tb)}’s ${f(bw,1)}. <b>${esc(lead)}</b> ahead by ${f(Math.abs(aw-bw),1)} a week.`;}
-      else v=`No games since. Before the deal, ${esc(x.ta)}’s side was scoring ${f(x.aPre,1)} a week and ${esc(x.tb)}’s ${f(x.bPre,1)}.`;
+        v=`${lab('Points')}Since the deal (${n>1?'weeks '+x.wk+'–'+(x.wk+n-1):'week '+x.wk}), ${esc(x.ta)}’s players have scored <b>${f(aw,1)}</b> a week and ${esc(x.tb)}’s <b>${f(bw,1)}</b>. <b>${esc(lead)}</b> ahead by <b>${f(Math.abs(aw-bw),1)}</b> a week.`;}
+      else v=`${lab('Points')}No games since. Before the deal, ${esc(x.ta)}’s side was scoring <b>${f(x.aPre,1)}</b> a week and ${esc(x.tb)}’s <b>${f(x.bPre,1)}</b>.`;
       /* by position: a tight end's 12 a game is worth more than a receiver's, so each player is set
-         against a replacement-level starter at his spot */
-      const vl=x.aVor>=x.bVor?x.ta:x.tb;
-      v+=` <br><span class="dim">By position${x.weeksSince?'':', before the deal'}:</span> ${esc(x.ta)}’s side ${sg(x.aVor,1)} a game over replacement players, ${esc(x.tb)}’s ${sg(x.bVor,1)}. <b>${esc(vl)}</b> ${x.weeksSince?'got':'is getting'} more at their positions.`;
+         against a replacement-level starter at his spot (VORP). In wins, that gap is WAR */
+      const vl=x.aVor>=x.bVor?x.ta:x.tb, dv=Math.abs(x.aVor-x.bVor), wpw=dv/PPW, left=Math.max(0,L.regWeeks-done);
+      v=`<div class="lv-vd">${v}</div><div class="lv-vd">${lab('By position')}${x.weeksSince?'':'Before the deal, '}${esc(x.ta)}’s side ${x.weeksSince?'is ':'was '}<b>${sg(x.aVor,1)}</b> a game over replacement players, ${esc(x.tb)}’s <b>${sg(x.bVor,1)}</b>. <b>${esc(vl)}</b> ${x.weeksSince?'got':'is getting'} <b>${f(dv,1)}</b> more a game at their positions.</div>`+
+        `<div class="lv-vd">${lab('In wins')}That gap is worth about <b>${f(wpw,2)}</b> wins a week to ${esc(vl)}${left?`, or <b>${f(wpw*left,1)}</b> over the ${nOf(left,'regular-season week')} left`:''}. <span class="dim">(Here an extra ${f(PPW,0)} points a week is worth one win.)</span></div>`;
       const st=t=>L.standings.find(r=>r.team===t), pc=v=>v==null?'—':Math.round(v*100)+'%';
       const bio=(t,F)=>{const r=st(t), b=F.before, a=F.since;
         return `<div class="lv-bio"><div class="sub-h" style="margin:0 0 4px">${esc(t)} · now ${r?r.w+'–'+r.l+', '+ord(r.rank):''}</div>
