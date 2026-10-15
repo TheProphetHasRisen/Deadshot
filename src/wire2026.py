@@ -28,6 +28,27 @@ def week_of(ts):
 
 TRADE_TIMES = {'Sep 15': '11:27 am', 'Sep 29': '2:32 pm', 'Oct 13': '12:43 pm'}
 
+# Small samples. A player with one game before a trade, or a team with one week, should not set
+# the bar on a fluke. Each is eased toward what is typical, by PRIOR_G games' worth of it:
+#   player baseline = (his points a game x his games + a typical starter at his position x 3) / (games + 3)
+#   team pace       = (its all-play rate x weeks + .500 x 3) / (weeks + 3)
+# With 1 game his own number counts a quarter; with 3, half; with 9, three quarters.
+PRIOR_G = 3
+# starters league-wide: QB, 2 RB, 2 WR, TE, a W/R/T flex, K, DEF on 10 teams (flex about 4 RB,
+# 5 WR, 1 TE). "A typical starter" is the average of that many best, by points a game.
+STARTERS = {'QB': 10, 'RB': 24, 'WR': 25, 'TE': 11, 'K': 10, 'DEF': 10}
+
+def pos_rank(allwk, pos, mine, a, b):
+    """where a points-a-game figure over weeks a..b ranks at a position, among every NFL player
+    there who played at least half those weeks"""
+    if mine is None or not allwk or pos not in allwk: return None
+    need = (b - a + 2) // 2
+    others = []
+    for line in allwk[pos]:
+        xs = [v for v in line[a - 1:b] if v is not None]
+        if len(xs) >= need: others.append(sum(xs) / len(xs))
+    return 1 + sum(1 for v in others if v > mine + 1e-9)
+
 def team_form(games, t, w0, w1):
     """record, points a week and all-play rate for team t in weeks w0..w1"""
     W = L = 0; pts = []; apw = apn = 0
@@ -44,9 +65,11 @@ def team_form(games, t, w0, w1):
     return dict(w=W, l=L, g=len(pts), ppg=round(sum(pts) / len(pts), 2) if pts else None,
                 ap=round(apw / apn, 4) if apn else None)
 
-def grade(S, wk, played, games=()):
+def grade(S, wk, played, games=(), allwk=None, curve=None):
     """wk: {player: [points by week, None = no game]}; played: last week with stats;
-    games: the season's results."""
+    games: the season's results; allwk: {pos: every NFL player's weeks}, for ranks;
+    curve: {pos: points a game, best first}, for a typical starter."""
+    typical = {p: sum(curve[p][:n]) / n for p, n in STARTERS.items() if curve and len(curve.get(p, [])) >= n}
     pts = lambda n, a, b: [x for x in (wk.get(n) or [])[max(a, 1) - 1:min(b, played)] if x is not None]
     # every event oldest first: the draft, then each move and trade in the order Yahoo made them
     ev = [(dt.datetime(2026, 9, 1), 'draft', (team, name)) for _, team, name, _, _ in S.DRAFT2026]
@@ -106,17 +129,25 @@ def grade(S, wk, played, games=()):
         def side(names):
             out = []
             for n in names:
-                pre, post = pts(n, 1, w - 1), pts(n, w, played)
-                pp = round(sum(pre) / len(pre), 2) if pre else None
-                qq = round(sum(post) / len(post), 2) if post else None
-                # against his own form: points a game since the deal minus points a game before it
-                out.append(dict(n=n, pos=S.TRADEPOS.get(n), pre=pp, preG=len(pre), post=round(sum(post), 2), postG=len(post),
-                                chg=round(qq - pp, 2) if pp is not None and qq is not None else None))
+                pre, post = pts(n, 1, w - 1), pts(n, w, played); pos = S.TRADEPOS.get(n)
+                pp = sum(pre) / len(pre) if pre else None
+                qq = sum(post) / len(post) if post else None
+                # against his own form, eased toward a typical starter while his sample is small
+                ty = typical.get(pos)
+                base = ((sum(pre) + ty * PRIOR_G) / (len(pre) + PRIOR_G) if ty is not None else pp) if pre or ty is not None else None
+                out.append(dict(n=n, pos=pos, pre=None if pp is None else round(pp, 2), preG=len(pre),
+                                post=round(sum(post), 2), postG=len(post),
+                                base=None if base is None else round(base, 2), typical=None if ty is None else round(ty, 2),
+                                chg=round(qq - base, 2) if base is not None and qq is not None else None,
+                                rkPre=pos_rank(allwk, pos, pp, 1, w - 1) if w > 1 else None,
+                                rkPost=pos_rank(allwk, pos, qq, w, played) if played >= w else None))
             return out
         def form(t):
             b4, af = team_form(games, t, 1, w - 1), team_form(games, t, w, played)
-            exp = round(b4['ap'] * af['g'], 2) if b4['ap'] is not None and af['g'] else None
-            return dict(before=b4, since=af, xw=exp, woe=round(af['w'] - exp, 2) if exp is not None else None)
+            pace = (b4['ap'] * b4['g'] + 0.5 * PRIOR_G) / (b4['g'] + PRIOR_G) if b4['ap'] is not None else None
+            exp = round(pace * af['g'], 2) if pace is not None and af['g'] else None
+            return dict(before=b4, since=af, pace=None if pace is None else round(pace, 4), xw=exp,
+                        woe=round(af['w'] - exp, 2) if exp is not None else None)
         A, B = side(ga), side(gb)
         trades.append(dict(d=d, wk=w, ta=ta, tb=tb, a=A, b=B, weeksSince=max(0, played - w + 1),
                            aPost=round(sum(p['post'] for p in A), 2), bPost=round(sum(p['post'] for p in B), 2),

@@ -17,6 +17,16 @@ site = json.load(open('site_data.json'))['live']
 W = site['wire']
 dp = json.load(open('draft_points.json'))
 wk, played = dp['wk2026'], int(dp['weeks']['2026'])
+allwk, cpg = dp['allwk2026'], dp['curvePG2026']
+# a typical starter: the average of the best 10 QB, 24 RB, 25 WR, 11 TE by points a game
+TYP = {p: sum(cpg[p][:n]) / n for p, n in dict(QB=10, RB=24, WR=25, TE=11, K=10, DEF=10).items()}
+def rank(pos, mine, a, b):
+    if mine is None: return None
+    pool = []
+    for line in allwk[pos]:
+        xs = [v for v in line[a - 1:b] if v is not None]
+        if 2 * len(xs) >= (b - a + 1): pool.append(sum(xs) / len(xs))
+    return 1 + len([v for v in pool if v > mine + 1e-9])
 games = site['games']
 bad = []
 
@@ -59,8 +69,13 @@ for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
         for n, P in zip(names, got):
             pre, _, _ = ppg(n, 1, w - 1); post, g, s = ppg(n, w, played)
             check(f'{d} {n} before a game', pre, P['pre']); check(f'{d} {n} points since', s if g else 0, P['post'])
-            mine_c = post - pre if pre is not None and post is not None else None
+            pos = S.TRADEPOS[n]; g0 = len([v for v in wk[n][:w - 1] if v is not None])
+            bar = ((pre or 0) * g0 + TYP[pos] * 3) / (g0 + 3)
+            check(f'{d} {n} bar', bar, P['base'], 0.02)
+            mine_c = post - bar if post is not None else None
             check(f'{d} {n} against his own form', mine_c, P['chg'], 0.02)
+            check(f'{d} {n} rank before', rank(pos, pre, 1, w - 1) if w > 1 else None, P['rkPre'], 0)
+            check(f'{d} {n} rank since', rank(pos, post, w, played) if played >= w else None, P['rkPost'], 0)
             chg += mine_c or 0; tot += s
         check(f'{d} side {key} against own form', chg if played >= w else None, T[key + 'Chg'], 0.05)
         check(f'{d} side {key} points since', tot, T[key + 'Post'], 0.05)
@@ -70,7 +85,8 @@ for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
         check(f'{d} {t} wins before', bw, F['before']['w'], 0); check(f'{d} {t} losses before', bl, F['before']['l'], 0)
         check(f'{d} {t} points a week before', bp, F['before']['ppg']); check(f'{d} {t} all-play before', bap, F['before']['ap'], 0.0001)
         check(f'{d} {t} wins since', aw, F['since']['w'], 0); check(f'{d} {t} points a week since', ap_, F['since']['ppg'])
-        xw = bap * ag if bap is not None and ag else None
+        pace = (bap * bg + 0.5 * 3) / (bg + 3) if bap is not None else None
+        xw = pace * ag if pace is not None and ag else None
         check(f'{d} {t} expected wins since', xw, F['xw']); check(f'{d} {t} wins over pace', None if xw is None else aw - xw, F['woe'])
 
 # pickups: replay every move and trade in order, tracking who holds whom from which week
@@ -107,4 +123,4 @@ if bad:
     print('TRADE AND WAIVER GRADES DO NOT MATCH a second working:'); [print('  ' + b) for b in bad[:40]]
     sys.exit(1)
 print(f'OK - 2026 grades match a second working ({len(W["trades"])} trades, every player, both teams each side, '
-      f'{min(15, len(mine))} top pickups)')
+      f'{min(15, len(mine))} top pickups, ranks and small-sample bars)')

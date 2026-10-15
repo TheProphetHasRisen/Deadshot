@@ -73,6 +73,11 @@ starts the day access is granted.
 
 ## What happens after Yahoo approves
 
+**Banked for the day lineups arrive (Brian, 14 Oct 2026):** grade every 2026 trade by the points
+the traded players added to lineups that actually started, not points scored on the bench. Until
+then `wire2026.py` grades by positional rank since the deal and by each player's own form, eased
+toward a typical starter while he has few games. Build this the moment weekly lineups are in.
+
 ### Step 1 — you sign in once (about two minutes)
 
 Yahoo does **not** hand over a key on approval. Brian registers an "app" on

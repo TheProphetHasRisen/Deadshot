@@ -127,6 +127,14 @@ for y, weeks in SEASONS.items():
             per[n] = [wk.get(pid, {}).get(w) for w in weeks]
         if miss: print('  NO WEEKLY LINE', miss)
         out['wk' + str(y)] = per
+        # every NFL player's weeks, by position (no names): what a traded player is ranked against
+        # for any stretch of weeks. Kept out of the page by export.py; wire2026.py reads it.
+        allw = {}
+        for pid, ws in wk.items():
+            pos = 'DEF' if pid.isalpha() else pos_of.get(pid, '')
+            if pos in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF'):
+                allw.setdefault(pos, []).append([ws.get(w) for w in weeks])
+        out['allwk' + str(y)] = allw
 out['weeks'] = {str(y): max(w) for y, w in SEASONS.items()}
 json.dump(out, open('draft_points.json', 'w'), indent=1)
 print('wrote draft_points.json')
