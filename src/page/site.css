@@ -1482,16 +1482,12 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-tk{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 @media(prefers-reduced-motion:no-preference){.lv-tk-in{animation:lv-tk .45s ease-out}
   @keyframes lv-tk{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}}
-/* ice and fire on the draft board: Brian's own banners (art/ice.png, art/fire.png, 14 Oct
-   2026) wrap the whole cell. fitFx() in site.js sizes the cell to the art's 10:1 shape. */
-.lv-draft td.lv-fx{background:center/100% 100% no-repeat;box-shadow:none!important;vertical-align:middle}
-/* the art's light middle is part see-through, so a dark theme would show through it: a light
-   band sits under exactly that part, behind the art, in every theme */
-.lv-draft td.lv-fx-b{background-image:url(art/ice.png),linear-gradient(90deg,transparent 2%,#e9ecef 4%,#e9ecef 54%,transparent 60%)}
-.lv-draft td.lv-fx-s{background-image:url(art/fire.png),linear-gradient(90deg,transparent 2%,#eeeae6 4%,#eeeae6 54%,transparent 60%)}
-.lv-draft td.lv-fx{background-size:100% 100%,100% 40%}
-.lv-draft tr.lv-fxr .lv-big{display:none}
-.lv-draft td.lv-fx,.lv-draft td.lv-fx *{color:#141414!important;font-weight:600;
-  text-shadow:0 0 2px #fff,0 0 4px #fff,0 0 7px #fff,0 0 10px rgba(255,255,255,.9)}
-.lv-draft td.lv-fx .lv-big{display:none}
-.lv-fxc{display:inline-block;white-space:nowrap}
+/* ice and fire on the draft board: the top busts and steals at each position get a light wash
+   of the bust or steal colour and a small chip cut from Brian's own banners (art/*-i.png) */
+.lv-draft td.lv-fx-b,.lv-draft tr.lv-fxr.lv-hl-b td{background-color:color-mix(in srgb,var(--neg) 9%,transparent)}
+.lv-draft td.lv-fx-s,.lv-draft tr.lv-fxr.lv-hl-s td{background-color:color-mix(in srgb,var(--pos) 9%,transparent)}
+.lv-draft td.lv-fx-b{box-shadow:inset 2px 0 0 var(--neg)}
+.lv-draft td.lv-fx-s{box-shadow:inset 2px 0 0 var(--pos)}
+.lv-fxi{width:17px;height:17px;border-radius:3px;vertical-align:-4px;margin:0 2px 0 3px}
+.lv-fxi-b{box-shadow:0 0 0 1px color-mix(in srgb,var(--neg) 55%,transparent),0 0 7px color-mix(in srgb,var(--neg) 45%,transparent)}
+.lv-fxi-s{box-shadow:0 0 0 1px color-mix(in srgb,var(--pos) 55%,transparent),0 0 7px color-mix(in srgb,var(--pos) 45%,transparent)}
