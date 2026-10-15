@@ -138,7 +138,7 @@ cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py mkfonts.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
          test_numbers.py numbers.lock.json test_copy.py test_ask.js season2026.py check_2026.py draft_points.py draft_points.json wire2026.py test_wire.py yahoo_fetch.py yahoo_parse.py yahoo_to_2026.py season2026_yahoo.py teamfile.py test_teamfile.py nfl_teams.py nflcomps.py injuries.py seasonpage.py sleeper_season.py scoring.py mkog.js ci_update.sh \
-         eslint.config.js package.json \
+         eslint.config.js package.json package-lock.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \
          league_rules_2026.md yahoo_scrape_status.md; do
@@ -159,6 +159,7 @@ mkdir -p "$CLONE/.github/workflows"
 cp ci/update.yml "$CLONE/.github/workflows/update.yml"
 cp ci/checks.yml "$CLONE/.github/workflows/checks.yml"      # the check on every publish
 cp ci/site.gitignore "$CLONE/.gitignore"
+cp ci/src.gitignore "$CLONE/src/.gitignore"   # an older copy left out package.json, so GitHub could not install the checks' tools
 git -C "$CLONE" add .gitignore .github/workflows/update.yml .github/workflows/checks.yml
 git -C "$CLONE" add -A index.html 404.html og.png og-*.png t src favicon.svg favicon-32.png \
   apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts art

@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "playwright": "^1.62.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.10.0"
+  },
+  "scripts": {
+    "lint": "eslint page/site.js page/ask.js page/sw.js --max-warnings 0",
+    "test": "node test.js && node test_rules.js && node --check sw.js"
+  }
+}

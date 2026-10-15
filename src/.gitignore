@@ -1,10 +1,11 @@
-# Playwright audit screenshots written by test.js — regenerated on every run
+# Installed as src/.gitignore in the site repo by deploy.sh. package.json and package-lock.json are
+# published on purpose: the checks and the scheduled update install the test tools from them.
+
+# Playwright audit screenshots written by test.js, regenerated on every run
 shot-*.png
 
-# Node test toolchain — the deploy repo contains index.html only
+# Node test toolchain
 node_modules/
-package.json
-package-lock.json
 
-# Generated from data.py + weekly*.py by export.py — rebuildable, never edited by hand
+# Generated from data.py + weekly*.py by export.py: rebuildable, never edited by hand
 site_data.json
