@@ -7027,7 +7027,7 @@ glossify();
       if(n){const aw=x.aPost/n, bw=x.bPost/n, pl=aw>=bw?x.ta:x.tb, fl=x.aChg>=x.bChg?x.ta:x.tb, gap=Math.abs(x.aChg-x.bChg), wpw=gap/PPW, left=Math.max(0,L.regWeeks-done);
         tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>
           <div class="tile"><span>At their positions, since</span>${ranks(x,'rkPost')}<div class="lv-tx">rank among every NFL player there, ${ws.replace('wk ',n>1?'weeks ':'week ')}</div></div>
-          <div class="tile"><span>In wins, to ${esc(fl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">against own form ${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)} · ${left?f(wpw*left,1)+' over '+nOf(left,'week')+' left':'season over'}</div></div>`;}
+          <div class="tile"><span>In wins, to ${esc(fl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">${left?f(wpw*left,1)+' over the '+nOf(left,'week')+' left':'season over'}</div></div>`;}
       else tiles=`<div class="tile"><span>Points a game before</span><b>${f(x.aPre,1)} <i>v</i> ${f(x.bPre,1)}</b><div class="lv-tx">each side’s players, added up</div></div>
           <div class="tile"><span>At their positions, before</span>${ranks(x,'rkPre')}<div class="lv-tx">rank among every NFL player there, ${wb.replace('wk ',x.wk>2?'weeks ':'week ')}</div></div>
           <div class="tile"><span>In wins ${gl('war')}</span><b>—</b><div class="lv-tx">no games since the deal yet</div></div>`;
