@@ -1521,3 +1521,6 @@ body.lv-pg .lv-go{color:var(--brass)}
 /* Front Office: long cells (trade sides, a draft slot's seasons) wrap rather than widen the card */
 #front td.fo-w{white-space:normal;min-width:200px;font-size:12.5px}
 #front b.lv-steal,#front b.lv-bust,#tLivePk b.lv-steal,#tLivePk b.lv-bust{font:inherit;font-weight:700}
+/* a trade card's verdict, stated before the working */
+.lv-verdict{font-size:14px;padding:10px 12px;margin:0 0 14px;background:var(--brass-wash);border-left:3px solid var(--brass);border-radius:0}
+.lv-vlab{font:600 10px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);margin-right:6px}

@@ -5043,6 +5043,14 @@ glossify();
           <td class="num lv-rk lv-trx">${rkT}</td><td class="num lv-rk lv-trx">${stT}</td><td class="num">${chg(p.chg)}</td></tr>`;}).join('')}
         <tr class="lv-trs"><td>Side</td><td class="num">${f(sum(p=>p.pre),1)}</td><td class="num">${anyS?f(sum(pg),1):'—'}</td><td class="lv-trx"></td><td class="lv-trx"></td><td class="num">${chg(anyS?sum(p=>p.chg):null)}</td></tr></tbody></table></div></div>`;};
     const st=t=>L.standings.find(r=>r.team===t);
+    /* the call, stated first: who has won the deal so far, on points that counted (only the weeks each
+       player started for his new team). Everything below it is the working. */
+    const verdict=x=>{const n=x.weeksSince;
+      if(!n)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Too early to call: no games since the deal.</div>`;
+      const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n;
+      if(Math.abs(as-bs)<0.05)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Even so far: ${f(as,1)} points that counted a week each.</div>`;
+      const W=as>bs?x.ta:x.tb, hi=Math.max(as,bs), lo=Math.min(as,bs);
+      return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}winning the trade: <b>${f(hi,1)}</b> points that counted a week to <b>${f(lo,1)}</b>, about <b>${f((hi-lo)/PPW,2)}</b> wins a week, over the ${nOf(n,'week')} since.</div>`;};
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
       const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):'wk 1', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
       let tiles;
@@ -5051,7 +5059,7 @@ glossify();
         const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n, sl=as>=bs?x.ta:x.tb, wpw=Math.abs(as-bs)/PPW;
         tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>`+
           (x.lineups?`<div class="tile"><span>Points that counted, a week ${gl('started')}</span><b>${f(as,1)} <i>v</i> ${f(bs,1)}</b><div class="lv-tx">${esc(sl)} ${sg(Math.abs(as-bs),1)} · started weeks only</div></div>`:'')+`
-          <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${esc(fl)} ${sg(gap,1)} a game</div></div>
+          <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${esc(fl)} ${sg(gap,1)} a game${(()=>{const thin=x.a.concat(x.b).filter(p=>p.preG===1).map(p=>p.n.split(' ').slice(-1)[0]); return thin.length?` · ${thin.join(', ')}: one game before the deal`:'';})()}</div></div>
           <div class="tile"><span>In wins, to ${esc(sl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">${left?f(wpw*left,1)+' over the '+nOf(left,'week')+' left':'season over'}</div></div>`;}
       else tiles=`<div class="tile"><span>Points a game before</span><b>${f(x.aPre,1)} <i>v</i> ${f(x.bPre,1)}</b><div class="lv-tx">each side’s players, added up</div></div>
           <div class="tile"><span>Against own form ${gl('xform')}</span><b>—</b><div class="lv-tx">no games since the deal yet</div></div>
@@ -5064,6 +5072,7 @@ glossify();
     <div class="card-h"><h3>${esc(x.ta)} &harr; ${esc(x.tb)}</h3><span class="sub">${esc(x.d)} · counts from week ${x.wk}</span>
       <div class="right trmg">${esc(mg(x.ta))} <span class="dim">(${esc(x.ta)})</span> &harr; ${esc(mg(x.tb))} <span class="dim">(${esc(x.tb)})</span></div></div>
     <div class="card-b">
+      ${verdict(x)}
       <div class="lv-trg">${ledger(x.ta,x.a)}${ledger(x.tb,x.b)}</div>
       <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched. Started: weeks in the lineup, of weeks on the roster, before the deal for the old team and since for the new. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal.</p>
       <div class="tiles lv-trtiles">${tiles}</div>
