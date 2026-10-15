@@ -233,7 +233,25 @@ type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
 
 ## The live season (2026)
 
-`season2026.py` holds the live season typed from Brian's screenshots until Yahoo connects;
+**Yahoo is connected (15 Oct 2026).** Each week, after the games:
+
+```bash
+python3 yahoo_fetch.py 2026      # raw replies into yahoo_raw/2026 (gitignored cache)
+python3 yahoo_to_2026.py         # -> season2026_yahoo.py (generated, committed)
+python3 draft_points.py          # re-score every player from Sleeper for ranks and pools
+python3 export.py && python3 mksite.py
+```
+
+`season2026.py` imports `season2026_yahoo.py` at its bottom, so Yahoo's scores, projections,
+standings, moves, trades (with exact times) and weekly rosters replace the typed copy wherever
+Yahoo has them; the typed lists stay as the fallback, along with the two drafts and the contested
+waiver claims (not in Yahoo's API). Every typed game, pick, add, drop and trade matched Yahoo.
+Times are US Eastern; a move counts from the first Sunday 1:00 pm Eastern kickoff after it.
+`ROSTERS2026` (who started each week, Yahoo's official points) drives the trade cards'
+"Started" column and "Points that counted" tile. Yahoo reaches the league for 2021-2026 on
+Brian's account; 2015-2020 are not listed there.
+
+`season2026.py` holds the live season as typed from Brian's screenshots (now overridden by Yahoo, above);
 `check_2026.py` reconciles it (records, streaks, PF, PA, both drafts as snake orders).
 `export.py` writes it as `D.live`, kept OUT of rows/careers-by-season/champions, but its
 games DO count in head to head, career W-L/PF/PA/PPG/all-play and the search's game log.

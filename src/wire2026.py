@@ -5,18 +5,18 @@ Reads season2026.py (the moves, typed from Yahoo) and draft_points.json (every p
 week by week, scored with Deadshot's rules by draft_points.py). export.py calls grade() and puts
 the result on the page as D.live.wire.
 
-Without Yahoo's lineups it cannot know who was started, so "points" here are what a player
-scored while on that roster, started or benched. When Yahoo connects, this is the place to
-swap in points that counted.
+Points are what a player scored, started or benched. Since Yahoo connected (15 Oct 2026) each
+traded player also carries his lineup record from Yahoo's weekly rosters: weeks started and
+the points that counted, before the deal for the old team and since it for the new one.
 
 Which week a move counts from: every move is dated, not given a week, so a move counts from
-the first week whose Sunday-morning lock (10:00 on the clock in Brian's screenshots) is still
-ahead of it. A Tuesday pickup counts that week; a Sunday-afternoon one counts the next.
-Thursday games are not split out.
+the first week whose Sunday 1:00 pm Eastern kickoff is still ahead of it (times are Eastern, as
+Yahoo and Brian's screenshots show them). A Tuesday pickup counts that week; a Sunday-afternoon
+one counts the next. Thursday games are not split out.
 """
 import datetime as dt
 
-KICK1 = dt.datetime(2026, 9, 13, 10, 0)   # week 1's Sunday lock
+KICK1 = dt.datetime(2026, 9, 13, 13, 0)   # week 1's Sunday 1:00 pm Eastern kickoff
 
 def when(d, t='12:00 pm'):
     return dt.datetime.strptime(f'{d} 2026 {t}', '%b %d %Y %I:%M %p')
@@ -26,7 +26,7 @@ def week_of(ts):
     while ts >= KICK1 + dt.timedelta(days=7 * (w - 1)): w += 1
     return w
 
-TRADE_TIMES = {'Sep 15': '11:27 am', 'Sep 29': '2:32 pm', 'Oct 13': '12:43 pm'}
+TRADE_TIMES = {'Sep 15': '11:27 am', 'Sep 29': '2:32 pm', 'Oct 13': '12:43 pm'}   # used only if Yahoo's are missing
 
 def pos_rank(allwk, pos, mine, a, b):
     """where a points-a-game figure over weeks a..b ranks at a position, among every NFL player
@@ -64,7 +64,7 @@ def grade(S, wk, played, games=(), allwk=None):
     for i, (d, t, team, adds, drops) in enumerate(reversed(S.MOVES2026)):
         ev.append((when(d, t), 'move', (team, adds, drops, i)))
     for i, tr in enumerate(S.TRADES2026):
-        ev.append((when(tr[0], TRADE_TIMES.get(tr[0], '12:00 pm')), 'trade', (tr, i)))
+        ev.append((when(tr[0], (getattr(S, 'TRADETIMES', None) or TRADE_TIMES).get(tr[0], '12:00 pm')), 'trade', (tr, i)))
     ev.sort(key=lambda e: e[0])
     own, held, adds_out = {}, [], []
     def close(name, last):
@@ -113,8 +113,13 @@ def grade(S, wk, played, games=(), allwk=None):
     # trades: each side's players before the deal (points a game) and since (total)
     trades = []
     for d, ta, ga, tb, gb in S.TRADES2026:
-        w = week_of(when(d, TRADE_TIMES.get(d, '12:00 pm')))
-        def side(names):
+        w = week_of(when(d, (getattr(S, 'TRADETIMES', None) or TRADE_TIMES).get(d, '12:00 pm')))
+        def lineup(n, team, a, b):
+            """weeks a..b on team's roster: (weeks rostered, weeks started, points that counted)"""
+            rows = [r for r in getattr(S, 'ROSTERS2026', []) if r[2] == n and r[1] == team and a <= r[0] <= min(b, played)]
+            st = [r for r in rows if r[4] not in ('BN', 'IR')]
+            return len(rows), len(st), round(sum(r[5] or 0 for r in st), 2)
+        def side(names, to, frm):
             out = []
             for n in names:
                 pre, post = pts(n, 1, w - 1), pts(n, w, played); pos = S.TRADEPOS.get(n)
@@ -126,20 +131,26 @@ def grade(S, wk, played, games=(), allwk=None):
                                 chg=round(qq - pp, 2) if pp is not None and qq is not None else None,
                                 rkPre=pos_rank(allwk, pos, pp, 1, w - 1) if w > 1 else None,
                                 rkPost=pos_rank(allwk, pos, qq, w, played) if played >= w else None))
+                # from Yahoo's lineups: how often he started, and the points that counted
+                rb, sb_, pb_ = lineup(n, frm, 1, w - 1); ra, sa_, pa_ = lineup(n, to, w, played)
+                out[-1].update(rosB=rb, stB=sb_, stBpts=pb_, rosA=ra, stA=sa_, stApts=pa_)
             return out
         def form(t):
             b4, af = team_form(games, t, 1, w - 1), team_form(games, t, w, played)
             exp = round(b4['ap'] * af['g'], 2) if b4['ap'] is not None and af['g'] else None
             return dict(before=b4, since=af, xw=exp,
                         woe=round(af['w'] - exp, 2) if exp is not None else None)
-        A, B = side(ga), side(gb)
+        A, B = side(ga, ta, tb), side(gb, tb, ta)
         trades.append(dict(d=d, wk=w, ta=ta, tb=tb, a=A, b=B, weeksSince=max(0, played - w + 1),
                            aPost=round(sum(p['post'] for p in A), 2), bPost=round(sum(p['post'] for p in B), 2),
                            aPre=round(sum(p['pre'] or 0 for p in A), 2), bPre=round(sum(p['pre'] or 0 for p in B), 2),
                            # each side's players against their own form before the deal, a game, summed
                            aChg=round(sum(p['chg'] for p in A if p['chg'] is not None), 2) if played >= w else None,
                            bChg=round(sum(p['chg'] for p in B if p['chg'] is not None), 2) if played >= w else None,
-                           fa=form(ta), fb=form(tb)))
+                           fa=form(ta), fb=form(tb),
+                           # points that counted: started for the team that got them, since the deal
+                           aStarted=round(sum(p['stApts'] for p in A), 2), bStarted=round(sum(p['stApts'] for p in B), 2),
+                           lineups=bool(getattr(S, 'ROSTERS2026', None))))
 
     # how busy each team has been, and the claims that were fought over
     busy = {}

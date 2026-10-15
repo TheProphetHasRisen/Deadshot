@@ -182,6 +182,9 @@ const GLOSS={
    `<b>vs .500</b> here is how far above or below even a career sits: +17.6% means winning 67.6% of the time, 17.6 points clear of even.<br><br>`+
    `<b>Weeks above</b> walks each season week by week and asks whether the record was above even <i>at that moment</i>, not just where it finished. 8-6 wire to wire and 8-6 after a 1-5 start are the same record and completely different seasons.<br><br>`+
    `<b>vs winners</b> is the record against opponents who finished that season above .500.`,
+ started:`<b>Started, and points that counted</b><br>From Yahoo’s weekly lineups.<br><br>`+
+   `<b>3/4</b> means he was in the starting lineup 3 of the 4 weeks he was on that roster. Before the deal it counts his old team; since, his new one. Bench and injured reserve do not count as started.<br><br>`+
+   `<b>Points that counted</b> adds up only the weeks he started, a week since the deal. It is what the trade actually put on the scoreboard: a player who scores 20 on the bench adds nothing.`,
  xform:`<b>Change, against his own form</b><br>A traded player’s points a game since the deal, minus his points a game before it.<br><br>`+
    `<b>+10.5</b> means he is scoring 10.5 a game more for his new team than he was for his old one. A side’s figure adds up its players.<br><br>`+
    `Early in a season "before" can be a game or two, so one big or small week can swing it. Read it alongside his rank at the position.`,
@@ -4904,17 +4907,21 @@ glossify();
     const ledger=(t,a)=>{const pg=p=>p.postG?p.post/p.postG:null, sum=k=>a.reduce((s,p)=>s+(k(p)||0),0);
       const anyS=a.some(p=>p.postG);
       return `<div><div class="sub-h" style="margin:0 0 4px">&rarr; ${esc(t)}</div><div class="scroll"><table class="lv-trt">
-        <thead><tr><th>Player</th><th class="num">Before</th><th class="num">Since</th><th class="num">Rank at position</th><th class="num">Change ${gl('xform')}</th></tr></thead><tbody>${
+        <thead><tr><th>Player</th><th class="num">Before</th><th class="num">Since</th><th class="num lv-trx">Rank at position</th><th class="num lv-trx">Started ${gl('started')}</th><th class="num">Change ${gl('xform')}</th></tr></thead><tbody>${
         a.map(p=>{const rk=r=>r==null?'—':esc(p.pos)+r;
-          return `<tr><td>${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span></td><td class="num">${p.pre==null?'—':f(p.pre,1)}</td><td class="num">${pg(p)==null?'—':f(pg(p),1)}</td>
-          <td class="num lv-rk">${p.rkPre==null&&p.rkPost==null?'—':rk(p.rkPre)+(anyS?' <span class="dim">→</span> '+rk(p.rkPost):'')}</td><td class="num">${chg(p.chg)}</td></tr>`;}).join('')}
-        <tr class="lv-trs"><td>Side</td><td class="num">${f(sum(p=>p.pre),1)}</td><td class="num">${anyS?f(sum(pg),1):'—'}</td><td></td><td class="num">${chg(anyS?sum(p=>p.chg):null)}</td></tr></tbody></table></div></div>`;};
+          const rkT=p.rkPre==null&&p.rkPost==null?'—':rk(p.rkPre)+(anyS?' <span class="dim">→</span> '+rk(p.rkPost):'');
+          const stT=p.rosB==null?'—':(p.rosB?p.stB+'/'+p.rosB:'—')+(anyS?' <span class="dim">→</span> '+(p.rosA?p.stA+'/'+p.rosA:'—'):'');
+          return `<tr><td>${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span><div class="lv-trm"><span class="nw">${rkT}</span> <span class="nw"><span class="dim">· started</span> ${stT}</span></div></td><td class="num">${p.pre==null?'—':f(p.pre,1)}</td><td class="num">${pg(p)==null?'—':f(pg(p),1)}</td>
+          <td class="num lv-rk lv-trx">${rkT}</td><td class="num lv-rk lv-trx">${stT}</td><td class="num">${chg(p.chg)}</td></tr>`;}).join('')}
+        <tr class="lv-trs"><td>Side</td><td class="num">${f(sum(p=>p.pre),1)}</td><td class="num">${anyS?f(sum(pg),1):'—'}</td><td class="lv-trx"></td><td class="lv-trx"></td><td class="num">${chg(anyS?sum(p=>p.chg):null)}</td></tr></tbody></table></div></div>`;};
     const st=t=>L.standings.find(r=>r.team===t);
     $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
       const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):'wk 1', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
       let tiles;
       if(n){const aw=x.aPost/n, bw=x.bPost/n, pl=aw>=bw?x.ta:x.tb, fl=x.aChg>=x.bChg?x.ta:x.tb, gap=Math.abs(x.aChg-x.bChg), wpw=gap/PPW, left=Math.max(0,L.regWeeks-done);
-        tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>
+        const as=x.aStarted/n, bs=x.bStarted/n, sl=as>=bs?x.ta:x.tb;
+        tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>`+
+          (x.lineups?`<div class="tile"><span>Points that counted, a week ${gl('started')}</span><b>${f(as,1)} <i>v</i> ${f(bs,1)}</b><div class="lv-tx">${esc(sl)} ${sg(Math.abs(as-bs),1)} · started weeks only</div></div>`:'')+`
           <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${esc(fl)} ${sg(gap,1)} a game</div></div>
           <div class="tile"><span>In wins, to ${esc(fl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">${left?f(wpw*left,1)+' over the '+nOf(left,'week')+' left':'season over'}</div></div>`;}
       else tiles=`<div class="tile"><span>Points a game before</span><b>${f(x.aPre,1)} <i>v</i> ${f(x.bPre,1)}</b><div class="lv-tx">each side’s players, added up</div></div>
@@ -4929,7 +4936,7 @@ glossify();
       <div class="right trmg">${esc(mg(x.ta))} <span class="dim">(${esc(x.ta)})</span> &harr; ${esc(mg(x.tb))} <span class="dim">(${esc(x.tb)})</span></div></div>
     <div class="card-b">
       <div class="lv-trg">${ledger(x.ta,x.a)}${ledger(x.tb,x.b)}</div>
-      <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched until Yahoo’s lineups are in. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal.</p>
+      <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched. Started: weeks in the lineup, of weeks on the roster, before the deal for the old team and since for the new. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal.</p>
       <div class="tiles lv-trtiles">${tiles}</div>
       <div class="scroll"><table class="lv-trt lv-trteam"><thead><tr><th>Team</th><th>Now</th><th>Before (${wb})</th><th>Since${ws?' ('+ws+')':''}</th><th class="num">vs pace ${gl('xwin')}</th></tr></thead>
         <tbody>${row(x.ta,x.fa)}${row(x.tb,x.fb)}</tbody></table></div>

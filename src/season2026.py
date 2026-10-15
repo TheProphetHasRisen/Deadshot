@@ -258,3 +258,13 @@ TRADEPOS = {"Isaiah Likely":"TE","Rome Odunze":"WR","Colston Loveland":"TE","Ash
             "Kyren Williams":"RB","Tyler Warren":"TE","CeeDee Lamb":"WR","Matthew Golden":"WR","Bijan Robinson":"RB",
             "Dontayvion Wicks":"WR","Parker Washington":"WR","Jonathan Taylor":"RB","RJ Harvey":"RB","Jalen Coker":"WR",
             "Jeremiyah Love":"RB"}
+
+# Yahoo, once connected (15 Oct 2026): every game, draft pick, add, drop and trade typed above was
+# checked against it and matched. Where Yahoo has the data, its copy replaces the typed one here:
+# scores (with week 5's projections, which the screenshots lacked), standings, every move, the
+# trades with their exact times, and who started each week. The draft lists and the contested
+# waiver claims stay as typed. Re-pull with: python3 yahoo_fetch.py 2026 && python3 yahoo_to_2026.py
+try:
+    from season2026_yahoo import W2026, UPCOMING2026, STANDINGS2026_WK5, MOVES2026, TRADES2026, TRADETIMES, TRADEPOS, ROSTERS2026  # noqa: F401,E402
+except ImportError:
+    TRADETIMES, ROSTERS2026 = {}, []

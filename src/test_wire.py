@@ -35,7 +35,7 @@ def check(what, mine, theirs, tol=0.011):
     if not near(mine, theirs, tol): bad.append(f'{what}: expected {mine}, page has {theirs}')
 
 # a move counts from the first week whose Sunday 10:00 lock is still ahead of it
-LOCKS = [dt.datetime(2026, 9, 13, 10) + dt.timedelta(weeks=k) for k in range(20)]
+LOCKS = [dt.datetime(2026, 9, 13, 13) + dt.timedelta(weeks=k) for k in range(20)]   # Sunday 1 pm Eastern
 def week_of(d, t):
     ts = dt.datetime.strptime(f'{d} 2026 {t}', '%b %d %Y %I:%M %p')
     return next(i + 1 for i, lk in enumerate(LOCKS) if ts < lk)
@@ -58,7 +58,7 @@ def form(t, a, b):
         w += me > op; l += me < op
     return w, l, (sum(pts) / len(pts) if pts else None), (beat / faced if faced else None), len(pts)
 
-times = {'Sep 15': '11:27 am', 'Sep 29': '2:32 pm', 'Oct 13': '12:43 pm'}
+times = getattr(S, 'TRADETIMES', None) or {'Sep 15': '11:27 am', 'Sep 29': '2:32 pm', 'Oct 13': '12:43 pm'}
 assert len(W['trades']) == len(S.TRADES2026)
 for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
     w = week_of(d, times[d]); check(f'{d} trade week', w, T['wk'], 0)
@@ -73,8 +73,17 @@ for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
             check(f'{d} {n} rank before', rank(pos, pre, 1, w - 1) if w > 1 else None, P['rkPre'], 0)
             check(f'{d} {n} rank since', rank(pos, post, w, played) if played >= w else None, P['rkPost'], 0)
             chg += mine_c or 0; tot += s
+            # lineups, straight from Yahoo's weekly rosters
+            frm, to = (tb, ta) if key == 'a' else (ta, tb)
+            R = [r for r in getattr(S, 'ROSTERS2026', []) if r[2] == n]
+            bef = [r for r in R if r[1] == frm and r[0] < w]; aft = [r for r in R if r[1] == to and w <= r[0] <= played]
+            st = lambda rs: [r for r in rs if r[4] not in ('BN', 'IR')]
+            for k, v in (('rosB', len(bef)), ('stB', len(st(bef))), ('rosA', len(aft)), ('stA', len(st(aft))),
+                         ('stApts', sum(r[5] or 0 for r in st(aft)))):
+                check(f'{d} {n} {k}', v, P[k], 0.011)
         check(f'{d} side {key} against own form', chg if played >= w else None, T[key + 'Chg'], 0.05)
         check(f'{d} side {key} points since', tot, T[key + 'Post'], 0.05)
+        check(f'{d} side {key} points that counted', sum(sum(r[5] or 0 for r in getattr(S, 'ROSTERS2026', []) if r[2] == n and r[1] == (ta if key == 'a' else tb) and w <= r[0] <= played and r[4] not in ('BN', 'IR')) for n in names), T[key + 'Started'], 0.05)
     for key, t in (('a', ta), ('b', tb)):
         F = T['f' + key]
         bw, bl, bp, bap, bg = form(t, 1, w - 1); aw, al, ap_, aap, ag = form(t, w, played)
@@ -118,4 +127,4 @@ if bad:
     print('TRADE AND WAIVER GRADES DO NOT MATCH a second working:'); [print('  ' + b) for b in bad[:40]]
     sys.exit(1)
 print(f'OK - 2026 grades match a second working ({len(W["trades"])} trades, every player, both teams each side, '
-      f'{min(15, len(mine))} top pickups, and ranks)')
+      f'{min(15, len(mine))} top pickups, ranks and lineups)')
