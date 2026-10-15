@@ -1491,3 +1491,7 @@ body.lv-pg .lv-go{color:var(--brass)}
 .lv-fxi{width:17px;height:17px;border-radius:3px;vertical-align:-4px;margin:0 2px 0 3px}
 .lv-fxi-b{box-shadow:0 0 0 1px color-mix(in srgb,var(--neg) 55%,transparent),0 0 7px color-mix(in srgb,var(--neg) 45%,transparent)}
 .lv-fxi-s{box-shadow:0 0 0 1px color-mix(in srgb,var(--pos) 55%,transparent),0 0 7px color-mix(in srgb,var(--pos) 45%,transparent)}
+/* 2026 trades, graded: each side's players stack, and the long cells wrap */
+.lv-trt td.lv-trc{white-space:normal;min-width:220px;vertical-align:top}
+.lv-trt td.lv-trv{min-width:180px;max-width:260px}
+.lv-trp{margin-top:3px;font-size:12.5px}

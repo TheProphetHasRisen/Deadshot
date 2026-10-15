@@ -305,11 +305,17 @@ if S26:
         m['winpct'] = (m['w'] + m['t'] / 2) / m['g']
         if m.get('apW') is not None:
             m['apW'] += r['apW']; m['apL'] += r['apL']; m['apPct'] = m['apW'] / (m['apW'] + m['apL'])
+    def _wire():
+        if not os.path.exists('draft_points.json'): return None
+        import wire2026; dp = json.load(open('draft_points.json'))
+        return wire2026.grade(S26, dp.get('wk2026') or {}, int(dp['weeks']['2026']))
     up = [dict(wk=wk, ta=a, pa=pa_, tb=b, pb=pb_) for wk, lst in S26.UPCOMING2026.items() for (a, pa_, b, pb_) in lst]
     out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
                        trades=[dict(d=d, ta=a, ga=ga, tb=b, gb=gb) for (d, a, ga, b, gb) in S26.TRADES2026],
                        draft={'2026': [list(p) for p in S26.DRAFT2026], '2025': [list(p) for p in S26.DRAFT2025]},
                        asOf='Oct 14, 2026',
+                       # trades and the waiver wire graded by what each player has scored since (wire2026.py)
+                       wire=_wire(),
                        # every drafted player's points under league scoring, and his finish at his position
                        draftPts=(json.load(open('draft_points.json')) if os.path.exists('draft_points.json') else None))
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)

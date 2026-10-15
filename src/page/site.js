@@ -4867,8 +4867,34 @@ glossify();
   };
   drawWk();
   /* trades */
-  $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
-  $('#tLiveTr').innerHTML='<tbody>'+L.trades.slice().reverse().map(x=>`<tr><td class="dim">${esc(x.d)}</td><td><b>${esc(x.ta)}</b> got ${esc(x.ga.join(', '))}<br><b>${esc(x.tb)}</b> got ${esc(x.gb.join(', '))}</td></tr>`).join('')+'</tbody>';
+  /* trades and the waiver wire, graded by what each player has scored since (wire2026.py). Points
+     are what a player scored while on the roster, started or benched: Yahoo's lineups are not in yet */
+  const WR=L.wire;
+  if(WR){
+    const wks=n=>nOf(n,'week'), pl=(n,pos)=>`${esc(n)} <span class="lv-pos">${esc(pos||'')}</span>`;
+    $('#lvTrSub').textContent=nOf(L.trades.length,'trade')+' · each player’s points a game before the deal, and his points since';
+    const sideH=(t,a)=>`<b>${esc(t)}</b> <span class="dim">${esc(mg(t))}</span> got`+a.map(p=>`<div class="lv-trp">${pl(p.n,p.pos)} <span class="dim">${p.pre==null?'no games before':f(p.pre,1)+' a game before'}</span>${p.postG?` · <b>${f(p.post,1)}</b> <span class="dim">since</span>`:''}</div>`).join('');
+    $('#tLiveTr').innerHTML='<tbody>'+WR.trades.slice().reverse().map(x=>{
+      let v;
+      if(x.weeksSince){const lead=x.aPost>=x.bPost?x.ta:x.tb; v=`<b>${esc(lead)}</b> ahead by ${f(Math.abs(x.aPost-x.bPost),1)} points in the ${wks(x.weeksSince)} since: ${f(x.aPost,1)} to ${f(x.bPost,1)}.`;}
+      else v=`No games since. Before the deal, ${esc(x.ta)}’s side was scoring ${f(x.aPre,1)} a week and ${esc(x.tb)}’s ${f(x.bPre,1)}.`;
+      return `<tr><td class="dim">${esc(x.d)}<br><span class="lv-ov">from week ${x.wk}</span></td><td class="lv-trc">${sideH(x.ta,x.a)}</td><td class="lv-trc">${sideH(x.tb,x.b)}</td><td class="lv-trc lv-trv">${v}</td></tr>`;}).join('')+'</tbody>';
+    const thru=`weeks 1–${WR.played}`;
+    $('#lvPkSub').textContent='Points he scored for the team that added him, started or not · '+thru;
+    $('#tLivePk').innerHTML='<thead><tr><th>Player</th><th>Added by</th><th>When</th><th class="num">Weeks</th><th class="num">Points</th></tr></thead><tbody>'+
+      WR.picks.filter(p=>p.g).slice(0,10).map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span> <span class="dim">${esc(p.nfl)}</span></td><td>${esc(p.team)} <span class="dim">${esc(mg(p.team))}</span></td><td class="dim">${esc(p.d)} · ${p.how==='W'?'claim':'free agent'}${p.until!=null?' · dropped after week '+p.until:''}</td><td class="num">${p.g}</td><td class="num"><b>${f(p.pts,1)}</b></td></tr>`).join('')+'</tbody>';
+    $('#lvGoSub').textContent='Dropped, then kept scoring · points since the drop, '+thru;
+    $('#tLiveGo').innerHTML='<thead><tr><th>Player</th><th>Dropped by</th><th>When</th><th>Now with</th><th class="num">Points since</th></tr></thead><tbody>'+
+      WR.gone.filter(p=>p.g).slice(0,10).map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span> <span class="dim">${esc(p.nfl)}</span></td><td>${esc(p.team)} <span class="dim">${esc(mg(p.team))}</span></td><td class="dim">${esc(p.d)}</td><td>${p.to?esc(p.to):'<span class="dim">nobody</span>'}</td><td class="num"><b>${f(p.pts,1)}</b></td></tr>`).join('')+'</tbody>';
+    $('#tLiveBusy').innerHTML='<thead><tr><th>Team</th><th class="num">Adds</th><th class="num">Drops</th><th class="num">Waiver claims</th></tr></thead><tbody>'+
+      WR.busy.map(b=>`<tr><td>${esc(b.team)} <span class="dim">${esc(mg(b.team))}</span></td><td class="num">${b.adds}</td><td class="num">${b.drops}</td><td class="num">${b.claims}</td></tr>`).join('')+'</tbody>';
+    $('#tLiveCl').innerHTML='<thead><tr><th>Fought over</th><th>Won by</th><th>Beat</th></tr></thead><tbody>'+
+      WR.claims.map(c=>`<tr><td><b>${esc(c.n)}</b> <span class="dim">${esc(c.d)}</span></td><td>${esc(c.team)} <span class="dim">priority ${c.pr}</span></td><td>${c.lost.map(l=>`${esc(l.team)} <span class="dim">(${l.pr})</span>`).join(', ')}</td></tr>`).join('')+'</tbody>';
+    ['#tLivePk','#tLiveGo','#tLiveBusy','#tLiveCl'].forEach(s=>fillEmpty($(s)));
+  }else{
+    $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
+    $('#tLiveTr').innerHTML='<tbody>'+L.trades.slice().reverse().map(x=>`<tr><td class="dim">${esc(x.d)}</td><td><b>${esc(x.ta)}</b> got ${esc(x.ga.join(', '))}<br><b>${esc(x.tb)}</b> got ${esc(x.gb.join(', '))}</td></tr>`).join('')+'</tbody>';
+  }
   /* the draft: one column per team in draft order, one row per round */
   /* ---- the draft: in draft order or by team, any mix of positions, and how each pick turned out ---- */
   let dy=String(L.year), view='order';
@@ -4876,13 +4902,15 @@ glossify();
   const DP=L.draftPts||{};
   /* the one or two biggest steals and busts at each position, called out on the board */
   const tops=J=>{const by={}; Object.entries(J).forEach(([pk,v])=>{if(v.fr==null)return; (by[v.pos]=by[v.pos]||[]).push({pk:+pk,...v});});
-    const t={}; Object.values(by).forEach(a=>{a.filter(x=>x.steal).sort((x,y)=>y.d-x.d).slice(0,2).forEach(x=>{t[x.pk]='STEAL';});
-      a.filter(x=>x.bust).sort((x,y)=>x.d-y.d).slice(0,2).forEach(x=>{t[x.pk]='BUST';});}); return t;};
+    /* ranked by places moved, weighed by how early: an RB7 falling to RB53 outranks an RB40 falling to RB108 */
+    const N={QB:3,TE:3,RB:5,WR:5,K:2,DEF:2};
+    const t={}; Object.entries(by).forEach(([pos,a])=>{a.filter(x=>x.steal).sort((x,y)=>y.d/Math.sqrt(y.fr)-x.d/Math.sqrt(x.fr)).slice(0,N[pos]||2).forEach(x=>{t[x.pk]='STEAL';});
+      a.filter(x=>x.bust).sort((x,y)=>x.d/Math.sqrt(x.dr)-y.d/Math.sqrt(y.dr)).slice(0,N[pos]||2).forEach(x=>{t[x.pk]='BUST';});}); return t;};
   const judge=P=>{   /* drafted as the Nth at his position, finished Mth: steal, bust or neither */
     const n={}, out={}; const pts=DP[dy]||{};
     P.slice().sort((a,b)=>a[0]-b[0]).forEach(p=>{n[p[4]]=(n[p[4]]||0)+1; const v=pts[p[2]]||[null,null];
       const dr=n[p[4]], fr=v[1], d=fr==null?null:dr-fr;
-      out[p[0]]={pos:p[4],dr,fr,pts:v[0],d,steal:d!=null&&fr<dr&&(d>=8||(fr*2<=dr&&d>=3)),bust:d!=null&&fr>dr&&dr<=36&&(-d>=12||(fr>=dr*2.5&&-d>=6))};});
+      out[p[0]]={pos:p[4],dr,fr,pts:v[0],d,steal:d!=null&&fr<dr&&(d>=6||(fr*2<=dr&&d>=3)),bust:d!=null&&fr>dr&&dr<=40&&(-d>=10||(fr>=dr*2&&-d>=5))};});
     return out;};
   const drawDr=()=>{
     $('#lvDy').innerHTML=Object.keys(L.draft).sort().reverse().map(y=>`<button data-dy="${y}" class="${y===dy?'on':''}">${y}</button>`).join('')+
@@ -4922,7 +4950,7 @@ glossify();
     const ln=x=>`<tr><td><b>${esc(x.p[2])}</b> <span class="dim">${esc(x.p[1])}</span></td><td class="num">pick ${x.p[0]} · ${x.p[4]}${x.v.dr}</td><td class="num"><b>${x.p[4]}${x.v.fr}</b></td><td class="num">${f(x.v.pts,1)}</td></tr>`;
     const tp={}; P.forEach(p=>{const v=J[p[0]]; if(v.pts!=null&&(!on.size||on.has(p[4])))tp[p[1]]=(tp[p[1]]||0)+v.pts;});
     const tr=Object.entries(tp).sort((a,b)=>b[1]-a[1]);
-    $('#lvSbHow').textContent='How a pick is judged: each player is ranked at his position by the order he was drafted (the 12th running back taken is RB12) and again by the points he scored under Deadshot\u2019s scoring, against every player in the NFL at that position. A steal finished well above where he was taken: 8 or more places, or twice as high. A bust was a top-36 pick at his position who finished 12 or more places below it, or two and a half times as low. Kickers and defenses are judged the same way. The board names the top one or two of each at every position.';
+    $('#lvSbHow').textContent='How a pick is judged: each player is ranked at his position by the order he was drafted (the 12th running back taken is RB12) and again by the points he scored under Deadshot\u2019s scoring, against every player in the NFL at that position. A steal finished well above where he was taken: 6 or more places, or twice as high. A bust was a top-40 pick at his position who finished 10 or more places below it, or twice as low. Kickers and defenses are judged the same way. The board marks the biggest of each at every position (five at running back and receiver, three at quarterback and tight end, two at kicker and defense), and a fall from an early pick counts for more than the same fall from a late one.';
     $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs finished at his position';
     $('#tLiveSb').innerHTML=`<thead><tr><th>Steals</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${st.map(ln).join('')}</tbody>`+
       `<thead><tr><th>Busts</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th></tr></thead><tbody>${bu.map(ln).join('')}</tbody>`+

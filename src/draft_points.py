@@ -69,13 +69,14 @@ for pick, team, name, nfl, pos in S.DRAFT2025 + S.DRAFT2026:   # score and rank 
 
 out = {}
 for y, weeks in SEASONS.items():
-    tot = {}
+    tot, wk = {}, {}
     for w in weeks:
         print(y, 'week', w); st = get(f'https://api.sleeper.app/v1/stats/nfl/regular/{y}/{w}')
         for pid, s in st.items():
             pos = 'DEF' if pid.isalpha() else pos_of.get(pid, '')
             if pos in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF'):
-                tot[pid] = tot.get(pid, 0) + score(s, pos)
+                v = score(s, pos); tot[pid] = tot.get(pid, 0) + v
+                wk.setdefault(pid, {})[w] = round(v, 2)
     rank_pos = {}
     for pid, pts in tot.items():
         pos = 'DEF' if pid.isalpha() else pos_of[pid]
@@ -97,6 +98,26 @@ for y, weeks in SEASONS.items():
         res[name] = [round(tot.get(pid, 0.0), 2), rk.get(pid)]
     if miss: print('  NOT MATCHED', y, miss)
     out[str(y)] = res
+    if y == max(SEASONS):
+        # week by week for everyone drafted, traded, added or dropped this season: what grades the
+        # trades and the waiver wire. None means no stats that week (a bye, hurt, or inactive).
+        names = {(n, nfl, pos) for _, _, n, nfl, pos in draft}
+        for _, _, _, adds, drops in S.MOVES2026:
+            names |= {(a[0], a[1], a[2]) for a in adds} | {(d[0], d[1], d[2]) for d in drops}
+        for t in S.TRADES2026:
+            names |= {(n, None, S.TRADEPOS[n]) for n in t[2] + t[4]}
+        per, miss = {}, []
+        for n, nfl, pos in sorted(names, key=lambda x: (x[0], x[1] or '')):
+            if n in per: continue
+            if pos == 'DEF': pid = nfl
+            else:
+                ids = by_name.get((norm(ALIAS.get(n, n)), pos), [])
+                if len(ids) > 1: ids = [i for i in ids if i in tot] or ids
+                pid = ids[0] if ids else None
+            if not pid: miss.append(n); continue
+            per[n] = [wk.get(pid, {}).get(w) for w in weeks]
+        if miss: print('  NO WEEKLY LINE', miss)
+        out['wk' + str(y)] = per
 out['weeks'] = {str(y): max(w) for y, w in SEASONS.items()}
 json.dump(out, open('draft_points.json', 'w'), indent=1)
 print('wrote draft_points.json')
