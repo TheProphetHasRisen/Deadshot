@@ -395,6 +395,14 @@ def front_office(H, keep):
                 draftByMgr=[dict(m=m, y=y, val=round(sum(d['val'] or 0 for d in draft if d['m'] == m and d['y'] == y), 1))
                             for m in mgrs for y in YEARS if any(d['m'] == m and d['y'] == y for d in draft)],
                 slots=[dict(slot=k, seasons=v) for k, v in sorted(slots.items())],
+                # for the season pages: each finished season's whole draft, its best pickups and its
+                # drops that came back. Draft rows: [pick, round, slot, manager, player, pos, taken, rank, starts, counted]
+                drafts={y: [[d['pick'], d['rnd'], d['slot'], d['m'], d['n'], d['pos'], d['taken'], d['rank'], d['starts'], d['counted']]
+                            for d in draft if d['y'] == y] for y in fin},
+                yPicks={y: sorted([p for p in H[y][1]['picks_list'] if skill(p) and p['starts'] and p['val'] is not None],
+                                  key=lambda p: -p['val'])[:10] for y in fin},
+                yGone={y: [g for g in starters_gone(H[y][1]['gone_list']) if skill(g)][:10] for y in fin},
+                yLeague={y: {k: v for k, v in H[y][1].items() if k in ('avg', 'sd', 'ppw', 'eff', 'moves', 'trades', 'weeks')} for y in fin},
                 loyal=list(best_owner.values())[:30])
 
 if __name__ == '__main__':

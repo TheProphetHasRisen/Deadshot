@@ -1589,7 +1589,10 @@ $('#board').innerHTML=D.champs.map(c=>`<button class="plate${c.co?' split':''}" 
   <div class="tm">${c.teams.map(esc).join(' / ')}</div>
   <div class="meta">${c.co?'Title split · final voided':`${c.spots}-team bracket · ${c.n} teams`}</div></button>`).join('');
 $$('#board .plate').forEach(b=>b.onclick=()=>{
-  const y=+b.dataset.y, c=D.champs.find(x=>x.y===y);
+  const y=+b.dataset.y;
+  /* every year opens its own page (the season pages, further down); the bracket on it traces the winner's run */
+  if(typeof openSeason==='function'){openSeason(y);return;}
+  const c=D.champs.find(x=>x.y===y);
   LOCKTEAM=c?c.teams[0]:null;
   drawSeason(y);
   $('#seasons').scrollIntoView({behavior:'smooth'});
@@ -2951,8 +2954,8 @@ addEventListener('load',()=>setTimeout(a11yTables,80));
 /* Any card marked data-collapse gets a Hide/Show control in its header. Add
    data-collapse-also="#id" when related content sits outside the card, as the trade
    grid does. data-collapse="closed" starts it shut; default is open. */
-(function(){
-  $$('.card[data-collapse]').forEach(card=>{
+function makeCollapsible(card){
+    if(card.dataset.collapseBound)return; card.dataset.collapseBound='1';
     const head=card.querySelector('.card-h'); if(!head)return;
     const wrap=document.createElement('div');
     [...card.children].filter(c=>c!==head).forEach(c=>wrap.appendChild(c));
@@ -2972,8 +2975,8 @@ addEventListener('load',()=>setTimeout(a11yTables,80));
     btn.onclick=()=>{wrap.hidden=!wrap.hidden;sync();};
     wrap.hidden=(card.getAttribute('data-collapse')==='closed');
     sync();
-  });
-})();
+}
+$$('.card[data-collapse]').forEach(makeCollapsible);
 /* ---- Shareable manager card -------------------------------------------------
    Draws a square PNG on a canvas and hands it to the phone's share sheet, which on
    iOS puts it straight into iMessage. Falls back to a download on desktop browsers
@@ -4925,6 +4928,86 @@ function pharaoh(){
     ['#tFoPick','#tFoPickKD','#tFoGone','#tFoTrades','#tFoSteal','#tFoBust','#tFoLoyal'].forEach(k=>fillEmpty($(k)));
   }
   drawFO(); REDRAW.push(drawFO);
+})();
+/* ============ season pages: every finished season on a page of its own, like 2026 ============
+   The record book's own standings, bracket and schedule for that year (the Seasons section's panes,
+   moved onto the page while it is open and put back after), then from 2021, when Yahoo starts:
+   every manager's season, every trade graded, the best pickups, the drops that came back, the draft. */
+let openSeason=null;
+(()=>{const V=$('#syView'); if(!V)return;
+  const SP=$('#seasonPane'), SC=$('#schedPane'), back=document.createComment('season panes go back here');
+  SP.before(back);
+  const FO=D.live&&D.live.files&&D.live.files.fo, LIVEY=D.live?D.live.year:null;
+  const sel=$('#lvSegYear');
+  if(sel){sel.innerHTML='<option value="">Seasons</option>'+(LIVEY?`<option value="${LIVEY}">${LIVEY} (live)</option>`:'')+SEA.slice().reverse().map(y=>`<option value="${y}">${y}</option>`).join('');}
+  let cur=null;
+  const last=n=>n.split(' ').slice(-1)[0], ud=v=>`<b class="${v>=0?'lv-steal':'lv-bust'}">${sg(v,1)}</b>`;
+  const card=(id,title,sub,inner,gl)=>`<div class="card" data-collapse id="${id}"><div class="card-h"><h3>${title}</h3>${gl?`<span class="gl" data-gl="${gl}" tabindex="0">?</span>`:''}${sub?`<span class="sub">${sub}</span>`:''}</div>${inner}</div>`;
+  function yahooCards(y){
+    if(!FO||!FO.finished.includes(y))return card('syNoY','From 2021 on','',`<div class="card-b"><p class="plain" style="margin:0">Lineups, pickups, drops, trades and the draft come from Yahoo, which reaches back to ${FO?FO.years[0]:2021}. ${y} has its standings, bracket${D.wk&&D.wk[y]?' and schedule':''} above.</p></div>`);
+    const team=m=>{const r=ROWS.find(r=>r.y===y&&r.mgr===m); return r?r.team:'';};
+    const ms=Object.keys(FO.mgrs).filter(m=>FO.mgrs[m][y]);
+    const rows=ms.map(m=>({m,...FO.mgrs[m][y]})).sort((a,b)=>b.w-a.w||b.pf-a.pf);
+    let h=card('syMgr',`The managers in ${y}`,'Regular season · everything Yahoo has on how each team was run',`<div class="scroll"><table><thead><tr><th>Manager</th><th class="num">Record</th><th class="num">All-play</th><th class="num">Wins above average</th><th class="num">Lineup efficiency</th><th class="num">Left on bench, a week</th><th class="num">Lost to the lineup</th><th class="num">Adds</th><th class="num">Pickup value</th><th class="num">Trades won–lost</th><th class="num">Patience</th></tr></thead><tbody>${
+      rows.map(r=>`<tr><td>${mlink(r.m)} <span class="dim">${esc(team(r.m))}</span></td><td class="num">${r.w}–${r.l}</td><td class="num">${pct(r.ap)}</td><td class="num">${sg(r.waa,1)}</td><td class="num">${pct(r.eff)}</td><td class="num">${f(r.left,1)}</td><td class="num">${r.lost_lineup}</td><td class="num">${r.adds}</td><td class="num">${sg(r.pk_val||0,0)}</td><td class="num">${r.trade_w}–${r.trade_l}</td><td class="num">${r.patience==null?'—':f(r.patience,1)}</td></tr>`).join('')}</tbody></table></div>`,'waa');
+    const T=FO.trades.filter(t=>t.y===y);
+    const side=s=>`<div><div class="sub-h" style="margin:0 0 6px">&rarr; ${esc(s.team)}</div>${s.got.map(p=>`<div style="font-size:13px">${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span><div class="dim" style="font-size:11.5px;margin-bottom:5px">${p.starts?nOf(p.starts,'start')+', '+f(p.counted,1)+' points that counted':'never started for them'}</div></div>`).join('')}</div>`;
+    h+=card('syTr',`Trades in ${y}, graded`,nOf(T.length,'trade')+' · points that counted for each side from the deal to the end of the regular season','',
+      'started')+`<div class="sy-trades" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:20px;margin-top:20px">${T.slice().reverse().map(t=>{
+        const w=t.a.counted===t.b.counted?null:t.a.counted>t.b.counted?t.a:t.b;
+        return `<div class="card" style="margin-top:0"><div class="card-h"><h3>${esc(t.a.team)} &harr; ${esc(t.b.team)}</h3><span class="sub">${esc(t.d)}</span>
+          <div class="right trmg">${esc(t.a.m)} &harr; ${esc(t.b.m)}</div></div>
+          <div class="card-b"><div class="lv-verdict"><span class="lv-vlab">Verdict</span> ${w?`<b>${esc(w.team)}</b> (${esc(w.m)}) won it: <b>${f(w.counted,1)}</b> points that counted to <b>${f(w===t.a?t.b.counted:t.a.counted,1)}</b>.`:'Even.'}</div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px">${side(t.a)}${side(t.b)}</div></div></div>`;}).join('')}</div>`;
+    const P=FO.yPicks[y]||[], G=FO.yGone[y]||[];
+    h+=card('syPk',`Best pickups of ${y}`,'Value at his position, in the weeks he started',`<div class="scroll"><table><thead><tr><th>Player</th><th>Manager</th><th>Added</th><th class="num">Starts</th><th class="num">Points that counted</th><th class="num">Value at position</th><th class="num">Finished</th></tr></thead><tbody>${
+      P.map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span></td><td>${esc(p.m)}</td><td class="dim">${esc(p.d)} · ${p.how}</td><td class="num">${p.starts}</td><td class="num">${f(p.pts,1)}</td><td class="num">${ud(p.val)}</td><td class="num">${p.rank?esc(p.pos.split(',')[0])+p.rank:'—'}</td></tr>`).join('')}</tbody></table></div>`,'val');
+    h+=card('syGo',`Drops that came back, ${y}`,'Cut, then finished the season as a starter at his position',`<div class="scroll"><table><thead><tr><th>Player</th><th>Dropped by</th><th>When</th><th class="num">Held</th><th class="num">Finished</th><th class="num">Points that counted for others</th><th>For</th></tr></thead><tbody>${
+      G.map(g=>`<tr><td><b>${esc(g.n)}</b> <span class="lv-pos">${esc(g.pos)}</span></td><td>${esc(g.m)}</td><td class="dim">${esc(g.d)}</td><td class="num">${nOf(g.held,'wk')}</td><td class="num"><b>${esc(g.pos.split(',')[0])}${g.rank}</b></td><td class="num">${f(g.counted,1)}</td><td>${g.to.map(esc).join(', ')||'<span class="dim">nobody</span>'}</td></tr>`).join('')}</tbody></table></div>`);
+    /* the draft, pick by pick: drafted as the Nth at his position, finished Mth. A steal finished 6+ places
+       higher (or twice as high); a bust was a top-40 pick at his position who finished 10+ places lower */
+    const LIST={QB:50,RB:100,WR:100,TE:75,K:50,DEF:50};
+    const DR=FO.drafts[y]||[];
+    h+=card('syDr',`The ${y} draft`,'In draft order · where each pick was taken at his position and where he finished',`<div class="scroll"><table class="lv-draft"><thead><tr><th>Pick</th><th>Manager</th><th>Player</th><th class="num">Taken</th><th class="num">Finished</th><th class="num">Starts for him</th><th class="num">Points that counted</th></tr></thead><tbody>${
+      DR.map(([pk,rnd,slot,m,n,pos,tk,rk,st,ct])=>{const fin=rk||LIST[pos]+1, d=tk-fin;
+        const steal=rk&&rk<tk&&(d>=6||(rk*2<=tk&&d>=3)), bust=fin>tk&&tk<=40&&(-d>=10||(fin>=tk*2&&-d>=5));
+        return `<tr class="${slot===1&&rnd>1?'lv-rd':''}"><td class="dim">${rnd}.${String(slot).padStart(2,'0')}</td><td>${esc(last(m))}</td><td><b>${esc(n)}</b></td><td class="num"><span class="lv-pos">${pos}${tk}</span></td>
+          <td class="num"><span class="${steal?'lv-steal':bust?'lv-bust':'lv-fin'}">${steal?'▲ ':bust?'▼ ':''}${rk?pos+rk:'outside top '+LIST[pos]}</span></td><td class="num">${st}</td><td class="num">${f(ct,1)}</td></tr>`;}).join('')}</tbody></table></div>`,'slotx');
+    const LG=FO.yLeague&&FO.yLeague[y];
+    if(LG)h+=card('syLg',`The league in ${y}`,'',`<div class="card-b"><div class="tiles" style="margin:0">
+      <div class="tile"><b>${f(LG.avg,1)}</b><span>Average score</span></div><div class="tile"><b>${f(LG.sd,1)}</b><span>Spread</span></div>
+      <div class="tile"><b>${LG.ppw?f(LG.ppw,0):'—'}</b><span>Points per win</span></div><div class="tile"><b>${pct(LG.eff)}</b><span>Lineup efficiency</span></div>
+      <div class="tile"><b>${f(LG.moves,1)}</b><span>Adds per team</span></div><div class="tile"><b>${LG.trades}</b><span>Trades</span></div></div></div>`);
+    return h;}
+  function setSeg(){const b=$('#lvSegBook'), l=$('#lvSegLive'); if(b)b.classList.toggle('on',!cur&&!document.body.classList.contains('lv-pg')); if(l&&cur)l.classList.remove('on'); if(sel)sel.value=cur?String(cur):'';}
+  function close(){
+    if(!cur)return; cur=null; V.hidden=true; document.body.classList.remove('sy-pg');
+    back.after(SP,SC); tabTitle('');
+    if(/^#\d{4}$/.test(location.hash)&&location.hash!=='#'+LIVEY)history.replaceState(null,'',location.pathname+location.search);
+    setSeg();}
+  openSeason=y=>{
+    y=+y; if(!y)return;
+    if(LIVEY&&y===LIVEY){close(); const l=$('#lvSegLive'); if(l&&l.onclick)l.onclick(); return;}
+    if(!SEA.includes(y))return;
+    if(document.body.classList.contains('lv-pg')){const b=$('#lvSegBook'); if(b&&b.onclick)b.onclick();}
+    cur=y; V.hidden=false; document.body.classList.add('sy-pg');
+    $('#syPanes').append(SP,SC);
+    const c=D.champs.find(x=>x.y===y), rs=ROWS.filter(r=>r.y===y), pl=n=>rs.find(r=>r.place===n);
+    LOCKTEAM=c?c.teams[0]:null; drawSeason(y);
+    $('#syH').textContent=String(y);
+    $('#syNote').innerHTML=`${rs.length} teams · ${c?c.spots:'?'}-team bracket<br>${FO&&FO.finished.includes(y)?'standings, bracket, schedule and Yahoo':'standings and bracket'}`;
+    $('#syLede').innerHTML=c?`<b>${c.teams.map(esc).join(' &amp; ')}</b> (${c.mgrs.map(esc).join(' &amp; ')}) ${c.co?'shared the title':'won it'}${pl(2)&&!c.co?`, over ${esc(pl(2).team)} (${esc(pl(2).mgr)})`:''}${pl(3)?`; ${esc(pl(3).team)} (${esc(pl(3).mgr)}) took third`:''}.`:'';
+    $('#syYahoo').innerHTML=yahooCards(y);
+    $$('#syView .card[data-collapse]').forEach(makeCollapsible);
+    const tc=$('#syTr'); if(tc){const g=tc.nextElementSibling; if(g&&g.classList.contains('sy-trades')){g.id='syTrGrid'; tc.setAttribute('data-collapse-also','#syTrGrid');}}
+    $$('#syPanes .card').forEach(k=>{if(!k.hasAttribute('data-collapse')){k.setAttribute('data-collapse','');makeCollapsible(k);}});
+    glossify(V); tabTitle(y+' season');
+    history.replaceState(null,'',location.pathname+location.search+'#'+y); scrollTo(0,0); setSeg();};
+  if(sel)sel.onchange=()=>{const y=+sel.value; if(y)openSeason(y);};
+  const bk=$('#lvSegBook'); if(bk)bk.addEventListener('click',close);
+  const lv=$('#lvSegLive'); if(lv)lv.addEventListener('click',close);
+  const ob=$('#syOpenBtn'); if(ob)ob.onclick=()=>{const b=$('#yrPills button.on'); openSeason(b?+b.dataset.y:SEA[SEA.length-1]);};
+  const m=/^#(\d{4})$/.exec(location.hash); if(m&&+m[1]!==LIVEY)setTimeout(()=>openSeason(+m[1]),0);
 })();
 /* which NFL franchise each manager is (nflcomps.py): his career against its last ten seasons */
 (()=>{const C=D.comps, el=$('#tComps'); if(!el)return; if(!C||!C.pairs.length){el.closest('.card').remove(); return;}

@@ -1524,3 +1524,9 @@ body.lv-pg .lv-go{color:var(--brass)}
 /* a trade card's verdict, stated before the working */
 .lv-verdict{font-size:14px;padding:10px 12px;margin:0 0 14px;background:var(--brass-wash);border-left:3px solid var(--brass);border-radius:0}
 .lv-vlab{font:600 10px "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);margin-right:6px}
+/* season pages: a past season on a page of its own, switched in like 2026 */
+body.sy-pg main#main{display:none}
+body.sy-pg nav{display:none}
+body.sy-pg .lv-strip{position:sticky;top:0;z-index:40;box-shadow:0 2px 10px -6px rgba(0,0,0,.35)}
+body.sy-pg #syView{padding-top:8px}
+#lvSegYear{margin-left:6px;font:600 11px "IBM Plex Mono",monospace;padding:6px 26px 6px 10px}
