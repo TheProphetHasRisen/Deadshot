@@ -4923,8 +4923,9 @@ function pharaoh(){
     const cls={}; FO.draftByMgr.forEach(x=>{cls[x.m+'|'+x.y]=x.val;});
     mat($('#tFoClass'),(m,y)=>cls[m+'|'+y]==null?null:cls[m+'|'+y],v=>sg(v,0));
     mat($('#tFoEff'),(m,y)=>FO.mgrs[m][y]?FO.mgrs[m][y].eff:null,v=>pct(v));
-    $('#tFoLoyal').innerHTML='<thead><tr><th>Player</th><th>Manager</th><th class="num">Weeks on his roster</th></tr></thead><tbody>'+
-      FO.loyal.filter(sel).map(x=>`<tr><td><b>${esc(x.n)}</b></td><td>${esc(x.m)}</td><td class="num">${x.wks}</td></tr>`).join('')+'</tbody>';
+    const span=a=>{const r=[]; a.forEach(y=>{const l=r[r.length-1]; if(l&&y===l[1]+1)l[1]=y; else r.push([y,y]);}); return r.map(([p,q])=>p===q?String(p):p+'–'+q).join(', ');};
+    $('#tFoLoyal').innerHTML='<thead><tr><th>Player</th><th>Manager</th><th class="num">Seasons</th><th>Which</th><th class="num">Weeks on his roster</th></tr></thead><tbody>'+
+      FO.loyal.filter(sel).map(x=>`<tr><td><b>${esc(x.n)}</b></td><td>${esc(x.m)}</td><td class="num">${x.yrs?x.yrs.length:'—'}</td><td class="dim">${x.yrs?span(x.yrs):''}</td><td class="num">${x.wks}</td></tr>`).join('')+'</tbody>';
     ['#tFoPick','#tFoPickKD','#tFoGone','#tFoTrades','#tFoSteal','#tFoBust','#tFoLoyal'].forEach(k=>fillEmpty($(k)));
   }
   drawFO(); REDRAW.push(drawFO);

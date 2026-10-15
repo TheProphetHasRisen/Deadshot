@@ -376,10 +376,12 @@ def front_office(H, keep):
         order = D.FINAL_PLACE.get(d['y'], []); place = order.index(team) + 1 if team in order else None
         rec = next(((r[2], r[3]) for r in D.STANDINGS[d['y']] if r[1] == team), (0, 0))
         slots.setdefault(d['slot'], []).append(dict(y=d['y'], m=d['m'], n=d['n'], place=place, w=rec[0], l=rec[1]))
-    held = {}
+    held, yrs = {}, {}
     for y in YEARS:
-        for h in H[y][1]['held']: held[(h['n'], h['m'])] = held.get((h['n'], h['m']), 0) + h['wks']
-    loyal = sorted(({'n': n, 'm': m, 'wks': v} for (n, m), v in held.items()), key=lambda x: -x['wks'])
+        for h in H[y][1]['held']:
+            held[(h['n'], h['m'])] = held.get((h['n'], h['m']), 0) + h['wks']
+            yrs.setdefault((h['n'], h['m']), set()).add(y)
+    loyal = sorted(({'n': n, 'm': m, 'wks': v, 'yrs': sorted(yrs[(n, m)])} for (n, m), v in held.items()), key=lambda x: (-x['wks'], -len(x['yrs'])))
     best_owner = {}
     for x in loyal:
         if x['n'] not in best_owner: best_owner[x['n']] = x
