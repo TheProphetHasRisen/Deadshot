@@ -198,7 +198,7 @@
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to open that season’s page<br>with the winner’s run traced</div></div>
     <div class="board" id="board"></div>
     <div class="card" id="arcCard" style="margin-top:18px"><div class="card-b" style="padding:15px 18px">
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)">This week in league history</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)" id="arcHead">This week in league history</div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:3px 0 8px" id="arcLabel">From the archive</div>
       <div id="arcMoment" style="font-size:15px;line-height:1.55;color:var(--ink)"></div>
     </div></div>
@@ -291,7 +291,7 @@
         <span class="sub">Rank 1 at the top · click any number of teams to lock them</span></div>
       <div class="card-b" style="padding-bottom:6px"><div class="pills" id="raceLeg"></div></div>
       <div class="card-b" style="padding-top:4px"><div class="chart" id="race"></div>
-        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, the same tiebreak the league uses. The shaded band is that season’s playoff field: <span id="raceSpots"></span>.</p></div>
+        <p style="margin:10px 0 0;font-size:12.5px;color:var(--ink-3)">Standing after each week, ranked by record then points for, which is how every tie from 2021 on was seeded. The shaded band is that season’s playoff field: <span id="raceSpots"></span>.</p></div>
     </div>
 
     <div class="card">
@@ -303,12 +303,12 @@
 
     <div class="card" data-collapse="closed">
       <div class="card-h"><h3>Beating the projection</h3><span class="sub">Actual points minus the projections, per week</span></div>
-      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week’s score is shown against what the site projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
+      <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)">Each week’s score is shown against what Yahoo projected for it. Beating that projection regularly points to sound start and sit decisions and useful waiver work. Any single week swings heavily on luck, so the per week column carries more meaning than the season total.</p></div>
       <div class="scroll"><table id="tProj"></table></div>
     </div>
 
     <div class="card" data-collapse="closed">
-      <div class="card-h"><h3>Biggest rivals this year</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
+      <div class="card-h"><h3>Biggest rivals of the season</h3><span class="gl" data-gl="rivalry" tabindex="0">?</span><span class="sub">meetings &times; balance &times; closeness</span></div>
       <div class="card-b" style="padding-bottom:0"><p style="margin:0 0 14px;font-size:13.5px;color:var(--ink-2)" id="rivPick"></p></div>
       <div class="scroll"><table id="tRiv"></table></div>
     </div>
@@ -413,8 +413,8 @@
   </section>
 
   <section id="trades-sec">
-    <div class="sec-head"><h2>Trade Market</h2><div class="rule-note">Who deals, and who they deal with<br>2021&ndash;2025 &middot; the years with logs</div></div>
-    <p class="lede">Every trade in the five seasons whose transaction logs are loaded. A trade counts once for each side, so the two managers in a deal each get credit for it. In and out count players, not deals: a three-for-one shows up as 3 in and 1 out for the side receiving three.</p>
+    <div class="sec-head"><h2>Trade Market</h2><div class="rule-note" id="trNote">Who deals, and who they deal with</div></div>
+    <p class="lede">Every trade since the league's transaction logs begin, the season being played included. A trade counts once for each side, so the two managers in a deal each get credit for it. In and out count players, not deals: a three-for-one shows up as 3 in and 1 out for the side receiving three.</p>
     <div class="card">
       <div class="card-h"><h3>Trade ledger</h3><span class="gl" data-gl="trade" tabindex="0">?</span><span class="sub" id="trLedSub"></span></div>
       <div class="scroll"><table id="tTrLed"></table></div>
@@ -447,7 +447,7 @@
     <div class="card"><div class="card-h"><h3>Draft busts</h3><span class="sub">First three rounds, finished far below where he was taken</span></div><div class="scroll"><table id="tFoBust"></table></div></div>
     <div class="card"><div class="card-h"><h3>Draft classes</h3><span class="gl" data-gl="val" tabindex="0">?</span><span class="sub">Each manager’s whole draft, by value at position in the weeks his picks started for him</span></div><div class="scroll"><table id="tFoClass"></table></div></div>
     <div class="card"><div class="card-h"><h3>Setting the lineup</h3><span class="gl" data-gl="eff" tabindex="0">?</span><span class="sub">Lineup efficiency, season by season</span></div><div class="scroll"><table id="tFoEff"></table></div></div>
-    <div class="card"><div class="card-h"><h3>Hardest injury hits</h3><span class="gl" data-gl="inj" tabindex="0">?</span><span class="sub">Regular starters who missed games, by the value their teams lost</span></div><div class="scroll"><table id="tFoHits"></table></div></div>
+    <div class="card"><div class="card-h"><h3>Hardest hits: missed games</h3><span class="gl" data-gl="inj" tabindex="0">?</span><span class="sub">Regular starters who missed games, by the value their teams lost</span></div><div class="scroll"><table id="tFoHits"></table></div></div>
     <div class="card"><div class="card-h"><h3>Loyalty</h3><span class="sub">The players a manager has held longest: seasons and weeks on his roster</span></div><div class="scroll"><table id="tFoLoyal"></table></div></div>
   </section>
 

@@ -73,43 +73,6 @@ def form(t, a, b):
     return w, l, (sum(pts) / len(pts) if pts else None), (beat / faced if faced else None), len(pts)
 
 times = getattr(S, 'TRADETIMES', None) or {'Sep 15': '11:27 am', 'Sep 29': '2:32 pm', 'Oct 13': '12:43 pm'}
-assert len(W['trades']) == len(S.TRADES2026)
-for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
-    w = week_of(d, times[d]); check(f'{d} trade week', w, T['wk'], 0)
-    for key, names, got in (('a', ga, T['a']), ('b', gb, T['b'])):
-        chg = 0; tot = 0
-        for n, P in zip(names, got):
-            pre, _, _ = ppg(n, 1, w - 1); post, g, s = ppg(n, w, played)
-            check(f'{d} {n} before a game', pre, P['pre']); check(f'{d} {n} points since', s if g else 0, P['post'])
-            pos = S.TRADEPOS[n]
-            mine_c = post - pre if pre is not None and post is not None else None
-            check(f'{d} {n} against his own form', mine_c, P['chg'], 0.02)
-            check(f'{d} {n} rank before', rank(pos, pre, 1, w - 1) if w > 1 else None, P['rkPre'], 0)
-            check(f'{d} {n} rank since', rank(pos, post, w, played) if played >= w else None, P['rkPost'], 0)
-            chg += mine_c or 0; tot += s
-            # lineups, straight from Yahoo's weekly rosters
-            frm, to = (tb, ta) if key == 'a' else (ta, tb)
-            R = [r for r in getattr(S, 'ROSTERS2026', []) if r[2] == n]
-            bef = [r for r in R if r[1] == frm and r[0] < w]; aft = [r for r in R if r[1] == to and w <= r[0] <= played]
-            st = lambda rs: [r for r in rs if r[4] not in ('BN', 'IR')]
-            for k, v in (('rosB', len(bef)), ('stB', len(st(bef))), ('rosA', len(aft)), ('stA', len(st(aft))),
-                         ('stApts', sum(r[5] or 0 for r in st(aft)))):
-                check(f'{d} {n} {k}', v, P[k], 0.011)
-            if REPL and P.get('stVal') is not None:
-                r0 = REPL[pos.split(',')[0]]
-                check(f'{d} {n} value at position', sum(r[5] or 0 for r in st(aft)) - r0 * len(st(aft)), P['stVal'], 0.02)
-        check(f'{d} side {key} against own form', chg if played >= w else None, T[key + 'Chg'], 0.05)
-        check(f'{d} side {key} points since', tot, T[key + 'Post'], 0.05)
-        check(f'{d} side {key} points that counted', sum(sum(r[5] or 0 for r in getattr(S, 'ROSTERS2026', []) if r[2] == n and r[1] == (ta if key == 'a' else tb) and w <= r[0] <= played and r[4] not in ('BN', 'IR')) for n in names), T[key + 'Started'], 0.05)
-    for key, t in (('a', ta), ('b', tb)):
-        F = T['f' + key]
-        bw, bl, bp, bap, bg = form(t, 1, w - 1); aw, al, ap_, aap, ag = form(t, w, played)
-        check(f'{d} {t} wins before', bw, F['before']['w'], 0); check(f'{d} {t} losses before', bl, F['before']['l'], 0)
-        check(f'{d} {t} points a week before', bp, F['before']['ppg']); check(f'{d} {t} all-play before', bap, F['before']['ap'], 0.0001)
-        check(f'{d} {t} wins since', aw, F['since']['w'], 0); check(f'{d} {t} points a week since', ap_, F['since']['ppg'])
-        xw = bap * ag if bap is not None and ag else None
-        check(f'{d} {t} expected wins since', xw, F['xw']); check(f'{d} {t} wins over pace', None if xw is None else aw - xw, F['woe'])
-
 # pickups: replay every move and trade in order, tracking who holds whom from which week
 ev = [(dt.datetime(2026, 9, 1), 0, ('draft', t, n)) for _, t, n, _, _ in S.DRAFT2026]
 for i, (d, t, team, adds, drops) in enumerate(reversed(S.MOVES2026)):
@@ -134,6 +97,51 @@ for ts, _, x in ev:
             if n in hold: prev = hold.pop(n); stints.append((n, prev[0], prev[1], w - 1, prev[2]))
             hold[n] = (t, w, 'trade')
 for n, (t, w0, k) in hold.items(): stints.append((n, t, w0, 99, k))
+
+assert len(W['trades']) == len(S.TRADES2026)
+for (d, ta, ga, tb, gb), T in zip(S.TRADES2026, W['trades']):
+    w = week_of(d, times[d]); check(f'{d} trade week', w, T['wk'], 0)
+    for key, names, got in (('a', ga, T['a']), ('b', gb, T['b'])):
+        chg = 0; tot = 0; sval = 0; cnt = 0
+        for n, P in zip(names, got):
+            # since the deal = while the team that got him kept him
+            to_ = ta if key == 'a' else tb
+            end = min(played, next((e for nn, tt, a, e, kk in stints if nn == n and tt == to_ and a == w and kk == 'trade'), played))
+            pre, _, _ = ppg(n, 1, w - 1); post, g, s = ppg(n, w, end)
+            check(f'{d} {n} before a game', pre, P['pre']); check(f'{d} {n} points since', s if g else 0, P['post'])
+            pos = S.TRADEPOS[n]
+            mine_c = post - pre if pre is not None and post is not None else None
+            check(f'{d} {n} against his own form', mine_c, P['chg'], 0.02)
+            check(f'{d} {n} rank before', rank(pos, pre, 1, w - 1) if w > 1 else None, P['rkPre'], 0)
+            check(f'{d} {n} rank since', rank(pos, post, w, end) if end >= w else None, P['rkPost'], 0)
+            chg += mine_c or 0; tot += s
+            # lineups, straight from Yahoo's weekly rosters
+            frm, to = (tb, ta) if key == 'a' else (ta, tb)
+            R = [r for r in getattr(S, 'ROSTERS2026', []) if r[2] == n]
+            bef = [r for r in R if r[1] == frm and r[0] < w]; aft = [r for r in R if r[1] == to and w <= r[0] <= end]
+            st = lambda rs: [r for r in rs if r[4] not in ('BN', 'IR')]
+            for k, v in (('rosB', len(bef)), ('stB', len(st(bef))), ('rosA', len(aft)), ('stA', len(st(aft))),
+                         ('stApts', sum(r[5] or 0 for r in st(aft)))):
+                check(f'{d} {n} {k}', v, P[k], 0.011)
+            if REPL and P.get('stVal') is not None:
+                r0 = REPL[pos.split(',')[0]]
+                check(f'{d} {n} value at position', sum(r[5] or 0 for r in st(aft)) - r0 * len(st(aft)), P['stVal'], 0.02)
+                sval += sum(r[5] or 0 for r in st(aft)) - r0 * len(st(aft))
+            cnt += sum(r[5] or 0 for r in st(aft))
+        check(f'{d} side {key} against own form', chg if played >= w else None, T[key + 'Chg'], 0.05)
+        check(f'{d} side {key} points since', tot, T[key + 'Post'], 0.05)
+        check(f'{d} side {key} points that counted', cnt, T[key + 'Started'], 0.05)
+        # a side's return is never worth less than getting nothing
+        if REPL and T.get(key + 'Val') is not None: check(f'{d} side {key} value at position', max(0.0, sval), T[key + 'Val'], 0.05)
+    for key, t in (('a', ta), ('b', tb)):
+        F = T['f' + key]
+        bw, bl, bp, bap, bg = form(t, 1, w - 1); aw, al, ap_, aap, ag = form(t, w, played)
+        check(f'{d} {t} wins before', bw, F['before']['w'], 0); check(f'{d} {t} losses before', bl, F['before']['l'], 0)
+        check(f'{d} {t} points a week before', bp, F['before']['ppg']); check(f'{d} {t} all-play before', bap, F['before']['ap'], 0.0001)
+        check(f'{d} {t} wins since', aw, F['since']['w'], 0); check(f'{d} {t} points a week since', ap_, F['since']['ppg'])
+        xw = bap * ag if bap is not None and ag else None
+        check(f'{d} {t} expected wins since', xw, F['xw']); check(f'{d} {t} wins over pace', None if xw is None else aw - xw, F['woe'])
+
 mine = sorted(((n, t, round(ppg(n, a, b)[2], 2)) for n, t, a, b, k in stints if k in ('FA', 'W') and a <= played),
               key=lambda r: -r[2])
 page = [(p['n'], p['team'], p['pts']) for p in W['picks']]

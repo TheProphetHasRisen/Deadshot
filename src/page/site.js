@@ -1,6 +1,9 @@
 
 const $=(s,e=document)=>e.querySelector(s), $$=(s,e=document)=>[...e.querySelectorAll(s)];
 const D=DATA, ROWS=D.rows, M=D.mgrs, SEA=D.seasons, LAST=D.last, K=2.37;
+/* how much league scoring rose from the first season to the last, worked out, never typed (it was "about
+   12%" in two notes and "14% higher" in a third) */
+const SCORERISE=(()=>{const a=ROWS.find(r=>r.y===SEA[0]), b=ROWS.find(r=>r.y===LAST); return a&&b&&a.lg?Math.round((b.lg/a.lg-1)*100):null;})();
 const byName={}; M.forEach(m=>byName[m.name]=m);
 const rowsOf={}; ROWS.forEach(r=>(rowsOf[r.mgr]=rowsOf[r.mgr]||[]).push(r));
 const f=(v,d=2)=>v==null||v===''?'—':(+v).toFixed(d);
@@ -202,11 +205,11 @@ const GLOSS={
    `<b>+10.5</b> means he is scoring 10.5 a game more for his new team than he was for his old one. A side’s figure adds up its players.<br><br>`+
    `Early in a season "before" can be a game or two, so one big or small week can swing it. Read it alongside his rank at the position.`,
  war:`<b>In wins</b><br>How many extra wins a points edge is worth.<br><br>`+
-   `<b>The easy version.</b> This season an extra 65 points or so a week adds up to about one extra win. So a trade that gives one side 6.5 more points a week than the other is worth about <b>0.1 wins a week</b>, or about <b>1 win over 10 weeks</b>.<br><br>`+
+   `<b>The easy version.</b> This season an extra 65 points or so adds up to about one extra win. So a trade that gives one side 6.5 more points a week than the other is worth about <b>0.1 wins a week</b>, or about <b>1 win over 10 weeks</b>.<br><br>`+
    `<b>Where 65 comes from.</b> Weekly scores this season spread out by about 26 points either side of average (the standard deviation, σ). Near an average score, one more point raises the chance of beating a typical opponent by 0.399 ÷ σ, the height of a bell curve at its middle divided by its spread. Flip that over: σ ÷ 0.399 ≈ 26 ÷ 0.399 ≈ <b>65 points per win</b>. It updates every week as more scores come in.<br><br>`+
    `On a trade card the edge is the gap between the two sides in <b>value at position</b> a week since the deal: each player’s points in the weeks he started for his new team, over a replacement-level starter at his position. That is baseball’s WAR (wins above replacement) for a trade.`,
  slotx:`<b>Expected, for a draft pick</b><br>What the player who finished at the slot he was drafted at actually scored.<br><br>`+
-   `Taken as the 16th receiver? He is held to what this season’s 16th-best receiver has scored. <b>Above or below</b> is his points minus that. <b>Season pace</b> carries the gap so far out to a 17-week season: the gap ÷ weeks played × 17.`,
+   `Taken as the 16th receiver? He is held to what this season’s 16th-best receiver has scored. <b>Above or below</b> is his points minus that. <b>Season pace</b> carries the gap so far out to a 17-game season: the gap ÷ weeks played × 17.`,
  xwin:`<b>Wins against the pre-trade pace</b><br>How a team has done since a trade, against how it was playing before it.<br><br>`+
    `Its pace is its all-play rate before the deal: the share of the league it outscored each week. Over the games since, that pace expects <b>pace × games</b> wins; actual wins since minus that is the figure. <b>+1.4</b> means 1.4 wins better than the team was playing before.<br><br>`+
    `A pace from a week or two can be a fluke, so treat early figures loosely.`,
@@ -227,7 +230,7 @@ const GLOSS={
    `High means slow to cut; low means a quick trigger. Set against the league and his own past seasons.`,
  trade:`<b>Trade counting</b><br>A deal counts once for <i>each</i> side, so both managers get credit for it.<br><br>`+
    `<b>In</b> and <b>out</b> count players, not deals: a three-for-one is 3 in and 1 out for the side receiving three.<br><br>`+
-   `Only the seasons whose transaction logs are loaded are counted: 2021 through 2025.`};
+   `Every season with a transaction log is counted, from 2021, the one being played included.`};
 function glossify(root){(root||document).querySelectorAll('[data-gl]').forEach(el=>{
   if(el.dataset.glBound)return; el.dataset.glBound='1';
   const h=GLOSS[el.dataset.gl]; if(h)bindTip(el,h);});}
@@ -1373,7 +1376,7 @@ function openMgr(name){
   const m=byName[name]; if(!m)return;
   const rs=[...rowsOf[name]].sort((a,b)=>a.y-b.y);
   $('#mTitle').textContent=name;
-  $('#mSub').textContent=`${m.seasons} season${m.seasons>1?'s':''} · ${m.first}–${m.last} · ${m.w}–${m.l}${m.t?'–'+m.t:''} · ${pct(m.winpct)}`;
+  $('#mSub').textContent=`${m.seasons} season${m.seasons>1?'s':''} · ${m.first===m.last?m.first:m.first+'–'+m.last} · ${m.w}–${m.l}${m.t?'–'+m.t:''} · ${pct(m.winpct)}`;
   const tiles=[['Titles',m.titles?(m.titles%1?m.titles.toFixed(1):m.titles):'0'],['Podiums',m.podium],
     ['Playoffs',m.apps],['Avg finish',m.avgPlace.toFixed(2)],['Power idx',m.cpi.toFixed(1)],
     ['Luck',sg(m.luck,2)],['PPG',m.ppg.toFixed(1)],['Playoff W-L',m.poW+'–'+m.poL],
@@ -1598,7 +1601,7 @@ $('#board').innerHTML=D.champs.map(c=>`<button class="plate${c.co?' split':''}" 
 if(D.live&&D.live.standings&&D.live.standings.length){const L=D.live, ld=L.standings[0], wk=L.weeks[L.weeks.length-1];
   $('#board').insertAdjacentHTML('beforeend',`<button class="plate plate-live" data-y="${L.year}">
     <div class="yr">${L.year}</div><div class="mgr">In progress</div>
-    <div class="tm">${esc(ld.team)} leads at ${ld.w}–${ld.l}${ld.mgr?' ('+esc(ld.mgr)+')':''}</div>
+    <div class="tm">${esc(ld.team)} leads${L.standings.filter(r=>r.w===ld.w&&r.l===ld.l).length>1?' on points':''} at ${ld.w}–${ld.l}${ld.mgr?' ('+esc(ld.mgr)+')':''}</div>
     <div class="meta">Week ${wk} of ${L.regWeeks} · open the live page</div></button>`);}
 $$('#board .plate').forEach(b=>b.onclick=()=>{
   const y=+b.dataset.y;
@@ -1611,8 +1614,11 @@ $$('#board .plate').forEach(b=>b.onclick=()=>{
   setTimeout(()=>{const el=$('#brkIn'); if(el)el.closest('.card').scrollIntoView({behavior:'smooth',block:'center'});},420);});
 
 /* injury luck over a career, from the team files (teamfile.py, 2021 on); null before Yahoo */
-function injLuckOf(name){const FO=D.live&&D.live.files&&D.live.files.fo; const h=FO&&FO.mgrs[name]; if(!h)return null;
-  const v=Object.values(h).filter(x=>x&&x.inj_luck!=null); return v.length?v.reduce((t,x)=>t+x.inj_luck,0):null;}
+/* injury luck over the career table's seasons: finished ones only, like every other career figure, and only
+   the seasons the table's window covers (Last 3, Last 5) */
+function injLuckOf(name,yrs){const FO=D.live&&D.live.files&&D.live.files.fo; const h=FO&&FO.mgrs[name]; if(!h)return null;
+  const v=Object.entries(h).filter(([y,x])=>x&&x.inj_luck!=null&&!(D.live&&+y===D.live.year)&&(!yrs||yrs.includes(+y))).map(([,x])=>x);
+  return v.length?v.reduce((t,x)=>t+x.inj_luck,0):null;}
 /* ============ generic table ============ */
 function table(el,cols,data,opts={}){
   const st={i:opts.sort??-1,dir:opts.dir??'desc'};
@@ -1711,7 +1717,7 @@ function rankTip(r,rank){
   const gap=(r.score-100);
   const L=[];
   L.push(`<b>${esc(r.n)}</b> &middot; power score <b>${r.score.toFixed(1)}</b> &middot; ${ord(rank)}`);
-  L.push(`<span style="opacity:.72">${m.seasons} season${m.seasons>1?'s':''} ${m.first}&ndash;${m.last}`
+  L.push(`<span style="opacity:.72">${m.seasons} season${m.seasons>1?'s':''} ${m.first===m.last?m.first:m.first+'&ndash;'+m.last}`
     +(titles.length?` &middot; ${titles.length===1?'champion in ':'champion in '}${titles.join(', ')}`:' &middot; no titles')
     +`</span>`);
   L.push(`Scores <b>${sg(gap,1)}%</b> versus a league-average team, `
@@ -1763,7 +1769,7 @@ function drawLadder(d){
       <span class="lad-ev" style="color:${EV(r.score!=null?r.neff:0)[1]}" title="Evidence: ${EV(r.neff)[0]}">${'●'.repeat(EV(r.neff)[0]==='HIGH'?3:EV(r.neff)[0]==='MEDIUM'?2:1)}<span style="opacity:.25">${'●'.repeat(EV(r.neff)[0]==='HIGH'?0:EV(r.neff)[0]==='MEDIUM'?1:2)}</span></span></div>`;});
   $('#ladder').innerHTML=`<div class="lad-head"><span></span><span></span>
       <span class="lad-track-h"><i style="left:0">${lo.toFixed(1)}</i><i style="left:${zero}%;transform:translateX(-50%)">100 · league average</i><i style="right:0">${hi.toFixed(1)}</i></span>
-      <span>SCORE</span><span>PROJ W%</span><span>vs&nbsp;λ1</span><span class="lad-ev">EVID</span></div>`+out;
+      <span>SCORE</span><span>PROJ W%</span><span>vs&nbsp;<span class="nocase">λ</span>1</span><span class="lad-ev">EVID</span></div>`+out;
   $$('#ladder .lad').forEach(el=>{
     el.onclick=()=>openMgr(el.dataset.m);
     const r=d.find(x=>x.n===el.dataset.m);
@@ -1836,20 +1842,20 @@ function buildAll(){
  {h:'3rd',f:r=>r.third||'—',c:'num',k:r=>r.third},
  {h:'Podium',f:r=>r.podium||'—',c:'num',k:r=>r.podium},
  {h:'Last',f:r=>r.lastPl||'—',c:'num',k:r=>r.lastPl},
- {h:'W',f:r=>r.w,c:'num',k:r=>r.w},{h:'L',f:r=>r.l,c:'num',k:r=>r.l},
+ {h:'W',f:r=>r.w,c:'num',k:r=>r.w},{h:'L',f:r=>r.t?`${r.l} <span class="dim" title="and ${nOf(r.t,'tie')}">+${r.t}T</span>`:r.l,c:'num',k:r=>r.l},
  {h:'Win %',f:r=>pct(r.winpct),c:'num',k:r=>r.winpct},
  {h:'All-play',f:r=>r.apW+r.apL?`<span class="mono">${r.apW}&ndash;${r.apL}</span>`:'—',c:'num',k:r=>r.apPct,
   t:'Record against the whole league every week, summed over the seasons with a loaded game log (2021–2025). Schedule luck removed entirely.'},
  {h:'All-play %',f:r=>r.apPct==null?'—':pct(r.apPct),c:'num',k:r=>r.apPct},
  {h:'Sched luck',f:r=>sg(r.apLuck,2),c:'num',k:r=>r.apLuck,
   t:'Real wins minus all-play expected wins over those same seasons. No model, no exponent, just how the schedule fell.'},
- {h:'Injury luck',f:r=>{const v=injLuckOf(r.name); return v==null?'—':sg(v,2);},c:'num',k:r=>injLuckOf(r.name),
-  t:'Wins: the league’s average loss to missed games minus his, every season from 2021 (the first Yahoo reaches) added up. Plus means his regular starters missed less than most.'},
+ {h:'Injury luck',f:r=>{const v=injLuckOf(r.name,yrs); return v==null?'—':sg(v,2);},c:'num',k:r=>injLuckOf(r.name,yrs),
+  t:'Wins: the league’s average loss to missed games minus his, every finished season from 2021 (the first Yahoo reaches) in the window, added up. Plus means his regular starters missed less than most.'},
  {h:'Avg finish',f:r=>f(r.avgPlace),c:'num',k:r=>r.avgPlace,asc:1},
  {h:'Playoffs',f:r=>r.apps,c:'num',k:r=>r.apps},
  {h:'Power idx',f:r=>f(r.cpi,1),c:'num',k:r=>r.cpi},
  {h:'Luck',f:r=>sg(r.luck),c:'num',k:r=>r.luck},
- {h:'Span',f:r=>`<span class="dim mono">${r.first}–${r.last}</span>`,k:r=>r.first},
+ {h:'Span',f:r=>`<span class="dim mono">${r.first===r.last?r.first:r.first+'–'+r.last}</span>`,k:r=>r.first},
 ],allTimeData(),{rank:1,sort:-1,cls:r=>r.titles>=1?'champ':'',
    filter:r=>vis(r.name)&&(!SEARCH||r.name.toLowerCase().includes(SEARCH)),
    after:d=>{$('#searchN').textContent=SEARCH?`${d.length} shown`:'';}});
@@ -2122,7 +2128,7 @@ const BAL={
   note:'The gap between the best and worst scoring team, in index points. The single bluntest measure of how lopsided a season was.',
   get:m=>m.rng},
  lg:{lab:'League average PPG',fmt:v=>v.toFixed(1),title:'League average points per game',
-  note:'Why the Power Index is re-based every year: raw scoring rose about 12% across the decade, so points from different eras are not comparable.',
+  note:'Why the Power Index is re-based every year: raw scoring rose about '+SCORERISE+'% from '+SEA[0]+' to '+LAST+', so points from different eras are not comparable.',
   get:m=>m.lg},
 };
 function drawBal(k){
@@ -2231,7 +2237,7 @@ function drawCon(){
   const yset=new Set(yy);
   $('#poSub').textContent=(yy.length<SEA.length
       ? (yy.length===1?`${yy[0]} · `:(contig?`${yy[0]}–${yy[yy.length-1]} · `:`${yy.length} seasons · `)) : '')
-    +`${D.games.filter(g=>yset.has(g.y)).length} playoff games`;
+    +`${D.games.filter(g=>yset.has(g.y)&&!g.void).length} playoff games`;
   table($('#tCon'),[
    {h:'Manager',f:r=>mlink(r.name),c:'nm',k:r=>r.name,asc:1,t:'Click any name to open their full career card.'},
    {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons,t:'Seasons played in the years currently selected above.'},
@@ -2489,7 +2495,8 @@ function drawSchedule(y){
     const gs=K.games.filter(g=>g.wk===w), by=K.byes.filter(b=>b.wk===w);
     const all=gs.flatMap(g=>[g.aa,g.ab]).concat(by.map(b=>b.a));
     const hi=Math.max(...all), lo=Math.min(...all);
-    out+=`<details class="wk"><summary>Week ${w} <span class="dim">${gs.length} game${gs.length===1?'':'s'}${by.length?' · '+by.length+' bye'+(by.length===1?'':'s'):''}</span></summary>
+    out+=`<details class="wk"><summary>Week ${w} <span class="dim">${gs.length} game${gs.length===1?'':'s'}${(()=>{const cb=by.filter(b=>b.br==='C').length, ob=by.length-cb;   /* a first-round bye is a bye; a team out of it is just not playing */
+        return (cb?' · '+nOf(cb,'bye'):'')+(ob?' · '+ob+' not playing':'');})()}</span></summary>
       <div class="wkgrid">`+
       gs.map(g=>{const vd=isVoid(y,g.wk,g.ta,g.tb), aw=g.aa>g.ab, dim=vd?' void':'';
         const side=(t,pt,pr,win)=>`<div class="side ${vd?'':(win?'w':'lo')}"><span class="tn">${esc(t)}<small>${esc(MG[t]||'')} · proj ${pr.toFixed(1)}</small></span>
@@ -2558,7 +2565,7 @@ const MX={reg:{t:tally(REGG),g:REGG,
   po:{t:tally(POG),g:POG,
    title:'Playoff head-to-head',
    /* counted, not typed: the totals and the year range move on their own when a season lands */
-   note:'All '+D.games.length+' playoff games, '+SEA[0]+' to '+SEA[SEA.length-1]+'. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
+   note:'All '+D.games.filter(g=>!g.void).length+' playoff games, '+SEA[0]+' to '+SEA[SEA.length-1]+'. The voided 2022 final is excluded, so Burke and Kaiper show nothing from it.'},
   all:{t:tally(REGG.concat(POG)),g:REGG.concat(POG),
    title:'All games',
    /* __NSEASONSW__ is filled in by the build, so this reads "ten"/"eleven" like the rest
@@ -3758,7 +3765,7 @@ function bigRecords(){
     const tied=M.filter(z=>z.titles===mostT.titles);
     R.push({k:'Most titles',v:String(mostT.titles%1?mostT.titles.toFixed(1):mostT.titles),
       who:tied.map(z=>z.name).join(' & '),
-      when:tied.length>1?'shared, and neither has it alone':mostT.seasons+' seasons  ·  '+mostT.first+'–'+mostT.last,
+      when:tied.length>1?'shared, and neither has it alone':nOf(mostT.seasons,'season')+'  ·  '+(mostT.first===mostT.last?mostT.first:mostT.first+'–'+mostT.last),
       sub:tied.length>1
         ?'Nobody in league history has more.'
         :'Last one in '+mostT.lastTitle+'. '+mostT.podium+' podium finishes in all.'});
@@ -4155,8 +4162,9 @@ function nflWeek(d){
   /* NFL week 1 lands in the first full week of September. Good enough to match a
      moment to roughly the right part of the season; it is decoration, not a fixture list. */
   const y=d.getFullYear();
+  /* the season opens the Thursday after Labor Day (the first Monday of September): 10 Sep 2026, not the 3rd */
   const sep=new Date(y,8,1);
-  const firstThu=new Date(y,8,1+((4-sep.getDay())+7)%7);
+  const firstThu=new Date(y,8,1+((1-sep.getDay())+7)%7+3);
   const diff=Math.floor((d-firstThu)/(7*24*3600*1000))+1;
   return (diff>=1&&diff<=17)?diff:null;
 }
@@ -4235,6 +4243,8 @@ function drawArchive(){
   host.innerHTML=pick.html;
   const lab=$('#arcLabel');
   if(lab)lab.textContent=wk&&pool.length?('From the archive · week '+wk):'From the archive';
+  /* nothing from this week of any season: say so, rather than file a December final under "this week" */
+  const hd=$('#arcHead'); if(hd)hd.textContent=wk&&pool.length?'This week in league history':'From league history';
 }
 
 /* ---- Milestone watch --------------------------------------------------------
@@ -4404,7 +4414,7 @@ function drawWeekly(YR){
   })();
   {const rs=$('#raceSpots'); if(rs)rs.textContent=LIVEYR?`${SPOTS} of ${T.length} teams make it; ${YR} so far, through week ${WKS[WKS.length-1]}`:`${SPOTS} of ${T.length} teams made it in ${YR}`;}
   $('#raceLeg').innerHTML=`<span class="fb-lab" style="margin-right:4px">Teams</span>`+
-    lines.map(l=>`<button data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" style="padding:4px 9px">${esc(l.t)} <span class="dim">${esc(l.m.split(' ')[0])}</span></button>`).join('')+
+    lines.map(l=>`<button data-t="${esc(l.t)}" data-mgr="${esc(l.m)}" style="padding:4px 9px">${esc(l.t)} <span class="dim">${esc(l.m.split(' ').slice(-1)[0])}</span></button>`).join('')+
     `<button id="raceClear" style="padding:4px 9px">Clear</button>`;
   const RPICK=new Set(); let RHOV=null;
   function paint(hoverT){
@@ -4511,7 +4521,7 @@ function drawWeekly(YR){
    {h:'',f:r=>dbar(r.luck,3.2,pol(r.luck)),k:r=>r.luck},
    {h:'High',f:r=>f(r.hi),c:'num',k:r=>r.hi},
    {h:'Low',f:r=>f(r.lo),c:'num',k:r=>r.lo},
-   {h:'Week σ',f:r=>r.fm?f(r.fm.sd,1):'—',c:'num',k:r=>r.fm?r.fm.sd:null,
+   {h:'Week <span class="nocase">σ</span>',f:r=>r.fm?f(r.fm.sd,1):'—',c:'num',k:r=>r.fm?r.fm.sd:null,
     t:'Standard deviation of this team\u2019s weekly scores. Low = metronome, high = boom or bust. This is real week-to-week volatility, unlike the season-to-season figure in Advanced.'},
    {h:'Swing %',f:r=>r.fm?f(r.fm.cv,1)+'%':'—',c:'num',k:r=>r.fm?r.fm.cv:null,
     t:'Week σ as a percentage of the team\u2019s own average, so a high scorer and a low scorer can be compared fairly.'},
@@ -4544,7 +4554,7 @@ function drawWeekly(YR){
    {h:'Avg margin',f:r=>f(r.marg),c:'num',k:r=>r.marg,asc:1},
    {h:'Rivalry score',f:r=>f(r.score,1),c:'num',k:r=>r.score,t:'meetings × balance × closeness'},
    {h:'',f:r=>dbar(r.score-6,7,'var(--brass)'),k:r=>r.score},
-  ],K5.rivals,{rank:1,sort:4});}
+  ],K5.rivals.filter(r=>r.score>0),{rank:1,sort:4});}   /* a pair whose meetings were all one-sided has no rivalry to rank */
   drawRiv(); push(drawRiv);
   const top=K5.rivals[0];
   $('#rivPick').innerHTML=`<b>${esc(top.a)}</b> vs <b>${esc(top.b)}</b>: ${top.g} meeting${top.g>1?'s':''}, split ${top.aw}–${top.bw}, decided by an average of <b>${top.marg.toFixed(2)}</b> points. That is the rivalry-week fixture on the numbers.`;
@@ -4602,13 +4612,13 @@ syncFilter();
   const R=[
   ['SCORING'],
   ['PPG / PPGA','Points per game scored and allowed.','<code>PF ÷ games</code>. Season length varies (13 games in 2017, 15 in 2021, 14 elsewhere), so raw PF is never used for cross-era rate or quality comparisons. It appears only in the Record Book, under a clearly labelled counting-record heading where the game count is shown alongside it.'],
-  ['Power Index','Scoring strength, era-proofed.','<code>100 × (PPG ÷ that season’s league-average PPG)</code>. 100 is average, 112 is 12% above the field. League scoring rose about 12% across the decade, which is why this and not PF is the headline number.'],
+  ['Power Index','Scoring strength, era-proofed.','<code>100 × (PPG ÷ that season’s league-average PPG)</code>. 100 is average, 112 is 12% above the field. League scoring rose about '+SCORERISE+'% across the decade, which is why this and not PF is the headline number.'],
   ['Z-score','How far above the field, in that league’s own units of spread.','<code>(PPG − league avg) ÷ population SD of PPG</code> that season. Rewards dominating a tight league. Above +1.5 is genuinely dominant.'],
   ['LUCK'],
   ['Pythagorean win %','The record your points deserved.','<code>PF^k ÷ (PF^k + PA^k)</code>, k = 2.37, the standard fantasy exponent.'],
   ['Luck','Wins you did not earn, or were robbed of.','<code>(Wins + &frac12; ties) − Pythagorean wins</code>. Positive means you won more than your scoring justified. Over one season it is noise; over ten it is a pattern.'],
-  ['All-play record','The luck-free record.','Every week, count how many of the other teams you outscored: <code>weeks × opponents</code> games a season, so 126 in a 14-week year and 135 in the 15-week 2021 season. Exact ties count as neither a win nor a loss, so three team-seasons show one game fewer: 2022 week 3, and 2023 weeks 5 and 8. This removes the schedule entirely. It is what your scoring alone was worth. Computed for every season with a loaded game log.'],
-  ['All-play luck','The sharpest luck measure available.','<code>Real wins − (all-play win % × weeks played)</code>. That is 14 weeks in most seasons, 15 in 2021, 13 in 2017. Unlike Pythagorean it needs no model at all, just the weekly scores.'],
+  ['All-play record','The luck-free record.','Every week, count how many of the other teams you outscored: <code>weeks × opponents</code> games a season, so 126 in a 14-week year and 135 in the 15-week 2021 season. Exact ties count as neither a win nor a loss, so both teams in each tie show one game fewer: 2022 week 3, and 2023 weeks 5 and 8, six team-seasons in all. This removes the schedule entirely. It is what your scoring alone was worth. Computed for every season with a loaded game log.'],
+  ['All-play luck','The sharpest luck measure available.','<code>Real wins − (all-play win % × weeks played)</code>. That is 14 weeks in most seasons and 15 in 2021. Unlike Pythagorean it needs no model at all, just the weekly scores.'],
   ['CAREER'],
   ['Career power index','Career scoring strength.','Games-weighted mean of season power indexes, so a long career outweighs one hot year.'],
   ['Std dev','Steady or streaky.','Population standard deviation of a manager’s season power indexes. Low is a metronome, high is boom-or-bust.'],
@@ -4623,8 +4633,8 @@ syncFilter();
   ['Points vs projection','Did you beat the number.','Season actual points minus the sum of weekly projections. Captures start/sit calls and waiver hits that the projection did not see, plus a large amount of noise. Read it in points per week, not totals.'],
   ['Rivalry score','Which fixture deserves a rivalry week.','<code>meetings × balance × closeness</code>, where balance is <code>1 − |W−L| ÷ meetings</code> and closeness is <code>100 ÷ (10 + average margin)</code>. Rewards fixtures that are frequent, even, and tight. Computed within the selected season.'],
   ['STILL MISSING'],
-  ['Weekly data before 2021','All-play, race charts and true strength of schedule for 2015–2020.','Needs the weekly game log for those six seasons. Everything the Week by Week section does extends backwards the day each one lands.'],
-  ['Trades before 2021','Trade trees, who fleeces whom, player value flow.','2021–2025 transaction logs are loaded; 2015–2020 are not. Grading a trade by what the pieces scored afterwards also needs per-player weekly scoring, which no screenshot has carried yet.'],
+  ['Weekly data before 2021','All-play, race charts and true strength of schedule for 2015–2020.','Needs the weekly game log for those seasons. Everything the Week by Week section does extends backwards the day each one lands.'],
+  ['Trades before 2021','Trade trees, who fleeces whom, player value flow.','Every trade from 2021 on is graded by what each player scored for the team that got him (the Front Office and each season page). 2015–2020 have no transaction log.'],
   ];
   $('#methodBody').innerHTML=R.map(r=>r.length===1?`<div class="mgroup">${r[0]}</div>`:
     `<div class="mrow"><div class="k">${r[0]}</div><div class="d">${r[1]}</div><div class="r">${r[2]}</div></div>`).join('');
@@ -4636,10 +4646,11 @@ syncFilter();
   const PAIR={}; TR.pairs.forEach(p=>{PAIR[key(p.a,p.b)]=p.n;});
   const total=TR.log.length;
   $('#trLedSub').textContent=`${total} deals · ${TR.years[0]}–${TR.years[TR.years.length-1]}`;
+  $('#trNote').innerHTML=`Who deals, and who they deal with<br>${TR.years[0]}&ndash;${TR.years[TR.years.length-1]} &middot; every season with a transaction log`;
   function drawLedger(){
     table($('#tTrLed'),[
      {h:'Manager',f:r=>mlink(r.name),c:'nm',k:r=>r.name,asc:1},
-     {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons,t:'Seasons this manager played inside the logged window'},
+     {h:'Szns',f:r=>r.seasons,c:'num',k:r=>r.seasons,t:'Seasons this manager played inside the logged window, the one being played included'},
      {h:'Trades',f:r=>r.trades,c:'num',k:r=>r.trades},
      {h:'',f:r=>dbar(r.trades-6,10,'var(--brass)'),k:r=>r.trades},
      {h:'Per season',f:r=>r.per.toFixed(2),c:'num',k:r=>r.per},
@@ -4682,6 +4693,7 @@ syncFilter();
     const cell=(m,y)=>(TR.byYear[y]||{})[m]||0;
     const MXY=Math.max(1,...ord.flatMap(m=>TR.years.map(y=>cell(m,y))));
     const played={}; ROWS.forEach(r=>{played[r.mgr+'|'+r.y]=1;});
+    if(D.live)Object.values(D.live.mgr).forEach(m=>{played[m+'|'+D.live.year]=1;});   /* the season being played */
     let h='<thead><tr><th class="rw"></th>'+TR.years.map(y=>`<th class="v">${y}</th>`).join('')+'<th class="v">TOTAL</th></tr></thead><tbody>';
     ord.forEach(m=>{h+=`<tr><th class="rw">${mlink(m)}</th>`;let tot=0;
       TR.years.forEach(y=>{
@@ -4987,7 +4999,7 @@ function pharaoh(){
   $('#foLede').textContent=`Every add, drop, trade, draft pick and lineup since ${YS[0]}, straight from Yahoo: who started, who sat, and the points that counted. Regular season only, so seasons compare like for like; ${LY} is the season so far.`;
   const yr=(y,s)=>y===LY?`<span class="lv-tag" style="font-size:9px">${y}</span>`:String(y)+(s||'');
   const pl=(n,pos)=>`<b>${esc(n)}</b> <span class="lv-pos">${esc(pos||'')}</span>`;
-  const updn=v=>v==null?'—':`<b class="${v>=0?'lv-steal':'lv-bust'}">${sg(v,1)}</b>`;
+  const updn=(v,d=1)=>v==null?'—':`<b class="${v>=0?'lv-steal':'lv-bust'}">${sg(v,d)}</b>`;   /* d=0 for places, which are whole */
   function drawFO(){
     const rows=Object.keys(FO.mgrs).map(m=>{const h=FO.mgrs[m], ys=YS.filter(y=>h[y]), S=k=>ys.reduce((t,y)=>t+(h[y][k]||0),0);
       const g=S('g'), pt=ys.filter(y=>h[y].patience!=null);
@@ -5018,19 +5030,21 @@ function pharaoh(){
       FO.picksKD.filter(sel).map(p=>`<tr><td>${yr(p.y)}</td><td>${pl(p.n,p.pos)}</td><td>${esc(p.m)}</td><td class="num">${p.starts}</td><td class="num">${f(p.pts,1)}</td><td class="num">${updn(p.val)}</td></tr>`).join('')+'</tbody>';
     $('#tFoGone').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Dropped by</th><th>When</th><th class="num">Held</th><th class="num">Finished</th><th class="num">Points that counted for others</th><th>For</th></tr></thead><tbody>'+
       FO.gone.filter(sel).map(g=>`<tr><td>${yr(g.y)}</td><td>${pl(g.n,g.pos)}</td><td>${esc(g.m)}</td><td class="dim">${esc(g.d)}</td><td class="num">${nOf(g.held,'wk')}</td><td class="num"><b>${esc(g.pos.split(',')[0])}${g.rank}</b></td><td class="num">${f(g.counted,1)}</td><td>${g.to.map(esc).join(', ')||'<span class="dim">nobody</span>'}</td></tr>`).join('')+'</tbody>';
-    const side=s=>`<b>${esc(last(s.m||s.team))}</b> got ${s.got.map(p=>`${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span> <span class="dim">(${p.starts?nOf(p.starts,'start')+', '+f(p.counted,0)+' pts, '+(p.val==null?'':sg(p.val,0)+' at position'):'never started'})</span>`).join(', ')}`;
+    const side=s=>`<b>${esc(last(s.m||s.team))}</b> got ${s.got.map(p=>`${esc(p.n)} <span class="lv-pos">${esc(p.pos||'')}</span> <span class="dim">(${p.starts?nOf(p.starts,'start')+', '+(Math.round(p.counted)===1?'1 pt':ty(f(p.counted,0))+' pts')+', '+(p.val==null?'':sg(p.val,0)+' at position'):'never started'})</span>`).join(', ')}`;
     $('#tFoTrades').innerHTML='<thead><tr><th>Season</th><th>When</th><th>One side</th><th class="num">Value</th><th>The other</th><th class="num">Value</th><th>Won by</th></tr></thead><tbody>'+
-      FO.trades.filter(t=>vis(t.a.m)||vis(t.b.m)).slice().reverse().map(t=>{const w=Math.abs(t.a.val-t.b.val)<0.05?null:t.a.val>t.b.val?t.a:t.b;
-        return `<tr><td>${yr(t.y)}</td><td class="dim">${esc(t.d)}</td><td class="fo-w">${side(t.a)}</td><td class="num">${updn(t.a.val)}</td><td class="fo-w">${side(t.b)}</td><td class="num">${updn(t.b.val)}</td><td>${w?`<b>${esc(last(w.m))}</b> <span class="dim">by ${f(Math.abs(t.a.val-t.b.val),1)}</span>`:'<span class="dim">even</span>'}</td></tr>`;}).join('')+'</tbody>';
+      FO.trades.filter(t=>vis(t.a.m)||vis(t.b.m)).slice().reverse().map(t=>{const w=Math.abs(t.a.val-t.b.val)<0.05?null:t.a.val>t.b.val?t.a:t.b,
+        early=D.live&&t.y===D.live.year&&t.wk>D.live.weeks[D.live.weeks.length-1];
+        return `<tr><td>${yr(t.y)}</td><td class="dim">${esc(t.d)}</td><td class="fo-w">${side(t.a)}</td><td class="num">${updn(t.a.val)}</td><td class="fo-w">${side(t.b)}</td><td class="num">${updn(t.b.val)}</td><td>${early?'<span class="dim">too early: no games since</span>':w?`<b>${esc(last(w.m))}</b> <span class="dim">by ${f(Math.abs(t.a.val-t.b.val),1)}</span>`:'<span class="dim">even</span>'}</td></tr>`;}).join('')+'</tbody>';
     $('#tFoSlots').innerHTML='<thead><tr><th>First-round slot</th><th class="num">Titles</th><th class="num">Podiums</th><th class="num">Regular season</th><th class="num">Average finish</th><th>Season by season</th></tr></thead><tbody>'+
       FO.slots.map(s=>{const v=s.seasons, w=v.reduce((t,x)=>t+x.w,0), l=v.reduce((t,x)=>t+x.l,0), pls=v.filter(x=>x.place);
-        return `<tr><td><b>${ord(s.slot)} pick</b></td><td class="num">${v.filter(x=>x.place===1).length}</td><td class="num">${v.filter(x=>x.place&&x.place<=3).length}</td><td class="num">${w}–${l}</td><td class="num">${pls.length?f(pls.reduce((t,x)=>t+x.place,0)/pls.length,1):'—'}</td>
-          <td class="fo-w">${v.map(x=>`${x.y} ${esc(last(x.m))} <span class="dim">(${esc(x.n||'')}, ${x.place?ord(x.place):'—'})</span>`).join(' · ')}</td></tr>`;}).join('')+'</tbody>';
+        const ti=v.reduce((t,x)=>t+(x.place===1?(x.co?0.5:1):0),0);
+        return `<tr><td><b>${ord(s.slot)} pick</b></td><td class="num">${ti%1?ti.toFixed(1):ti}</td><td class="num">${v.filter(x=>x.place&&x.place<=3).length}</td><td class="num">${w}–${l}</td><td class="num">${pls.length?f(pls.reduce((t,x)=>t+x.place,0)/pls.length,1):'—'}</td>
+          <td class="fo-w">${v.map(x=>`${x.y} ${esc(last(x.m))} <span class="dim">(${esc(x.n||'')}, ${x.co?'co-champion':x.place?ord(x.place):'—'})</span>`).join(' · ')}</td></tr>`;}).join('')+'</tbody>';
     const pk=d=>`${d.rnd}.${String(d.slot).padStart(2,'0')}`;
     $('#tFoSteal').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Pick</th><th class="num">Taken</th><th class="num">Finished</th><th class="num">Climb</th></tr></thead><tbody>'+
-      FO.draftBest.filter(sel).map(d=>`<tr><td>${yr(d.y)}</td><td>${pl(d.n,d.pos)}</td><td>${esc(d.m)}</td><td class="num">${pk(d)}</td><td class="num">${d.pos}${d.taken}</td><td class="num"><b>${d.pos}${d.rank}</b></td><td class="num">${updn(d.taken-d.rank)}</td></tr>`).join('')+'</tbody>';
+      FO.draftBest.filter(sel).map(d=>`<tr><td>${yr(d.y)}</td><td>${pl(d.n,d.pos)}</td><td>${esc(d.m)}</td><td class="num">${pk(d)}</td><td class="num">${d.pos}${d.taken}</td><td class="num"><b>${d.pos}${d.rank}</b></td><td class="num">${updn(d.taken-d.rank,0)}</td></tr>`).join('')+'</tbody>';
     $('#tFoBust').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Pick</th><th class="num">Taken</th><th class="num">Finished</th><th class="num">Fell</th></tr></thead><tbody>'+
-      FO.draftWorst.filter(sel).map(d=>`<tr><td>${yr(d.y)}</td><td>${pl(d.n,d.pos)}</td><td>${esc(d.m)}</td><td class="num">${pk(d)}</td><td class="num">${d.pos}${d.taken}</td><td class="num"><b>${d.rank?d.pos+d.rank:'outside the top '+({QB:50,RB:100,WR:100,TE:75}[d.pos])}</b></td><td class="num">${updn(-d.fell)}</td></tr>`).join('')+'</tbody>';
+      FO.draftWorst.filter(sel).map(d=>`<tr><td>${yr(d.y)}</td><td>${pl(d.n,d.pos)}</td><td>${esc(d.m)}</td><td class="num">${pk(d)}</td><td class="num">${d.pos}${d.taken}</td><td class="num"><b>${d.rank?d.pos+d.rank:'outside the top '+({QB:50,RB:100,WR:100,TE:75}[d.pos])}</b></td><td class="num">${d.rank?updn(-d.fell,0):'—'}</td></tr>`).join('')+'</tbody>';
     const mat=(el,val,fmt,lo)=>{const ms=Object.keys(FO.mgrs).filter(vis).sort((a,b)=>YS.filter(y=>FO.mgrs[b][y]).length-YS.filter(y=>FO.mgrs[a][y]).length||a.localeCompare(b));
       const best={}; YS.forEach(y=>{const v=ms.map(m=>val(m,y)).filter(x=>x!=null); if(v.length)best[y]=lo?Math.min(...v):Math.max(...v);});
       el.innerHTML='<thead><tr><th>Manager</th>'+YS.map(y=>`<th class="num">${y}</th>`).join('')+'</tr></thead><tbody>'+
@@ -5040,7 +5054,7 @@ function pharaoh(){
     mat($('#tFoEff'),(m,y)=>FO.mgrs[m][y]?FO.mgrs[m][y].eff:null,v=>pct(v));
     const span=a=>{const r=[]; a.forEach(y=>{const l=r[r.length-1]; if(l&&y===l[1]+1)l[1]=y; else r.push([y,y]);}); return r.map(([p,q])=>p===q?String(p):p+'–'+q).join(', ');};
     $('#tFoHits').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>'+
-      (FO.hits||[]).filter(sel).map(h=>`<tr><td>${yr(h.y)}</td><td>${pl(h.n,h.pos)}</td><td>${esc(h.m)}</td><td class="num">${h.slot?esc(h.slot):'<span class="dim">pickup</span>'}</td><td class="num">${h.missed}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')+'</tbody>';
+      (FO.hits||[]).filter(sel).map(h=>`<tr><td>${yr(h.y)}</td><td>${pl(h.n,h.pos)}</td><td>${esc(h.m)}</td><td class="num">${h.slot?esc(h.slot):`<span class="dim">${h.how==='trade'?'trade':'pickup'}</span>`}</td><td class="num">${h.missed}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')+'</tbody>';
     fillEmpty($('#tFoHits'));
     $('#tFoLoyal').innerHTML='<thead><tr><th>Player</th><th>Manager</th><th class="num">Seasons</th><th>Which</th><th class="num">Weeks on his roster</th></tr></thead><tbody>'+
       FO.loyal.filter(sel).map(x=>`<tr><td><b>${esc(x.n)}</b></td><td>${esc(x.m)}</td><td class="num">${x.yrs?x.yrs.length:'—'}</td><td class="dim">${x.yrs?span(x.yrs):''}</td><td class="num">${x.wks}</td></tr>`).join('')+'</tbody>';
@@ -5066,7 +5080,7 @@ let openSeason=null;
   const last=n=>n.split(' ').slice(-1)[0], ud=v=>`<b class="${v>=0?'lv-steal':'lv-bust'}">${sg(v,1)}</b>`;
   const card=(id,title,sub,inner,gl)=>`<div class="card" data-collapse id="${id}"><div class="card-h"><h3>${title}</h3>${gl?`<span class="gl" data-gl="${gl}" tabindex="0">?</span>`:''}${sub?`<span class="sub">${sub}</span>`:''}</div>${inner}</div>`;
   function yahooCards(y){
-    if(!FO||!FO.finished.includes(y))return card('syNoY','From 2021 on','',`<div class="card-b"><p class="plain" style="margin:0">Lineups, pickups, drops, trades and the draft come from Yahoo, which reaches back to ${FO?FO.years[0]:2021}. ${y} has its standings, bracket${D.wk&&D.wk[y]?' and schedule':''} above.</p></div>`);
+    if(!FO||!FO.finished.includes(y))return card('syNoY','From 2021 on','',`<div class="card-b"><p class="plain" style="margin:0">Lineups, pickups, drops, trades and the draft come from Yahoo, which reaches back to ${FO?FO.years[0]:2021}. ${y} has its standings and bracket${D.wk&&D.wk[y]?', and its schedule,':''} below.</p></div>`);
     const team=m=>{const r=ROWS.find(r=>r.y===y&&r.mgr===m); return r?r.team:'';};
     const ms=Object.keys(FO.mgrs).filter(m=>FO.mgrs[m][y]);
     const rows=ms.map(m=>({m,...FO.mgrs[m][y]})).sort((a,b)=>b.w-a.w||b.pf-a.pf);
@@ -5124,7 +5138,7 @@ let openSeason=null;
     const c=D.champs.find(x=>x.y===y), rs=ROWS.filter(r=>r.y===y), pl=n=>rs.find(r=>r.place===n);
     LOCKTEAM=c?c.teams[0]:null; drawSeason(y);
     $('#syH').textContent=String(y);
-    $('#syNote').innerHTML=`${rs.length} teams · ${c?c.spots:'?'}-team bracket<br>${FO&&FO.finished.includes(y)?'standings, bracket, schedule and Yahoo':'standings and bracket'}`;
+    $('#syNote').innerHTML=`${rs.length} teams · ${c?c.spots:'?'}-team bracket<br>${FO&&FO.finished.includes(y)?'every game, trade, pickup and draft pick':'standings and bracket'}`;
     $('#syLede').innerHTML=c?`<b>${c.teams.map(esc).join(' &amp; ')}</b> (${c.mgrs.map(esc).join(' &amp; ')}) ${c.co?'shared the title':'won it'}${pl(2)&&!c.co?`, over ${esc(pl(2).team)} (${esc(pl(2).mgr)})`:''}${pl(3)?`; ${esc(pl(3).team)} (${esc(pl(3).mgr)}) took third`:''}.`:'';
     const SB=D.seasonPages&&D.seasonPages[y];
     if(SB&&LV&&window.drawSeasonView){
@@ -5292,28 +5306,30 @@ glossify();
       if(x.aVal==null){const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n, W=as>=bs?x.ta:x.tb;
         return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ahead: ${f(Math.max(as,bs),1)} points that counted a week to ${f(Math.min(as,bs),1)}.</div>`;}
       const av=x.aVal/n, bv=x.bVal/n;
-      if(Math.abs(av-bv)<0.05)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Even so far at their positions.</div>`;
+      /* a gap that rounds to no wins at all is not a winner */
+      if(Math.abs(av-bv)<0.05||Math.abs(av-bv)/PPW<0.005)return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> Even${FINAL?'':' so far'} at their positions.</div>`;
       const W=av>bv?x.ta:x.tb, hi=Math.max(av,bv), lo=Math.min(av,bv);
       return `<div class="lv-verdict"><span class="lv-vlab">Verdict</span> <b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}${FINAL?'won the trade':'winning the trade'}: <b>${sg(hi,1)}</b> a week at their positions to <b>${sg(lo,1)}</b>, about <b>${f((hi-lo)/PPW,2)}</b> wins a week, over the ${nOf(n,'week')} since.</div>`;};
-    $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map(x=>{
-      const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):'wk 1', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
+    const lead=(t,d)=>Math.abs(d)<0.05?'level':esc(t)+' '+sg(Math.abs(d),1);   /* no leader on a tie */
+    $('#tLiveTr').innerHTML=WR.trades.slice().reverse().map((x,ti)=>{
+      const n=x.weeksSince, wb=x.wk>2?'wk 1–'+(x.wk-1):x.wk===2?'wk 1':'', ws=!n?'':n>1?'wk '+x.wk+'–'+(x.wk+n-1):'wk '+x.wk;
       let tiles;
       if(n){const aw=x.aPost/n, bw=x.bPost/n, pl=aw>=bw?x.ta:x.tb, fl=x.aChg>=x.bChg?x.ta:x.tb, gap=Math.abs(x.aChg-x.bChg), left=Math.max(0,L.regWeeks-done);
         /* the wins figure is built from points that counted: what each side actually put in its lineups */
         const as=(x.lineups?x.aStarted:x.aPost)/n, bs=(x.lineups?x.bStarted:x.bPost)/n;
         /* the wins figure is built on value at position when it is available, else on points that counted */
         const av=x.aVal!=null?x.aVal/n:as, bv=x.bVal!=null?x.bVal/n:bs, sl=av>=bv?x.ta:x.tb, wpw=Math.abs(av-bv)/PPW;
-        tiles=`<div class="tile"><span>Points a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${esc(pl)} ${sg(Math.abs(aw-bw),1)}</div></div>`+
-          (x.lineups?`<div class="tile"><span>Points that counted, a week ${gl('started')}</span><b>${f(as,1)} <i>v</i> ${f(bs,1)}</b><div class="lv-tx">${esc(as>=bs?x.ta:x.tb)} ${sg(Math.abs(as-bs),1)} · started weeks only</div></div>`:'')+
-          (x.aVal!=null?`<div class="tile"><span>Value at position, a week ${gl('val')}</span><b>${sg(av,1)} <i>v</i> ${sg(bv,1)}</b><div class="lv-tx">${esc(sl)} ${sg(Math.abs(av-bv),1)} · over replacement starters</div></div>`:'')+`
-          <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${esc(fl)} ${sg(gap,1)} a game${(()=>{const thin=x.a.concat(x.b).filter(p=>p.preG===1).map(p=>p.n.split(' ').slice(-1)[0]); return thin.length?` · ${thin.join(', ')}: one game before the deal`:'';})()}</div></div>
+        tiles=`<div class="tile"><span>All its players, a week since</span><b>${f(aw,1)} <i>v</i> ${f(bw,1)}</b><div class="lv-tx">${lead(pl,aw-bw)} · started or benched, while on the team</div></div>`+
+          (x.lineups?`<div class="tile"><span>Points that counted, a week ${gl('started')}</span><b>${f(as,1)} <i>v</i> ${f(bs,1)}</b><div class="lv-tx">${lead(as>=bs?x.ta:x.tb,as-bs)} · started weeks only</div></div>`:'')+
+          (x.aVal!=null?`<div class="tile"><span>Value at position, a week ${gl('val')}</span><b>${sg(av,1)} <i>v</i> ${sg(bv,1)}</b><div class="lv-tx">${lead(sl,av-bv)} · over replacement starters</div></div>`:'')+`
+          <div class="tile"><span>Against own form ${gl('xform')}</span><b>${sg(x.aChg,1)} <i>v</i> ${sg(x.bChg,1)}</b><div class="lv-tx">${gap<0.05?'level':esc(fl)+' '+sg(gap,1)+' a game'}${(()=>{const thin=x.a.concat(x.b).filter(p=>p.preG===1).map(p=>p.n.split(' ').slice(-1)[0]); return thin.length?` · ${thin.join(', ')}: one game before the deal`:'';})()}</div></div>
           <div class="tile"><span>In wins, to ${esc(sl)} ${gl('war')}</span><b>${f(wpw,2)}<i>/wk</i></b><div class="lv-tx">${left?f(wpw*left,1)+' over the '+nOf(left,'week')+' left':'season over'}</div></div>`;}
       else tiles=`<div class="tile"><span>Points a game before</span><b>${f(x.aPre,1)} <i>v</i> ${f(x.bPre,1)}</b><div class="lv-tx">each side’s players, added up</div></div>
           <div class="tile"><span>Against own form ${gl('xform')}</span><b>—</b><div class="lv-tx">no games since the deal yet</div></div>
           <div class="tile"><span>In wins ${gl('war')}</span><b>—</b><div class="lv-tx">no games since the deal yet</div></div>`;
       const J=(...x)=>x.map(v=>`<span class="nw">${v}</span>`).join(' · ');   /* on a phone, break only between the pieces */
       const row=(t,F)=>{const r=st(t), b=F.before, a=F.since;
-        return `<tr><td>${esc(t)}</td><td>${r?J(r.w+'–'+r.l,ord(r.rank)):'—'}</td><td>${b.ppg!=null?J(b.w+'–'+b.l,f(b.ppg,1),pc(b.ap)):J(b.w+'–'+b.l)}</td>
+        return `<tr><td>${esc(t)}</td><td>${r?J(r.w+'–'+r.l,ord(r.rank)):'—'}</td><td>${b.ppg!=null?J(b.w+'–'+b.l,f(b.ppg,1),pc(b.ap)):b.g?J(b.w+'–'+b.l):'<span class="dim">preseason</span>'}</td>
           <td>${a.g?J(a.w+'–'+a.l,f(a.ppg,1),pc(a.ap)):'<span class="dim">no games yet</span>'}</td><td class="num">${F.woe==null?'—':chg(F.woe)}</td></tr>`;};
       return `<div class="card" style="margin-top:0">
     <div class="card-h"><h3>${esc(x.ta)} &harr; ${esc(x.tb)}</h3><span class="sub">${esc(x.d)} · counts from week ${x.wk}</span>
@@ -5321,9 +5337,9 @@ glossify();
     <div class="card-b">
       ${verdict(x)}
       <div class="lv-trg">${ledger(x.ta,x.a)}${ledger(x.tb,x.b)}</div>
-      <p class="lv-trnote">Points a game, before the deal and since${n?' ('+ws.replace('wk ',n>1?'weeks ':'week ')+')':''}, started or benched. Started: weeks in the lineup, of weeks on the roster, before the deal for the old team and since for the new. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal.</p>
+      ${ti?'':`<p class="lv-trnote">Points a game, before the deal and since, started or benched. Started: weeks in the lineup, of weeks on the roster, before the deal for the old team and since for the new. Rank: among every NFL player at the position over the same weeks. Change: since, against his form before the deal. The same for every card below.</p>`}
       <div class="tiles lv-trtiles">${tiles}</div>
-      <div class="scroll"><table class="lv-trt lv-trteam"><thead><tr><th>Team</th><th>${FINAL?'Final':'Now'}</th><th>Before (${wb})</th><th>Since${ws?' ('+ws+')':''}</th><th class="num">vs pace ${gl('xwin')}</th></tr></thead>
+      <div class="scroll"><table class="lv-trt lv-trteam"><thead><tr><th>Team</th><th>${FINAL?'Final':'Now'}</th><th>${wb?'Before ('+wb+')':'Before'}</th><th>Since${ws?' ('+ws+')':''}</th><th class="num">vs pace ${gl('xwin')}</th></tr></thead>
         <tbody>${row(x.ta,x.fa)}${row(x.tb,x.fb)}</tbody></table></div>
       <p class="lv-trnote">Record · points a week · share of the league outscored. vs pace: wins since against what their form before the deal expected${x.fa.xw!=null?` (${f(x.fa.xw,1)} and ${f(x.fb.xw,1)})`:''}.</p>
     </div></div>`;}).join('');
@@ -5339,10 +5355,10 @@ glossify();
         (TFz.picksKD.length?'<tr class="lv-trs"><td colspan="6">Kickers and defenses, kept apart because every team streams them</td></tr>'+
           TFz.picksKD.map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span></td><td>${esc(p.team)} <span class="dim">${esc(mg(p.team))}</span></td><td class="dim">${esc(p.d)} · ${p.how}</td><td class="num">${p.starts}</td><td class="num">${f(p.pts,1)}</td><td class="num">${ud(p.val)}</td></tr>`).join(''):'')+'</tbody>';
       glossify($('#lvPkSub'));
-      const goneRow=g=>`<tr><td><b>${esc(g.n)}</b> <span class="lv-pos">${esc(g.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===g.m)||'')} <span class="dim">${esc(g.m)}</span></td><td class="dim">${esc(g.d)}</td><td class="num">${nOf(g.held,'wk')}</td><td class="num"><b>${esc(g.pos.split(',')[0])}${g.rank}</b></td><td class="num">${f(g.counted,1)}</td><td>${g.to.map(esc).join(', ')||'<span class="dim">nobody yet</span>'}</td></tr>`;
-      $('#lvGoSub').textContent='Cut, and so far finishing as a starter at his position · '+thru;
-      $('#tLiveGo').innerHTML='<thead><tr><th>Player</th><th>Dropped by</th><th>When</th><th class="num">Held</th><th class="num">Rank so far</th><th class="num">Points that counted for others</th><th>For</th></tr></thead><tbody>'+
-        (TFz.gone.length?'':'<tr><td colspan="7" class="dim">No quarterback, back, receiver or tight end cut this year is finishing as a starter yet.</td></tr>')+TFz.gone.map(goneRow).join('')+(TFz.goneKD&&TFz.goneKD.length?'<tr class="lv-trs"><td colspan="7">Kickers and defenses</td></tr>'+TFz.goneKD.map(goneRow).join(''):'')+'</tbody>';
+      const goneRow=g=>`<tr><td><b>${esc(g.n)}</b> <span class="lv-pos">${esc(g.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===g.m)||'')} <span class="dim">${esc(g.m)}</span></td><td class="dim">${esc(g.d)}</td><td class="num">${nOf(g.held,'wk')}</td><td class="num"><b>${esc(g.pos.split(',')[0])}${g.rank}</b></td><td class="num">${f(g.counted,1)}</td><td>${g.to.map(esc).join(', ')||(FINAL?'<span class="dim">nobody</span>':'<span class="dim">nobody yet</span>')}</td></tr>`;
+      $('#lvGoSub').textContent=(FINAL?'Cut, then finished the season as a starter at his position · ':'Cut, and so far finishing as a starter at his position · ')+thru;
+      $('#tLiveGo').innerHTML='<thead><tr><th>Player</th><th>Dropped by</th><th>When</th><th class="num">Held</th><th class="num">'+(FINAL?'Finished':'Rank so far')+'</th><th class="num">Points that counted for others</th><th>For</th></tr></thead><tbody>'+
+        (TFz.gone.length?'':'<tr><td colspan="7" class="dim">'+(FINAL?'No quarterback, back, receiver or tight end cut that season finished as a starter.':'No quarterback, back, receiver or tight end cut this year is finishing as a starter yet.')+'</td></tr>')+TFz.gone.map(goneRow).join('')+(TFz.goneKD&&TFz.goneKD.length?'<tr class="lv-trs"><td colspan="7">Kickers and defenses</td></tr>'+TFz.goneKD.map(goneRow).join(''):'')+'</tbody>';
     }else{
     $('#lvPkSub').textContent='Points he scored for the team that added him, started or not · '+thru;
     $('#tLivePk').innerHTML='<thead><tr><th>Player</th><th>Added by</th><th>When</th><th class="num">Weeks</th><th class="num">Points</th></tr></thead><tbody>'+
@@ -5351,13 +5367,16 @@ glossify();
     $('#tLiveGo').innerHTML='<thead><tr><th>Player</th><th>Dropped by</th><th>When</th><th>Now with</th><th class="num">Points since</th></tr></thead><tbody>'+
       WR.gone.filter(p=>p.g).slice(0,10).map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span> <span class="dim">${esc(p.nfl)}</span></td><td>${esc(p.team)} <span class="dim">${esc(mg(p.team))}</span></td><td class="dim">${esc(p.d)}</td><td>${p.to?esc(p.to):'<span class="dim">nobody</span>'}</td><td class="num"><b>${f(p.pts,1)}</b></td></tr>`).join('')+'</tbody>';
     }
-    $('#tLiveBusy').innerHTML='<thead><tr><th>Team</th><th class="num">Adds</th><th class="num">Drops</th><th class="num">Waiver claims</th></tr></thead><tbody>'+
+    $('#tLiveBusy').innerHTML='<thead><tr><th>Team</th><th class="num">Adds</th><th class="num">Drops</th><th class="num">Claims won</th></tr></thead><tbody>'+
       WR.busy.map(b=>`<tr><td>${esc(b.team)} <span class="dim">${esc(mg(b.team))}</span></td><td class="num">${b.adds}</td><td class="num">${b.drops}</td><td class="num">${b.claims}</td></tr>`).join('')+'</tbody>';
     $('#tLiveCl').innerHTML='<thead><tr><th>Fought over</th><th>Won by</th><th>Beat</th></tr></thead><tbody>'+
       WR.claims.map(c=>`<tr><td><b>${esc(c.n)}</b> <span class="dim">${esc(c.d)}</span></td><td>${esc(c.team)} <span class="dim">priority ${c.pr}</span></td><td>${c.lost.map(l=>`${esc(l.team)} <span class="dim">(${l.pr})</span>`).join(', ')}</td></tr>`).join('')+'</tbody>';
     ['#tLivePk','#tLiveGo','#tLiveBusy','#tLiveCl'].forEach(s=>fillEmpty($(s)));
+    /* Yahoo keeps no record of contested claims for a finished season: no table, rather than an empty one */
+    $('#tLiveCl').closest('.scroll').hidden=FINAL&&!WR.claims.length;
   }else{
     $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
+    ['#tLivePk','#tLiveGo','#tLiveBusy','#tLiveCl'].forEach(s=>{const t=$(s); if(t)t.innerHTML='';});   /* never another season's rows */
   }
   /* the draft: one column per team in draft order, one row per round */
   /* ---- the draft: in draft order or by team, any mix of positions, and how each pick turned out ---- */
@@ -5409,21 +5428,27 @@ glossify();
     }
     /* the verdicts: biggest steals, biggest busts, and whose draft has scored the most */
     const rows=P.map(p=>({p,v:J[p[0]]})).filter(x=>x.v.fr!=null&&(!on.size||on.has(x.p[4])));
-    const st=rows.filter(x=>x.v.fr<=24&&x.v.d>0).sort((a,b)=>b.v.d-a.v.d).slice(0,8);
-    const bu=rows.filter(x=>x.v.dr<=24&&x.v.d<0).sort((a,b)=>a.v.d-b.v.d).slice(0,8);
     /* expected: what the player who finished at the slot he was drafted at scored (an RB12 pick
        "should" score what this year's RB12 did). Pace carries the gap out to a 17-week season */
     const CV=DP['curve'+dy]||{}, exp=x=>{const c=CV[x.p[4]]; return c&&c[x.v.dr-1]!=null?c[x.v.dr-1]:null;};
     const pace=v=>partial&&wk?v/wk*17:null;
+    /* ordered by points against the slot, not places: falling 36 places from RB1 costs far more than the
+       same fall from a late tight end, which is what the explainer below promises */
+    const gap=x=>{const e=exp(x); return e==null||x.v.pts==null?x.v.d:x.v.pts-e;};
+    const st=rows.filter(x=>x.v.fr<=24&&x.v.d>0).sort((a,b)=>gap(b)-gap(a)).slice(0,8);
+    const bu=rows.filter(x=>x.v.dr<=24&&x.v.d<0).sort((a,b)=>gap(a)-gap(b)).slice(0,8);
     const ln=x=>{const e=exp(x), dv=e==null?null:x.v.pts-e;
       return `<tr><td><b>${esc(x.p[2])}</b> <span class="dim">${esc(x.p[1])}</span></td><td class="num">pick ${x.p[0]} · ${x.p[4]}${x.v.dr}</td><td class="num"><b>${x.p[4]}${x.v.fr}</b></td><td class="num">${f(x.v.pts,1)}</td><td class="num dim">${e==null?'—':f(e,1)}</td><td class="num"><b>${dv==null?'—':sg(dv,1)}</b></td>${partial?`<td class="num">${dv==null?'—':sg(pace(dv),1)}</td>`:''}</tr>`;};
     const tp={}, tx={}; P.forEach(p=>{const v=J[p[0]]; if(v.pts!=null&&(!on.size||on.has(p[4]))){tp[p[1]]=(tp[p[1]]||0)+v.pts; const e=exp({p,v}); if(e!=null)tx[p[1]]=(tx[p[1]]||0)+v.pts-e;}});
     const tr=Object.entries(tp).sort((a,b)=>b[1]-a[1]);
+    /* each draft against the league's average draft: against the slot curve alone nearly every team came out
+       below, since the curve is set by hindsight (undrafted breakouts included), so that told nobody anything */
+    const txv=Object.values(tx), txm=txv.length?txv.reduce((a,b)=>a+b,0)/txv.length:0;
     $('#lvSbHow').textContent='How a pick is judged: each player is ranked at his position by the order he was drafted (the 12th running back taken is RB12) and again by the points he scored under Deadshot\u2019s scoring, against every player in the NFL at that position. A steal finished well above where he was taken: 6 or more places, or twice as high. A bust was a top-40 pick at his position who finished 10 or more places below it, or twice as low. Kickers and defenses are judged the same way. The board marks the biggest of each at every position (five at running back and receiver, three at quarterback and tight end, two at kicker and defense), and a fall from an early pick counts for more than the same fall from a late one.';
-    $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs finished at his position';
+    $('#lvSbSub').textContent=(partial?'2026 so far, weeks 1–'+wk:dy+' season')+' · every player scored with Deadshot’s rules · drafted vs '+(partial?'where he ranks so far':'finished')+' at his position';
     const hd=t=>`<thead><tr><th>${t}</th><th class="num">Taken</th><th class="num">${partial?'Running':'Finished'}</th><th class="num">Points</th><th class="num">Expected <span class="gl" data-gl="slotx" tabindex="0">?</span></th><th class="num">Above or below</th>${partial?'<th class="num">Season pace</th>':''}</tr></thead>`;
     $('#tLiveSb').innerHTML=`${hd('Steals')}<tbody>${st.map(ln).join('')}</tbody>${hd('Busts')}<tbody>${bu.map(ln).join('')}</tbody>`+
-      `<thead><tr><th>Best drafts</th><th class="num"></th><th class="num">Rank</th><th class="num">Points</th><th class="num"></th><th class="num">Above or below</th>${partial?'<th class="num">Season pace</th>':''}</tr></thead><tbody>${tr.map(([t,v],i)=>`<tr><td><b>${esc(t)}</b> <span class="dim">${esc(own[t]||'')}</span></td><td></td><td class="num">${ord(i+1)}</td><td class="num">${f(v,1)}</td><td></td><td class="num"><b>${tx[t]==null?'—':sg(tx[t],1)}</b></td>${partial?`<td class="num">${tx[t]==null?'—':sg(pace(tx[t]),1)}</td>`:''}</tr>`).join('')}</tbody>`;
+      `<thead><tr><th>Best drafts</th><th class="num"></th><th class="num">Rank</th><th class="num">Points</th><th class="num"></th><th class="num">vs the average draft</th>${partial?'<th class="num">Season pace</th>':''}</tr></thead><tbody>${tr.map(([t,v],i)=>`<tr><td><b>${esc(t)}</b> <span class="dim">${esc(own[t]||'')}</span></td><td></td><td class="num">${ord(i+1)}</td><td class="num">${f(v,1)}</td><td></td><td class="num"><b>${tx[t]==null?'—':sg(tx[t]-txm,1)}</b></td>${partial?`<td class="num">${tx[t]==null?'—':sg(pace(tx[t]-txm),1)}</td>`:''}</tr>`).join('')}</tbody>`;
     glossify($('#tLiveSb'));
   };
   drawDr();
@@ -5432,7 +5457,7 @@ glossify();
   ['#lvOddsCard','#lvFileCard','#lvLeagueCard','#lvInjCard'].forEach(k=>{const e=$(k); if(e)e.hidden=!TF;});
   if(TF){
     const gl=k=>`<span class="gl" data-gl="${k}" tabindex="0">?</span>`;
-    const MD=TF.model, YRS=TF.years, PAST=YRS.filter(y=>y!==L.year);
+    const MD=TF.model, YRS=TF.years, PAST=YRS.filter(y=>y!==L.year&&!(D.live&&y===D.live.year));   /* his other finished seasons, never the one being played */
     $('#lvOddsCard').hidden=!MD;
     if(MD){$('#lvOddsSub').textContent=`${MD.runs.toLocaleString()} simulated finishes of the ${nOf(MD.weeksLeft,'week')} left · rerun every week`;
     $('#tLiveOdds').innerHTML='<thead><tr><th>Team</th><th class="num">Expected points a week</th><th class="num">Projected wins</th><th class="num">Playoffs</th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
@@ -5447,7 +5472,11 @@ glossify();
     const NAMES=Object.keys(TF.files).sort((a,b)=>{const ra=L.standings.find(r=>r.mgr===a), rb=L.standings.find(r=>r.mgr===b); return (ra?ra.rank:99)-(rb?rb.rank:99);});
     let who=NAMES[0];
     const hv=(F,k,per)=>{const v=PAST.map(y=>F.hist[y]).filter(h=>h&&h[k]!=null&&h.g).map(h=>per?h[k]/h.g:h[k]); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;};
-    const lv=(k,per)=>{const v=Object.values(TF.files).map(F=>F.hist[L.year]).filter(h=>h&&h[k]!=null&&h.g).map(h=>per?h[k]/h.g:h[k]); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;};
+    const lv=(k,per)=>{
+      /* the league's lineup efficiency is pooled (every team's points over every team's best), the figure "How
+         the league is moving" shows; an average of ten percentages came out a tenth different */
+      if(k==='eff'&&LG&&LG[L.year]&&LG[L.year].eff!=null)return LG[L.year].eff;
+      const v=Object.values(TF.files).map(F=>F.hist[L.year]).filter(h=>h&&h[k]!=null&&h.g).map(h=>per?h[k]/h.g:h[k]); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;};
     const span=a=>!a.length?'':a.length>1?a[0]+'–'+a[a.length-1]:String(a[0]);
     const tile=(lab,val,sub,g)=>`<div class="tile"><span>${lab} ${g?gl(g):''}</span><b>${val}</b>${sub?`<div class="lv-tx">${sub}</div>`:''}</div>`;
     const cmp=(F,k,fmt,per)=>{const h=hv(F,k,per), l=lv(k,per); return [l!=null?'league '+fmt(l):'', h!=null?'his '+span(PAST.filter(y=>F.hist[y]))+' '+fmt(h):''].filter(Boolean).join(' · ');};
@@ -5456,12 +5485,12 @@ glossify();
       $$('#lvFileMgr button').forEach(b=>b.onclick=()=>{who=b.dataset.tf; drawFile();});
       const F=TF.files[who], H=F.hist[L.year], st=L.standings.find(r=>r.mgr===who), od=MD?MD.odds.find(o=>o.mgr===who):null;
       const p1=v=>pct(v), n1=v=>f(v,1), n2=v=>f(v,2);
-      $('#lvFileSub').textContent=`${F.team} · ${who} · against the league this year and his own ${PAST.filter(y=>F.hist[y]).length?span(PAST.filter(y=>F.hist[y])):'history'}`;
+      $('#lvFileSub').textContent=`${F.team} · ${who} · against the league ${FINAL?'that season':'this year'} and his ${FINAL?'other seasons, ':'own '}${PAST.filter(y=>F.hist[y]).length?span(PAST.filter(y=>F.hist[y])):'history'}`;
       const best=(k,per,lo)=>{const ys=YRS.filter(y=>F.hist[y]&&F.hist[y][k]!=null&&F.hist[y].g); if(!ys.length)return '—';
         const v=y=>per?F.hist[y][k]/F.hist[y].g:F.hist[y][k]; const y=ys.reduce((a,b)=>(lo?v(b)<v(a):v(b)>v(a))?b:a); return y;};
       /* lo: 1 = lower is better, 0 = higher is better, 2 = neither (no best year marked) */
       const hrow=(lab,k,fmt,per,lo,g)=>{const v=y=>F.hist[y]&&F.hist[y][k]!=null&&F.hist[y].g?(per?F.hist[y][k]/F.hist[y].g:F.hist[y][k]):null;
-        return `<tr><td>${lab} ${g?gl(g):''}</td>${YRS.map(y=>{const x=v(y), b=lo!==2&&best(k,per,lo===1)===y; return `<td class="num"${b?' style="font-weight:700;color:var(--brass)"':''}>${x==null?'—':fmt(x)}</td>`;}).join('')}<td class="num dim">${lv(k,per)==null?'—':fmt(lv(k,per))}</td></tr>`;};
+        return `<tr><td>${lab} ${g?gl(g):''}</td>${YRS.map(y=>{const x=v(y), b=lo!==2&&best(k,per,lo===1)===y; return `<td class="num"${b?' style="font-weight:700;color:var(--brass)"':''}>${x==null?'—':fmt(x)}</td>`;}).join('')}<td class="num dim">${(()=>{const l=lv(k,per); return l==null?'—':/^[+−-]?\d+$/.test(String(fmt(l)).replace(/<[^>]*>/g,''))&&Math.abs(l-Math.round(l))>0.05?f(l,1):fmt(l);})()}</td></tr>`;};   /* the league's average of a count keeps its tenth (5.3, not 5) */
       const wk=F.weekly;
       $('#lvFile').innerHTML=`<div class="lv-file">
         <div class="tiles lv-trtiles">
@@ -5490,14 +5519,14 @@ glossify();
           ${tile('Adds',H?H.adds:'—',H?nOf(H.fa,'free agent')+' · '+nOf(H.wv,'claim')+' · league '+n1(lv('adds')):'')}
           ${tile('Pickups over your bench',H?sg(H.pk_marg,1):'—',H&&H.pickup_wins!=null?sg(H.pickup_wins,2)+' wins · '+nOf(H.pk_starts,'start'):'','marg')}
           ${tile('Patience',H&&H.patience!=null?n1(H.patience)+'<i> wks</i>':'—',cmp(F,'patience',n1),'patience')}
-          ${tile('Trades',H?H.trade_w+'–'+H.trade_l:'—',H&&H.trades?sg(H.trade_net,1)+' points that counted, net':'none yet','started')}
+          ${tile('Trades',H?H.trade_w+'–'+H.trade_l:'—',H&&H.trades?sg(H.trade_net,1)+' value at position, net':(FINAL?'none':'none yet'),'started')}
         </div>
-        <div class="sub-h">Best pickups this year</div>
+        <div class="sub-h">Best pickups${FINAL?'':' this year'}</div>
         <div class="scroll"><table><thead><tr><th>Player</th><th>Added</th><th class="num">Weeks held</th><th class="num">Started</th><th class="num">Points that counted</th><th class="num">Over the bench ${gl('marg')}</th><th class="num">Finish</th></tr></thead><tbody>${
-          F.pickups.map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span></td><td class="dim">${esc(p.d)} · ${p.how}</td><td class="num">${p.held}</td><td class="num">${p.starts}</td><td class="num">${f(p.pts,1)}</td><td class="num">${p.marg==null?'<span class="dim">K/DEF</span>':chgB(p.marg)}</td><td class="num">${p.rank?esc(p.pos)+p.rank:'—'}</td></tr>`).join('')}</tbody></table></div>
+          F.pickups.map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span></td><td class="dim">${esc(p.d)} · ${p.how}</td><td class="num">${p.held}</td><td class="num">${p.starts}</td><td class="num">${f(p.pts,1)}</td><td class="num">${p.marg==null?'<span class="dim" title="Kickers and defenses: a team keeps no spare on the bench to measure against">—</span>':chgB(p.marg)}</td><td class="num">${p.rank?esc(p.pos)+p.rank:'—'}</td></tr>`).join('')}</tbody></table></div>
         <div class="sub-h">Drops that came back</div>
         <div class="scroll"><table><thead><tr><th>Player</th><th>Dropped</th><th class="num">Held</th><th class="num">Finish at position</th><th class="num">Points that counted for others</th><th>For</th></tr></thead><tbody>${
-          F.gone.map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span></td><td class="dim">${esc(p.d)}</td><td class="num">${nOf(p.held,'wk')}</td><td class="num"><b>${esc(p.pos)}${p.rank}</b></td><td class="num">${f(p.counted,1)}</td><td>${p.to.map(esc).join(', ')||'<span class="dim">nobody yet</span>'}</td></tr>`).join('')}</tbody></table></div>
+          F.gone.map(p=>`<tr><td><b>${esc(p.n)}</b> <span class="lv-pos">${esc(p.pos)}</span></td><td class="dim">${esc(p.d)}</td><td class="num">${nOf(p.held,'wk')}</td><td class="num"><b>${esc(p.pos)}${p.rank}</b></td><td class="num">${f(p.counted,1)}</td><td>${p.to.map(esc).join(', ')||(FINAL?'<span class="dim">nobody</span>':'<span class="dim">nobody yet</span>')}</td></tr>`).join('')}</tbody></table></div>
         <div class="sub-h">Against his own history</div>
         <div class="scroll"><table><thead><tr><th></th>${YRS.map(y=>`<th class="num">${y}</th>`).join('')}<th class="num">League ${L.year}</th></tr></thead><tbody>
           ${hrow('Points a game','pf',n1,1)}${hrow('All-play','ap',p1)}${hrow('Wins above average','waa',v=>sg(v,1),0,0,'waa')}
@@ -5505,7 +5534,7 @@ glossify();
           ${hrow('Adds a week','adds',n2,1,2)}${hrow('Pickups over the bench, a week','pk_marg',v=>sg(v,1),1,0,'marg')}${hrow('Patience, weeks held before a drop','patience',n1,0,2,'patience')}
           ${hrow('Draft: points that counted, a week','drafted_pts',n1,1)}${hrow('Starter games missed','inj_g',v=>String(Math.round(v)),0,2,'inj')}${hrow('Injury luck, wins','inj_luck',v=>sg(v,2),0,0,'inj')}${hrow('Trades','trades',v=>String(Math.round(v)),0,2)}
         </tbody></table></div>
-        <p class="lv-trnote">Regular season only, so every year compares like for like. ${L.year} is weeks 1–${wk.length}; counts are given a week where a part season would otherwise look small. Highlighted: his best year, where more (or less) is plainly better.</p>
+        <p class="lv-trnote">Regular season only, so every year compares like for like. ${L.year} is weeks 1–${wk.length}${FINAL?'.':'; counts are given a week where a part season would otherwise look small.'} Highlighted: his best year, where more (or less) is plainly better.</p>
         <div class="sub-h">Week by week</div>
         <div class="scroll"><table><thead><tr><th>Week</th><th>Opponent</th><th class="num">Result</th><th class="num">Beat of 9 ${gl('allplay')}</th><th class="num">Best possible ${gl('eff')}</th><th class="num">Left on bench</th></tr></thead><tbody>${
           wk.map(x=>`<tr><td>${x.wk}</td><td>${esc(x.vs||'')}</td><td class="num">${x.pts>x.opp?'<b class="lv-steal">W</b>':'<b class="lv-bust">L</b>'} ${f(x.pts)}–${f(x.opp)}</td><td class="num">${x.ap}</td><td class="num">${f(x.opt)}</td><td class="num">${f(x.opt-x.pts,1)}</td></tr>`).join('')}</tbody></table></div></div>`;
@@ -5516,11 +5545,11 @@ glossify();
     {const el=$('#lvInj'); if(el){
       const rows=Object.entries(TF.files).map(([m,F])=>({m,team:F.team,...(F.hist[L.year]||{})})).sort((a,b)=>(a.inj_luck??0)-(b.inj_luck??0));
       const NOW=TF.injNow||[], where=s=>s==='IR'?'IR slot':s==='BN'?'bench':'starting';
-      $('#lvInjSub').textContent=`games missed, weeks 1–${L.weeks[L.weeks.length-1]} · Yahoo’s report for week ${TF.injWeek||''}`;
-      el.innerHTML=`<div class="sub-h" style="margin:0 0 6px">Missed games so far</div><div class="scroll"><table><thead><tr><th>Team</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
+      $('#lvInjSub').textContent=`games missed, weeks 1–${L.weeks[L.weeks.length-1]}`+(TF.injWeek?` · Yahoo’s report for week ${TF.injWeek}`:'');
+      el.innerHTML=`<div class="sub-h" style="margin:0 0 6px">Missed games${FINAL?'':' so far'}</div><div class="scroll"><table><thead><tr><th>Team</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
         rows.map(r=>`<tr><td><b>${esc(r.team)}</b> <span class="dim">${esc(r.m)}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
-        <div class="sub-h" style="margin:16px 0 6px">Hardest hits so far</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Drafted as</th><th class="num">Games missed</th><th>Weeks</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>${
-        (TF.hits||[]).map(h=>`<tr><td><b>${esc(h.n)}</b> <span class="lv-pos">${esc(h.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===h.m)||'')} <span class="dim">${esc(h.m)}</span></td><td class="num">${h.slot?esc(h.slot):'<span class="dim">pickup</span>'}</td><td class="num">${h.missed}</td><td class="dim">${h.wks.join(', ')}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)+' <span class="dim">('+nOf(h.g,'game')+')</span>'}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')}</tbody></table></div>
+        <div class="sub-h" style="margin:16px 0 6px">Hardest hits${FINAL?'':' so far'}</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Drafted as</th><th class="num">Games missed</th><th>Weeks</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+        (TF.hits||[]).map(h=>`<tr><td><b>${esc(h.n)}</b> <span class="lv-pos">${esc(h.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===h.m)||'')} <span class="dim">${esc(h.m)}</span></td><td class="num">${h.slot?esc(h.slot):`<span class="dim">${h.how==='trade'?'trade':'pickup'}</span>`}</td><td class="num">${h.missed}</td><td class="dim">${h.wks.join(', ')}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)+' <span class="dim">('+nOf(h.g,'game')+')</span>'}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')}</tbody></table></div>
         ${NOW.length?`        <div class="sub-h" style="margin:16px 0 6px">Yahoo’s report, week ${TF.injWeek||''}</div><div class="scroll"><table><thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Injury</th><th>On his roster</th></tr></thead><tbody>${
         NOW.map(x=>`<tr><td>${esc(x.team)} <span class="dim">${esc(x.m||'')}</span></td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td><b>${esc(x.status)}</b></td><td class="dim">${esc(x.injury||'')}</td><td class="${x.slot==='BN'||x.slot==='IR'?'dim':''}">${where(x.slot)}</td></tr>`).join('')}</tbody></table></div>`:''}
         <p class="lv-trnote">${NOW.length?'Status as Yahoo shows it now: Q questionable, D doubtful, O out, IR injured reserve. ':''}Missed games: a regular starter (or a player drafted as one) whose NFL team played and he did not, valued at what he was expected to score.</p>`;

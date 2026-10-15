@@ -1548,6 +1548,8 @@ body.sy-pg #syView{padding-top:8px}
 .sec-head h2+.sec-fold-btn{margin-left:auto}
 #syView #live>.fold-bar{display:none}
 section.sec-shut{padding-top:26px}
+/* a Greek letter in an uppercased header stays itself: σ became Σ ("sum"), λ became Λ */
+.nocase{text-transform:none}
 @media (max-width:560px){.fold-bar{gap:6px}.fold-bar button{padding:7px 8px;font-size:10.5px;flex:1 1 auto}}
 section.sec-shut>.sec-head{margin-bottom:0}
 /* on a phone the heading and its button share a line, and the small note drops beneath them */

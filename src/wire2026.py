@@ -55,8 +55,21 @@ def team_form(games, t, w0, w1):
         g = next(g for g in wg if t in (g['ta'], g['tb']))
         mine, theirs = (g['aa'], g['ab']) if g['ta'] == t else (g['ab'], g['aa'])
         W += mine > theirs; L += mine < theirs
-    return dict(w=W, l=L, g=len(pts), ppg=round(sum(pts) / len(pts), 2) if pts else None,
+    return dict(w=W, l=L, g=len(pts), ppg=round(sum(pts) / len(pts), 4) if pts else None,
                 ap=round(apw / apn, 4) if apn else None)
+
+def undone(trades):
+    """trades: [(key, week, [(player, from, to), ...])]. A trade reversed exactly, player for player, before the
+    next week locked never happened (Krueger and Wu, 22 Sep 2022, undone 87 minutes later): both are voided.
+    Returns the voided keys."""
+    void = set()
+    for i, (ka, wa, ma) in enumerate(trades):
+        if ka in void: continue
+        undo = sorted((n, t, f) for n, f, t in ma)
+        for kb, wb, mb in trades[i + 1:]:
+            if kb not in void and wb == wa and sorted(mb) == undo:
+                void |= {ka, kb}; break
+    return void
 
 def grade(S, wk, played, games=(), allwk=None, repl=None, year=2026, kick1=None):
     """wk: {player: [points by week, None = no game]}; played: last week with stats;
@@ -69,8 +82,12 @@ def grade(S, wk, played, games=(), allwk=None, repl=None, year=2026, kick1=None)
     ev = [(dt.datetime(YEAR, 9, 1), 'draft', (team, name)) for _, team, name, _, _ in S.DRAFT2026]
     for i, (d, t, team, adds, drops) in enumerate(reversed(S.MOVES2026)):
         ev.append((when(d, t), 'move', (team, adds, drops, i)))
+    TT = getattr(S, 'TRADETIMES', None) or TRADE_TIMES
+    void = undone([(i, week_of(when(d, TT.get(d, '12:00 pm'))), [(n, tb, ta) for n in ga] + [(n, ta, tb) for n in gb])
+                   for i, (d, ta, ga, tb, gb) in enumerate(S.TRADES2026)])
     for i, tr in enumerate(S.TRADES2026):
-        ev.append((when(tr[0], (getattr(S, 'TRADETIMES', None) or TRADE_TIMES).get(tr[0], '12:00 pm')), 'trade', (tr, i)))
+        if i in void: continue
+        ev.append((when(tr[0], TT.get(tr[0], '12:00 pm')), 'trade', (tr, i)))
     ev.sort(key=lambda e: e[0])
     own, held, adds_out = {}, [], []
     def close(name, last):
@@ -118,27 +135,35 @@ def grade(S, wk, played, games=(), allwk=None, repl=None, year=2026, kick1=None)
 
     # trades: each side's players before the deal (points a game) and since (total)
     trades = []
-    for d, ta, ga, tb, gb in S.TRADES2026:
-        w = week_of(when(d, (getattr(S, 'TRADETIMES', None) or TRADE_TIMES).get(d, '12:00 pm')))
+    for i, (d, ta, ga, tb, gb) in enumerate(S.TRADES2026):
+        if i in void: continue
+        w = week_of(when(d, TT.get(d, '12:00 pm')))
         def lineup(n, team, a, b):
             """weeks a..b on team's roster: (weeks rostered, weeks started, points that counted)"""
             rows = [r for r in getattr(S, 'ROSTERS2026', []) if r[2] == n and r[1] == team and a <= r[0] <= min(b, played)]
             st = [r for r in rows if r[4] not in ('BN', 'IR')]
             return len(rows), len(st), round(sum(r[5] or 0 for r in st), 2)
+        def kept(n, to):
+            """the last week the team that got him in this deal kept him (he can be moved on, or the deal undone)"""
+            h = next((h for h in held if h[0] == n and h[1] == to and h[2] == w and h[4] == 'trade'), None)
+            return min(played, h[3]) if h else played
         def side(names, to, frm):
             out = []
             for n in names:
-                pre, post = pts(n, 1, w - 1), pts(n, w, played); pos = S.TRADEPOS.get(n)
+                # since the deal = while the team that got him had him: a player flipped on a week later is not
+                # credited with the rest of his season (Tee Higgins, held one week, credited twelve)
+                end = kept(n, to)
+                pre, post = pts(n, 1, w - 1), pts(n, w, end); pos = S.TRADEPOS.get(n)
                 pp = sum(pre) / len(pre) if pre else None
                 qq = sum(post) / len(post) if post else None
                 # against his own form: points a game since the deal minus points a game before it
-                out.append(dict(n=n, pos=pos, pre=None if pp is None else round(pp, 2), preG=len(pre),
+                out.append(dict(n=n, pos=pos, pre=None if pp is None else round(pp, 4), preG=len(pre),
                                 post=round(sum(post), 2), postG=len(post),
                                 chg=round(qq - pp, 2) if pp is not None and qq is not None else None,
                                 rkPre=pos_rank(allwk, pos, pp, 1, w - 1) if w > 1 else None,
-                                rkPost=pos_rank(allwk, pos, qq, w, played) if played >= w else None))
+                                rkPost=pos_rank(allwk, pos, qq, w, end) if end >= w else None))
                 # from Yahoo's lineups: how often he started, and the points that counted
-                rb, sb_, pb_ = lineup(n, frm, 1, w - 1); ra, sa_, pa_ = lineup(n, to, w, played)
+                rb, sb_, pb_ = lineup(n, frm, 1, w - 1); ra, sa_, pa_ = lineup(n, to, w, end)
                 out[-1].update(rosB=rb, stB=sb_, stBpts=pb_, rosA=ra, stA=sa_, stApts=pa_)
                 # value at position: those points, minus a replacement-level starter at his position over the same starts
                 r0 = (repl or {}).get((out[-1]['pos'] or '').split(',')[0])
@@ -159,8 +184,10 @@ def grade(S, wk, played, games=(), allwk=None, repl=None, year=2026, kick1=None)
                            fa=form(ta), fb=form(tb),
                            # points that counted: started for the team that got them, since the deal
                            aStarted=round(sum(p['stApts'] for p in A), 2), bStarted=round(sum(p['stApts'] for p in B), 2),
-                           aVal=round(sum(p['stVal'] or 0 for p in A), 2) if repl else None,
-                           bVal=round(sum(p['stVal'] or 0 for p in B), 2) if repl else None,
+                           # a side's return is never worth less than getting nothing: a team that never started what
+                           # it got does not win because the other side started theirs below replacement
+                           aVal=round(max(0.0, sum(p['stVal'] or 0 for p in A)), 2) if repl else None,
+                           bVal=round(max(0.0, sum(p['stVal'] or 0 for p in B)), 2) if repl else None,
                            lineups=bool(getattr(S, 'ROSTERS2026', None))))
 
     # how busy each team has been, and the claims that were fought over

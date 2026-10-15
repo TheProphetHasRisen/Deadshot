@@ -72,7 +72,13 @@ jobs:
             src/yahoo_raw/sleeper_pts_2024.json
             src/yahoo_raw/sleeper_pts_2025.json
             src/yahoo_raw/sleeper_players.json
-          key: yahoo-past-v2
+            src/yahoo_raw/sleeper_ids.json
+            src/yahoo_raw/sleeper_team_2021.json
+            src/yahoo_raw/sleeper_team_2022.json
+            src/yahoo_raw/sleeper_team_2023.json
+            src/yahoo_raw/sleeper_team_2024.json
+            src/yahoo_raw/sleeper_team_2025.json
+          key: yahoo-past-v3
       - name: Browsers for the checks
         if: steps.key.outputs.ok == 'true'
         uses: actions/cache@v4

@@ -175,8 +175,12 @@ for YR in sorted(WKALL):
         tLog.append(dict(y=YR,d=t['d'],ma=ma,mb=mb,ta=t['ta'],tb=t['tb'],pa=t['pa'],pb=t['pb']))
 tYears=sorted(WKALL)
 tMgr=[]
+# the seasons a manager played inside the logged years, the one being played included (its trades are in
+# the ledger, so it has to be in the count they are divided by)
+_LIVEM=set((MGRS_LIVE.get(max(tYears)) or {}).values()) if tYears and max(tYears) in MGRS_LIVE else set()
+def _yrs(m): return [y for y in tYears if any(r['mgr']==m and r['y']==y for r in rows) or (y in MGRS_LIVE and m in _LIVEM)]
 for m in tCnt:
-    yrs=[y for y in tYears if any(r['mgr']==m and r['y']==y for r in rows)]
+    yrs=_yrs(m)
     busy=max(((tYear[y][m],y) for y in tYears if tYear[y][m]), default=(0,None))
     tMgr.append(dict(name=m,trades=tCnt[m],seasons=len(yrs),
         per=(tCnt[m]/len(yrs) if yrs else 0),partners=len(tPartners[m]),
@@ -184,7 +188,7 @@ for m in tCnt:
         busyN=busy[0],busyY=busy[1]))
 for m in [mm['name'] for mm in mgrs]:
     if m in tCnt: continue
-    yrs=[y for y in tYears if any(r['mgr']==m and r['y']==y for r in rows)]
+    yrs=_yrs(m)
     if yrs: tMgr.append(dict(name=m,trades=0,seasons=len(yrs),per=0,partners=0,pin=0,pout=0,busyN=0,busyY=None))
 tMgr.sort(key=lambda d:-d['trades'])
 out.update(trade=dict(years=tYears,mgr=tMgr,

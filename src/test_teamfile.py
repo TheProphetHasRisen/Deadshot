@@ -23,6 +23,7 @@ def best_brute(players, slots):
             for wr in itertools.combinations(by('WR'), min(slots.get('WR', 0), len(by('WR')))):
                 for te in itertools.combinations(by('TE'), min(slots.get('TE', 0), len(by('TE')))):
                     used = {id(p) for p in qb + rb + wr + te}
+                    if len(used) < len(qb + rb + wr + te): continue   # one player cannot fill two slots (Taysom Hill, QB and TE)
                     flex = [p for p in pl if id(p) not in used and any(x in ('RB', 'WR', 'TE') for x in (p['pos'] or '').split(','))]
                     fx = max((p['pts'] or 0 for p in flex), default=0) if slots.get('W/R/T') else 0
                     k = max((p['pts'] or 0 for p in by('K')), default=0)
@@ -30,7 +31,7 @@ def best_brute(players, slots):
                     best = max(best, pts(qb + rb + wr + te) + fx + k + d)
     return best
 
-for y in [TF.LIVE, TF.LIVE - 1]:
+for y in TF.YEARS:   # every season: the multi-position flaw only showed in 2021 and 2024
     if y not in TF.YEARS: continue
     st = TF.settings(y)
     R = P.rosters(y); by = {}
@@ -79,7 +80,7 @@ for y in [2023, TF.LIVE]:
     R = [r for r in P.rosters(y)]
     G = [g for g in P.games(y) if g['status'] == 'postevent' and g['wk'] < st['po']]
     wks = {g['wk'] for g in G}
-    PL = INJ.played(y); RP = L['repl']
+    PL = INJ.played(y, live=(y == TF.LIVE)); RP = L['repl']
     # draft-slot expectation, worked out here from Yahoo's rankings and draft directly
     import json as _j, os as _o
     TOTS = {}
@@ -97,18 +98,19 @@ for y in [2023, TF.LIVE]:
     seen = {}; TK = {}
     for pick, tm, pn, nfl, pp in P.draft(y):
         p0 = (pp or '').split(',')[0]; seen[p0] = seen.get(p0, 0) + 1
-        if pn: TK[pn] = (p0, seen[p0])
+        if pn: TK[pn] = (p0, seen[p0], TF.mgr_of(y, tm))
     STARTN = dict(QB=10, RB=24, WR=25, TE=11, K=10, DEF=10)
     pts = {}
     for r in R:
-        if r['wk'] in wks and PL(r['n'], r['pos'], r['nfl'], r['wk']): pts.setdefault(r['n'], []).append(r['pts'] or 0)
+        if r['wk'] in wks and PL(r['n'], r['pos'], r['nfl'], r.get('bye'), r['wk']): pts.setdefault(r['n'], []).append(r['pts'] or 0)
     tot = {}
     stints = {}
     for r in R:
         if r['wk'] in wks: stints.setdefault((r['team'], r['n']), []).append(r)
     for (team, n), rows in stints.items():
-        played_rows = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r['wk'])]
-        missed = [r for r in rows if r['wk'] != r.get('bye') and (r['slot'] == 'IR' or PL(r['n'], r['pos'], r['nfl'], r['wk']) is False)]
+        played_rows = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r.get('bye'), r['wk'])]
+        # missed: his team (that season's, with its own bye) played and he did not; an IR slot alone is not a miss
+        missed = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r.get('bye'), r['wk']) is False]
         if not missed: continue
         tk = TK.get(n); sp = None
         if tk:
@@ -117,7 +119,7 @@ for y in [2023, TF.LIVE]:
         gp = len(pts.get(n, [])); own = sum(pts[n]) / gp if gp else None
         if own is None and sp is None: continue
         is_starter = (played_rows and 2 * sum(1 for r in played_rows if r['slot'] not in ('BN', 'IR')) >= len(played_rows)) \
-            or (tk is not None and tk[1] <= STARTN.get(tk[0], 0)) or any(r['slot'] == 'IR' for r in rows)
+            or (tk is not None and tk[2] == TF.mgr_of(y, team) and tk[1] <= STARTN.get(tk[0], 0))
         if not is_starter: continue
         exp = ((own or 0) * gp + sp * 4) / (gp + 4) if sp is not None else own
         pos = (rows[0]['pos'] or '').split(',')[0]

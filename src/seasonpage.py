@@ -90,32 +90,34 @@ def bundle(y, H):
         for x in drops: names[x[0]] = (x[2], x[1])
     for pk, team, n, nfl, pos in S.DRAFT2026: names[n] = (pos, nfl)
     for n, pos in S.TRADEPOS.items(): names.setdefault(n, (pos, None))
-    wk = {n: by_key.get(SL.key(n, pos, nfl)) for n, (pos, nfl) in names.items()}
+    wk = {n: SL.lookup(by_key, n, pos, nfl)[1] for n, (pos, nfl) in names.items()}
     wk = {n: v for n, v in wk.items() if v}
     k1 = TF.week_dates(y).get(1)
     wire = W.grade(S, wk, max(weeks), games, allwk, TF.replacement(y, 17), year=y,
                    kick1=dt.datetime(k1.year, k1.month, k1.day, 13, 0) if k1 else None)
-    # the draft, and every drafted player's season: points and rank at his position, NFL-wide
-    tot = {pos: sorted(((sum(v or 0 for v in line[:17]), i) for i, line in enumerate(lines)), reverse=True) for pos, lines in allwk.items()}
-    rank_of = {}
-    for pos, lst in tot.items():
-        for r, (pts, i) in enumerate(lst): rank_of[(pos, i)] = (round(pts, 2), r + 1)
-    idx = {}
-    for pos, lines in allwk.items():
-        for i, line in enumerate(lines): idx[id(line)] = (pos, i)
+    # the draft, and every drafted player's season: points and rank at his position, NFL-wide, the same
+    # ranking the Front Office uses (sleeper_season.ranker); a pick who never played ranks behind everyone
+    rank = SL.ranker(by_key, allwk, 17)
     dp = {}
     for pk, team, n, nfl, pos in S.DRAFT2026:
-        line = by_key.get(SL.key(n, pos, nfl))
-        if line is not None and id(line) in idx:
-            pts, rk = rank_of[idx[id(line)]]; dp[n] = [pts, rk]
-    curve = {pos: [round(p, 1) for p, _ in lst[:150]] for pos, lst in tot.items()}
+        pts, rk = rank(n, pos, nfl)
+        if rk is not None: dp[n] = [pts, rk]
+    tot = {pos: sorted((sum(v or 0 for v in line[:17]) for line in lines), reverse=True) for pos, lines in allwk.items()}
+    curve = {pos: [round(p, 1) for p in lst[:150]] for pos, lst in tot.items()}
+    # the NFL team each pick played for THAT season (Yahoo's old drafts carry today's: 2021's McCaffrey "SF")
+    import injuries
+    ids, st = injuries._ids(), injuries.season_teams(y)
+    def then(n, pos, nfl):
+        if (pos or '').split(',')[0] == 'DEF': return nfl
+        return next((st[c] for c in injuries.cands(ids, n, pos) if c in st), nfl)
+    S.DRAFT2026 = [(pk, team, n, then(n, pos, nfl), pos) for pk, team, n, nfl, pos in S.DRAFT2026]
     # the page draws pickups and drops from the team files below; the grader's full lists are not needed
     wire['picks'] = [p for p in wire['picks'] if p.get('g')][:10]
     wire['gone'] = [p for p in wire['gone'] if p.get('g')][:10]
     M, L = H[y]
     # the team-file pieces for this season (careers come from the Front Office data on the page)
     files = {m: dict(team=Z['team'], weekly=Z['weekly'], pickups=Z['pickups'][:8], gone=Z['gone'][:8]) for m, Z in M.items()}
-    return dict(year=y, final=True, weeks=weeks, regWeeks=len(weeks), mgr=mgr, games=games, standings=standings,
+    out = dict(year=y, final=True, weeks=weeks, regWeeks=len(weeks), mgr=mgr, games=games, standings=standings,
                 upcoming=[], asOf='Final', trades=[dict(d=d, ta=ta, ga=ga, tb=tb, gb=gb) for (d, ta, ga, tb, gb) in S.TRADES2026],
                 draft={str(y): [list(p) for p in S.DRAFT2026]},
                 draftPts={str(y): dp, 'weeks': {str(y): 17}, 'curve' + str(y): curve},
@@ -126,3 +128,15 @@ def bundle(y, H):
                         gone=[g for g in TF.starters_gone(L['gone_list']) if TF.skill(g)][:12],
                         goneKD=[g for g in TF.starters_gone(L['gone_list']) if not TF.skill(g)][:6],
                         hits=L['hits'][:12], injAvg=L['injAvg']))
+    # the record book's own team names: Yahoo has "HunchoCamby🥸" for 2021, the record book "HunchoCamby"
+    import data as D
+    ren = {}
+    for t in teams:
+        bk = next((b for b in D.MANAGERS.get(y, {}) if TF._plain(b) == TF._plain(t)), t)
+        if bk != t: ren[t] = bk
+    def walk(x):
+        if isinstance(x, dict): return {ren.get(k, k): walk(v) for k, v in x.items()}
+        if isinstance(x, list): return [walk(v) for v in x]
+        if isinstance(x, tuple): return tuple(walk(v) for v in x)
+        return ren.get(x, x) if isinstance(x, str) else x
+    return walk(out) if ren else out

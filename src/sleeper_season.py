@@ -18,7 +18,9 @@ def _players():
     f = 'yahoo_raw/sleeper_players.json'
     if os.path.exists(f): return json.load(open(f))
     P = injuries._get('https://api.sleeper.app/v1/players/nfl')
-    out = {pid: [p.get('full_name'), p.get('position')] for pid, p in P.items() if p.get('position') in ('QB', 'RB', 'WR', 'TE', 'K')}
+    OFF = ('QB', 'RB', 'WR', 'TE', 'K')
+    pos = lambda p: p.get('position') if p.get('position') in OFF else next((x for x in p.get('fantasy_positions') or [] if x in OFF), None)
+    out = {pid: [p.get('full_name'), pos(p)] for pid, p in P.items() if pos(p)}
     json.dump(out, open(f, 'w')); return out
 
 def weekly(y, weeks=range(1, 18)):
@@ -52,3 +54,32 @@ def key(name, pos, nfl=None):
     p0 = (pos or '').split(',')[0]
     if p0 == 'DEF': return injuries.TEAMFIX.get(nfl, nfl) + '|DEF'
     n = injuries.norm(name); return injuries.ALIAS.get(n, n) + '|' + p0
+
+def keys(name, pos, nfl=None):
+    """every by_key key worth trying for a Yahoo player: each spelling (Sleeper renames players) at each
+    position Yahoo lists (Cordarrelle Patterson is "WR,RB"; Sleeper has him at RB)"""
+    ps = (pos or '').split(',')
+    if ps[0] == 'DEF': return [injuries.TEAMFIX.get(nfl, nfl) + '|DEF'] if nfl else []
+    return [nm + '|' + p for p in ps for nm in injuries.names(injuries.norm(name))]
+
+def lookup(by_key, name, pos, nfl=None):
+    """(key, weekly line) for a Yahoo player, or (None, None)"""
+    for k in keys(name, pos, nfl):
+        if k in by_key: return k, by_key[k]
+    return None, None
+
+def ranker(by_key, allwk, weeks):
+    """rank(name, pos, nfl) -> (points over the weeks, rank at his position among every NFL player), one
+    ranking for the whole site (the season pages and the Front Office used to rank differently). A
+    drafted player Sleeper knows who never played scores 0 and ranks behind everyone who scored."""
+    tot = {p: sorted((sum(v or 0 for v in l[:weeks]) for l in lines), reverse=True) for p, lines in allwk.items()}
+    ids = injuries._ids()
+    def rank(name, pos, nfl=None):
+        k, line = lookup(by_key, name, pos, nfl)
+        if line is None:
+            if (pos or '').split(',')[0] == 'DEF' or not injuries.cands(ids, name, pos): return None, None
+            p0 = (pos or '').split(',')[0]
+            return 0.0, 1 + sum(1 for t in tot.get(p0, []) if t > 0)
+        p0 = k.split('|')[1]; t = sum(v or 0 for v in line[:weeks])
+        return round(t, 2), 1 + sum(1 for x in tot.get(p0, []) if x > t + 1e-9)
+    return rank
