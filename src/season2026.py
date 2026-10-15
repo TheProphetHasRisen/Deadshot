@@ -266,5 +266,6 @@ TRADEPOS = {"Isaiah Likely":"TE","Rome Odunze":"WR","Colston Loveland":"TE","Ash
 # waiver claims stay as typed. Re-pull with: python3 yahoo_fetch.py 2026 && python3 yahoo_to_2026.py
 try:
     from season2026_yahoo import W2026, UPCOMING2026, STANDINGS2026_WK5, MOVES2026, TRADES2026, TRADETIMES, TRADEPOS, ROSTERS2026  # noqa: F401,E402
+    from season2026_yahoo import ASOF  # noqa: F401,E402
 except ImportError:
     TRADETIMES, ROSTERS2026 = {}, []

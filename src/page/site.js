@@ -1601,6 +1601,9 @@ $$('#board .plate').forEach(b=>b.onclick=()=>{
   $('#seasons').scrollIntoView({behavior:'smooth'});
   setTimeout(()=>{const el=$('#brkIn'); if(el)el.closest('.card').scrollIntoView({behavior:'smooth',block:'center'});},420);});
 
+/* injury luck over a career, from the team files (teamfile.py, 2021 on); null before Yahoo */
+function injLuckOf(name){const FO=D.live&&D.live.files&&D.live.files.fo; const h=FO&&FO.mgrs[name]; if(!h)return null;
+  const v=Object.values(h).filter(x=>x&&x.inj_luck!=null); return v.length?v.reduce((t,x)=>t+x.inj_luck,0):null;}
 /* ============ generic table ============ */
 function table(el,cols,data,opts={}){
   const st={i:opts.sort??-1,dir:opts.dir??'desc'};
@@ -1831,6 +1834,8 @@ function buildAll(){
  {h:'All-play %',f:r=>r.apPct==null?'—':pct(r.apPct),c:'num',k:r=>r.apPct},
  {h:'Sched luck',f:r=>sg(r.apLuck,2),c:'num',k:r=>r.apLuck,
   t:'Real wins minus all-play expected wins over those same seasons. No model, no exponent, just how the schedule fell.'},
+ {h:'Injury luck',f:r=>{const v=injLuckOf(r.name); return v==null?'—':sg(v,2);},c:'num',k:r=>injLuckOf(r.name),
+  t:'Wins: the league’s average loss to missed games minus his, every season from 2021 (the first Yahoo reaches) added up. Plus means his regular starters missed less than most.'},
  {h:'Avg finish',f:r=>f(r.avgPlace),c:'num',k:r=>r.avgPlace,asc:1},
  {h:'Playoffs',f:r=>r.apps,c:'num',k:r=>r.apps},
  {h:'Power idx',f:r=>f(r.cpi,1),c:'num',k:r=>r.cpi},
@@ -5098,10 +5103,13 @@ glossify();
   /* up next and results: the same matchup cards as Week by Week in the record book */
   const GRID='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:12px">';
   const ups=L.upcoming; if(ups.length){
-    $('#lvUpH').textContent='Week '+ups[0].wk+' · up next';
+    /* once a week's games have kicked off, Yahoo has live scores: show those, with the projection beside them */
+    const live=ups.some(g=>g.status==='midevent'&&(g.aa||g.ab));
+    $('#lvUpH').textContent='Week '+ups[0].wk+(live?' · live':' · up next');
     $('#tLiveUp').innerHTML=GRID+ups.map(g=>{
-      const s=(t,p)=>`<div class="side"><span class="tn">${esc(t)}<small>${esc(mg(t))} · ${recOf(t)}</small></span><span class="sc">${f(p)}</span></div>`;
-      return `<div class="game"><div class="gh">Week ${g.wk} · projected margin ${f(Math.abs(g.pa-g.pb))}</div>${s(g.ta,g.pa)}${s(g.tb,g.pb)}</div>`;}).join('')+'</div>';
+      const on=g.status==='midevent'&&(g.aa||g.ab), lead=on?(g.aa>=g.ab?'a':'b'):null;
+      const s=(t,p,sc,k)=>`<div class="side${on&&lead===k?' w':''}"><span class="tn">${esc(t)}<small>${esc(mg(t))} · ${recOf(t)}${on?' · proj '+f(p,1):''}</small></span><span class="sc">${on?f(sc):f(p)}</span></div>`;
+      return `<div class="game"><div class="gh">Week ${g.wk} · ${on?'<span class="lv-up" style="margin-left:0">live</span> margin '+f(Math.abs(g.aa-g.ab)):'projected margin '+f(Math.abs(g.pa-g.pb))}</div>${s(g.ta,g.pa,g.aa,'a')}${s(g.tb,g.pb,g.ab,'b')}</div>`;}).join('')+'</div>';
   }else $('#tLiveUp').closest('.card').remove();
   /* results, a week at a time */
   let wk=done;

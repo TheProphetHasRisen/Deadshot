@@ -13,6 +13,12 @@ PUSH=0; [ "${1:-}" = "--push" ] && PUSH=1
 
 say(){ printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
+if [ -f .yahoo_tokens.json ] && [ "${DEADSHOT_NO_REFRESH:-0}" != 1 ]; then
+  say "read Yahoo"
+  python3 yahoo_fetch.py 2026 >/dev/null && python3 yahoo_to_2026.py && python3 draft_points.py >/dev/null \
+    || echo "  (Yahoo could not be read: building from the last copy)"
+fi
+
 say "build"
 python3 export.py >/dev/null
 python3 mksite.py
@@ -131,7 +137,7 @@ mkdir -p "$CLONE/src" "$CLONE/src/page"
 cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py mkfonts.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
-         test_numbers.py numbers.lock.json test_copy.py test_ask.js season2026.py check_2026.py draft_points.py draft_points.json wire2026.py test_wire.py yahoo_fetch.py yahoo_parse.py yahoo_to_2026.py season2026_yahoo.py teamfile.py test_teamfile.py nfl_teams.py nflcomps.py injuries.py \
+         test_numbers.py numbers.lock.json test_copy.py test_ask.js season2026.py check_2026.py draft_points.py draft_points.json wire2026.py test_wire.py yahoo_fetch.py yahoo_parse.py yahoo_to_2026.py season2026_yahoo.py teamfile.py test_teamfile.py nfl_teams.py nflcomps.py injuries.py mkog.js ci_update.sh \
          eslint.config.js package.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \
@@ -147,6 +153,12 @@ done
 mkdir -p "$CLONE/art" && cp art/*.png "$CLONE/art/"   # the draft board's ice and fire banners
 mkdir -p "$CLONE/fonts"
 cp fonts/*.woff2 fonts/OFL-*.txt "$CLONE/fonts/"
+# the scheduled job that keeps the site current from Yahoo (ci_update.sh), and the guard that keeps
+# the Yahoo sign-in it uses out of this public repo
+mkdir -p "$CLONE/.github/workflows"
+cp ci/update.yml "$CLONE/.github/workflows/update.yml"
+cp ci/site.gitignore "$CLONE/.gitignore"
+git -C "$CLONE" add .gitignore .github/workflows/update.yml
 git -C "$CLONE" add -A index.html 404.html og.png og-*.png t src favicon.svg favicon-32.png \
   apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts art
 if git -C "$CLONE" diff --cached --quiet; then

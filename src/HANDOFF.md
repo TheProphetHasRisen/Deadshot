@@ -1012,3 +1012,24 @@ sync. The short version:
 - When he has to do something himself, walk him through every click and screen and
   say what he should see when it worked.
 - Deploy without asking. Do not ask for or accept a GitHub personal access token.
+
+## Automatic updates (set up 15 Oct 2026)
+
+The site keeps itself current from Yahoo with no computer involved. A scheduled GitHub job in the
+public site repo (`.github/workflows/update.yml`, source in `ci/update.yml`, runner `ci_update.sh`)
+reads Yahoo every 30 minutes through Sunday, Monday-night and Thursday-night games and once every
+morning, rebuilds the page from the `src/` copy deploy.sh keeps there, runs every check deploy.sh
+runs, and publishes to the same repo; Vercel redeploys. A run that finds nothing new stops early.
+
+It needs one secret, `YAHOO_TOKENS`, set by Brian himself (credentials never pass through Claude):
+
+    gh secret set YAHOO_TOKENS -R TheProphetHasRisen/Deadshot < ~/Downloads/Deadshot/.yahoo_tokens.json
+
+Yahoo keeps the same refresh token across renewals (checked 15 Oct 2026), so the stored copy stays
+good. If Yahoo ever revokes it, the job fails and GitHub emails the repo owner: sign in again with
+yahoo_auth.py and re-run the line above. Run it by hand from the repo's Actions tab ("Live update
+from Yahoo", Run workflow; tick "force" to publish even when nothing changed).
+
+Local deploys (`./deploy.sh --push`) read Yahoo first, so a deploy from the Mac is never older than
+the job's last publish. deploy.sh installs the workflow and the site repo's `.gitignore` (which keeps
+the sign-in and the caches out of the public repo) on every push.

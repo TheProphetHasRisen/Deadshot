@@ -318,11 +318,12 @@ if S26:
             repl = teamfile.replacement(2026, int(dp['weeks']['2026']))
         return wire2026.grade(S26, dp.get('wk2026') or {}, int(dp['weeks']['2026']), games,
                               dp.get('allwk2026'), repl)
-    up = [dict(wk=wk, ta=a, pa=pa_, tb=b, pb=pb_) for wk, lst in S26.UPCOMING2026.items() for (a, pa_, b, pb_) in lst]
+    up = [dict(wk=wk, ta=u[0], pa=u[1], tb=u[2], pb=u[3], aa=u[4] if len(u) > 4 else None, ab=u[5] if len(u) > 5 else None,
+               status=u[6] if len(u) > 6 else 'preevent') for wk, lst in S26.UPCOMING2026.items() for u in lst]
     out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
                        trades=[dict(d=d, ta=a, ga=ga, tb=b, gb=gb) for (d, a, ga, b, gb) in S26.TRADES2026],
                        draft={'2026': [list(p) for p in S26.DRAFT2026], '2025': [list(p) for p in S26.DRAFT2025]},
-                       asOf='Oct 14, 2026',
+                       asOf=getattr(S26, 'ASOF', 'Oct 14, 2026'),
                        # trades and the waiver wire graded by what each player has scored since (wire2026.py)
                        wire=_wire(),
                        # the team files and playoff odds, from every season Yahoo reaches (teamfile.py)

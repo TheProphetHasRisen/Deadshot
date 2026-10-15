@@ -254,6 +254,12 @@ rest-of-season scoring on early scoring over 2021-2025, then 20,000 simulated fi
 real schedule). It reads yahoo_raw/2021-2026, so on a fresh machine pull every season first
 (`for y in 2021 2022 2023 2024 2025 2026; do python3 yahoo_fetch.py $y; done`, ~1,200 calls).
 `test_teamfile.py` checks it and `deploy.sh` gates on it.
+**Missed games** (`injuries.py`): Yahoo keeps no injury history, so a rostered player missed a week
+when his NFL team played (not his bye, from Yahoo's roster) and Sleeper's weekly stats show no `gp`
+for him, or he sat in an IR slot. Only regular starters (started half the games they played for that
+team) count; each miss costs his points a game over replacement at his position. Suspensions count,
+so the site says "missed games". Sleeper's replies cache in yahoo_raw/ (sleeper_ids.json,
+sleeper_gp_<year>.json; the live year re-pulls every run).
 `ROSTERS2026` (who started each week, Yahoo's official points) drives the trade cards'
 "Started" column and "Points that counted" tile. Yahoo reaches the league for 2021-2026 on
 Brian's account; 2015-2020 are not listed there.

@@ -38,7 +38,8 @@ def main():
     G = P.games(YEAR)
     W = [(g['wk'], g['ta'], g['aa'], g['pa'], g['tb'], g['ab'], g['pb'], '') for g in G if g['status'] == 'postevent']
     nxt = min((g['wk'] for g in G if g['status'] != 'postevent'), default=None)
-    UP = {nxt: [(g['ta'], g['pa'], g['tb'], g['pb']) for g in G if g['wk'] == nxt]} if nxt else {}
+    # the coming (or in-progress) week: projections, and once kickoff has passed the live score
+    UP = {nxt: [(g['ta'], g['pa'], g['tb'], g['pb'], g['aa'], g['ab'], g['status']) for g in G if g['wk'] == nxt]} if nxt else {}
     moves, trades, times, tpos = [], [], {}, {}
     for t in P.transactions(YEAR):
         if t['status'] != 'successful': continue
@@ -66,6 +67,8 @@ def main():
         'TRADES2026 = ' + pprint.pformat(trades, width=140),
         'TRADETIMES = ' + pprint.pformat(times),
         'TRADEPOS = ' + pprint.pformat(tpos),
+        '# when Yahoo was read (Pacific time, where the league lives)',
+        'ASOF = ' + repr(dt.datetime.now(ZoneInfo('America/Los_Angeles')).strftime('%b %-d, %Y, %-I:%M %p').replace('AM', 'am').replace('PM', 'pm') + ' PT'),
         '# every player on every roster every week: (week, team, player, position, slot, points);',
         '# slot BN is the bench and IR injured reserve, anything else started',
         'ROSTERS2026 = ' + pprint.pformat(ro, width=120),

@@ -1,0 +1,86 @@
+# Keeps deadshotleague.com current without anyone's computer: reads Yahoo, rebuilds the page,
+# runs every check, publishes. Installed into the site repo by deploy.sh; edit it in the source
+# repo's ci/ folder, never in the site repo (the next deploy overwrites it).
+#
+# Times are UTC. Pacific is UTC-7 until 1 Nov 2026, then UTC-8; the windows below cover both.
+#   Sunday games        every 30 minutes, 10 am to 11:30 pm Pacific
+#   Monday night game   every 30 minutes, 5 pm to 11:30 pm Pacific
+#   Thursday night game every 30 minutes, 5 pm to 11:30 pm Pacific
+#   Every morning       once, about 6 am Pacific (waivers, trades, injury news)
+# A run that finds nothing new on Yahoo stops before building, and publishes nothing.
+#
+# Needs one secret, YAHOO_TOKENS: the contents of .yahoo_tokens.json from the Mac that signed in
+# to Yahoo. Brian sets it himself (see HANDOFF.md, "Automatic updates").
+name: Live update from Yahoo
+on:
+  schedule:
+    - cron: '*/30 17-23 * * 0'
+    - cron: '*/30 0-7 * * 1'
+    - cron: '*/30 0-7 * * 2'
+    - cron: '*/30 0-7 * * 5'
+    - cron: '17 13 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Publish even if Yahoo has nothing new
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: live-update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Is the Yahoo sign-in set up?
+        id: key
+        run: |
+          if [ "${{ secrets.YAHOO_TOKENS != '' }}" = "true" ]; then echo "ok=true" >> "$GITHUB_OUTPUT";
+          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::notice::No YAHOO_TOKENS secret yet, so nothing to do. See HANDOFF.md, Automatic updates."; fi
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.ok == 'true'
+      - uses: actions/setup-python@v5
+        if: steps.key.outputs.ok == 'true'
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.ok == 'true'
+        with:
+          node-version: '20'
+      - name: Past seasons already read from Yahoo and Sleeper (2021-2025 never change)
+        if: steps.key.outputs.ok == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            src/yahoo_raw/2021
+            src/yahoo_raw/2022
+            src/yahoo_raw/2023
+            src/yahoo_raw/2024
+            src/yahoo_raw/2025
+            src/yahoo_raw/league_keys.json
+            src/yahoo_raw/sleeper_gp_2021.json
+            src/yahoo_raw/sleeper_gp_2022.json
+            src/yahoo_raw/sleeper_gp_2023.json
+            src/yahoo_raw/sleeper_gp_2024.json
+            src/yahoo_raw/sleeper_gp_2025.json
+          key: yahoo-past-v1
+      - name: Browsers for the checks
+        if: steps.key.outputs.ok == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('src/package.json') }}
+      - name: Tools
+        if: steps.key.outputs.ok == 'true'
+        run: |
+          pip install --quiet certifi
+          cd src && npm install --no-audit --no-fund --silent && npx playwright install --with-deps chromium webkit
+      - name: Read Yahoo, rebuild, check, publish
+        if: steps.key.outputs.ok == 'true'
+        run: bash src/ci_update.sh
+        env:
+          YAHOO_TOKENS: ${{ secrets.YAHOO_TOKENS }}
+          FORCE: ${{ inputs.force && '1' || '0' }}

@@ -1,0 +1,24 @@
+# never commit: the Yahoo sign-in the scheduled job writes for a run, and the replies it caches
+src/.yahoo_tokens.json
+src/.yahoo_tokens.json.tmp
+src/yahoo_raw
+src/node_modules
+src/.site.check.js
+# links the scheduled job makes from src/ to files that live at the site root
+src/fonts
+src/art
+src/manifest.webmanifest
+src/favicon.svg
+src/favicon-32.png
+src/apple-touch-icon.png
+src/icon-192.png
+src/icon-512.png
+src/icon-maskable-512.png
+src/vercel.json
+# what the build leaves beside the sources; the published copies live at the site root
+src/index.html
+src/404.html
+src/sw.js
+src/og.png
+src/og-*.png
+src/t/
