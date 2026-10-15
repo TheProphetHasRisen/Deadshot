@@ -127,7 +127,8 @@ def season(y):
         if not m: continue
         M[m] = dict(team=t, g=0, w=0, l=0, pf=0.0, apw=0, apl=0, act=0.0, opt=0.0, lost_lineup=0, perfect=0,
                     adds=0, fa=0, wv=0, drops=0, trades=0, pk_pts=0.0, pk_marg=0.0, pk_starts=0, dr_pts=0.0,
-                    drafted_pts=0.0, held=[], pickups=[], gone=[], trade_net=0.0, trade_w=0, trade_l=0, weekly=[], pk_val=0.0)
+                    drafted_pts=0.0, held=[], pickups=[], gone=[], trade_net=0.0, trade_w=0, trade_l=0, weekly=[], pk_val=0.0,
+                    inj_g=0, inj_val=0.0)
     # results, all-play, lineups: regular season only, so seasons compare like for like
     for wk in weeks:
         sc = {t: score[(t, wk)][0] for t in teams if (t, wk) in score}
@@ -264,12 +265,52 @@ def season(y):
         # efficiency: (his efficiency - league's) x his best possible points a week, in wins
         Z['lineup_wins'] = ((Z['eff'] - eff_avg) * Z['opt'] / ppw) if Z['eff'] is not None and ppw else None
         Z['pickup_wins'] = Z['pk_marg'] / ppw if ppw else None
+    # games missed, from 2021 (injuries.py): a regular starter (started at least half the games he played
+    # for this team) who missed a week cost his points a game over a replacement-level starter at his
+    # position. Regular season only. Turned into wins with this season's points per win.
+    hits = []
+    try:
+        import injuries
+        PL = injuries.played(y)
+    except Exception:
+        PL = None
+    if PL:
+        reg_wks = set(weeks)
+        played_pts = {}
+        for r in R:
+            if r['wk'] in reg_wks and PL(r['n'], r['pos'], r['nfl'], r['wk']):
+                played_pts.setdefault(r['n'], {})[r['wk']] = r['pts'] or 0
+        for (team, n), wks in held.items():
+            m = mgr_of(y, team)
+            if m not in M: continue
+            rows = [r for w in sorted(wks) if w in reg_wks for r in by.get((team, w), []) if r['n'] == n]
+            if not rows: continue
+            pos = (rows[0]['pos'] or '').split(',')[0]
+            pl = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r['wk'])]
+            miss = [r for r in rows if r['wk'] != r.get('bye') and (r['slot'] == 'IR' or PL(r['n'], r['pos'], r['nfl'], r['wk']) is False)]
+            if not miss: continue
+            ppg_w = played_pts.get(n, {})
+            if not ppg_w: continue
+            ppg = sum(ppg_w.values()) / len(ppg_w)
+            starter = (sum(1 for r in pl if r['started']) * 2 >= len(pl)) if pl else any(r['slot'] == 'IR' for r in rows)
+            if not starter: continue
+            lost = max(0.0, ppg - RP.get(pos, 0)) * len(miss)
+            Z = M[m]; Z['inj_g'] += len(miss); Z['inj_val'] += lost
+            hits.append(dict(y=y, m=m, n=n, pos=pos, missed=len(miss), ppg=round(ppg, 2), val=round(lost, 2),
+                             wks=[r['wk'] for r in miss]))
+    hits.sort(key=lambda h: -h['val'])
+    inj_avg = sum(Z['inj_val'] for Z in M.values()) / max(1, len(M))
+    for Z in M.values():
+        # injury luck, in wins: the league's average loss to missed games minus his (plus = lucky)
+        Z['inj_wins'] = Z['inj_val'] / ppw if ppw else None
+        Z['inj_luck'] = (inj_avg - Z['inj_val']) / ppw if ppw else None
     # who held whom: weeks on a manager's roster, every player
     hw = {}
     for r in R:
         m = mgr_of(y, r['team'])
         if m and r['wk'] in weeks: hw[(r['n'], m)] = hw.get((r['n'], m), 0) + 1
-    league = dict(year=y, avg=mu, sd=sd, ppw=ppw, eff=eff_avg, opt=opt_avg, weeks=len(weeks), repl=RP,
+    league = dict(year=y, avg=mu, sd=sd, ppw=ppw, eff=eff_avg, opt=opt_avg, weeks=len(weeks), repl=RP, hits=hits,
+                  injAvg=inj_avg,
                   trades_list=trades_list, draft_list=draft_list, picks_list=picks_list, gone_list=gone_list,
                   held=[dict(n=n, m=m, wks=v) for (n, m), v in hw.items()],
                   moves=sum(Z['adds'] for Z in M.values()) / max(1, len(M)),
@@ -331,7 +372,7 @@ def build():
     H = {y: season(y) for y in YEARS}
     played = H[LIVE][1]['weeks']
     keep = ('g', 'w', 'l', 'pf', 'ap', 'waa', 'eff', 'left', 'lost_lineup', 'perfect', 'adds', 'fa', 'wv', 'drops', 'trades',
-            'pk_pts', 'pk_marg', 'pk_starts', 'patience', 'drafted_pts', 'trade_net', 'trade_w', 'trade_l', 'lineup_wins', 'pickup_wins', 'pk_val')
+            'pk_pts', 'pk_marg', 'pk_starts', 'patience', 'drafted_pts', 'trade_net', 'trade_w', 'trade_l', 'lineup_wins', 'pickup_wins', 'pk_val', 'inj_g', 'inj_val', 'inj_wins', 'inj_luck')
     LEAN = ('trades_list', 'draft_list', 'picks_list', 'gone_list', 'held')
     out = dict(years=YEARS, league={y: {k: v for k, v in H[y][1].items() if k not in LEAN} for y in YEARS}, model=model(H, played), files={})
     for m in H[LIVE][0]:
@@ -346,6 +387,17 @@ def build():
     out['gone'] = [g for g in starters_gone(L26['gone_list']) if skill(g)][:12]
     out['goneKD'] = [g for g in starters_gone(L26['gone_list']) if not skill(g)][:6]
     out['fo'] = front_office(H, keep)
+    # injuries, 2026: who missed games so far, and Yahoo's report as it stands for the coming week
+    out['hits'] = L26['hits'][:12]
+    out['injAvg'] = L26['injAvg']
+    try:
+        R = P.rosters(LIVE); wk = max(r['wk'] for r in R)
+        out['injNow'] = sorted([dict(m=mgr_of(LIVE, r['team']), team=r['team'], n=r['n'], pos=r['pos'], status=r['status'], injury=r['injury'], slot=r['slot'])
+                                for r in R if r['wk'] == wk and r['status'] and r['status'] not in ('NA',)],
+                               key=lambda x: (x['team'], x['slot'] in ('BN', 'IR'), x['n']))
+        out['injWeek'] = wk
+    except Exception:
+        out['injNow'] = []
     return out
 
 LISTED = {'QB': 50, 'RB': 100, 'WR': 100, 'TE': 75, 'K': 50, 'DEF': 50}   # how deep Yahoo's ranked lists are pulled
@@ -410,6 +462,8 @@ def front_office(H, keep):
                                   key=lambda p: -p['val'])[:10] for y in fin},
                 yGone={y: [g for g in starters_gone(H[y][1]['gone_list']) if skill(g)][:10] for y in fin},
                 yLeague={y: {k: v for k, v in H[y][1].items() if k in ('avg', 'sd', 'ppw', 'eff', 'moves', 'trades', 'weeks')} for y in fin},
+                hits=sorted([h for y in YEARS for h in H[y][1]['hits']], key=lambda h: -h['val'])[:25],
+                yHits={y: H[y][1]['hits'][:10] for y in fin},
                 loyal=list(best_owner.values())[:30])
 
 if __name__ == '__main__':

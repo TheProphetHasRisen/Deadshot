@@ -65,7 +65,9 @@ def rosters(year):
             pts = rest.get('player_points', {}).get('total')
             out.append(dict(wk=wk, team=T[tk]['name'], key=f['player_key'], n=f['name']['full'],
                             pos=f.get('display_position'), nfl=(f.get('editorial_team_abbr') or '').upper(),
-                            slot=slot, started=slot not in ('BN', 'IR'), pts=float(pts) if pts is not None else None))
+                            slot=slot, started=slot not in ('BN', 'IR'), pts=float(pts) if pts is not None else None,
+                            bye=int((f.get('bye_weeks') or {}).get('week') or 0) or None, status=f.get('status'),
+                            injury=f.get('injury_note')))
     out.sort(key=lambda r: (r['wk'], r['team'], not r['started'], r['n']))
     return out
 

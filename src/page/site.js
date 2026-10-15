@@ -188,6 +188,9 @@ const GLOSS={
  comps:`<b>If they were NFL teams</b><br>Each manager’s whole career against each NFL franchise’s last ten seasons, on the same seven things: win %, how often they make the playoffs, titles, finals, playoff wins a trip, how steady they are year to year, and whether they are trending up or down.<br><br>`+
    `Each is scored against its own world (managers against managers, NFL teams against NFL teams), so making the playoffs in a ten-team league and in a 32-team one mean the same thing. Titles and win % count for the most. Then everyone is paired so the overall fit is as close as it can be, each franchise used once.<br><br>`+
    `NFL records, playoffs and Super Bowls are from ESPN.`,
+ inj:`<b>Missed games and injury luck</b><br>Yahoo keeps no injury history, so it is worked out week by week from 2021: a rostered player <b>missed</b> a week when his NFL team played (not his bye) and he did not, or when he sat in an IR slot. Injuries, illness and suspensions all count.<br><br>`+
+   `Only <b>regular starters</b> count: players who started at least half the games they played for that team. Each game one missed cost his points a game over a replacement-level starter at his position: the <b>value lost</b>. Turned into wins with points per win.<br><br>`+
+   `<b>Injury luck</b> is the league’s average loss that season minus his, in wins. Plus means he lost less than most.`,
  val:`<b>Value at position</b><br>Points that counted, against a replacement-level starter at the same position.<br><br>`+
    `For every week a player started, his points minus what a replacement-level player at his position scores a game that season. Replacement level is the first player past the league’s starters in Yahoo’s season rankings: about the 11th quarterback, 25th back, 26th receiver, 12th tight end. A pickup who started 4 weeks at 20 a game when replacement backs scored 10 is worth <b>+40</b>.<br><br>`+
    `It is what keeps quarterbacks from topping every list: a quarterback’s 20 a game is close to replacement, a running back’s is not.`,
@@ -4880,7 +4883,7 @@ function pharaoh(){
       const g=S('g'), pt=ys.filter(y=>h[y].patience!=null);
       return {m, seasons:ys.length, waa:S('waa'), lw:S('lineup_wins'), pw:S('pickup_wins'), adds:S('adds'), val:S('pk_val'),
         eff:g?ys.reduce((t,y)=>t+(h[y].eff||0)*h[y].g,0)/g:null, tw:S('trade_w'), tl:S('trade_l'), tn:S('trade_net'),
-        pat:pt.length?pt.reduce((t,y)=>t+h[y].patience,0)/pt.length:null, gone:FO.gone.filter(x=>x.m===m).length};});
+        pat:pt.length?pt.reduce((t,y)=>t+h[y].patience,0)/pt.length:null, gone:FO.gone.filter(x=>x.m===m).length, ig:S('inj_g'), il:S('inj_luck')};});
     $('#foMgrSub').textContent=`${YS[0]}–${YS[YS.length-1]} · every manager in those seasons · click a heading to sort`;
     table($('#tFoMgr'),[
       {h:'Manager',f:r=>mlink(r.m),c:'nm',k:r=>r.m,asc:1},
@@ -4895,6 +4898,8 @@ function pharaoh(){
       {h:'Trade net',f:r=>sg(r.tn,0),c:'num',k:r=>r.tn,t:'Value at position from what he got, minus from what he gave, added over every trade.'},
       {h:'Patience',f:r=>r.pat==null?'—':f(r.pat,1),c:'num',k:r=>r.pat,t:'Weeks in a row he held a player before dropping him, on average.'},
       {h:'Drops that came back',f:r=>r.gone,c:'num',k:r=>r.gone,t:'Players he cut who finished that season as a starter at their position.'},
+      {h:'Starter games missed',f:r=>r.ig,c:'num',k:r=>r.ig,t:'Games his regular starters missed (injury, illness or suspension), every season added.'},
+      {h:'Injury luck',f:r=>sg(r.il,2),c:'num',k:r=>r.il,t:'Wins: the league average loss to missed games minus his, every season added. Plus means he lost less than most.'},
     ],rows.filter(r=>vis(r.m)),{rank:1,sort:2});
     const sel=x=>vis(x.m);
     $('#tFoPick').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th>Added</th><th class="num">Starts</th><th class="num">Points that counted</th><th class="num">Value at position</th><th class="num">Finish</th></tr></thead><tbody>'+
@@ -4924,6 +4929,9 @@ function pharaoh(){
     mat($('#tFoClass'),(m,y)=>cls[m+'|'+y]==null?null:cls[m+'|'+y],v=>sg(v,0));
     mat($('#tFoEff'),(m,y)=>FO.mgrs[m][y]?FO.mgrs[m][y].eff:null,v=>pct(v));
     const span=a=>{const r=[]; a.forEach(y=>{const l=r[r.length-1]; if(l&&y===l[1]+1)l[1]=y; else r.push([y,y]);}); return r.map(([p,q])=>p===q?String(p):p+'–'+q).join(', ');};
+    $('#tFoHits').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Games missed</th><th class="num">Points a game</th><th class="num">Value lost</th></tr></thead><tbody>'+
+      (FO.hits||[]).filter(sel).map(h=>`<tr><td>${yr(h.y)}</td><td>${pl(h.n,h.pos)}</td><td>${esc(h.m)}</td><td class="num">${h.missed}</td><td class="num">${f(h.ppg,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')+'</tbody>';
+    fillEmpty($('#tFoHits'));
     $('#tFoLoyal').innerHTML='<thead><tr><th>Player</th><th>Manager</th><th class="num">Seasons</th><th>Which</th><th class="num">Weeks on his roster</th></tr></thead><tbody>'+
       FO.loyal.filter(sel).map(x=>`<tr><td><b>${esc(x.n)}</b></td><td>${esc(x.m)}</td><td class="num">${x.yrs?x.yrs.length:'—'}</td><td class="dim">${x.yrs?span(x.yrs):''}</td><td class="num">${x.wks}</td></tr>`).join('')+'</tbody>';
     ['#tFoPick','#tFoPickKD','#tFoGone','#tFoTrades','#tFoSteal','#tFoBust','#tFoLoyal'].forEach(k=>fillEmpty($(k)));
@@ -4974,6 +4982,11 @@ let openSeason=null;
         const steal=rk&&rk<tk&&(d>=6||(rk*2<=tk&&d>=3)), bust=fin>tk&&tk<=40&&(-d>=10||(fin>=tk*2&&-d>=5));
         return `<tr class="${slot===1&&rnd>1?'lv-rd':''}"><td class="dim">${rnd}.${String(slot).padStart(2,'0')}</td><td>${esc(last(m))}</td><td><b>${esc(n)}</b></td><td class="num"><span class="lv-pos">${pos}${tk}</span></td>
           <td class="num"><span class="${steal?'lv-steal':bust?'lv-bust':'lv-fin'}">${steal?'▲ ':bust?'▼ ':''}${rk?pos+rk:'outside top '+LIST[pos]}</span></td><td class="num">${st}</td><td class="num">${f(ct,1)}</td></tr>`;}).join('')}</tbody></table></div>`,'slotx');
+    const IH=(FO.yHits||{})[y]||[];
+    h+=card('syInj',`Missed games, ${y}`,'Regular starters who missed games, and what it cost each team',`<div class="scroll"><table><thead><tr><th>Manager</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
+      rows.slice().sort((a,b)=>(a.inj_luck??0)-(b.inj_luck??0)).map(r=>`<tr><td>${mlink(r.m)} <span class="dim">${esc(team(r.m))}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
+      <div class="scroll"><table><thead><tr><th>Hardest hits</th><th>Manager</th><th class="num">Games missed</th><th class="num">Points a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+      IH.map(x=>`<tr><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.m)}</td><td class="num">${x.missed}</td><td class="num">${f(x.ppg,1)}</td><td class="num">${f(x.val,1)}</td></tr>`).join('')}</tbody></table></div>`,'inj');
     const LG=FO.yLeague&&FO.yLeague[y];
     if(LG)h+=card('syLg',`The league in ${y}`,'',`<div class="card-b"><div class="tiles" style="margin:0">
       <div class="tile"><b>${f(LG.avg,1)}</b><span>Average score</span></div><div class="tile"><b>${f(LG.sd,1)}</b><span>Spread</span></div>
@@ -5319,6 +5332,12 @@ glossify();
           ${tile('Games lost to the lineup',H?H.lost_lineup:'—','losses his best possible lineup would have won','eff')}
           ${tile('Lineup calls, in wins',H&&H.lineup_wins!=null?sg(H.lineup_wins,2):'—',cmp(F,'lineup_wins',v=>sg(v,2)),'lineupwins')}
         </div>
+        <div class="sub-h">Missed games</div>
+        <div class="tiles lv-trtiles">
+          ${tile('Starter games missed',H?H.inj_g:'—',cmp(F,'inj_g',v=>f(v,1)),'inj')}
+          ${tile('Value lost',H&&H.inj_val!=null?f(H.inj_val,1):'—',H&&H.inj_wins!=null?f(H.inj_wins,2)+' wins':'','inj')}
+          ${tile('Injury luck',H&&H.inj_luck!=null?sg(H.inj_luck,2):'—',cmp(F,'inj_luck',v=>sg(v,2)),'inj')}
+        </div>
         <div class="sub-h">Moves</div>
         <div class="tiles lv-trtiles">
           ${tile('Adds',H?H.adds:'—',H?nOf(H.fa,'free agent')+' · '+nOf(H.wv,'claim')+' · league '+n1(lv('adds')):'')}
@@ -5337,7 +5356,7 @@ glossify();
           ${hrow('Points a game','pf',n1,1)}${hrow('All-play','ap',p1)}${hrow('Wins above average','waa',v=>sg(v,1),0,0,'waa')}
           ${hrow('Lineup efficiency','eff',p1,0,0,'eff')}${hrow('Left on the bench, a week','left',n1,0,1)}${hrow('Lineup calls, in wins','lineup_wins',v=>sg(v,2),0,0,'lineupwins')}
           ${hrow('Adds a week','adds',n2,1,2)}${hrow('Pickups over the bench, a week','pk_marg',v=>sg(v,1),1,0,'marg')}${hrow('Patience, weeks held before a drop','patience',n1,0,2,'patience')}
-          ${hrow('Draft: points that counted, a week','drafted_pts',n1,1)}${hrow('Trades','trades',v=>String(Math.round(v)),0,2)}
+          ${hrow('Draft: points that counted, a week','drafted_pts',n1,1)}${hrow('Starter games missed','inj_g',v=>String(Math.round(v)),0,2,'inj')}${hrow('Injury luck, wins','inj_luck',v=>sg(v,2),0,0,'inj')}${hrow('Trades','trades',v=>String(Math.round(v)),0,2)}
         </tbody></table></div>
         <p class="lv-trnote">Regular season only, so every year compares like for like. ${L.year} is weeks 1–${wk.length}; counts are given a week where a part season would otherwise look small. Highlighted: his best year, where more (or less) is plainly better.</p>
         <div class="sub-h">Week by week</div>
@@ -5346,5 +5365,18 @@ glossify();
       glossify($('#lvFile'));};
     const chgB=v=>`<b class="${v>=0?'lv-steal':'lv-bust'}">${sg(v,1)}</b>`;
     drawFile(); glossify($('#lvOddsCard')); glossify($('#lvLeagueCard'));
+    /* injuries: games missed so far by each team's regular starters, the hardest hits, and Yahoo's report now */
+    {const el=$('#lvInj'); if(el){
+      const rows=Object.entries(TF.files).map(([m,F])=>({m,team:F.team,...(F.hist[L.year]||{})})).sort((a,b)=>(a.inj_luck??0)-(b.inj_luck??0));
+      const NOW=TF.injNow||[], where=s=>s==='IR'?'IR slot':s==='BN'?'bench':'starting';
+      $('#lvInjSub').textContent=`games missed, weeks 1–${L.weeks[L.weeks.length-1]} · Yahoo’s report for week ${TF.injWeek||''}`;
+      el.innerHTML=`<div class="sub-h" style="margin:0 0 6px">Missed games so far</div><div class="scroll"><table><thead><tr><th>Team</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
+        rows.map(r=>`<tr><td><b>${esc(r.team)}</b> <span class="dim">${esc(r.m)}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
+        <div class="sub-h" style="margin:16px 0 6px">Hardest hits so far</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Games missed</th><th>Weeks</th><th class="num">Points a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+        (TF.hits||[]).map(h=>`<tr><td><b>${esc(h.n)}</b> <span class="lv-pos">${esc(h.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===h.m)||'')} <span class="dim">${esc(h.m)}</span></td><td class="num">${h.missed}</td><td class="dim">${h.wks.join(', ')}</td><td class="num">${f(h.ppg,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')}</tbody></table></div>
+        <div class="sub-h" style="margin:16px 0 6px">Yahoo’s report, week ${TF.injWeek||''}</div><div class="scroll"><table><thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Injury</th><th>On his roster</th></tr></thead><tbody>${
+        NOW.map(x=>`<tr><td>${esc(x.team)} <span class="dim">${esc(x.m||'')}</span></td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td><b>${esc(x.status)}</b></td><td class="dim">${esc(x.injury||'')}</td><td class="${x.slot==='BN'||x.slot==='IR'?'dim':''}">${where(x.slot)}</td></tr>`).join('')}</tbody></table></div>
+        <p class="lv-trnote">Status as Yahoo shows it now: Q questionable, D doubtful, O out, IR injured reserve. Missed games: a regular starter whose NFL team played and he did not.</p>`;
+      el.querySelectorAll('table').forEach(fillEmpty); glossify($('#lvInjCard'));}}
   }
 })();

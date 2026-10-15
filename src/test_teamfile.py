@@ -70,6 +70,38 @@ for y in TF.YEARS:
             bad.append('%d %s: Yahoo %d-%d, record book %s' % (y, m, Z['w'], Z['l'], book.get(TF._plain(Z['team']))))
 print('  records: every finished season Yahoo reaches checked against the record book')
 
+# missed games, recounted another way for one finished season and the live one: walk each roster
+# week by week, ask Sleeper's list of who played, and add up what a regular starter's absence cost
+import injuries as INJ
+for y in [2023, TF.LIVE]:
+    if y not in TF.YEARS: continue
+    st = TF.settings(y); M, L = TF.season(y)
+    R = [r for r in P.rosters(y)]
+    G = [g for g in P.games(y) if g['status'] == 'postevent' and g['wk'] < st['po']]
+    wks = {g['wk'] for g in G}
+    PL = INJ.played(y); RP = L['repl']
+    pts = {}
+    for r in R:
+        if r['wk'] in wks and PL(r['n'], r['pos'], r['nfl'], r['wk']): pts.setdefault(r['n'], []).append(r['pts'] or 0)
+    tot = {}
+    stints = {}
+    for r in R:
+        if r['wk'] in wks: stints.setdefault((r['team'], r['n']), []).append(r)
+    for (team, n), rows in stints.items():
+        played_rows = [r for r in rows if PL(r['n'], r['pos'], r['nfl'], r['wk'])]
+        missed = [r for r in rows if r['wk'] != r.get('bye') and (r['slot'] == 'IR' or PL(r['n'], r['pos'], r['nfl'], r['wk']) is False)]
+        if not missed or n not in pts: continue
+        if played_rows: is_starter = 2 * sum(1 for r in played_rows if r['slot'] not in ('BN', 'IR')) >= len(played_rows)
+        else: is_starter = any(r['slot'] == 'IR' for r in rows)
+        if not is_starter: continue
+        ppg = sum(pts[n]) / len(pts[n]); pos = (rows[0]['pos'] or '').split(',')[0]
+        m = TF.mgr_of(y, team); g, v = tot.get(m, (0, 0.0))
+        tot[m] = (g + len(missed), v + max(0.0, ppg - RP.get(pos, 0)) * len(missed))
+    for m, Z in M.items():
+        g, v = tot.get(m, (0, 0.0))
+        if g != Z['inj_g'] or abs(v - Z['inj_val']) > 0.05: bad.append('%d %s missed games %d / %.2f, team file %d / %.2f' % (y, m, g, v, Z['inj_g'], Z['inj_val']))
+    print('  %d: missed games and value lost recounted for every team' % y)
+
 if bad:
     print('TEAM FILES DO NOT MATCH a second working:'); [print('  ' + b) for b in bad[:30]]; sys.exit(1)
-print('OK - team files match a second working (best lineups, wins above average, efficiency, bench, records)')
+print('OK - team files match a second working (best lineups, wins above average, efficiency, bench, records, missed games)')
