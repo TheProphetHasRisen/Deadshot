@@ -4262,7 +4262,7 @@ function advAgg(){
   const yy=advYears(), set=new Set(yy), END=yy[yy.length-1], out={};
   ROWS.filter(r=>set.has(r.y)).forEach(r=>{
     const m=out[r.mgr]=out[r.mgr]||{name:r.mgr,seasons:0,g:0,piW:0,zW:0,pis:[],zs:[],rec:[],
-      titles:0,apps:0,expT:0,poW:0,poL:0,poG:0,poPts:0,finals:0};
+      titles:0,apps:0,expT:0,poW:0,poL:0,poG:0,poPts:0,poOpp:0,finals:0};
     const g=r.w+r.l+r.t;
     m.seasons++; m.g+=g; m.piW+=r.pi*g; m.zW+=r.z*g; m.pis.push(r.pi); m.zs.push(r.z);
     if(r.y>=END-2)m.rec.push(r.pi);
@@ -4272,7 +4272,7 @@ function advAgg(){
       const m=out[n]; if(!m)return;
       if(x.rnd==='Final')m.finals++;
       if(x.void)return;
-      m.poG++; m.poPts+=mine; if(mine>opp)m.poW++; else m.poL++;});});
+      m.poG++; m.poPts+=mine; m.poOpp+=opp; if(mine>opp)m.poW++; else m.poL++;});});
   return Object.values(out).map(m=>{
     const mean=m.pis.reduce((a,b)=>a+b,0)/m.pis.length, cpi=m.piW/m.g,
           form=m.rec.length?m.rec.reduce((a,b)=>a+b,0)/m.rec.length:null;
@@ -4280,7 +4280,7 @@ function advAgg(){
       sd:m.pis.length>1?Math.sqrt(m.pis.reduce((t,p)=>t+(p-mean)*(p-mean),0)/m.pis.length):null,
       form,trend:form==null?null:form-cpi,
       zAvg:m.zW/m.g,zPeak:Math.max(...m.zs),zFloor:Math.min(...m.zs),
-      poPPG:m.poG?m.poPts/m.poG:null,vsExp:m.titles-m.expT};});
+      poPPG:m.poG?m.poPts/m.poG:null,poOPPG:m.poG?m.poOpp/m.poG:null,vsExp:m.titles-m.expT};});
 }
 function drawCon(){
   const yy=advYears(), A=advAgg();
@@ -4322,6 +4322,7 @@ function drawPO(){table($('#tPO'),[
  {h:'G',f:r=>r.poG,c:'num',k:r=>r.poG},{h:'W',f:r=>r.poW,c:'num',k:r=>r.poW},{h:'L',f:r=>r.poL,c:'num',k:r=>r.poL},
  {h:'Win %',f:r=>r.poG?pct(r.poW/r.poG):'—',c:'num',k:r=>r.poG?r.poW/r.poG:null},
  {h:'PPG',f:r=>r.poPPG==null?'—':f(r.poPPG),c:'num',k:r=>r.poPPG},
+ {h:'OPPG',f:r=>r.poOPPG==null?'—':f(r.poOPPG),c:'num',k:r=>r.poOPPG,t:'Opponents’ points per game in the playoffs: what the teams they met scored against them.'},
  {h:'Finals',f:r=>r.finals||'—',c:'num',k:r=>r.finals},
  {h:'Titles',f:r=>r.titles?(r.titles%1?r.titles.toFixed(1):r.titles):'—',c:'num',k:r=>r.titles},
  {h:'Expected',f:r=>f(r.expT),c:'num',k:r=>r.expT,t:'Coin flip every round: (½)^(wins needed). A first-round bye is worth double, and the season total is always exactly 1.00.'},
@@ -4679,25 +4680,55 @@ drawMtx(); REDRAW.push(drawMtx);
     }
   }
   fillPickers();
+  /* the two managers in games against each other only (a friend's ask, Oct 2026): what each scored
+     against the other, margins, the best and worst of it, and season by season */
+  const POSET=new Set(POG);
+  function vsTables(A,B){
+    const G=MX.all.g.filter(x=>(x.ma===A&&x.mb===B)||(x.ma===B&&x.mb===A))
+      .map(x=>{const fa=x.ma===A; return {y:x.y,wk:x.wk||0,lab:x.lab,po:POSET.has(x),a:fa?x.pa:x.pb,b:fa?x.pb:x.pa};})
+      .sort((x,y)=>x.y-y.y||x.wk-y.wk);
+    if(!G.length)return `<div style="flex:1 1 300px;min-width:0"><p class="dim" style="margin:0">${esc(A)} and ${esc(B)} have never met in a game on record, so there is nothing to compare against each other.</p></div>`;
+    const S=k=>G.reduce((t,g)=>t+g[k],0), n=G.length, aw=G.filter(g=>g.a>g.b).length, bw=G.filter(g=>g.b>g.a).length;
+    const best=k=>G.reduce((m,g)=>!m||g[k]>m[k]?g:m,null), worst=k=>G.reduce((m,g)=>!m||g[k]<m[k]?g:m,null);
+    const big=(k,o)=>{const w=G.filter(g=>g[k]>g[o]); return w.length?w.reduce((m,g)=>!m||g[k]-g[o]>m[k]-m[o]?g:m,null):null;};
+    const at=g=>`<span class="dim">${esc(g.lab)}</span>`;
+    let run=0,who=null; for(let i=n-1;i>=0;i--){const w=G[i].a>G[i].b?'a':G[i].b>G[i].a?'b':'t'; if(who===null)who=w; if(w!==who)break; run++;}
+    const close=k=>G.filter(g=>Math.abs(g.a-g.b)<10&&g[k]>g[k==='a'?'b':'a']).length;
+    const po=G.filter(g=>g.po), poA=po.filter(g=>g.a>g.b).length, poB=po.filter(g=>g.b>g.a).length;
+    const rows=[
+      ['Meetings',n,n],
+      ['Wins',aw,bw,1],
+      ['Win %',pct(aw/n),pct(bw/n)],
+      ['Points a game v each other',f(S('a')/n),f(S('b')/n),1,S('a'),S('b')],
+      ['Average margin',sg((S('a')-S('b'))/n,2),sg((S('b')-S('a'))/n,2)],
+      ['Highest score v the other',(()=>{const g=best('a');return f(g.a)+'<br>'+at(g);})(),(()=>{const g=best('b');return f(g.b)+'<br>'+at(g);})()],
+      ['Lowest score v the other',(()=>{const g=worst('a');return f(g.a)+'<br>'+at(g);})(),(()=>{const g=worst('b');return f(g.b)+'<br>'+at(g);})()],
+      ['Biggest win',(()=>{const g=big('a','b');return g?'+'+f(g.a-g.b)+'<br>'+at(g):'—';})(),(()=>{const g=big('b','a');return g?'+'+f(g.b-g.a)+'<br>'+at(g):'—';})()],
+      ['Close games won (under 10)',close('a'),close('b'),1],
+      ['Playoff wins v each other',po.length?poA:'—',po.length?poB:'—',1],
+      ['Current streak',who==='a'?'W'+run:who==='b'?'L'+run:'—',who==='b'?'W'+run:who==='a'?'L'+run:'—'],
+    ];
+    const yrs=[...new Set(G.map(g=>g.y))];
+    const byYr=yrs.map(y=>{const g=G.filter(x=>x.y===y), w=g.filter(x=>x.a>x.b).length, l=g.filter(x=>x.b>x.a).length;
+      const pa=g.reduce((t,x)=>t+x.a,0)/g.length, pb=g.reduce((t,x)=>t+x.b,0)/g.length;
+      return `<tr><td>${y}${g.some(x=>x.po)?' <span class="dim">incl. playoffs</span>':''}</td><td class="num">${w}–${l}</td><td class="num"${pa>pb?' style="font-weight:700;color:var(--brass)"':''}>${f(pa)}</td><td class="num"${pb>pa?' style="font-weight:700;color:var(--brass)"':''}>${f(pb)}</td></tr>`;}).join('');
+    return `<div style="flex:1 1 300px;min-width:0"><div class="sub-h" style="margin:0 0 6px">Against each other</div>
+      <table><thead><tr><th></th><th class="num">${esc(A)}</th><th class="num">${esc(B)}</th></tr></thead><tbody>${
+      rows.map(([lab,x,y,cmp,nx,ny])=>{const vx=nx!=null?nx:+x, vy=ny!=null?ny:+y, hi=cmp&&vx!==vy;
+        return `<tr><td>${lab}</td><td class="num" style="white-space:normal;${hi&&vx>vy?'font-weight:700;color:var(--brass)':''}">${x}</td><td class="num" style="white-space:normal;${hi&&vy>vx?'font-weight:700;color:var(--brass)':''}">${y}</td></tr>`;}).join('')}
+      </tbody></table>
+      <div class="sub-h" style="margin:16px 0 6px">Season by season</div>
+      <table><thead><tr><th>Season</th><th class="num">${esc(A.split(' ').slice(-1)[0])}’s record</th><th class="num">${esc(A.split(' ').slice(-1)[0])} a game</th><th class="num">${esc(B.split(' ').slice(-1)[0])} a game</th></tr></thead><tbody>${byYr}</tbody></table></div>`;
+  }
   function draw(){
     const a=byName[$('#cmpA').value],b=byName[$('#cmpB').value];
     if(!a||!b||a===b){$('#cmpOut').innerHTML='<p class="dim" style="margin:0">Pick two different managers.</p>';return;}
     const splits=[['Regular season','reg'],['Playoffs','po'],['All games','all']];
-    const rows=[['Seasons','seasons',0],['Titles','titles',1],['Podiums','podium',0],['Playoff apps','apps',0],
-      ['Win %','winpct',3],['Avg finish','avgPlace',2],['PPG','ppg',2],['Power index','cpi',1],
-      ['Luck','luck',2],['Playoff W','poW',0]];
-    const cell=(m,k,d)=>k==='winpct'?pct(m[k]):k==='luck'?sg(m[k],d):(d?(+m[k]).toFixed(d):m[k]);
-    const better=(k,x,y)=>k==='avgPlace'?x<y:x>y;
     {const sh=$('#cmpShare'); if(sh)sh.onclick=()=>shareH2H($('#cmpA').value,$('#cmpB').value,sh);}
     {const rv=$('#cmpRiv'); if(rv)rv.onclick=()=>{const a=$('#cmpA').value,b=$('#cmpB').value;
       shareAny(()=>makeRivalryCard(a,b),'deadshot-'+slug(a)+'-every-meeting-'+slug(b)+'.png',rv);};}
     $('#cmpOut').innerHTML=`<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;max-width:100%">
-      <table style="flex:1 1 300px;min-width:0"><thead><tr><th></th><th class="num">${esc(a.name)}</th><th class="num">${esc(b.name)}</th></tr></thead><tbody>${
-      rows.map(([lab,k,d])=>{const x=a[k],y=b[k];
-        return `<tr><td>${lab}</td>
-          <td class="num" style="${better(k,x,y)?'font-weight:700;color:var(--brass)':''}">${cell(a,k,d)}</td>
-          <td class="num" style="${better(k,y,x)?'font-weight:700;color:var(--brass)':''}">${cell(b,k,d)}</td></tr>`;}).join('')}
-      </tbody></table>
+      ${vsTables(a.name,b.name)}
       <div style="flex:0 0 240px;padding:14px;border:1px solid var(--rule);border-radius:3px;background:var(--surface-2)">
         ${(()=>{const all=MX.all.t[a.name+'|'+b.name];
           if(!all)return '<p class="dim" style="margin:0;font-size:13px">These two have never met in any game on record.</p>';
