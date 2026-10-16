@@ -52,6 +52,10 @@ const EXE = process.env.CHROMIUM_PATH || undefined;
     await p.waitForTimeout(250);
     const wk2=await p.evaluate(()=>({trade:!!document.querySelector('#trades .card .fold-body:not([hidden])'), week:(document.querySelector('#wkSel button.on')||{}).dataset?.w}));
     if(!wk.btn||wk2.week!==wk.week||!wk2.trade)errs.push(name+' Week by Week lost a control or the reader\'s place on opening a box: '+JSON.stringify({wk,wk2}));
+    /* opening a Trades box opens the trade cards in it (it only revealed more shut boxes, and read as broken) */
+    const tro=await p.evaluate(()=>{const out=[]; document.querySelectorAll('.card[data-collapse-also]').forEach(c=>{const g=document.querySelector(c.getAttribute('data-collapse-also'));
+        if(!g||!c._fold)return; c._fold(false); c._fold(true); const cs=[...g.querySelectorAll('.card')]; out.push(cs.filter(k=>k.querySelector(':scope > .fold-body')?.hidden).length);}); return out;});
+    if(tro.some(n=>n>0))errs.push(name+' a Trades box opened but left trade cards shut: '+JSON.stringify(tro));
     console.log(name+' folding', JSON.stringify({start:f0, sections:f1.secsOpen, season:sp.season}));
     // structural checks
     const r=await p.evaluate(()=>({

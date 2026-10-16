@@ -3033,10 +3033,13 @@ function makeCollapsible(card,open){
       btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false');
       btn.setAttribute('aria-label',(o?'Hide ':'Show ')+title());
       const extra=also(); if(extra)extra.hidden=!o;};
-    card._fold=v=>{wrap.hidden=!v; FOLDMEM.set(foldKey(card),!!v); sync();};
+    card._fold=v=>{wrap.hidden=!v; FOLDMEM.set(foldKey(card),!!v); sync();
+      /* a box whose content is a grid of cards (the trades): opening it opens them, or it looks like nothing happened */
+      const ex=v&&also(); if(ex)ex.querySelectorAll('.card').forEach(c=>{if(c._fold&&c.querySelector(':scope > .fold-body')?.hidden)c._fold(true);});};
     btn.onclick=()=>card._fold(wrap.hidden);
     const k=foldKey(card);
-    wrap.hidden=!(open||card.getAttribute('data-collapse')==='open'||(FOLDMEM.has(k)?FOLDMEM.get(k):wantOpen(card)));
+    const sub=card.parentElement&&card.parentElement.closest('[data-fold-sub]');
+    wrap.hidden=!(open||card.getAttribute('data-collapse')==='open'||(sub&&!sub.hidden)||(FOLDMEM.has(k)?FOLDMEM.get(k):wantOpen(card)));
     sync();
 }
 /* a section folds below its heading: the lede, the cards, everything */
@@ -5037,6 +5040,23 @@ function pharaoh(){
       FO.trades.filter(t=>vis(t.a.m)||vis(t.b.m)).slice().reverse().map(t=>{const w=Math.abs(t.a.val-t.b.val)<0.05?null:t.a.val>t.b.val?t.a:t.b,
         early=D.live&&t.y===D.live.year&&t.wk>D.live.weeks[D.live.weeks.length-1];
         return `<tr><td>${yr(t.y)}</td><td class="dim">${esc(t.d)}</td><td class="fo-w">${side(t.a)}</td><td class="num">${updn(t.a.val)}</td><td class="fo-w">${side(t.b)}</td><td class="num">${updn(t.b.val)}</td><td>${early?'<span class="dim">too early: no games since</span>':w?`<b>${esc(last(w.m))}</b> <span class="dim">by ${f(Math.abs(t.a.val-t.b.val),1)}</span>`:'<span class="dim">even</span>'}</td></tr>`;}).join('')+'</tbody>';
+    /* the biggest fleeces: every graded trade by how lopsided it was, in wins at that season's points per win, so
+       a 2021 deal and a 2025 one compare fairly. A fleece is a deal won by a full win or more. */
+    {const LGY=(D.live.files&&D.live.files.league)||{}, live=y=>D.live&&y===D.live.year;
+      const FL=FO.trades.map(t=>{const w=t.a.val>=t.b.val?t.a:t.b, l=w===t.a?t.b:t.a, m=w.val-l.val, ppw=(LGY[t.y]||{}).ppw;
+          return {t,w,l,m,wins:ppw?m/ppw:null};}).filter(x=>x.m>=0.05&&x.wins!=null&&!(live(x.t.y)&&x.t.wk>D.live.weeks[D.live.weeks.length-1]))
+        .sort((a,b)=>b.wins-a.wins);
+      const big=FL.filter(x=>x.wins>=1), cnt=k=>{const c={}; big.forEach(x=>{const n=x[k].m; if(n)c[n]=(c[n]||0)+1;}); return c;};
+      const lead=c=>{const mx=Math.max(0,...Object.values(c)), who=Object.keys(c).filter(n=>c[n]===mx).map(n=>last(n)); return mx?{who:yearList(who),n:mx}:null;};
+      const W=lead(cnt('w')), V=lead(cnt('l')), top=FL[0];
+      $('#foFleeceSub').textContent=`The most lopsided deals since ${FO.years[0]}, by value at position, in wins at that season’s points per win · a fleece is won by a full win or more`;
+      $('#foFleeceT').innerHTML=(top?`<div class="tile"><b>${f(top.wins,2)}</b><span>Biggest ever: ${esc(last(top.w.m))} over ${esc(last(top.l.m))}, ${top.t.y}</span></div>`:'')+
+        (W?`<div class="tile"><b>${W.n}</b><span>Most fleeces pulled: ${esc(W.who)}</span></div>`:'')+
+        (V?`<div class="tile"><b>${V.n}</b><span>Fleeced most: ${esc(V.who)}</span></div>`:'')+
+        `<div class="tile"><b>${big.length}</b><span>Fleeces, of ${FL.length} deals with a winner</span></div>`;
+      $('#tFoFleece').innerHTML='<thead><tr><th class="num">#</th><th>Season</th><th>When</th><th>Won</th><th class="num">Value</th><th>Lost</th><th class="num">Value</th><th class="num">Margin</th><th class="num">In wins</th></tr></thead><tbody>'+
+        FL.filter(x=>vis(x.w.m)||vis(x.l.m)).slice(0,15).map((x,i)=>`<tr><td class="num dim">${i+1}</td><td>${yr(x.t.y)}${live(x.t.y)?' <span class="dim">so far</span>':''}</td><td class="dim">${esc(x.t.d)}</td><td class="fo-w">${side(x.w)}</td><td class="num">${updn(x.w.val)}</td><td class="fo-w">${side(x.l)}</td><td class="num">${updn(x.l.val)}</td><td class="num"><b>${f(x.m,1)}</b></td><td class="num"><b class="${x.wins>=1?'lv-steal':''}">${f(x.wins,2)}</b></td></tr>`).join('')+'</tbody>';
+      fillEmpty($('#tFoFleece'));}
     $('#tFoSlots').innerHTML='<thead><tr><th>First-round slot</th><th class="num">Titles</th><th class="num">Podiums</th><th class="num">Regular season</th><th class="num">Average finish</th><th>Season by season</th></tr></thead><tbody>'+
       FO.slots.map(s=>{const v=s.seasons, w=v.reduce((t,x)=>t+x.w,0), l=v.reduce((t,x)=>t+x.l,0), pls=v.filter(x=>x.place);
         const ti=v.reduce((t,x)=>t+(x.place===1?(x.co?0.5:1):0),0);
