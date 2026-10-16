@@ -10,7 +10,7 @@
    come from the store immediately and are only fetched once. The typefaces are our own
    files under /fonts/ (self-hosted since 25 Sep 2026) and are precached on install, so a
    copy installed on one visit has the real faces even if the signal is gone by the next. */
-const VERSION='deadshot-ceb30b2e3b68';
+const VERSION='deadshot-8602cf0fdfc3';
 const CORE=['/','/manifest.webmanifest','/favicon-32.png',
             '/favicon.svg','/apple-touch-icon.png','/icon-192.png','/icon-512.png',
             '/icon-maskable-512.png',
