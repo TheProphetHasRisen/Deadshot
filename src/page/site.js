@@ -3,6 +3,8 @@ const $=(s,e=document)=>e.querySelector(s), $$=(s,e=document)=>[...e.querySelect
 const D=DATA, ROWS=D.rows, M=D.mgrs, SEA=D.seasons, LAST=D.last, K=2.37;
 /* how much league scoring rose from the first season to the last, worked out, never typed (it was "about
    12%" in two notes and "14% higher" in a third) */
+/* how many finishes the playoff-odds model plays out, read from the model, never typed */
+const SIMRUNS=((D.live&&D.live.files&&D.live.files.model&&D.live.files.model.runs)||100000).toLocaleString();
 const SCORERISE=(()=>{const a=ROWS.find(r=>r.y===SEA[0]), b=ROWS.find(r=>r.y===LAST); return a&&b&&a.lg?Math.round((b.lg/a.lg-1)*100):null;})();
 const byName={}; M.forEach(m=>byName[m.name]=m);
 const rowsOf={}; ROWS.forEach(r=>(rowsOf[r.mgr]=rowsOf[r.mgr]||[]).push(r));
@@ -215,8 +217,8 @@ const GLOSS={
    `A pace from a week or two can be a fluke, so treat early figures loosely.`,
  model:`<b>Playoff odds</b><br>A model, rerun every week.<br><br>`+
    `<b>Step 1, a regression.</b> For every team in every season Yahoo reaches, compare its points a game over the first weeks (as many as have been played this year) with its points a game over the rest of that regular season. The fitted line says how much of a hot or cold start carries on: a slope of 0.5 means half of it does, and the other half fades back toward the league average.<br><br>`+
-   `<b>Step 2, a simulation.</b> Each team gets the scoring level that line predicts. The rest of the real schedule is then played 20,000 times, every team scoring around its level with the week-to-week swing history shows. The top six make the playoffs, the top two get byes, and the bracket is played out.<br><br>`+
-   `<b>Expected points a week</b> is that level. <b>Playoffs, bye, title</b> are the share of the 20,000 runs it happened in.`,
+   `<b>Step 2, a simulation.</b> Each team gets the scoring level that line predicts. The rest of the real schedule is then played ${SIMRUNS} times, every team scoring around its level with the week-to-week swing history shows. The top six make the playoffs, the top two get byes, and the bracket is played out.<br><br>`+
+   `<b>Expected points a week</b> is that level. <b>Playoffs, bye, title</b> are the share of the ${SIMRUNS} runs it happened in.`,
  waa:`<b>Wins above average</b><br>The league’s nearest thing to baseball’s WAR for a manager.<br><br>`+
    `Each week a team’s score is set against all nine others (its all-play record). An average team beats half of them. Wins above average = (all-play rate − 0.500) × games. <b>+2.0</b> means his scoring earned two more wins than an average team’s would have, whatever the schedule did.`,
  eff:`<b>Lineup efficiency</b><br>Points his lineup scored, out of the most it could have.<br><br>`+

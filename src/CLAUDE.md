@@ -255,19 +255,29 @@ real schedule). It reads yahoo_raw/2021-2026, so on a fresh machine pull every s
 (`for y in 2021 2022 2023 2024 2025 2026; do python3 yahoo_fetch.py $y; done`, ~1,200 calls).
 `test_teamfile.py` checks it and `deploy.sh` gates on it.
 **Missed games** (`injuries.py`): Yahoo keeps no injury history, so a rostered player missed a week
-when his NFL team played (not his bye, from Yahoo's roster) and Sleeper's weekly stats show no `gp`
-for him, or he sat in an IR slot. Only regular starters (started half the games they played for that
-team) count; each miss costs his points a game over replacement at his position. Suspensions count,
-so the site says "missed games". Sleeper's replies cache in yahoo_raw/ (sleeper_ids.json,
-sleeper_gp_<year>.json; the live year re-pulls every run).
+when his NFL team played and Sleeper's weekly stats show no `gp` for him. **For finished seasons the
+team and its bye come from Sleeper** (`injuries.teams(y)`, cached as sleeper_team_<year>.json): Yahoo's
+old rosters carry each player's CURRENT team and bye, which counted real byes as misses (found 15 Oct
+2026). An IR slot alone is not a miss. Only regular starters count: started half the games he played for
+that team, or drafted as a starter by THIS manager. Each miss costs his expected points a game over
+replacement. Suspensions count, so the site says "missed games".
+
+**Rules the adversarial review (15 Oct 2026) fixed, easy to undo by accident:** pickups and drops are
+regular season only; a pickup or a trade is credited only the weeks in a row that start AT its own week
+(`teamfile.stint`), so a move undone before the lock gets nothing; a trade and its exact undo in the same
+week are both voided (`wire2026.undone`); a trade side is never worth less than zero; one finishing rank
+for the whole site (`sleeper_season.ranker`, weeks 1-17, never Yahoo's season totals, which count NFL
+week 18); Sleeper names are matched every spelling and every Yahoo position (`sleeper_season.lookup`);
+a shutout scores 10 (`scoring.pa_score`). `test_teamfile.py` brute-checks best lineups in every season.
 `ROSTERS2026` (who started each week, Yahoo's official points) drives the trade cards'
 "Started" column and "Points that counted" tile. Yahoo reaches the league for 2021-2026 on
 Brian's account; 2015-2020 are not listed there.
 
 `season2026.py` holds the live season as typed from Brian's screenshots (now overridden by Yahoo, above);
 `check_2026.py` reconciles it (records, streaks, PF, PA, both drafts as snake orders).
-`export.py` writes it as `D.live`, kept OUT of rows/careers-by-season/champions, but its
-games DO count in head to head, career W-L/PF/PA/PPG/all-play and the search's game log.
+`export.py` writes it as `D.live`, kept OUT of rows, careers and champions until the final (careers
+are finished seasons only, so every career column adds up: mixing 2026's games into some columns and not
+others broke the Luck Ledger, 15 Oct 2026). Its games DO count in head to head and the search's game log.
 `draft_points.py` scores every drafted player from Sleeper's public weekly stats with the
 league's own scoring and writes `draft_points.json` (re-run it weekly in season); the draft
 board's steals, busts and best drafts come from that.

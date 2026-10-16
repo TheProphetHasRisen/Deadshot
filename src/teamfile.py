@@ -433,7 +433,7 @@ def model(H, played):
     team_m = {Z['team']: m for m, Z in M26.items()}
     sched = [(g['wk'], team_m[g['ta']], team_m[g['tb']]) for g in P.games(LIVE) if g['status'] != 'postevent' and g['wk'] < settings(LIVE)['po']]
     base = {m: [Z['w'], Z['pf']] for m, Z in M26.items()}
-    rnd = random.Random(2026); N = 20000
+    rnd = random.Random(2026); N = 100000   # 100,000 finishes (Brian, 16 Oct 2026; was 20,000), rerun on every update
     po = {m: 0 for m in M26}; bye = dict(po); title = dict(po); wins = dict(po)
     for _ in range(N):
         rec = {m: [v[0], v[1]] for m, v in base.items()}
