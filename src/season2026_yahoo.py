@@ -27,7 +27,7 @@ W2026 = [(1, 'The Curse', 114.72, 108.83, 'SNIPES', 106.86, 123.06, ''),
  (5, 'Kabul Gearing Bombers', 148.5, 132.24, 'Stegostompem', 179.16, 123.15, '')]
 UPCOMING2026 = {6: [('The Curse', 116.25, 'Hench', 137.72, 5.2, 0.0, 'midevent'),
      ('DylansVillans', 124.59, "Poe's Palace", 139.49, 25.4, 0.0, 'midevent'),
-     ("It's a Love Story", 119.84, 'Medellin', 110.18, 0.0, 0.0, 'midevent'),
+     ("It's a Love Story", 119.84, 'Medellin', 114.06, 0.0, 0.0, 'midevent'),
      ('SNIPES', 129.41, 'Kabul Gearing Bombers', 125.6, 7.0, 7.0, 'midevent'),
      ('Stegostompem', 124.77, 'U gotta BO-lieve', 129.08, 0.0, 0.0, 'midevent')]}
 STANDINGS2026_WK5 = {'DylansVillans': (3, 3, 2, 0, 690.3, 606.7, 'L1', 7, 10),
@@ -210,7 +210,7 @@ TRADEPOS = {'Ashton Jeanty': 'RB',
  'Rome Odunze': 'WR',
  'Tyler Warren': 'TE'}
 # when Yahoo was read (Pacific time, where the league lives)
-ASOF = 'Oct 16, 2026, 4:19 pm PT'
+ASOF = 'Oct 16, 2026, 4:28 pm PT'
 # every player on every roster every week: (week, team, player, position, slot, points);
 # slot BN is the bench and IR injured reserve, anything else started
 ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),
@@ -1069,18 +1069,18 @@ ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),
  (6, 'Kabul Gearing Bombers', 'Zach Charbonnet', 'RB', 'IR', 0.0),
  (6, 'Medellin', 'Bhayshul Tuten', 'RB', 'RB', 0.0),
  (6, 'Medellin', 'Caleb Williams', 'QB', 'QB', 0.0),
+ (6, 'Medellin', 'DeVonta Smith', 'WR', 'WR', 0.0),
  (6, 'Medellin', 'Eddy Pineiro', 'K', 'K', 0.0),
  (6, 'Medellin', 'Garrett Wilson', 'WR', 'WR', 0.0),
  (6, 'Medellin', 'Omarion Hampton', 'RB', 'RB', 0.0),
  (6, 'Medellin', 'Pat Freiermuth', 'TE', 'W/R/T', 0.0),
- (6, 'Medellin', 'Romeo Doubs', 'WR', 'WR', 0.0),
  (6, 'Medellin', 'Steelers', 'DEF', 'DEF', 0.0),
  (6, 'Medellin', 'Trey McBride', 'TE', 'TE', 0.0),
- (6, 'Medellin', 'DeVonta Smith', 'WR', 'BN', 0.0),
  (6, 'Medellin', "Ja'Marr Chase", 'WR', 'BN', 0.0),
  (6, 'Medellin', 'Jacoby Brissett', 'QB', 'BN', 0.0),
  (6, 'Medellin', 'Jeremiyah Love', 'RB', 'BN', 0.0),
  (6, 'Medellin', 'Patrick Mahomes', 'QB', 'BN', 0.0),
+ (6, 'Medellin', 'Romeo Doubs', 'WR', 'BN', 0.0),
  (6, 'Medellin', 'TreVeyon Henderson', 'RB', 'BN', 0.0),
  (6, "Poe's Palace", 'Chiefs', 'DEF', 'DEF', 0.0),
  (6, "Poe's Palace", 'Christian McCaffrey', 'RB', 'RB', 0.0),
