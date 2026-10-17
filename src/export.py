@@ -366,8 +366,6 @@ if S26:
         import forecast; out['forecast'] = forecast.build()         # the rest of the live season, played out
     except Exception as e:
         print('  (against the crowd left out: %s)' % str(e)[:120], file=sys.stderr)   # stderr: deploy.sh hides stdout
-    # the forecast run on every finished season (backtest.py, run by hand: it takes minutes), for the model lab
-    if os.path.exists('backtest.json'):
-        _bt = json.load(open('backtest.json')); _bt.pop('rows', None); out['backtest'] = _bt
+    # the backtest (backtest.py) is read by the model lab, mklab.py, which is USER's own page and never on the site
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))

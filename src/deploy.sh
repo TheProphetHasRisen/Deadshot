@@ -22,6 +22,7 @@ fi
 say "build"
 python3 export.py >/dev/null
 python3 mksite.py
+[ -f mklab.py ] && python3 mklab.py >/dev/null || true   # USER's own model page (model-lab.html), never published
 
 say "verify"
 # The numbers tripwire. verify.py proves the raw data is consistent; this proves the

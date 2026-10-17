@@ -245,6 +245,9 @@ const GLOSS={
 function glossify(root){(root||document).querySelectorAll('[data-gl]').forEach(el=>{
   if(el.dataset.glBound)return; el.dataset.glBound='1';
   const h=GLOSS[el.dataset.gl]; if(h)bindTip(el,h);});}
+/* every ? on the page wires itself up whenever it appears: a table that redraws itself (the league table's
+   weeks/whole-seasons switch) used to leave its ? marks dead (USER, 16 Oct 2026) */
+{let q=0; new MutationObserver(()=>{if(q)return; q=requestAnimationFrame(()=>{q=0; glossify();});}).observe(document.body,{childList:true,subtree:true});}
 function bindTip(el,h){el.addEventListener('mouseenter',e=>showTip(e,h));el.addEventListener('mousemove',moveTip);
   el.addEventListener('mouseleave',hideTip);
   if(el.hasAttribute('tabindex')||el.tagName==='BUTTON'){
@@ -5216,84 +5219,6 @@ let openSeason=null;
     fillEmpty(el);};
   draw(); REDRAW.push(draw);
 })();
-/* ============ the model lab (#lab): unlisted, for USER. Every model's workings, the backtest, and a builder ============ */
-(()=>{const V=$('#mlView'); if(!V)return;
-  const open=()=>{V.hidden=false; document.body.classList.add('ml-pg'); tabTitle('Model lab'); scrollTo(0,0); draw();};
-  const close=()=>{V.hidden=true; document.body.classList.remove('ml-pg'); tabTitle(''); if(location.hash==='#lab')history.replaceState(null,'',location.pathname+location.search);};
-  $('#mlClose').onclick=close;
-  addEventListener('hashchange',()=>{if(location.hash==='#lab')open();});
-  if(location.hash==='#lab')setTimeout(open,0);
-  let drawn=false;
-  const p=v=>v==null?'—':v<0.001?v.toExponential(1):f(v,3), pc=v=>v==null?'—':(v*100).toFixed(1)+'%';
-  function draw(){ if(drawn)return; drawn=true;
-    const FC=D.forecast, F=FC&&FC.fit, BT=D.backtest;
-    /* the forecast's fit, with the numbers it runs on today */
-    if(F){$('#mlFitSub').textContent=`fitted on ${F.n} team-weeks, every season Yahoo reaches before ${FC.year}, at the same point (${FC.played} weeks played)`;
-      $('#mlFit').innerHTML=`<p class="plain" style="margin:0">Two layers. First a <b>multiple regression</b> (ordinary least squares, two predictors) sets each team’s expected score for each week left; then a <b>Monte Carlo simulation</b> plays the rest of the season ${FC.runs.toLocaleString()} times.</p>
-        <div class="ml-eq">expected score = league average + <b>${f(F.b1,3)}</b> × (his projected best lineup − the league’s) + <b>${f(F.b2,3)}</b> × (his points a game so far − the league’s)<br>each score swings around it with a spread of <b>${f(F.sd,1)}</b> points (one standard deviation)</div>
-        <div class="scroll"><table><thead><tr><th>Predictor</th><th class="num">Weight</th><th class="num">Standard error</th><th class="num">p-value</th><th>In plain words</th></tr></thead><tbody>
-          <tr><td>Projected lineup</td><td class="num"><b>${f(F.b1,3)}</b></td><td class="num">${f(F.se1,3)}</td><td class="num">${p(F.p1)}</td><td style="white-space:normal">Every point a team’s projected lineup is above the league’s turns into about ${f(F.b1,2)} real points that week. ${F.p1<0.01?'Very unlikely to be chance.':'Could be chance.'}</td></tr>
-          <tr><td>Scoring so far</td><td class="num"><b>${f(F.b2,3)}</b></td><td class="num">${f(F.se2,3)}</td><td class="num">${p(F.p2)}</td><td style="white-space:normal">Every point a game a team has scored above the league so far adds about ${f(F.b2,2)}. ${F.p2<0.05?'Unlikely to be chance.':'Not statistically clear: once the projected lineup is known, past scoring adds little.'}</td></tr>
-        </tbody></table></div>
-        <p class="plain" style="margin:12px 0 0">R² = <b>${f(F.r2,3)}</b>: the two explain about ${Math.round(F.r2*100)}% of how a week’s scores spread out (from ±${f(F.rawsd,1)} to ±${f(F.sd,1)}). Week to week, this league is close to a coin flip around the average. The two predictors are correlated at only ${f(F.corr,2)} (variance inflation ${f(1/(1-F.corr*F.corr),2)}), so they are not tripping over each other (no multicollinearity).</p>`;}
-    /* the backtest */
-    if(BT){const B=BT.brier, T=BT.brierTitle, has=k=>B[k]!=null;
-      const names={model:'The model as live',fixed:'The model, refitted on projections as known at the time',record:'The standings alone (every team equal)',coin:'A coin (every team the same chance)'};
-      const ks=['model','fixed','record','coin'].filter(has);
-      $('#mlBtSub').textContent=`${BT.n} predictions: every team, every week, ${Object.keys(BT.seasons).join(', ')}, each season predicted by a fit that never saw it`;
-      const cal=(C,lab)=>C?`<div class="sub-h" style="margin:18px 0 6px">${lab}</div><div class="scroll"><table><thead><tr><th>It said</th><th class="num">Teams</th><th class="num">Average it said</th><th class="num">Made it</th></tr></thead><tbody>${Object.entries(C).map(([lo,c])=>`<tr><td>${lo}–${+lo+10}%</td><td class="num">${c.n}</td><td class="num">${pc(c.said)}</td><td class="num"><b>${pc(c.made)}</b></td></tr>`).join('')}</tbody></table></div>`:'';
-      $('#mlBt').innerHTML=`<p class="plain" style="margin:0 0 10px">The forecast was run on every finished season as it stood after each week, using only what was known then (rosters that week, projections made by then, each season predicted by a model fitted on the others), and every prediction was scored against what happened. The score is the <b>Brier score</b>: the average of (the chance it gave − what happened)², where what happened is 1 or 0. Lower is better.</p>
-        <div class="scroll"><table><thead><tr><th>Predictor</th><th class="num">Playoffs</th><th class="num">Title</th></tr></thead><tbody>${ks.map(k=>`<tr><td>${names[k]}</td><td class="num"><b>${f(B[k],3)}</b></td><td class="num">${T[k]==null?'—':f(T[k],3)}</td></tr>`).join('')}</tbody></table></div>
-        <div class="sub-h" style="margin:18px 0 6px">By week of the season (playoffs)</div><div class="scroll"><table><thead><tr><th>After week</th>${ks.map(k=>`<th class="num">${k==='model'?'Live':k==='fixed'?'Refitted':k==='record'?'Standings':'Coin'}</th>`).join('')}</tr></thead><tbody>${Object.entries(BT.weeks).map(([w,v])=>`<tr><td>${w}</td>${ks.map(k=>`<td class="num">${v[k]==null?'—':f(v[k],3)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
-        ${cal(BT.cal,'Calibration, the model as live: of the teams it gave each chance, how many made it')}${cal(BT.calFixed,'Calibration, refitted')}`;}
-    else $('#mlBt').innerHTML='<p class="plain">Not run yet.</p>';
-    /* the builder: the same simulation, in the browser, with the weights moved */
-    if(FC){const T=FC.teams, G=FC.games, wk=[...new Set(G.map(g=>g.wk))];
-      const pm={}; wk.forEach(w=>{pm[w]=T.reduce((a,t)=>a+(t.proj[w]||0),0)/T.length;});
-      const ctl=[['b1','How much the projected lineup counts',0,1.5,0.01,F.b1,'0 ignores projections; the fitted weight is '+f(F.b1,2)],
-        ['b2','How much the season so far counts',0,1.5,0.01,F.b2,'0 ignores how teams have scored; the fitted weight is '+f(F.b2,2)],
-        ['sd','How wild a week is (points either way)',8,35,0.5,F.sd,'bigger means more upsets; the fitted spread is '+f(F.sd,1)],
-        ['n','Seasons to simulate',2000,50000,1000,20000,'more is steadier and slower']];
-      const W={}; ctl.forEach(c=>{W[c[0]]=c[5];});
-      $('#mlBuild').innerHTML=`<div class="ml-ctl">${ctl.map(([k,l,mn,mx,st,v,h])=>`<label>${l} <b id="mlV_${k}">${k==='n'?v.toLocaleString():f(v,2)}</b><input type="range" min="${mn}" max="${mx}" step="${st}" value="${v}" data-ml="${k}"><span class="dim">${h}</span></label>`).join('')}</div>
-        <button type="button" id="mlRun">Run it</button> <button type="button" id="mlReset">Back to the fitted weights</button>
-        <div class="scroll" style="margin-top:12px"><table id="tMlOut"></table></div>`;
-      $$('#mlBuild input').forEach(i=>i.oninput=()=>{W[i.dataset.ml]=+i.value; $('#mlV_'+i.dataset.ml).textContent=i.dataset.ml==='n'?(+i.value).toLocaleString():f(+i.value,2);});
-      $('#mlReset').onclick=()=>{ctl.forEach(c=>{W[c[0]]=c[5]; const i=$(`#mlBuild [data-ml="${c[0]}"]`); i.value=c[5]; $('#mlV_'+c[0]).textContent=c[0]==='n'?c[5].toLocaleString():f(c[5],2);});};
-      const gauss=()=>{let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
-      const run=()=>{const n=W.n, mu={}, by={}; T.forEach(t=>{by[t.team]=t; wk.forEach(w=>{mu[t.team+'|'+w]=FC.lg+W.b1*((t.proj[w]||0)-pm[w])+W.b2*(t.form||0);});});
-        const po={},bye={},ti={}; T.forEach(t=>{po[t.team]=bye[t.team]=ti[t.team]=0;});
-        const play=(x,z)=>(FC.lg+W.b2*(by[x].form||0)+W.sd*gauss())>(FC.lg+W.b2*(by[z].form||0)+W.sd*gauss())?x:z;
-        for(let i=0;i<n;i++){const Wn={},PF={}; T.forEach(t=>{Wn[t.team]=t.w; PF[t.team]=t.pf;});
-          for(const g of G){const a=mu[g.ta+'|'+g.wk]+W.sd*gauss(), b=mu[g.tb+'|'+g.wk]+W.sd*gauss(); PF[g.ta]+=a; PF[g.tb]+=b; Wn[a>b?g.ta:g.tb]++;}
-          const o=T.map(t=>t.team).sort((x,z)=>Wn[z]-Wn[x]||PF[z]-PF[x]), s6=o.slice(0,6);
-          s6.forEach(t=>po[t]++); bye[o[0]]++; bye[o[1]]++;
-          const q=[play(s6[2],s6[5]),play(s6[3],s6[4])].sort((x,z)=>s6.indexOf(x)-s6.indexOf(z));
-          ti[play(play(s6[0],q[1]),play(s6[1],q[0]))]++;}
-        $('#tMlOut').innerHTML='<thead><tr><th>Team</th><th class="num">Playoffs</th><th class="num">vs the live forecast</th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
-          T.slice().sort((x,z)=>po[z.team]-po[x.team]).map(t=>{const d=po[t.team]/n-t.po; return `<tr><td><b>${esc(t.team)}</b> <span class="dim">${esc(t.mgr||'')}</span></td><td class="num"><b>${pc(po[t.team]/n)}</b></td><td class="num"><span class="${d>=0?'lv-steal':'lv-bust'}">${sg(d*100,1)}</span></td><td class="num">${pc(bye[t.team]/n)}</td><td class="num">${pc(ti[t.team]/n)}</td></tr>`;}).join('')+'</tbody>';};
-      $('#mlRun').onclick=()=>{$('#mlRun').textContent='Running…'; setTimeout(()=>{run(); $('#mlRun').textContent='Run it';},20);};
-      run();}
-    /* every model on the site */
-    const M_=[
-      ['The forecast','2026 page','Predicts','Projected lineups (Sleeper’s weekly projections, scored the league’s way), scoring so far, the schedule left, the standings','A regression for each team’s expected score each week (above), then '+(FC?FC.runs.toLocaleString():'')+' simulated seasons: normal swings around it, ties on points for, a re-seeded bracket.','Backtested above'],
-      ['Pythagorean wins and luck','All-Time, Seasons, Luck Ledger','Measures','Points for and against','Deserved wins = games × PF^2.37 ÷ (PF^2.37 + PA^2.37). The 2.37 is fitted to this league’s history. Luck = real wins − deserved wins.','Pinned by the numbers tripwire'],
-      ['All-play record and schedule luck','Week by Week, All-Time','Measures','Every weekly score','Each week, count the other teams you outscored. Schedule luck = real wins − all-play win % × games. No model at all: an exact count.','Exact'],
-      ['Wins above average','Front Office, team files','Measures','All-play','(all-play win % − 0.500) × games: wins earned above an average team’s, whatever the schedule did. The league’s nearest thing to baseball’s WAR.','Exact'],
-      ['Expected titles','Advanced, Champions','Baseline','Playoff bracket','A coin flip every playoff game: ½ raised to the games needed to win it, added up over a career. Titles above that are skill or luck.','Sums to 1.00 a season'],
-      ['Power Index','Power Index','Measures','Points a game','100 × his points a game ÷ that season’s league average. 112 is 12% above the field, in any era.','Pinned'],
-      ['Power rankings','Power Index','Predicts (roughly)','Every season’s Power Index','Recent seasons weighted more (each season back counts λ times the one after it; the slider), small samples pulled toward average.','Not backtested'],
-      ['Points per win (“in wins”)','Trades, team files, missed games','Converts','The spread of weekly scores','σ ÷ 0.399: the points a week that move an average team one win, from the normal distribution (0.399 is its height at the middle).','Exact under its assumption'],
-      ['Value at position','Trades, pickups, Front Office','Measures','Started points, Yahoo’s season rankings','Points that counted minus a replacement-level starter at his position over the same starts (about the 11th QB, 25th RB, 26th WR, 12th TE).','Rechecked by test_wire'],
-      ['Trade grading 2.0','2026 page (preview)','Measures','Lineups, projections','Each week after a deal, his real lineup against the same lineup with the deal undone: each slot a received player filled goes to whoever the old roster had there with the best projection.','Preview only'],
-      ['Missed games value','Injuries, injury luck','Measures','Sleeper games played, Yahoo rosters, draft slot','Expected points a game (his own scoring blended with what his draft slot usually scores, the slot worth 4 games) minus replacement, times games missed.','Recounted by test_teamfile'],
-      ['Draft board: expected, steals, busts','Draft boards, Front Office','Measures','Draft order, Sleeper season points','Expected = what the player who finished at his draft slot scored. Steal: finished 6+ places (or twice as) high; bust: a top-40 pick 10+ places (or twice as) low.','Rechecked'],
-      ['Against the crowd','Against the Crowd','Measures','Yahoo-wide % started and % rostered, projections','Chalk, calls against the crowd (20-point gap), gutsy (under 40%), spot starts (under 50% and double the projection), gems (70%+), sleepers (under 25% the week before).','Thresholds by hand'],
-      ['Lineup efficiency','Front Office, team files','Measures','Lineups, points','His points ÷ his best possible lineup’s points, the best lineup brute-checked for every team-week.','Brute-force checked'],
-      ['NFL team matches','Advanced','Matches','Career and franchise records','Seven numbers each, turned into z-scores within their own world, weighted (titles 2×, win % 1.5×…), then everyone paired at once to make the total gap smallest (the Hungarian method).','Not predictive']];
-    $('#tMlAll').innerHTML='<thead><tr><th>Model</th><th>Where</th><th>Kind</th><th>What goes in</th><th>The math</th><th>Checked by</th></tr></thead><tbody>'+M_.map(r=>`<tr>${r.map((c,i)=>i?`<td>${esc(c)}</td>`:`<td><b>${esc(c)}</b></td>`).join('')}</tr>`).join('')+'</tbody>';
-  }
-})();
 /* ============ the forecast (forecast.py): the rest of the season played 100,000 times ============ */
 function drawForecast(FC,L){
   const T=FC.teams, by={}; T.forEach(t=>{by[t.team]=t;});
@@ -5313,7 +5238,8 @@ function drawForecast(FC,L){
   const G=FC.games.filter(g=>g.wk===wk);
   $('#lvFcWeekH').textContent=`This week · week ${wk}`;
   $('#lvFcWeekB').innerHTML=G.map(g=>{const a=by[g.ta], b=by[g.tb], pa=g.pA;
-    const side=(t,p,mu)=>`<div><div>${tm(t)}</div><div class="dim" style="font-size:12.5px;margin-top:2px">${t.w}–${t.l} · expected <b style="color:var(--ink)">${f(mu,1)}</b> · <b style="color:var(--ink)">${pct(p)}</b> to win</div><div class="dim" style="font-size:12.5px">playoffs: ${pct(t.ifWin)} with a win, ${pct(t.ifLose)} with a loss</div></div>`;
+    const yp=t=>{const u=(L.upcoming||[]).find(x=>x.wk===wk&&(x.ta===t.team||x.tb===t.team)); return u?(u.ta===t.team?u.pa:u.pb):null;};   /* Yahoo's projection, for comparison */
+    const side=(t,p,mu)=>`<div><div>${tm(t)}</div><div class="dim" style="font-size:12.5px;margin-top:2px">${t.w}–${t.l} · our model <b style="color:var(--ink)">${f(mu,1)}</b>${yp(t)!=null?` <span title="Yahoo’s own projection, for comparison">(Yahoo ${f(yp(t),1)})</span>`:''} · <b style="color:var(--ink)">${pct(p)}</b> to win</div><div class="dim" style="font-size:12.5px">playoffs: ${pct(t.ifWin)} with a win, ${pct(t.ifLose)} with a loss</div></div>`;
     return `<div class="lv-trg" style="padding:12px 0;border-bottom:1px solid var(--rule-2)">${side(a,pa,g.muA)}${side(b,1-pa,g.muB)}</div>`;}).join('')+`<p class="lv-trnote">The biggest swing this week: ${(()=>{const s=T.slice().sort((x,y)=>(y.ifWin-y.ifLose)-(x.ifWin-x.ifLose))[0]; return `${esc(s.team)}, ${pct(s.ifLose)} to ${pct(s.ifWin)}`;})()}.</p>`;
   /* what each team needs: the playoff odds at each final win total, and the total for 50%, 80% and 95% */
   const maxW=FC.played+left;
