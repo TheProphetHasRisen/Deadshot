@@ -163,7 +163,7 @@ cp ci/site.gitignore "$CLONE/.gitignore"
 cp ci/src.gitignore "$CLONE/src/.gitignore"   # an older copy left out package.json, so GitHub could not install the checks' tools
 git -C "$CLONE" add .gitignore .github/workflows/update.yml .github/workflows/checks.yml
 git -C "$CLONE" add -A index.html 404.html og.png og-*.png t src favicon.svg favicon-32.png \
-  apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js fonts art
+  apple-touch-icon.png icon-192.png icon-512.png icon-maskable-512.png vercel.json manifest.webmanifest sw.js lab_feed.json fonts art
 if git -C "$CLONE" diff --cached --quiet; then
   echo "  index.html unchanged — nothing to deploy"; exit 0
 fi
