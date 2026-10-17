@@ -55,6 +55,16 @@ def latest(players):
     out['_link'] = link
     return out
 
+def sig():
+    """the newest headline time for every hurt player on a Deadshot roster: changes when news lands"""
+    import yahoo_parse as P, teamfile as TF
+    R = P.rosters(TF.LIVE); wk = max(r['wk'] for r in R)
+    hurt = sorted({(r['n'], r['pos']) for r in R if r['wk'] == wk and (r.get('status') or '') not in ('', 'OK')})
+    L = latest(hurt)
+    return '\n'.join('%s %s' % (n, L[n][0]['t']) for n in sorted(L) if n != '_link')
+
 if __name__ == '__main__':
+    import sys
+    if '--sig' in sys.argv: print(sig()); sys.exit()
     r = latest([('A.J. Brown', 'WR'), ('Mike Evans', 'WR'), ('Caleb Williams', 'QB')])
     print(json.dumps(r, indent=1)[:2000])

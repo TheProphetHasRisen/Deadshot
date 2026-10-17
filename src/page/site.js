@@ -162,6 +162,7 @@ let tipPark;
 const hideTip=()=>{tip.classList.remove('on');tip.setAttribute('aria-hidden','true');
   clearTimeout(tipPark);
   tipPark=setTimeout(()=>{tip.style.left='0px';tip.style.top='0px';},150);};
+const glq=k=>`<span class="gl" data-gl="${k}" tabindex="0">?</span>`;   /* a ? mark that opens GLOSS[k] */
 const GLOSS={
  z:`<b>Z-score</b><br>How far clear of the field you scored, in standard deviations.<br><br>`+
    `Take a team’s points per game, subtract that season’s league average, then divide by how spread out the league was that year.<br><br>`+
@@ -225,9 +226,15 @@ const GLOSS={
    `A pace from a week or two can be a fluke, so treat early figures loosely.`,
  model:`<b>The forecast</b><br>Rerun every time the site updates.<br><br>`+
    `<b>Each team, each week left.</b> His expected score is the league average, plus part of how his projected best lineup that week compares with everyone else’s, plus part of how he has scored so far. The lineup is built from the players on his roster now, each with that week’s projection scored the league’s way, so a player out hurt, suspended or on a bye counts nothing until the week he is projected back, and an IR stash is in it once he is.<br><br>`+
-   `<b>How much of each.</b> Fitted on every season Yahoo reaches, each frozen at the same number of weeks played, with the projections as they stood then. In this league a week’s score is close to a coin flip around the average, so both are shrunk hard, and every score swings around its expected value by the spread history leaves.<br><br>`+
+   `<b>How much of each.</b> Fitted on every season Yahoo reaches, each frozen at the same number of weeks played, with the projections as they stood then. Both weights are small: in this league projections and form explain only a small part of a week’s score. Each simulated score is drawn around its expected value with the week-to-week spread seen in past seasons.<br><br>`+
    `<b>Two answers, blended.</b> Playoff, bye and seed odds mix that model with the standings alone (every team equal from here), moving toward the standings each week until week 8; title odds use the model alone. Both choices are what scored best when the forecast was rerun on every season since 2021.<br><br>`+
    `<b>The season, played out.</b> The real schedule, ${SIMRUNS} times. Ties go on points for, as Yahoo has seeded every tie since 2021. The top six make it, the top two get byes, and the bracket re-seeds after the first round. Every figure is the share of the runs it happened in; <b>with a win / with a loss</b> splits those runs on this week’s result.`,
+ needBig:`<b>Biggest need</b><br>The position where his starters fall furthest below the league average, after the best free agents are counted. If a free agent projects better than one of his starters, he could fix that hole today, so it is not counted as a need.<br><br>The figure is how far behind the league he still is there, in projected points a week.`,
+ spare:`<b>Spare depth</b><br>His best bench player at each position against the best free agents at that position. The position shown is where his best bench player projects furthest above the free agents, in points a week. A bench player who projects no better than a free agent is not counted. <b>None</b> means no bench player beats the free agents by half a point.`,
+ freePick:`<b>Best free pickup</b><br>The free agent who would add most to his lineup: the best one at the position where he projects furthest above that team’s weakest starter there, in points a week over the rest of the season. Shown only when the gain is at least a point a week.`,
+ hitPpg:`<b>His points a game</b><br>His points per game in the games he played that season, under this league’s scoring.`,
+ hitExp:`<b>Valued at, a game</b><br>What he was expected to score per game, used to price each missed game. For a drafted player it starts at what his draft slot usually scores and moves toward his own points a game as his games pile up (the draft slot counts as 4 games). Undrafted players are valued on their own scoring.`,
+ hitLost:`<b>Value lost</b><br>Games missed × (valued at, a game − a replacement-level starter at his position). What the absences cost his team in points over a player off waivers.`,
  need:`<b>What each team needs</b><br>From the simulated seasons: of the runs in which he finished with a given number of wins, the share in which he made the playoffs. <b>Wins for 50%</b> is the fewest wins that got him in at least half the time; in brackets, how many of the games left that takes. Schedule left: his opponents’ expected scores against the league’s average, plus means harder.`,
  waa:`<b>Wins above average</b><br>The league’s nearest thing to baseball’s WAR for a manager.<br><br>`+
    `Each week a team’s score is set against all nine others (its all-play record). An average team beats half of them. Wins above average = (all-play rate − 0.500) × games. <b>+2.0</b> means his scoring earned two more wins than an average team’s would have, whatever the schedule did.`,
@@ -3046,7 +3053,7 @@ function makeCollapsible(card,open){
       btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false');
       btn.setAttribute('aria-label',(o?'Hide ':'Show ')+title());
       const extra=also(); if(extra)extra.hidden=!o;};
-    card._fold=v=>{wrap.hidden=!v; FOLDMEM.set(foldKey(card),!!v); sync();
+    card._fold=v=>{wrap.hidden=!v; FOLDMEM.set(foldKey(card),!!v); sync(); const sc=card.closest('section'); if(sc&&sc._syncAll)sc._syncAll();
       /* a box whose content is a grid of cards (the trades): opening it opens them, or it looks like nothing happened */
       const ex=v&&also(); if(ex)ex.querySelectorAll('.card').forEach(c=>{if(c._fold&&c.querySelector(':scope > .fold-body')?.hidden)c._fold(true);});};
     btn.onclick=()=>card._fold(wrap.hidden);
@@ -3063,20 +3070,23 @@ function makeSectionFold(sec,open){
   /* every node, comments too: the season page leaves a marker comment where its cards go back */
   [...sec.childNodes].filter(c=>c!==head).forEach(c=>body.appendChild(c));
   sec.appendChild(body);
-  /* and one that opens the section with every box in it (Brian, 16 Oct 2026) */
+  /* and one that opens the section with every box in it (USER, 16 Oct 2026), or shuts every box once they are all open.
+     "Show section" only unfolds the list of box titles, each still shut */
   const all=document.createElement('button'); all.type='button'; all.className='fold-btn sec-fold-btn sec-all-btn';
-  all.innerHTML='Open all<span class="sf-w"> boxes</span> &#9662;'; all.setAttribute('aria-label','Open this section and every box in it');
-  all.onclick=()=>{sec._fold(true); sec.querySelectorAll('.card').forEach(c=>{if(c._fold)c._fold(true);});
-    const rt=sec.querySelector('#recsToggle'); if(rt&&rt._set)rt._set(true);};
+  const allOpen=()=>{const cs=[...sec.querySelectorAll('.card')].filter(c=>c._fold); return !body.hidden&&cs.length>0&&cs.every(c=>!c.querySelector(':scope > .fold-body')?.hidden);};
+  sec._syncAll=()=>{const o=allOpen(); all.innerHTML=o?'Shut all<span class="sf-w"> boxes</span> &#9652;':'Open all<span class="sf-w"> boxes</span> &#9662;';
+    all.setAttribute('aria-label',o?'Shut every box in this section':'Open this section and every box in it');};
+  all.onclick=()=>{const o=allOpen(); if(!o)sec._fold(true); sec.querySelectorAll('.card').forEach(c=>{if(c._fold)c._fold(!o);});
+    const rt=sec.querySelector('#recsToggle'); if(!o&&rt&&rt._set)rt._set(true); sec._syncAll();};
   head.appendChild(all);
   const btn=document.createElement('button'); btn.type='button'; btn.className='fold-btn sec-fold-btn';
   head.appendChild(btn);
   const sync=()=>{const o=!body.hidden; btn.innerHTML=o?'Hide<span class="sf-w"> section</span> &#9652;':'Show<span class="sf-w"> section</span> &#9662;';
     btn.classList.toggle('on',o); btn.setAttribute('aria-expanded',o?'true':'false'); sec.classList.toggle('sec-shut',!o);};
-  sec._fold=v=>{body.hidden=!v; sync();};
+  sec._fold=v=>{body.hidden=!v; sync(); sec._syncAll();};
   btn.onclick=()=>sec._fold(body.hidden);
   body.hidden=!(open||wantOpen(sec));
-  sync();
+  sync(); sec._syncAll();
 }
 /* open everything between an element and the top of its page, so a jump lands on something visible */
 function reveal(el){
@@ -5098,7 +5108,7 @@ function pharaoh(){
     mat($('#tFoClass'),(m,y)=>cls[m+'|'+y]==null?null:cls[m+'|'+y],v=>sg(v,0));
     mat($('#tFoEff'),(m,y)=>FO.mgrs[m][y]?FO.mgrs[m][y].eff:null,v=>pct(v));
     const span=a=>{const r=[]; a.forEach(y=>{const l=r[r.length-1]; if(l&&y===l[1]+1)l[1]=y; else r.push([y,y]);}); return r.map(([p,q])=>p===q?String(p):p+'–'+q).join(', ');};
-    $('#tFoHits').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Draft pick</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>'+
+    $('#tFoHits').innerHTML='<thead><tr><th>Season</th><th>Player</th><th>Manager</th><th class="num">Draft pick</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game '+glq('hitPpg')+'</th><th class="num">Valued at, a game '+glq('hitExp')+'</th><th class="num">Value lost '+glq('hitLost')+'</th></tr></thead><tbody>'+
       (FO.hits||[]).filter(sel).map(h=>`<tr><td>${yr(h.y)}</td><td>${pl(h.n,h.pos)}</td><td>${esc(h.m)}</td><td class="num">${draftPick(h.y,h.n)}</td><td class="num">${h.slot?esc(h.slot):`<span class="dim">${h.how==='trade'?'trade':'pickup'}</span>`}</td><td class="num">${h.missed}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')+'</tbody>';
     fillEmpty($('#tFoHits'));
     $('#tFoLoyal').innerHTML='<thead><tr><th>Player</th><th>Manager</th><th class="num">Seasons</th><th>Which</th><th class="num">Weeks on his roster</th></tr></thead><tbody>'+
@@ -5157,7 +5167,7 @@ let openSeason=null;
     const IH=(FO.yHits||{})[y]||[];
     h+=card('syInj',`Missed games, ${y}`,'Regular starters who missed games, and what it cost each team',`<div class="scroll"><table><thead><tr><th>Manager</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
       rows.slice().sort((a,b)=>(a.inj_luck??0)-(b.inj_luck??0)).map(r=>`<tr><td>${mlink(r.m)} <span class="dim">${esc(team(r.m))}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
-      <div class="scroll"><table><thead><tr><th>Hardest hits</th><th>Manager</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+      <div class="scroll"><table><thead><tr><th>Hardest hits</th><th>Manager</th><th class="num">Drafted as</th><th class="num">Games missed</th><th class="num">His points a game ${glq('hitPpg')}</th><th class="num">Valued at, a game ${glq('hitExp')}</th><th class="num">Value lost ${glq('hitLost')}</th></tr></thead><tbody>${
       IH.map(x=>`<tr><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.m)}</td><td class="num">${x.slot?esc(x.slot):'<span class="dim">pickup</span>'}</td><td class="num">${x.missed}</td><td class="num">${x.ppg==null?'<span class="dim">never played</span>':f(x.ppg,1)}</td><td class="num">${f(x.exp,1)}</td><td class="num">${f(x.val,1)}</td></tr>`).join('')}</tbody></table></div>`,'inj');
     const LG=FO.yLeague&&FO.yLeague[y];
     if(LG)h+=card('syLg',`The league in ${y}`,'',`<div class="card-b"><div class="tiles" style="margin:0">
@@ -5229,9 +5239,9 @@ let openSeason=null;
   const FC=D.forecast;
   if(FC){const fit=FC.fit, T=FC.teams||[], MD=FC.model;
     if(fit&&fit.b1!=null)add(`Every point a team’s projected lineup is above the league’s turns into about ${b(f(fit.b1,2))} real points that week, from ${fit.n} team-weeks since 2021.`);
-    if(fit&&fit.r2!=null)add(`Week to week, this league is close to a coin flip: projections and form together explain only ${b(Math.round(fit.r2*100)+'%')} of how scores spread out.`);
-    if(fit&&fit.b2!=null)add(`A point a game of scoring so far adds only ${b(f(fit.b2,2))} points to a team’s expected score: once the projected lineup is known, past scoring says little.`);
-    if(MD&&MD.weight!=null&&MD.weight<1)add(`This week’s playoff odds lean ${b(Math.round(MD.weight*100)+'%')} on the model and ${b(Math.round((1-MD.weight)*100)+'%')} on the standings: run on every past season, the standings alone called the race better from week 6 on.`);
+    if(fit&&fit.r2!=null)add(`Projections and form together explain ${b(Math.round(fit.r2*100)+'%')} of the week-to-week variation in team scores.`);
+    if(fit&&fit.b2!=null)add(`Each point a game a team has scored above the league so far adds ${b(f(fit.b2,2))} points to its expected score, once the projected lineup is counted.`);
+    if(MD&&MD.weight!=null&&MD.weight<1)add(`This week’s playoff odds are ${b(Math.round(MD.weight*100)+'%')} the model and ${b(Math.round((1-MD.weight)*100)+'%')} the standings alone. In past seasons, the standings alone were the better predictor from week 6 on.`);
     if(T.length){const top=T[0], low=T[T.length-1];
       add(`Across ${b(FC.runs.toLocaleString())} simulated seasons, ${esc(top.team)} makes the playoffs in ${b(pct(top.po))} of them.`);
       add(`${esc(low.team)} still makes the playoffs in ${b(pct(low.po))} of ${FC.runs.toLocaleString()} simulated seasons.`);
@@ -5242,13 +5252,13 @@ let openSeason=null;
     const N=FC.needs; if(N&&N.teams){const lab={QB:'quarterback',RB:'running back',WR:'receiver',TE:'tight end',K:'kicker',DEF:'defense'};
       let w=null; Object.entries(N.teams).forEach(([t,v])=>Object.keys(lab).forEach(p=>{const g=(v._eff?v._eff[p]:v[p])-N.league[p]; if(N.league[p]!=null&&(!w||g<w.g))w={t,p,g};}));
       if(w&&w.g<-1)add(`The biggest hole in the league: ${esc(w.t)} at ${lab[w.p]}, ${b(f(-w.g,1))} points a week behind the league even after the best free agents.`);
-      if(N.repl&&N.repl.QB&&N.league.QB)add(`A free-agent quarterback projects ${b(f(N.repl.QB,1))} a week this season; the league’s starters ${b(f(N.league.QB,1))}. That is why a backup quarterback is worth so little.`);}}
+      if(N.repl&&N.repl.QB&&N.league.QB)add(`The best free-agent quarterbacks project ${b(f(N.repl.QB,1))} a week for the rest of the season; the league’s starting quarterbacks ${b(f(N.league.QB,1))}.`);}}
   const PV=D.posValue; if(PV&&PV.seasons){const LY=D.live?D.live.year:null, fin=PV.years.filter(y=>y!==LY&&PV.seasons[y]);
     const avg=(p,k)=>{let t=0,n=0; fin.forEach(y=>{const s=PV.seasons[y], v=s.pos[p]; if(v&&v[k]!=null){t+=v[k]*s.weeks; n+=s.weeks;}}); return n?t/n:null;};
     if(fin.length){const rb=avg('RB','worth'), qb=avg('QB','worth'), sh=avg('RB','share'), wr=avg('WR','share');
-      if(rb!=null&&qb!=null)add(`Since ${fin[0]}, a point from a running back has been worth ${b(f(rb,2))} over waivers; a point from a quarterback ${b(f(qb,2))}. Same scoreboard, very different scarcity.`);
+      if(rb!=null&&qb!=null)add(`Since ${fin[0]}, each point a starting running back scored was worth ${b(f(rb,2))} over a free agent; each point from a starting quarterback ${b(f(qb,2))}.`);
       if(sh!=null&&wr!=null)add(`Running backs and receivers produced ${b(Math.round((sh+wr)*100)+'%')} of everything the league’s starters scored over the free agents since ${fin[0]}.`);
-      const k=avg('K','worth'); if(k!=null&&k<0.05)add(`Kickers: the three best-projected free agents have scored ${k<0?'more than':'about as much as'} the league’s starting kickers since ${fin[0]}. Stream them.`);}}
+      const k=avg('K','worth'); if(k!=null&&k<0.05)add(`Kickers: the three best-projected free agents have scored ${k<0?'more than':'about as much as'} the league’s starting kickers since ${fin[0]}.`);}}
   const RC=D.report; if(RC&&RC.seasons){const LY=D.live?D.live.year:null, all=[];
     Object.entries(RC.seasons).forEach(([y,s])=>{if(+y===LY)return; Object.entries(s).forEach(([m,v])=>all.push({y,m,...v}));});
     if(all.length){const top=all.slice().sort((x,y)=>y.grade-x.grade)[0]; add(`Best GM report card since ${RC.years[0]}: ${esc(top.m)} in ${top.y}, a grade of ${b(top.grade)} out of 100.`);
@@ -5261,8 +5271,10 @@ let openSeason=null;
   if(!F.length)return;
   for(let i=F.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [F[i],F[j]]=[F[j],F[i]];}
   let i=0, hold=false;
-  const show=()=>{tx.classList.add('fade'); setTimeout(()=>{tx.innerHTML=F[i%F.length]; tx.classList.remove('fade');},300);};
-  tx.innerHTML=F[0]; host.hidden=false;
+  const cnt=$('#factCount'), at=()=>{if(cnt)cnt.textContent=`${(i%F.length)+1} of ${F.length}`;};
+  const show=()=>{i=(i+F.length)%F.length; at(); tx.classList.add('fade'); setTimeout(()=>{tx.innerHTML=F[i]; tx.classList.remove('fade');},300);};
+  tx.innerHTML=F[0]; at(); host.hidden=false;
+  const pv=$('#factPrev'); if(pv)pv.onclick=()=>{i--; show();};
   host.addEventListener('mouseenter',()=>{hold=true;}); host.addEventListener('mouseleave',()=>{hold=false;});
   $('#factNext').onclick=()=>{i++; show();};
   setInterval(()=>{if(hold||document.hidden)return; i++; show();},9000);
@@ -5279,7 +5291,7 @@ function drawForecast(FC,L){
   const R=FC.runs.toLocaleString(), games=FC.games.length;
   $('#lvFcTitle').textContent=`${R} seasons, simulated`;
   $('#lvFcSub').textContent=`every one of the ${games} games left played ${R} times · rerun every update`;
-  $('#lvFcIntro').innerHTML=`The rest of ${L.year}, played out ${R} times: <b>${(FC.runs*games).toLocaleString()}</b> simulated games. Every team’s score each week comes from his projected lineup that week (injuries, players coming back, suspensions and byes included) and how he has scored so far, weighted by a model fitted on every season since 2021 as it stood at this point. ${FC.model&&FC.model.weight<1?`Playoff, bye and seed odds blend that model (${Math.round(FC.model.weight*100)}% this week) with the standings alone (${Math.round((1-FC.model.weight)*100)}%), shifting toward the standings each week until week 8: run on every past season, that blend called the playoff race best. Title odds use the model alone. `:''}Ties go on points for and the bracket re-seeds, as Yahoo runs it. The line beside each team is his playoff odds after every week so far.`;
+  $('#lvFcIntro').innerHTML=`The rest of ${L.year}, played out ${R} times: <b>${(FC.runs*games).toLocaleString()}</b> simulated games. Every team’s score each week comes from his projected lineup that week (injuries, players coming back, suspensions and byes included) and how he has scored so far, weighted by a model fitted on 2021 to 2025 at the same point of each season. ${FC.model&&FC.model.weight<1?`Playoff, bye and seed odds blend that model (${Math.round(FC.model.weight*100)}% this week) with the standings alone (${Math.round((1-FC.model.weight)*100)}%), moving to the standings alone by week 8. In past seasons this mix predicted the playoff field better than either alone. Title odds use the model alone. `:''}Ties go on points for and the bracket re-seeds, as Yahoo runs it. The line beside each team is his playoff odds after every week so far.`;
   $('#tFcOdds').innerHTML='<thead><tr><th>Team</th><th class="num">Record</th><th class="num">Projected wins</th><th class="num">Playoffs</th><th></th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
     T.map(t=>`<tr><td>${tm(t)}</td><td class="num">${t.w}–${t.l}</td><td class="num">${f(t.wins,1)}</td><td class="num"><b>${pct(t.po)}</b></td><td>${spark(t)}</td><td class="num">${pct(t.bye)}</td><td class="num">${pct(t.title)}</td></tr>`).join('')+'</tbody>';
   /* this week: each matchup, expected scores and the chance each way, and what it does to the odds */
@@ -5306,7 +5318,7 @@ function drawForecast(FC,L){
     T.map(t=>`<tr><th class="rw">${tm(t)}</th>`+t.seed.map(v=>v<0.005?'<td><span></span></td>':`<td><span style="${heat(v)}">${Math.round(v*100)}</span></td>`).join('')+'</tr>').join('')+'</tbody>';
   /* who is out */
   const I=T.flatMap(t=>t.inj.map(x=>({...x,t})));
-  $('#lvFcInjSub').textContent=`Every player Yahoo lists as hurt, and how the simulation plays him. A player Sleeper projects to play counts at his full projection. One projected out costs his team the points its best lineup loses in each week he is out, added up over all those weeks, not just this one.`;
+  $('#lvFcInjSub').textContent=`Every player Yahoo lists as hurt, and how the simulation treats him. A player Sleeper projects to play counts at his full projection. For a player projected out, the cost is the points his team’s best lineup loses in each week he is out, summed over all of those weeks.`;
   const spot=s=>s==='IR'?'IR':s==='BN'?'Bench':'Starting';
   const costOf=x=>{const out=x.back==null?null:Math.max(0,x.back-wk);
     if(x.back===wk)return [0,'<span class="dim">none: projected to play</span>'];
@@ -5328,44 +5340,64 @@ function drawForecast(FC,L){
     const ov=t=>T_(t)._over||{}, spare=t=>{const o=ov(t), k=Object.keys(o).sort((a,b)=>o[b]-o[a])[0]; return k&&o[k]>=0.5?k:null;};
     const cellN=v=>{const t=Math.max(-1,Math.min(1,v/6)), bg=t<0?mix(cssv('--surface'),cssv('--neg'),Math.abs(t)*.7):mix(cssv('--surface'),cssv('--pos'),t*.7); return `<td class="num"><span style="background:${bg};color:${pickInk(bg)};padding:2px 6px;border-radius:3px">${sg(v,1)}</span></td>`;};
     $('#lvNeedSub').textContent=`starters’ projected points a week, minus the league average at each position · the ${nOf(left,'week')} left · injuries and byes counted`;
-    $('#tNeedPos').innerHTML='<thead><tr><th>Team</th>'+N.pos.map(p=>`<th class="num">${lab[p]}</th>`).join('')+'<th title="The position where he is furthest behind the league even after picking up the best free agents there">Biggest need</th><th title="His best bench player against the free agents at the same position: the trade chip worth something">Spare depth</th><th title="The free agent who would add most to his lineup, points a week over the starter he would replace">Best free pickup</th></tr></thead><tbody>'+
+    $('#tNeedPos').innerHTML='<thead><tr><th>Team</th>'+N.pos.map(p=>`<th class="num">${lab[p]}</th>`).join('')+'<th>Biggest need '+glq('needBig')+'</th><th>Spare depth '+glq('spare')+'</th><th>Best free pickup '+glq('freePick')+'</th></tr></thead><tbody>'+
       T.map(t=>{const h=hole(t), sp=spare(t), fx=T_(t)._fix;
         return `<tr><td>${tm(t)}</td>`+N.pos.map(p=>cellN(gap(t,p))).join('')+
         `<td>${effGap(t,h)<-0.5?`<b>${lab[h]}</b> <span class="dim">${sg(effGap(t,h),1)} a week</span>`:'<span class="dim">none</span>'}</td>`+
         `<td>${sp?`${lab[sp]} <span class="dim">${sg(ov(t)[sp],1)} over waivers</span>`:'<span class="dim">none</span>'}</td>`+
         `<td>${fx?`${esc(fx[1])} <span class="lv-pos">${esc(fx[0])}</span> <span class="dim">${sg(fx[2],1)} a week</span>`:'<span class="dim">none better</span>'}</td></tr>`;}).join('')+'</tbody>';
     $('#lvNeedNote').innerHTML=`Each position cell is his starters’ projected points a week there minus the league average (${N.pos.map(p=>lab[p]+' '+f(N.league[p],1)).join(', ')}). `+
-      (N.repl?`Free agents are valued too: the best three at each position project ${P6.map(p=>lab[p]+' '+f(N.repl[p],1)).join(', ')} a week. That is why a quarterback gap rarely ranks as a need and a backup quarterback is rarely spare depth: a free one scores nearly as much. `:'')+
+      (N.repl?`Free agents are valued too: the best three at each position project ${P6.map(p=>lab[p]+' '+f(N.repl[p],1)).join(', ')} a week. A gap that a free agent can close is not counted as a need, and a bench player is only counted as spare depth if he projects above the free agents. `:'')+
       `How much each position is really worth, season by season, is in the Front Office: What a point is worth.`;}
 }
-/* ============ the GM report card: every decision against the alternative he really had (report.py) ============ */
+/* ============ the GM report card: every decision against the alternative he had (report.py) ============
+   Letter grades come from percentiles against every finished manager-season; the card under the table shows the
+   decisions behind each grade. */
 (()=>{const G=D.report, card=$('#gmCard'); if(!G||!G.years||!G.years.length){if(card)card.remove(); return;}
-  const LY=D.live?D.live.year:null, P=G.parts, ys=G.years.map(String); let YS=0;
+  const LY=D.live?D.live.year:null, P=G.parts, ys=G.years.map(String); let YS=0, WHO=null;
   const lab={draft:'Draft',waivers:'Waivers',drops:'Drops',trades:'Trades',lineups:'Lineups'};
-  const tip={draft:'Each pick against the next five players taken: his season over the free-agent level at his position, minus theirs. Kickers and defenses aside',
-    waivers:'Each pickup against the best-projected free agent at the same position that week, over the weeks he kept him: points each actually scored',
-    drops:'Each cut against keeping him: the free-agent level at his position minus what the dropped player scored, every week left. Cutting a player who then flopped scores well',
-    trades:'Each deal’s value at position against the other side’s, as the trade cards grade them. No trades is the middle (50)',
-    lineups:'His starters’ points against the lineup the projections would have set from the same roster that week: start/sit with only what was known then'};
-  const heat=v=>{if(v==null)return ''; const t=Math.abs(v-50)/50, bg=v<50?mix(cssv('--surface'),cssv('--neg'),t*.6):mix(cssv('--surface'),cssv('--pos'),t*.6); return `background:${bg};color:${pickInk(bg)};padding:2px 6px;border-radius:3px`;};
+  const tip={draft:'Each pick against the next five players taken: his season over the free-agent level at his position, minus their average. Kickers and defenses left out',
+    waivers:'Each pickup against the best-projected free agent at the same position that week, over the weeks he kept him: the points each scored',
+    drops:'Each cut against keeping him: the free-agent level at his position minus what the dropped player scored in each game after',
+    trades:'Each deal’s value at position against the other side’s, as the trade cards grade them. No trades counts as average',
+    lineups:'Each week, his starters’ points against the lineup the projections would have set from the same roster'};
+  const what={draft:'pick against the next five taken',waivers:'pickup against the best free agent passed over',drops:'cut against keeping him',trades:'trade against the other side',lineups:'week against the projections’ lineup'};
+  const letter=p=>p==null?'—':p>=93?'A+':p>=85?'A':p>=78?'A−':p>=70?'B+':p>=62?'B':p>=55?'B−':p>=48?'C+':p>=40?'C':p>=33?'C−':p>=26?'D+':p>=18?'D':p>=10?'D−':'F';
+  const heat=v=>{if(v==null)return ''; const t=Math.abs(v-50)/50, bg=v<50?mix(cssv('--surface'),cssv('--neg'),t*.6):mix(cssv('--surface'),cssv('--pos'),t*.6); return `background:${bg};color:${pickInk(bg)};padding:2px 7px;border-radius:3px;font-weight:700`;};
+  const chip=p=>`<span style="${heat(p)}">${letter(p)}</span>`;
+  const collect=()=>{const rows={};
+    ys.filter(y=>!YS||+y===YS).forEach(y=>Object.entries(G.seasons[y]||{}).forEach(([m,v])=>{if(!vis(m))return;
+      const r=rows[m]||(rows[m]={m,n:0,g:0,pts:{},pc:{},cnt:{},grade:0,dec:{}}); r.n++; r.g+=v.g; r.grade+=v.grade*v.g;
+      P.forEach(k=>{r.pts[k]=(r.pts[k]||0)+v[k]; r.pc[k]=(r.pc[k]||0)+(v.pct[k]??50)*v.g; r.cnt[k]=(r.cnt[k]||0)+((v.n||{})[k]||0);
+        const d=(v.dec||{})[k]||{}, tag=x=>[x[0],(YS?'':y+' · ')+x[1]]; const o=r.dec[k]||(r.dec[k]={best:[],worst:[]});
+        o.best.push(...(d.best||[]).map(tag)); o.worst.push(...(d.worst||[]).map(tag));});}));
+    return Object.values(rows).map(r=>({...r,grade:r.grade/r.g,pc:Object.fromEntries(P.map(k=>[k,r.pc[k]/r.g]))}));};
+  const detail=R=>{const r=R.find(x=>x.m===WHO)||R.slice().sort((a,b)=>b.grade-a.grade)[0]; if(!r){$('#gmDet').innerHTML=''; return;} WHO=r.m;
+    const span=YS?String(YS)+(YS===LY?' so far':''):'every season';
+    const li=(x,cls)=>`<li><b class="${cls}">${sg(x[0],1)}</b> ${esc(x[1])}</li>`;
+    $('#gmDet').innerHTML=`<div class="gm-who"><div class="pills">${R.slice().sort((a,b)=>a.m.localeCompare(b.m)).map(x=>`<button type="button" data-gmw="${esc(x.m)}" class="${x.m===r.m?'on':''}">${esc(x.m.split(' ').slice(-1)[0])}</button>`).join('')}</div></div>
+      <div class="gm-head"><b>${esc(r.m)}</b>, ${span}: overall ${chip(r.grade)} <span class="dim">(${Math.round(r.grade)} of 100: better than ${Math.round(r.grade)}% of manager-seasons)</span></div>
+      <div class="gm-grid">${P.map(k=>{const d=r.dec[k]||{best:[],worst:[]}, b=d.best.sort((x,y)=>y[0]-x[0]).slice(0,3), w=d.worst.sort((x,y)=>x[0]-y[0]).slice(0,3);
+        return `<div class="gm-sk"><div class="gm-sk-h">${lab[k]} ${chip(r.pc[k])} <span class="dim">${sg(r.pts[k],0)} pts · ${nOf(r.cnt[k],'decision')}</span></div>
+          <div class="dim gm-sk-w">Each ${what[k]}</div>
+          ${b.length?`<div class="gm-l">Best</div><ul>${b.map(x=>li(x,'lv-steal')).join('')}</ul>`:''}${w.length?`<div class="gm-l">Worst</div><ul>${w.map(x=>li(x,'lv-bust')).join('')}</ul>`:''}${!b.length&&!w.length?'<p class="dim" style="margin:6px 0 0">None</p>':''}</div>`;}).join('')}</div>`;
+    $$('#gmDet [data-gmw]').forEach(b=>b.onclick=()=>{WHO=b.dataset.gmw; detail(R);});};
   const draw=()=>{
     $('#gmYr').innerHTML=`<button data-gy="0" class="${YS?'':'on'}">Every season</button>`+ys.map(y=>`<button data-gy="${y}" class="${String(YS)===y?'on':''}">${y}${+y===LY?' <span class="lv-tag" style="font-size:8px;padding:0 4px">live</span>':''}</button>`).join('');
     $$('#gmYr button').forEach(b=>b.onclick=()=>{YS=+b.dataset.gy; draw();});
-    const rows={};
-    ys.filter(y=>!YS||+y===YS).forEach(y=>Object.entries(G.seasons[y]||{}).forEach(([m,v])=>{if(!vis(m))return;
-      const r=rows[m]||(rows[m]={m,n:0,g:0,pts:{},pc:{},grade:0}); r.n++; r.g+=v.g; r.grade+=v.grade*v.g;
-      P.forEach(k=>{r.pts[k]=(r.pts[k]||0)+v[k]; r.pc[k]=(r.pc[k]||0)+(v.pct[k]??50)*v.g;});}));
-    const R=Object.values(rows).map(r=>({...r,grade:r.grade/r.g,pc:Object.fromEntries(P.map(k=>[k,r.pc[k]/r.g]))}));
-    const span=YS?String(YS)+(YS===LY?' so far':''):`${ys[0]}–${ys[ys.length-1]}`;
-    $('#gmSub').textContent=`${span} · regular season · each skill a percentile against every manager-season since ${ys[0]} (50 is the middle)`;
+    const R=collect(), span=YS?String(YS)+(YS===LY?' so far':''):`${ys[0]}–${ys[ys.length-1]}`;
+    $('#gmSub').textContent=`${span} · regular season · graded against every manager-season since ${ys[0]}`;
     table($('#tGm'),[
       {h:'Manager',f:r=>mlink(r.m),c:'nm',k:r=>r.m,asc:1},
       {h:'Szns',f:r=>r.n,c:'num',k:r=>r.n},
-      ...P.map(k=>({h:lab[k],t:tip[k],c:'num',k:r=>r.pc[k],f:r=>`<span style="${heat(r.pc[k])}" title="${esc(lab[k])}: ${sg(r.pts[k],0)} points ${YS?'that season':'over his seasons'}">${Math.round(r.pc[k])}</span>`})),
-      {h:'Grade',t:'The average of the five: each skill counts the same',c:'num',k:r=>r.grade,f:r=>`<b style="${heat(r.grade)}">${Math.round(r.grade)}</b>`},
+      ...P.map(k=>({h:lab[k],t:tip[k],c:'num',k:r=>r.pc[k],f:r=>`${chip(r.pc[k])} <span class="dim" title="${esc(lab[k])}: ${sg(r.pts[k],0)} points">${sg(r.pts[k],0)}</span>`})),
+      {h:'Overall',t:'The average of the five grades: each skill counts the same',c:'num',k:r=>r.grade,f:r=>`${chip(r.grade)} <span class="dim">${Math.round(r.grade)}</span>`},
+      {h:'',f:r=>`<button type="button" class="gm-open" data-gmw="${esc(r.m)}">Card</button>`,k:()=>0},
     ],R,{rank:1,sort:7});
-    $('#gmNote').textContent=`Every decision is graded against the alternative he really had at that moment, in points, then each skill is ranked against all ${G.pool} finished manager-seasons, points a week, so a season in progress compares fairly. Hover a figure for the points behind it.${YS===LY?' Early in a season these move a lot.':''}`;};
-  draw();
+    $('#tGm').onclick=e=>{const b=e.target.closest('[data-gmw]'); if(!b)return; WHO=b.dataset.gmw; detail(R); $('#gmDet').scrollIntoView({block:'nearest',behavior:'smooth'});};
+    detail(R);
+    $('#gmNote').textContent=`Each decision is compared with the alternative available at the time, in points. The ? on each column says what that alternative was. Grades are percentiles against all ${G.pool} finished manager-seasons (per week, so a season in progress compares fairly): A grades are about the top fifth, C the middle, F the bottom tenth. Overall is the average of the five. Points are not added across skills: a draft pick is judged over a whole season, a lineup call over one week.${YS===LY?' Early in a season these move a lot.':''}`;};
+  draw(); REDRAW.push(draw);   /* theme colours and the manager filter */
 })();
 /* ============ what a point is worth at each position, season by season (posvalue.py) ============ */
 (()=>{const V=D.posValue, card=$('#posValCard'); if(!V||!V.years||!V.years.length){if(card)card.remove(); return;}
@@ -5378,6 +5410,7 @@ function drawForecast(FC,L){
   const cell=(v,tip)=>v==null?'<td class="num">—</td>':`<td class="num"><span style="${heat(v.worth,0,0.6)}" title="${tip}">${v.worth==null?'—':f(v.worth,2)}</span></td>`;
   const tipOf=(p,v)=>`${lab[p]}: starters ${f(v.starter,1)} a week, the best free agents ${f(v.fa,1)}, so a starter was worth ${sg(v.over,1)} a week over waivers`;
   const P=V.pos;
+  const draw=()=>{
   $('#pvSub').textContent=`of every point a starter scores, the part a free agent would not have given you · regular season, ${ys[0]}–${ys[ys.length-1]}`;
   const avRow=k=>fin.length>1?`<tr style="border-top:2px solid var(--rule)"><td><b>${fin[0]}–${fin[fin.length-1]}</b></td>`+P.map(p=>{const w=avg(p,k); return k==='worth'?`<td class="num"><b>${w==null?'—':f(w,2)}</b></td>`:`<td class="num"><b>${w==null?'—':Math.round(w*100)+'%'}</b></td>`;}).join('')+'</tr>':'';
   $('#tPosVal').innerHTML='<thead><tr><th>Season</th>'+P.map(p=>`<th class="num">${lab[p]}</th>`).join('')+'</tr></thead><tbody>'+
@@ -5385,10 +5418,11 @@ function drawForecast(FC,L){
   $('#tPosShare').innerHTML='<thead><tr><th>Season</th>'+P.map(p=>`<th class="num">${lab[p]}</th>`).join('')+'</tr></thead><tbody>'+
     ys.slice().reverse().map(y=>{const s=V.seasons[y]; return `<tr><td>${yl(y)}</td>`+P.map(p=>{const v=s.pos[p]; return `<td class="num">${v?`<span style="${heat(v.share,0,0.5)}">${Math.round(v.share*100)}%</span>`:'—'}</td>`;}).join('')+'</tr>';}).join('')+avRow('share')+'</tbody>';
   const rk=P.filter(p=>avg(p,'worth')!=null).sort((a,b)=>avg(b,'worth')-avg(a,'worth'));
-  $('#pvNote').innerHTML=`On the scoreboard a point is a point. What differs is how many of a starter’s points you could have had for nothing. Each week, the free agent level is what the three best-projected players nobody in Deadshot had rostered went on to score (picked by the projection made before the games, so no hindsight). `+
+  $('#pvNote').innerHTML=`Each figure is the share of a starter’s points that a free agent would not have provided: (starter − free agent) ÷ starter. Each week, the free agent level is what the three best-projected unrostered players at that position scored, chosen by the projection made before the games. `+
     (rk.length?(()=>{const w={QB:'quarterback',RB:'running back',WR:'receiver',TE:'tight end',K:'kicker',DEF:'defense'}; return `Over ${fin.length>1?`${fin[0]}–${fin[fin.length-1]}`:'the seasons here'}, a point from a ${w[rk[0]]} was worth ${f(avg(rk[0],'worth'),2)} over waivers and a point from a ${w[rk[rk.length-1]]} ${f(avg(rk[rk.length-1],'worth'),2)}. `;})():'')+
     `A figure below zero means the free agents outscored the league’s starters there. The second table splits all the points the league’s starters scored over the free agents by position, flex starters counted at their own. Hover a figure for the points behind it.`;
-  [$('#tPosVal'),$('#tPosShare')].forEach(fillEmpty);
+  [$('#tPosVal'),$('#tPosShare')].forEach(fillEmpty);};
+  draw(); REDRAW.push(draw);   /* theme colours */
 })();
 /* ============ against the crowd: Deadshot's lineups and pickups against all of Yahoo (crowd.py) ============ */
 (()=>{const C=D.crowd, sec=$('#crowd'); if(!C||!C.years||!Object.keys(C.mgrs).length){if(sec)sec.remove(); const a=$('#nav a[data-id="crowd"]'); if(a)a.remove(); return;}
@@ -5485,12 +5519,17 @@ glossify();
   if(tick.length>1)setInterval(()=>{if(hold||document.hidden)return; ti=(ti+1)%tick.length;
     const s=document.createElement('span'); s.className='lv-tk lv-tk-in'; s.innerHTML=tick[ti]; tx.replaceChildren(s);},3800);
   const seg=on=>{$('#lvSegBook').classList.toggle('on',!on); $('#lvSegLive').classList.toggle('on',on);};
+  /* a row of every box on the 2026 page, under the masthead: one click opens it and goes there (USER, 17 Oct 2026) */
+  const jump=()=>{const J=$('#lvJump'); if(!J)return;
+    const cs=$$('#lvView .card').filter(c=>!c.hidden&&!c.parentElement.closest('[data-fold-sub],.card')&&c.querySelector(':scope > .card-h h3'));
+    J.innerHTML=cs.map((c,i)=>`<a href="#" data-jump="${i}">${esc(c.querySelector(':scope > .card-h h3').textContent.trim())}</a>`).join('');
+    $$('[data-jump]',J).forEach(a=>a.onclick=e=>{e.preventDefault(); const c=cs[+a.dataset.jump]; if(c._fold)c._fold(true); c.scrollIntoView({behavior:'smooth',block:'start'});});};
   const show=mode=>{if(mode&&V.hidden){foldSweep(V); foldBar(V); foldAll(V,null);}   /* 2026 starts with every card shut, each time it opens */
     V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
     seg(mode==='pg'); tabTitle(mode?L.year+' Live':'');
     $('#lvGo').textContent=mode==='pg'?'\u2190 Back to the record book':'Open 2026 \u2192';
     if(mode==='ov'){document.body.style.overflow='hidden'; V.scrollTop=0; $('#lvClose').focus();} else document.body.style.overflow='';
-    if(mode==='pg')scrollTo(0,0);
+    if(mode==='pg'){scrollTo(0,0); jump();}
     if(mode)history.replaceState(null,'',location.pathname+location.search+'#'+L.year); else if(location.hash==='#'+L.year)history.replaceState(null,'',location.pathname+location.search);};
   $('#lvOpen').onclick=()=>show(document.body.classList.contains('lv-pg')?null:'pg');
   $('#lvClose').onclick=()=>show(null);
@@ -5842,18 +5881,19 @@ glossify();
       $('#lvInjSub').textContent=`games missed, weeks 1–${L.weeks[L.weeks.length-1]}`+(TF.injWeek?` · Yahoo’s report for week ${TF.injWeek}`:'');
       el.innerHTML=`<div class="sub-h" style="margin:0 0 6px">Missed games${FINAL?'':' so far'}</div><div class="scroll"><table><thead><tr><th>Team</th><th class="num">Starter games missed</th><th class="num">Value lost</th><th class="num">Wins lost</th><th class="num">Injury luck</th></tr></thead><tbody>${
         rows.map(r=>`<tr><td><b>${esc(r.team)}</b> <span class="dim">${esc(r.m)}</span></td><td class="num">${r.inj_g??'—'}</td><td class="num">${r.inj_val==null?'—':f(r.inj_val,1)}</td><td class="num">${r.inj_wins==null?'—':f(r.inj_wins,2)}</td><td class="num">${r.inj_luck==null?'—':`<b class="${r.inj_luck>=0?'lv-steal':'lv-bust'}">${sg(r.inj_luck,2)}</b>`}</td></tr>`).join('')}</tbody></table></div>
-        <div class="sub-h" style="margin:16px 0 6px">Hardest hits${FINAL?'':' so far'}</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Draft pick</th><th class="num">Drafted as</th><th class="num">Games missed</th><th>Weeks</th><th class="num">His points a game</th><th class="num">Valued at, a game</th><th class="num">Value lost</th></tr></thead><tbody>${
+        <div class="sub-h" style="margin:16px 0 6px">Hardest hits${FINAL?'':' so far'}</div><div class="scroll"><table><thead><tr><th>Player</th><th>Team</th><th class="num">Draft pick</th><th class="num">Drafted as</th><th class="num">Games missed</th><th>Weeks</th><th class="num">His points a game ${glq('hitPpg')}</th><th class="num">Valued at, a game ${glq('hitExp')}</th><th class="num">Value lost ${glq('hitLost')}</th></tr></thead><tbody>${
         (TF.hits||[]).map(h=>`<tr><td><b>${esc(h.n)}</b> <span class="lv-pos">${esc(h.pos)}</span></td><td>${esc(Object.keys(L.mgr).find(t=>L.mgr[t]===h.m)||'')} <span class="dim">${esc(h.m)}</span></td><td class="num">${(()=>{const dl=(L.draft&&L.draft[String(L.year)])||[], nt=Object.keys(L.mgr).length||10, d=dl.find(x=>x[2]===h.n);
           return d?`${Math.floor((d[0]-1)/nt)+1}.${String((d[0]-1)%nt+1).padStart(2,'0')} <span class="dim">${esc((L.mgr[d[1]]||'').split(' ').slice(-1)[0])}</span>`:'<span class="dim">undrafted</span>';})()}</td><td class="num">${h.slot?esc(h.slot):`<span class="dim">${h.how==='trade'?'trade':'pickup'}</span>`}</td><td class="num">${h.missed}</td><td class="dim">${h.wks.join(', ')}</td><td class="num">${h.ppg==null?'<span class="dim">never played</span>':f(h.ppg,1)+' <span class="dim">('+nOf(h.g,'game')+')</span>'}</td><td class="num">${f(h.exp,1)}</td><td class="num">${f(h.val,1)}</td></tr>`).join('')}</tbody></table></div>
         ${NOW.length?`        <div class="sub-h" style="margin:16px 0 6px">Yahoo’s report, week ${TF.injWeek||''}</div><div class="scroll"><table><thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Injury</th><th>Lineup spot</th></tr></thead><tbody>${
-        NOW.map(x=>`<tr><td>${esc(x.team)} <span class="dim">${esc(x.m||'')}</span></td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td><b>${esc(x.status)}</b></td><td class="dim">${esc(x.injury||'')}</td><td class="${x.slot==='BN'||x.slot==='IR'?'dim':''}">${where(x.slot)}</td></tr>`+newsRow(x)).join('')}</tbody></table></div>`:''}
-        <p class="lv-trnote">${NOW.length?'Status as Yahoo shows it now: Q questionable, D doubtful, O out, IR injured reserve. '+(Object.keys(NW).length>1?'Under each player, the latest Rotowire headlines (the same write-ups Yahoo shows), newest first, times US Eastern; the link opens the full story. ':''):''}Missed games: a regular starter (or a player drafted as one) whose NFL team played and he did not, valued at what he was expected to score.</p>`;
+        NOW.slice().sort((a,b)=>((NW[b.n]||[{}])[0].t||'').localeCompare((NW[a.n]||[{}])[0].t||'')).map(x=>`<tr><td>${esc(x.team)} <span class="dim">${esc(x.m||'')}</span></td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td><b>${esc(x.status)}</b></td><td class="dim">${esc(x.injury||'')}</td><td class="${x.slot==='BN'||x.slot==='IR'?'dim':''}">${where(x.slot)}</td></tr>`+newsRow(x)).join('')}</tbody></table></div>`:''}
+        <p class="lv-trnote">${NOW.length?'Status as Yahoo shows it now: Q questionable, D doubtful, O out, IR injured reserve. '+(Object.keys(NW).length>1?'Players with the newest news first. Under each, the latest Rotowire headline (the same notes Yahoo shows), times US Eastern; the link opens all his news. ':''):''}Missed games: a regular starter (or a player drafted as one) whose NFL team played and he did not, valued at what he was expected to score.</p>`;
       el.querySelectorAll('table').forEach(fillEmpty); glossify($('#lvInjCard'));}}
   }
   };
-  renderSeason(L);
-  /* a season page borrows this section and redraws it with its own season; leaving puts 2026 back */
-  window.drawSeasonView=renderSeason;
+  /* a season page borrows this section and redraws it with its own season; leaving puts 2026 back. A theme change
+     redraws whichever season is showing, so colours worked out from the theme follow it */
+  let CUR=L; const rs=X=>{CUR=X; renderSeason(X);};
+  rs(L); window.drawSeasonView=rs; REDRAW.push(()=>renderSeason(CUR));
 })();
 
 /* ---- folding, switched on once the whole page is drawn; boxes drawn later fold as they appear ---- */

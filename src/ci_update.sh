@@ -22,7 +22,7 @@ done
 trap 'rm -f "$ROOT/src/.yahoo_tokens.json"' EXIT
 
 # what Yahoo said last time (the read time aside), to skip a publish when nothing has moved
-sig(){ { grep -v '^ASOF' season2026_yahoo.py; cat status_log.json; } 2>/dev/null | shasum | cut -c1-40; }   # a status change counts too
+sig(){ { grep -v '^ASOF' season2026_yahoo.py; cat status_log.json; python3 news.py --sig 2>/dev/null; } 2>/dev/null | shasum | cut -c1-40; }   # a status change or new injury news counts too
 before="$(sig)"
 
 for y in 2021 2022 2023 2024 2025; do
@@ -43,7 +43,7 @@ for f in og.png og-*.png; do [ -f "$f" ] && cp "$f" "$ROOT/$f"; done
 mkdir -p "$ROOT/t" && cp t/*.html "$ROOT/t/" 2>/dev/null || true
 
 cd "$ROOT"
-git add index.html 404.html sw.js og.png og-*.png t src/season2026_yahoo.py src/draft_points.json src/status_log.json
+git add index.html 404.html sw.js og.png og-*.png t src/season2026_yahoo.py src/draft_points.json src/status_log.json src/pred_log.json src/lab_feed.json
 if git diff --cached --quiet; then echo "The page came out the same: nothing to publish."; exit 0; fi
 git -c user.name="Deadshot updater" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
     commit -qm "Live update from Yahoo ($(TZ=America/Los_Angeles date '+%b %-d, %-I:%M %p PT'))"

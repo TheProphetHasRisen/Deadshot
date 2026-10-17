@@ -1,6 +1,142 @@
 {
 "2021": {
 "Brian Berger": {
+"dec": {
+"draft": {
+"best": [
+[
+123.0,
+"Took Tom Brady (QB, pick 7.08). Best of the next five: Ryan Tannehill"
+],
+[
+63.8,
+"Took DJ Moore (WR, pick 6.03). Best of the next five: Adam Thielen"
+],
+[
+63.5,
+"Took Brandin Cooks (WR, pick 11.08). Best of the next five: Leonard Fournette"
+]
+],
+"worst": [
+[
+-113.5,
+"Took Julio Jones (WR, pick 5.08). Best of the next five: Diontae Johnson"
+],
+[
+-69.2,
+"Took Michael Gallup (WR, pick 9.08). Best of the next five: Melvin Gordon III"
+],
+[
+-58.8,
+"Took Saquon Barkley (RB, pick 2.03). Best of the next five: Jonathan Taylor"
+]
+]
+},
+"drops": {
+"best": [
+[
+27.1,
+"Cut Chase McLaughlin (K) in week 9. He scored 27.0 in 6 games after"
+],
+[
+17.6,
+"Cut Latavius Murray (RB) in week 7. He scored 24.4 in 5 games after"
+],
+[
+14.8,
+"Cut Giovani Bernard (RB) in week 13. He scored 2.0 in 2 games after"
+]
+],
+"worst": [
+[
+-42.5,
+"Cut Patriots (DEF) in week 4. They scored 141.5 in 11 games after"
+],
+[
+-22.9,
+"Cut Hunter Henry (TE) in week 4. He scored 121.2 in 11 games after"
+],
+[
+-15.8,
+"Cut Van Jefferson (WR) in week 10. He scored 62.9 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+9.4,
+"Week 15: started DJ Moore 12.8 over Devonta Freeman 3.4"
+],
+[
+0.9,
+"Week 11: started Dawson Knox 14.0 over Rob Gronkowski 13.1"
+]
+],
+"worst": [
+[
+-3.2,
+"Week 12: started DJ Moore 14.3 over Darnell Mooney 17.5"
+],
+[
+-1.6,
+"Week 2: started Saquon Barkley 8.9 over Kenyan Drake 10.5"
+],
+[
+-0.3,
+"Week 8: started Jakobi Meyers 9.6 over DJ Moore 9.9"
+]
+]
+},
+"trades": {
+"best": [
+[
+17.4,
+"Week 6: got Devontae Booker for Michael Gallup"
+],
+[
+9.2,
+"Week 4: got Tee Higgins, Rob Gronkowski for Brandin Cooks, Robert Tonyan"
+]
+],
+"worst": [
+[
+-15.3,
+"Week 9: got Taysom Hill for AJ Dillon"
+]
+]
+},
+"waivers": {
+"best": [
+[
+24.1,
+"Added Dawson Knox (TE) in week 4 over Jared Cook, kept 12 weeks"
+],
+[
+18.4,
+"Added Devonta Freeman (RB) in week 11 over D'Onta Foreman, kept 5 weeks"
+],
+[
+13.0,
+"Added Seahawks (DEF) in week 8 over Cardinals, kept 1 week"
+]
+],
+"worst": [
+[
+-7.5,
+"Added Giovani Bernard (RB) in week 12 over David Johnson, kept 1 week"
+],
+[
+-7.0,
+"Added Chase McLaughlin (K) in week 5 over Matt Prater, kept 4 weeks"
+],
+[
+-6.7,
+"Added Mike Davis (RB) in week 10 over Brandon Bolden, kept 2 weeks"
+]
+]
+}
+},
 "draft": -41.64,
 "drops": -0.82,
 "g": 15,
@@ -12,11 +148,139 @@
 "trades": 4,
 "waivers": 23
 },
+"ppw": 68.01,
 "team": "\u201cClose\u201d~~~ 0.33-0.42",
 "trades": 11.3,
 "waivers": 86.68
 },
 "Brian Burke": {
+"dec": {
+"draft": {
+"best": [
+[
+34.6,
+"Took Patrick Mahomes (QB, pick 3.07). Best of the next five: Cooper Kupp"
+],
+[
+17.3,
+"Took Davante Adams (WR, pick 1.07). Best of the next five: Austin Ekeler"
+],
+[
+15.2,
+"Took Damien Harris (RB, pick 5.07). Best of the next five: Diontae Johnson"
+]
+],
+"worst": [
+[
+-170.9,
+"Took Calvin Ridley (WR, pick 2.04). Best of the next five: Jonathan Taylor"
+],
+[
+-91.0,
+"Took Trey Sermon (RB, pick 7.07). Best of the next five: Tom Brady"
+],
+[
+-61.9,
+"Took Logan Thomas (TE, pick 9.07). Best of the next five: Melvin Gordon III"
+]
+]
+},
+"drops": {
+"best": [
+[
+64.8,
+"Cut Josh Gordon (WR) in week 7. He scored 10.6 in 8 games after"
+],
+[
+35.5,
+"Cut Trey Sermon (RB) in week 6. He scored 6.5 in 5 games after"
+],
+[
+33.3,
+"Cut Bryan Edwards (WR) in week 3. He scored 79.7 in 12 games after"
+]
+],
+"worst": [
+[
+-18.3,
+"Cut A.J. Green (WR) in week 2. He scored 131.3 in 12 games after"
+],
+[
+-9.2,
+"Cut DeVante Parker (WR) in week 10. He scored 28.0 in 2 games after"
+],
+[
+-7.4,
+"Cut DeVante Parker (WR) in week 15. He scored 16.8 in 1 game after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+10.1,
+"Week 15: started Amon-Ra St. Brown 23.5 over Chase Claypool 1.9, Rams 11.5"
+],
+[
+7.0,
+"Week 8: started Damien Harris 14.0, Mike Gesicki 9.8 over T.Y. Hilton 3.6, Dallas Goedert 13.2"
+],
+[
+5.9,
+"Week 13: started Damien Harris 17.1 over DeVante Parker 11.2"
+]
+],
+"worst": [
+[
+-12.3,
+"Week 4: started Damien Harris 4.6, Henry Ruggs III 9.0 over Trey Sermon 8.9, Laviska Shenault Jr. 17.0"
+],
+[
+-8.0,
+"Week 2: started Laviska Shenault Jr. 1.7 over Chase Claypool 9.7"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-21.7,
+"Week 9: got Allen Robinson for Dallas Goedert"
+]
+]
+},
+"waivers": {
+"best": [
+[
+60.6,
+"Added Mike Gesicki (TE) in week 5 over Cameron Brate, kept 11 weeks"
+],
+[
+58.4,
+"Added Cordarrelle Patterson (WR) in week 3 over Jakobi Meyers, kept 13 weeks"
+],
+[
+19.5,
+"Added Amon-Ra St. Brown (WR) in week 15 over Rondale Moore, kept 1 week"
+]
+],
+"worst": [
+[
+-44.6,
+"Added Le'Veon Bell (RB) in week 1 over Leonard Fournette, kept 4 weeks"
+],
+[
+-36.9,
+"Added T.Y. Hilton (WR) in week 6 over Cole Beasley, kept 8 weeks"
+],
+[
+-26.3,
+"Added Tyler Higbee (TE) in week 14 over Taysom Hill, kept 1 week"
+]
+]
+}
+},
 "draft": -361.24,
 "drops": 276.68,
 "g": 15,
@@ -28,11 +292,152 @@
 "trades": 1,
 "waivers": 25
 },
+"ppw": 68.01,
 "team": "brian's Choice Team",
 "trades": -21.74,
 "waivers": -10.48
 },
 "Chris Cossu": {
+"dec": {
+"draft": {
+"best": [
+[
+223.0,
+"Took Cooper Kupp (WR, pick 3.09). Best of the next five: Mike Evans"
+],
+[
+149.5,
+"Took Leonard Fournette (RB, pick 11.09). Best of the next five: Mike Williams"
+],
+[
+86.3,
+"Took Tyreek Hill (WR, pick 1.09). Best of the next five: Austin Ekeler"
+]
+],
+"worst": [
+[
+-124.8,
+"Took Curtis Samuel (WR, pick 12.02). Best of the next five: Mike Williams"
+],
+[
+-47.0,
+"Took Kenny Golladay (WR, pick 10.02). Best of the next five: Matthew Stafford"
+],
+[
+-36.5,
+"Took Mecole Hardman Jr. (WR, pick 14.02). Best of the next five: Darnell Mooney"
+]
+]
+},
+"drops": {
+"best": [
+[
+49.0,
+"Cut Jaguars (DEF) in week 2. They scored 68.0 in 13 games after"
+],
+[
+37.3,
+"Cut Curtis Samuel (WR) in week 1. He scored 9.8 in 5 games after"
+],
+[
+28.7,
+"Cut Mecole Hardman Jr. (WR) in week 1. He scored 103.2 in 14 games after"
+]
+],
+"worst": [
+[
+-137.9,
+"Cut Leonard Fournette (RB) in week 1. He scored 255.5 in 14 games after"
+],
+[
+-34.6,
+"Cut Elijah Moore (WR) in week 1. He scored 138.2 in 11 games after"
+],
+[
+-27.0,
+"Cut Dolphins (DEF) in week 7. They scored 99.0 in 8 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+13.0,
+"Week 5: started Damien Williams 16.4 over Clyde Edwards-Helaire 3.4"
+],
+[
+9.3,
+"Week 9: started Michael Carter 9.6 over Chase Edmonds 0.3"
+],
+[
+3.1,
+"Week 6: started Carson Wentz 17.0 over Ryan Tannehill 13.9"
+]
+],
+"worst": [
+[
+-17.9,
+"Week 4: started James Robinson 20.6, Odell Beckham Jr. 5.1 over Clyde Edwards-Helaire 19.4, Diontae Johnson 24.2"
+],
+[
+-2.5,
+"Week 15: started James Robinson 17.8, Tyler Conklin 1.7 over David Montgomery 11.3, Noah Fant 10.7"
+]
+]
+},
+"trades": {
+"best": [
+[
+90.4,
+"Week 6: got Austin Ekeler, Ryan Tannehill for Kyler Murray, Kareem Hunt"
+]
+],
+"worst": [
+[
+-91.7,
+"Week 1: got Brandon Aiyuk, Clyde Edwards-Helaire, David Montgomery for Najee Harris"
+],
+[
+-24.7,
+"Week 7: got Chase Edmonds for Elijah Mitchell"
+],
+[
+-3.4,
+"Week 9: got Matthew Stafford for Clyde Edwards-Helaire"
+]
+]
+},
+"waivers": {
+"best": [
+[
+28.4,
+"Added Khalil Herbert (RB) in week 6 over Kenny Gainwell, kept 3 weeks"
+],
+[
+15.0,
+"Added Hunter Henry (TE) in week 9 over Evan Engram, kept 4 weeks"
+],
+[
+12.0,
+"Added Cam Newton (QB) in week 11 over Ryan Tannehill, kept 3 weeks"
+]
+],
+"worst": [
+[
+-23.0,
+"Added Eagles (DEF) in week 12 over Bengals, kept 4 weeks"
+],
+[
+-20.8,
+"Added Mecole Hardman Jr. (WR) in week 1 over Marvin Jones, kept 2 weeks"
+],
+[
+-17.6,
+"Added Marvin Jones Jr. (WR) in week 3 over Jakobi Meyers, kept 2 weeks"
+]
+]
+}
+},
 "draft": 431.04,
 "drops": -11.28,
 "g": 15,
@@ -44,11 +449,152 @@
 "trades": 6,
 "waivers": 27
 },
+"ppw": 68.01,
 "team": "Aaron it out",
 "trades": -29.46,
 "waivers": -64.96
 },
 "Jonathan Campbell": {
+"dec": {
+"draft": {
+"best": [
+[
+107.8,
+"Took Austin Ekeler (RB, pick 1.10). Best of the next five: Jonathan Taylor"
+],
+[
+48.1,
+"Took Melvin Gordon III (RB, pick 10.01). Best of the next five: Matthew Stafford"
+],
+[
+24.8,
+"Took Ryan Tannehill (QB, pick 7.10). Best of the next five: Chase Claypool"
+]
+],
+"worst": [
+[
+-166.9,
+"Took Trey Lance (QB, pick 13.10). Best of the next five: Mike Gesicki"
+],
+[
+-136.3,
+"Took Chris Carson (RB, pick 4.01). Best of the next five: Josh Allen"
+],
+[
+-90.4,
+"Took Allen Robinson (WR, pick 3.10). Best of the next five: Mike Evans"
+]
+]
+},
+"drops": {
+"best": [
+[
+33.1,
+"Cut Bryan Edwards (WR) in week 1. He scored 98.8 in 14 games after"
+],
+[
+32.1,
+"Cut Trey Lance (QB) in week 1. He scored 46.9 in 5 games after"
+],
+[
+20.5,
+"Cut Justin Fields (QB) in week 4. He scored 121.7 in 9 games after"
+]
+],
+"worst": [
+[
+-53.0,
+"Cut Elijah Mitchell (RB) in week 4. He scored 111.8 in 7 games after"
+],
+[
+-48.5,
+"Cut Patriots (DEF) in week 8. They scored 111.5 in 7 games after"
+],
+[
+-38.4,
+"Cut Melvin Gordon III (RB) in week 7. He scored 97.2 in 7 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+18.1,
+"Week 13: started Buccaneers 11.5, Dallas Goedert 28.5 over T.J. Hockenson 14.9, Bills 7.0"
+],
+[
+9.1,
+"Week 4: started Taylor Heinicke 27.9 over Ryan Tannehill 18.8"
+]
+],
+"worst": [
+[
+-29.8,
+"Week 12: started AJ Dillon 20.0, Dallas Goedert 1.0, Kareem Hunt 2.0 over Elijah Mitchell 27.8, Brandon Aiyuk 12.5, T.J. Hockenson 12.5"
+],
+[
+-28.4,
+"Week 11: started Bills -3.0, Dallas Goedert 11.2, Kadarius Toney 11.0 over Brandon Aiyuk 21.5, T.J. Hockenson 11.1, Buccaneers 15.0"
+],
+[
+-15.7,
+"Week 14: started Kareem Hunt 3.8, Sterling Shepard 4.7 over Brandon Aiyuk 18.6, Jeff Wilson Jr. 5.6"
+]
+]
+},
+"trades": {
+"best": [
+[
+55.0,
+"Week 2: got Keenan Allen for Chris Carson, Ty'Son Williams"
+],
+[
+24.7,
+"Week 7: got Elijah Mitchell for Chase Edmonds"
+],
+[
+21.7,
+"Week 9: got Dallas Goedert for Allen Robinson"
+]
+],
+"worst": [
+[
+-90.4,
+"Week 6: got Kyler Murray, Kareem Hunt for Austin Ekeler, Ryan Tannehill"
+]
+]
+},
+"waivers": {
+"best": [
+[
+56.5,
+"Added Brandon Aiyuk (WR) in week 9 over Kenny Golladay, kept 7 weeks"
+],
+[
+21.5,
+"Added Sony Michel (RB) in week 13 over Rex Burkhead, kept 3 weeks"
+],
+[
+20.9,
+"Added Jeff Wilson Jr. (RB) in week 14 over JaMycal Hasty, kept 2 weeks"
+]
+],
+"worst": [
+[
+-46.8,
+"Added Kadarius Toney (WR) in week 6 over Cole Beasley, kept 7 weeks"
+],
+[
+-24.5,
+"Added Evan Engram (TE) in week 14 over Taysom Hill, kept 1 week"
+],
+[
+-20.0,
+"Added Deshaun Watson (QB) in week 7 over Derek Carr, kept 2 weeks"
+]
+]
+}
+},
 "draft": -285.06,
 "drops": -205.96,
 "g": 15,
@@ -60,11 +606,143 @@
 "trades": 6,
 "waivers": 53
 },
+"ppw": 68.01,
 "team": "HunchoCamby\ud83e\udd78",
 "trades": 26.39,
 "waivers": -94.02
 },
 "Kevin Krueger": {
+"dec": {
+"draft": {
+"best": [
+[
+124.7,
+"Took Chris Godwin Jr. (WR, pick 5.04). Best of the next five: Tyler Lockett"
+],
+[
+103.4,
+"Took Justin Herbert (QB, pick 7.04). Best of the next five: Tom Brady"
+],
+[
+73.0,
+"Took Javonte Williams (RB, pick 8.07). Best of the next five: Deebo Samuel Sr."
+]
+],
+"worst": [
+[
+-78.1,
+"Took Darren Waller (TE, pick 3.04). Best of the next five: Cooper Kupp"
+],
+[
+-40.3,
+"Took Derrick Henry (RB, pick 1.04). Best of the next five: Tyreek Hill"
+],
+[
+-27.4,
+"Took Tyler Higbee (TE, pick 12.07). Best of the next five: Jalen Hurts"
+]
+]
+},
+"drops": {
+"best": [
+[
+19.3,
+"Cut Daniel Jones (QB) in week 4. He scored 107.1 in 8 games after"
+],
+[
+18.2,
+"Cut Tyler Bass (K) in week 7. He scored 54.0 in 8 games after"
+],
+[
+16.6,
+"Cut Boston Scott (RB) in week 11. He scored 17.0 in 4 games after"
+]
+],
+"worst": [
+[
+-53.5,
+"Cut Cowboys (DEF) in week 10. They scored 107.5 in 6 games after"
+],
+[
+-38.6,
+"Cut Darnell Mooney (WR) in week 4. He scored 142.2 in 11 games after"
+],
+[
+-19.5,
+"Cut Broncos (DEF) in week 8. They scored 82.5 in 7 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+11.0,
+"Week 5: started Antonio Gibson 21.2 over Tee Higgins 10.2"
+],
+[
+4.1,
+"Week 3: started Antonio Gibson 17.4 over Michael Pittman Jr. 13.3"
+],
+[
+2.5,
+"Week 13: started DeVonta Smith 3.5 over Adam Thielen 1.0"
+]
+],
+"worst": [
+[
+-40.9,
+"Week 9: started Boston Scott 4.0, Joe Burrow 9.4 over Justin Herbert 31.6, DeVonta Smith 22.6"
+],
+[
+-24.7,
+"Week 6: started DeVonta Smith 5.1 over Adam Thielen 29.8"
+],
+[
+-19.0,
+"Week 12: started DeVonta Smith 4.2 over Adam Thielen 23.2"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-14.8,
+"Week 6: got Miles Sanders, Alvin Kamara for Antonio Gibson, D'Andre Swift, Tee Higgins"
+]
+]
+},
+"waivers": {
+"best": [
+[
+37.1,
+"Added Pat Freiermuth (TE) in week 9 over Evan Engram, kept 7 weeks"
+],
+[
+25.5,
+"Added Cowboys (DEF) in week 12 over Bengals, kept 4 weeks"
+],
+[
+25.0,
+"Added Melvin Gordon III (RB) in week 8 over Mike Davis, kept 8 weeks"
+]
+],
+"worst": [
+[
+-40.1,
+"Added Zack Moss (RB) in week 4 over J.D. McKissic, kept 10 weeks"
+],
+[
+-25.0,
+"Added Tyler Bass (K) in week 8 over Nick Folk, kept 8 weeks"
+],
+[
+-19.0,
+"Added Darnell Mooney (WR) in week 14 over Russell Gage, kept 2 weeks"
+]
+]
+}
+},
 "draft": 330.06,
 "drops": -24.46,
 "g": 15,
@@ -76,11 +754,126 @@
 "trades": 2,
 "waivers": 19
 },
+"ppw": 68.01,
 "team": "Kevin's Superb Optimal Team",
 "trades": -14.75,
 "waivers": -38.88
 },
 "Niko Contreras": {
+"dec": {
+"draft": {
+"best": [
+[
+114.3,
+"Took James Conner (RB, pick 10.10). Best of the next five: Jaylen Waddle"
+],
+[
+95.9,
+"Took Joe Mixon (RB, pick 3.01). Best of the next five: Keenan Allen"
+],
+[
+62.2,
+"Took CeeDee Lamb (WR, pick 4.10). Best of the next five: Chris Godwin Jr."
+]
+],
+"worst": [
+[
+-172.7,
+"Took Will Fuller V (WR, pick 11.01). Best of the next five: Brandin Cooks"
+],
+[
+-77.0,
+"Took Christian McCaffrey (RB, pick 1.01). Best of the next five: Travis Kelce"
+],
+[
+-13.8,
+"Took Trevor Lawrence (QB, pick 15.01). Best of the next five: A.J. Green"
+]
+]
+},
+"drops": {
+"best": [
+[
+81.5,
+"Cut Josh Gordon (WR) in week 5. He scored 12.7 in 10 games after"
+],
+[
+40.0,
+"Cut Trevor Lawrence (QB) in week 4. He scored 133.8 in 11 games after"
+],
+[
+23.0,
+"Cut Kenny Golladay (WR) in week 8. He scored 33.5 in 6 games after"
+]
+],
+"worst": [
+[
+-6.5,
+"Cut Hunter Henry (TE) in week 7. He scored 78.0 in 8 games after"
+],
+[
+-3.9,
+"Cut Matt Prater (K) in week 12. He scored 31.0 in 3 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+11.5,
+"Week 8: started James Conner 14.2 over Kenny Gainwell 2.7"
+],
+[
+0.6,
+"Week 10: started Myles Gaskin 5.5 over Courtland Sutton 4.9"
+]
+],
+"worst": [
+[
+-13.1,
+"Week 4: started Courtland Sutton 7.7 over Tyler Boyd 20.8"
+],
+[
+-0.2,
+"Week 15: started Gerald Everett 10.0, James Conner 9.0 over Kyle Pitts Sr. 11.7, Cole Beasley 7.5"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+55.0,
+"Added 49ers (DEF) in week 7 over Raiders, kept 9 weeks"
+],
+[
+41.8,
+"Added Elijah Moore (WR) in week 11 over Mecole Hardman, kept 5 weeks"
+],
+[
+29.8,
+"Added Jarvis Landry (WR) in week 11 over Mecole Hardman, kept 4 weeks"
+]
+],
+"worst": [
+[
+-26.4,
+"Added Daniel Jones (QB) in week 8 over Carson Wentz, kept 3 weeks"
+],
+[
+-21.3,
+"Added Latavius Murray (RB) in week 5 over Alexander Mattison, kept 1 week"
+],
+[
+-16.0,
+"Added Matt Prater (K) in week 7 over Joey Slye, kept 5 weeks"
+]
+]
+}
+},
 "draft": 41.81,
 "drops": 188.0,
 "g": 15,
@@ -92,11 +885,139 @@
 "trades": 0,
 "waivers": 20
 },
+"ppw": 68.01,
 "team": "VICTORY",
 "trades": 0.0,
 "waivers": 70.46
 },
 "Peter Modlin": {
+"dec": {
+"draft": {
+"best": [
+[
+133.6,
+"Took Deebo Samuel Sr. (WR, pick 8.09). Best of the next five: Tyler Boyd"
+],
+[
+90.0,
+"Took Justin Jefferson (WR, pick 2.09). Best of the next five: Joe Mixon"
+],
+[
+70.7,
+"Took Joe Burrow (QB, pick 14.09). Best of the next five: A.J. Green"
+]
+],
+"worst": [
+[
+-145.5,
+"Took Raheem Mostert (RB, pick 6.09). Best of the next five: Justin Herbert"
+],
+[
+-62.9,
+"Took Ronald Jones (RB, pick 9.02). Best of the next five: Ja'Marr Chase"
+],
+[
+-42.6,
+"Took Nyheim Miller-Hines (RB, pick 10.09). Best of the next five: James Conner"
+]
+]
+},
+"drops": {
+"best": [
+[
+57.6,
+"Cut Ty'Son Williams (RB) in week 5. He scored 9.6 in 8 games after"
+],
+[
+38.1,
+"Cut Ronald Jones (RB) in week 4. He scored 54.3 in 11 games after"
+],
+[
+29.5,
+"Cut Bears (DEF) in week 5. They scored 60.5 in 10 games after"
+]
+],
+"worst": [
+[
+-29.6,
+"Cut Devonta Freeman (RB) in week 8. He scored 88.4 in 7 games after"
+],
+[
+-19.9,
+"Cut Joe Burrow (QB) in week 6. He scored 162.1 in 9 games after"
+],
+[
+-11.5,
+"Cut Browns (DEF) in week 12. They scored 38.5 in 3 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+0.9,
+"Week 6: started Christian Kirk 18.5 over Sterling Shepard 17.6"
+]
+],
+"worst": [
+[
+-25.2,
+"Week 11: started Lamar Jackson 0.0 over Kirk Cousins 25.2"
+],
+[
+-21.4,
+"Week 14: started Christian Kirk 11.6, David Johnson 0.0 over Devin Singletary 14.9, Brandin Cooks 18.1"
+],
+[
+-8.0,
+"Week 12: started what the projections said"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-55.0,
+"Week 2: got Chris Carson, Ty'Son Williams for Keenan Allen"
+],
+[
+-9.2,
+"Week 4: got Brandin Cooks, Robert Tonyan for Tee Higgins, Rob Gronkowski"
+]
+]
+},
+"waivers": {
+"best": [
+[
+124.7,
+"Added Christian Kirk (WR) in week 4 over DJ Chark, kept 12 weeks"
+],
+[
+39.6,
+"Added Kirk Cousins (QB) in week 8 over Carson Wentz, kept 8 weeks"
+],
+[
+19.0,
+"Added Evan McPherson (K) in week 12 over Brandon McManus, kept 4 weeks"
+]
+],
+"worst": [
+[
+-59.8,
+"Added Robert Tonyan (TE) in week 8 over Hunter Henry, kept 8 weeks"
+],
+[
+-50.5,
+"Added Sterling Shepard (WR) in week 1 over Marvin Jones, kept 13 weeks"
+],
+[
+-33.0,
+"Added Ravens (DEF) in week 13 over Chiefs, kept 2 weeks"
+]
+]
+}
+},
 "draft": 189.01,
 "drops": 182.0,
 "g": 15,
@@ -108,11 +1029,148 @@
 "trades": 2,
 "waivers": 18
 },
+"ppw": 68.01,
 "team": "SAUCE TEAM",
 "trades": -64.22,
 "waivers": 31.22
 },
 "Shane Kaiper": {
+"dec": {
+"draft": {
+"best": [
+[
+43.0,
+"Took Cole Beasley (WR, pick 14.08). Best of the next five: Joe Burrow"
+],
+[
+23.4,
+"Took Devin Singletary (RB, pick 9.03). Best of the next five: Ja'Marr Chase"
+],
+[
+21.7,
+"Took Amari Cooper (WR, pick 5.03). Best of the next five: Chris Godwin Jr."
+]
+],
+"worst": [
+[
+-153.8,
+"Took Michael Thomas (WR, pick 8.08). Best of the next five: Deebo Samuel Sr."
+],
+[
+-106.9,
+"Took DJ Chark (WR, pick 10.08). Best of the next five: James Conner"
+],
+[
+-84.6,
+"Took Phillip Lindsay (RB, pick 15.03). Best of the next five: A.J. Green"
+]
+]
+},
+"drops": {
+"best": [
+[
+56.5,
+"Cut Phillip Lindsay (RB) in week 1. He scored 35.9 in 11 games after"
+],
+[
+47.5,
+"Cut Raiders (DEF) in week 4. They scored 51.5 in 11 games after"
+],
+[
+45.9,
+"Cut Cameron Brate (TE) in week 5. He scored 43.5 in 10 games after"
+]
+],
+"worst": [
+[
+-53.3,
+"Cut Hunter Renfrow (WR) in week 6. He scored 138.1 in 9 games after"
+],
+[
+-45.5,
+"Cut Cowboys (DEF) in week 7. They scored 117.5 in 8 games after"
+],
+[
+-41.7,
+"Cut Tee Higgins (WR) in week 7. He scored 117.1 in 8 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+23.8,
+"Week 7: started D'Ernest Johnson 24.8 over Mike Davis 1.0"
+],
+[
+7.1,
+"Week 1: started Miles Sanders 17.3 over Mike Davis 10.2"
+],
+[
+5.1,
+"Week 8: started Zach Ertz 8.2 over Dalton Schultz 3.1"
+]
+],
+"worst": [
+[
+-13.9,
+"Week 10: started J.D. McKissic 7.9 over Antonio Gibson 21.8"
+],
+[
+-3.5,
+"Week 9: started Khalil Herbert 1.3, Rondale Moore 7.5 over Derrick Gore 2.9, Dalton Schultz 9.4"
+],
+[
+-2.0,
+"Week 6: started Emmanuel Sanders 14.1 over A.J. Brown 16.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+14.8,
+"Week 6: got Antonio Gibson, D'Andre Swift, Tee Higgins for Miles Sanders, Alvin Kamara"
+]
+],
+"worst": [
+[
+-17.4,
+"Week 6: got Michael Gallup for Devontae Booker"
+]
+]
+},
+"waivers": {
+"best": [
+[
+56.5,
+"Added Dalton Schultz (TE) in week 5 over Cameron Brate, kept 11 weeks"
+],
+[
+47.6,
+"Added Emmanuel Sanders (WR) in week 4 over DJ Chark, kept 5 weeks"
+],
+[
+33.3,
+"Added Van Jefferson (WR) in week 12 over Cedrick Wilson, kept 4 weeks"
+]
+],
+"worst": [
+[
+-22.3,
+"Added Tyler Conklin (TE) in week 14 over Taysom Hill, kept 1 week"
+],
+[
+-18.2,
+"Added Taylor Heinicke (QB) in week 6 over Kirk Cousins, kept 1 week"
+],
+[
+-18.0,
+"Added Browns (DEF) in week 2 over Bears, kept 1 week"
+]
+]
+}
+},
 "draft": -597.91,
 "drops": 275.4,
 "g": 15,
@@ -124,11 +1182,135 @@
 "trades": 4,
 "waivers": 51
 },
+"ppw": 68.01,
 "team": "Stegostompem",
 "trades": -2.6,
 "waivers": 105.82
 },
 "Walter Bremer": {
+"dec": {
+"draft": {
+"best": [
+[
+121.3,
+"Took Ja'Marr Chase (WR, pick 9.05). Best of the next five: Jakobi Meyers"
+],
+[
+104.5,
+"Took Matthew Stafford (QB, pick 10.06). Best of the next five: James Conner"
+],
+[
+54.3,
+"Took Josh Allen (QB, pick 4.06). Best of the next five: Mark Andrews"
+]
+],
+"worst": [
+[
+-129.8,
+"Took Gus Edwards (RB, pick 5.05). Best of the next five: Tyler Lockett"
+],
+[
+-114.4,
+"Took JuJu Smith-Schuster (WR, pick 8.06). Best of the next five: Deebo Samuel Sr."
+],
+[
+-29.9,
+"Took Robbie Chosen (WR, pick 7.05). Best of the next five: Tom Brady"
+]
+]
+},
+"drops": {
+"best": [
+[
+33.0,
+"Cut Jaguars (DEF) in week 7. They scored 39.0 in 8 games after"
+],
+[
+17.5,
+"Cut Ravens (DEF) in week 8. They scored 45.5 in 7 games after"
+],
+[
+12.1,
+"Cut Ricky Seals-Jones (TE) in week 9. He scored 14.7 in 3 games after"
+]
+],
+"worst": [
+[
+-44.9,
+"Cut Michael Carter (RB) in week 4. He scored 112.1 in 8 games after"
+],
+[
+-22.5,
+"Cut Mike Gesicki (TE) in week 4. He scored 120.8 in 11 games after"
+],
+[
+-6.0,
+"Cut Broncos (DEF) in week 9. They scored 60.0 in 6 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+4.8,
+"Week 12: started Hunter Renfrow 21.6 over Tony Pollard 16.8"
+]
+],
+"worst": [
+[
+-20.7,
+"Week 3: started Robbie Chosen 1.8 over Ja'Marr Chase 22.5"
+],
+[
+-9.6,
+"Week 2: started Robbie Chosen 6.8 over JuJu Smith-Schuster 16.4"
+],
+[
+-7.2,
+"Week 9: started Darrel Williams 10.7 over Hunter Renfrow 17.9"
+]
+]
+},
+"trades": {
+"best": [
+[
+3.4,
+"Week 9: got Clyde Edwards-Helaire for Matthew Stafford"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+94.5,
+"Added Hunter Renfrow (WR) in week 7 over Corey Davis, kept 9 weeks"
+],
+[
+65.2,
+"Added Darrel Williams (RB) in week 6 over Kenny Gainwell, kept 10 weeks"
+],
+[
+27.4,
+"Added Jared Cook (TE) in week 5 over Cameron Brate, kept 11 weeks"
+]
+],
+"worst": [
+[
+-14.9,
+"Added Alexander Mattison (RB) in week 4 over J.D. McKissic, kept 1 week"
+],
+[
+-12.0,
+"Added Alex Collins (RB) in week 6 over Kenny Gainwell, kept 9 weeks"
+],
+[
+-9.0,
+"Added Randy Bullock (K) in week 11 over Greg Zuerlein, kept 1 week"
+]
+]
+}
+},
 "draft": 156.9,
 "drops": 26.64,
 "g": 15,
@@ -140,11 +1322,143 @@
 "trades": 1,
 "waivers": 16
 },
+"ppw": 68.01,
 "team": "Hail Chubby",
 "trades": 3.43,
 "waivers": 187.06
 },
 "Wesley Alpert": {
+"dec": {
+"draft": {
+"best": [
+[
+135.9,
+"Took Jonathan Taylor (RB, pick 2.05). Best of the next five: Justin Jefferson"
+],
+[
+120.7,
+"Took Jalen Hurts (QB, pick 13.06). Best of the next five: Elijah Moore"
+],
+[
+82.5,
+"Took Mike Williams (WR, pick 12.05). Best of the next five: Tony Pollard"
+]
+],
+"worst": [
+[
+-56.5,
+"Took Clyde Edwards-Helaire (RB, pick 3.06). Best of the next five: Cooper Kupp"
+],
+[
+-49.7,
+"Took David Montgomery (RB, pick 4.05). Best of the next five: Mark Andrews"
+],
+[
+-25.9,
+"Took Sony Michel (RB, pick 10.05). Best of the next five: James Conner"
+]
+]
+},
+"drops": {
+"best": [
+[
+33.8,
+"Cut Curtis Samuel (WR) in week 5. He scored 3.9 in 4 games after"
+],
+[
+32.1,
+"Cut Rondale Moore (WR) in week 4. He scored 71.5 in 11 games after"
+],
+[
+19.2,
+"Cut Ryan Succop (K) in week 3. He scored 89.0 in 12 games after"
+]
+],
+"worst": [
+[
+-18.8,
+"Cut Nick Folk (K) in week 4. He scored 118.0 in 11 games after"
+],
+[
+-14.0,
+"Cut Saints (DEF) in week 14. They scored 32.0 in 2 games after"
+],
+[
+-13.3,
+"Cut Jarvis Landry (WR) in week 10. He scored 51.0 in 4 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+25.2,
+"Week 6: started Leonard Fournette 30.7 over Tyler Lockett 5.5"
+],
+[
+19.3,
+"Week 2: started Mike Williams 22.1 over Corey Davis 2.8"
+],
+[
+10.9,
+"Week 10: started Jalen Hurts 19.4, Mike Williams 7.3 over Aaron Rodgers 11.5, Tyler Lockett 4.3"
+]
+],
+"worst": [
+[
+-21.6,
+"Week 12: started Jalen Hurts 9.9, Mike Williams 7.9 over Aaron Rodgers 26.3, Hollywood Brown 13.1"
+],
+[
+-20.1,
+"Week 13: started Hollywood Brown 10.5, Jaylen Waddle 18.0 over Tyler Lockett 19.8, Tee Higgins 28.8"
+],
+[
+-14.7,
+"Week 11: started Jalen Hurts 30.8, Tee Higgins 3.5 over Aaron Rodgers 33.5, Tyler Lockett 15.5"
+]
+]
+},
+"trades": {
+"best": [
+[
+91.7,
+"Week 1: got Najee Harris for Brandon Aiyuk, Clyde Edwards-Helaire, David Montgomery"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+225.5,
+"Added Leonard Fournette (RB) in week 2 over James White, kept 14 weeks"
+],
+[
+80.1,
+"Added Tee Higgins (WR) in week 7 over Corey Davis, kept 9 weeks"
+],
+[
+71.0,
+"Added Hollywood Brown (WR) in week 1 over Marvin Jones, kept 15 weeks"
+]
+],
+"worst": [
+[
+-22.3,
+"Added Nyheim Miller-Hines (RB) in week 5 over Alexander Mattison, kept 2 weeks"
+],
+[
+-19.1,
+"Added Tarik Cohen (RB) in week 2 over James White, kept 5 weeks"
+],
+[
+-18.0,
+"Added Browns (DEF) in week 2 over Bears, kept 1 week"
+]
+]
+}
+},
 "draft": 343.5,
 "drops": 171.62,
 "g": 15,
@@ -156,6 +1470,7 @@
 "trades": 2,
 "waivers": 38
 },
+"ppw": 68.01,
 "team": "NAH G",
 "trades": 91.65,
 "waivers": 270.06
@@ -163,6 +1478,133 @@
 },
 "2022": {
 "Brian Berger": {
+"dec": {
+"draft": {
+"best": [
+[
+172.8,
+"Took Josh Jacobs (RB, pick 4.09). Best of the next five: Jaylen Waddle"
+],
+[
+123.4,
+"Took Tyreek Hill (WR, pick 2.09). Best of the next five: Nick Chubb"
+],
+[
+111.3,
+"Took Miles Sanders (RB, pick 10.09). Best of the next five: Chris Olave"
+]
+],
+"worst": [
+[
+-106.4,
+"Took Darren Waller (TE, pick 5.02). Best of the next five: Jaylen Waddle"
+],
+[
+-93.7,
+"Took Michael Thomas (WR, pick 6.09). Best of the next five: Jalen Hurts"
+],
+[
+-90.1,
+"Took Skyy Moore (WR, pick 12.09). Best of the next five: Jamaal Williams"
+]
+]
+},
+"drops": {
+"best": [
+[
+79.8,
+"Cut Skyy Moore (WR) in week 2. He scored 30.4 in 12 games after"
+],
+[
+76.5,
+"Cut Zamir White (RB) in week 2. He scored 6.2 in 11 games after"
+],
+[
+76.5,
+"Cut Robbie Chosen (WR) in week 3. He scored 24.5 in 11 games after"
+]
+],
+"worst": [
+[
+-23.1,
+"Cut Nick Folk (K) in week 4. He scored 106.0 in 10 games after"
+],
+[
+-21.9,
+"Cut 49ers (DEF) in week 7. They scored 81.0 in 7 games after"
+],
+[
+-16.1,
+"Cut Kirk Cousins (QB) in week 12. He scored 59.7 in 3 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+2.5,
+"Week 2: started Miles Sanders 11.6 over Josh Jacobs 9.1"
+],
+[
+1.2,
+"Week 6: started DeVonta Smith 15.4 over Miles Sanders 14.2"
+]
+],
+"worst": [
+[
+-22.7,
+"Week 1: started DeVonta Smith 0.0 over Michael Thomas 22.7"
+],
+[
+-21.9,
+"Week 5: started Miles Sanders 8.4 over Josh Jacobs 30.3"
+],
+[
+-9.4,
+"Week 7: started Christian McCaffrey 8.2 over Chris Olave 17.6"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-16.6,
+"Week 10: got Curtis Samuel, Brandin Cooks, A.J. Brown for Miles Sanders, DeVonta Smith, Chris Olave"
+]
+]
+},
+"waivers": {
+"best": [
+[
+87.6,
+"Added Jakobi Meyers (WR) in week 3 over Sterling Shepard, kept 12 weeks"
+],
+[
+31.9,
+"Added Foster Moreau (TE) in week 10 over Zach Ertz, kept 5 weeks"
+],
+[
+21.0,
+"Added Ryan Succop (K) in week 4 over Riley Patterson, kept 7 weeks"
+]
+],
+"worst": [
+[
+-13.5,
+"Added Titans (DEF) in week 14 over Eagles, kept 1 week"
+],
+[
+-10.0,
+"Added Devin Duvernay (WR) in week 2 over Russell Gage, kept 2 weeks"
+],
+[
+-5.0,
+"Added Foster Moreau (TE) in week 9 over Isaiah Likely, kept 1 week"
+]
+]
+}
+},
 "draft": 272.1,
 "drops": 317.73,
 "g": 14,
@@ -174,11 +1616,134 @@
 "trades": 1,
 "waivers": 22
 },
+"ppw": 60.09,
 "team": "Hit by Gatsby's Bus",
 "trades": -16.6,
 "waivers": 155.94
 },
 "Brian Burke": {
+"dec": {
+"draft": {
+"best": [
+[
+137.4,
+"Took Patrick Mahomes (QB, pick 6.07). Best of the next five: David Montgomery"
+],
+[
+98.4,
+"Took Nick Chubb (RB, pick 3.04). Best of the next five: Terry McLaurin"
+],
+[
+63.4,
+"Took Justin Jefferson (WR, pick 1.04). Best of the next five: Austin Ekeler"
+]
+],
+"worst": [
+[
+-65.4,
+"Took Robert Woods (WR, pick 10.07). Best of the next five: Miles Sanders"
+],
+[
+-52.9,
+"Took Chase Edmonds (RB, pick 7.04). Best of the next five: Dameon Pierce"
+],
+[
+-17.1,
+"Took DeVante Parker (WR, pick 12.07). Best of the next five: Jamaal Williams"
+]
+]
+},
+"drops": {
+"best": [
+[
+47.8,
+"Cut Sammy Watkins (WR) in week 4. He scored 16.5 in 7 games after"
+],
+[
+36.3,
+"Cut Sammy Watkins (WR) in week 9. He scored 9.6 in 5 games after"
+],
+[
+35.7,
+"Cut Robert Woods (WR) in week 5. He scored 46.9 in 9 games after"
+]
+],
+"worst": [
+[
+-47.9,
+"Cut Garrett Wilson (WR) in week 8. He scored 103.0 in 6 games after"
+],
+[
+-26.7,
+"Cut Antonio Gibson (RB) in week 8. He scored 71.8 in 6 games after"
+],
+[
+-11.9,
+"Cut Melvin Gordon III (RB) in week 1. He scored 87.1 in 10 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+12.6,
+"Week 5: started Broncos 16.5, JuJu Smith-Schuster 6.3 over Vikings 4.5, Garrett Wilson 5.7"
+],
+[
+2.9,
+"Week 3: started JuJu Smith-Schuster 13.9 over Antonio Gibson 11.0"
+]
+],
+"worst": [
+[
+-16.0,
+"Week 11: started Kadarius Toney 0.0 over Brandon Aiyuk 16.0"
+],
+[
+-13.2,
+"Week 13: started Dawson Knox 0.0 over Cole Kmet 13.2"
+],
+[
+-8.1,
+"Week 2: started JuJu Smith-Schuster 4.0 over Antonio Gibson 12.1"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+57.0,
+"Added Ravens (DEF) in week 6 over Bears, kept 9 weeks"
+],
+[
+48.3,
+"Added David Njoku (TE) in week 5 over Irv Smith, kept 10 weeks"
+],
+[
+39.3,
+"Added Dawson Knox (TE) in week 10 over Zach Ertz, kept 5 weeks"
+]
+],
+"worst": [
+[
+-73.1,
+"Added Deshaun Watson (QB) in week 9 over Kirk Cousins, kept 6 weeks"
+],
+[
+-38.3,
+"Added Michael Gallup (WR) in week 6 over Tyler Boyd, kept 2 weeks"
+],
+[
+-30.9,
+"Added Kadarius Toney (WR) in week 8 over Michael Gallup, kept 6 weeks"
+]
+]
+}
+},
 "draft": 285.01,
 "drops": 292.7,
 "g": 14,
@@ -190,11 +1755,144 @@
 "trades": 0,
 "waivers": 33
 },
+"ppw": 60.09,
 "team": "Poe's Palace",
 "trades": 0.0,
 "waivers": 15.66
 },
 "Chris Cossu": {
+"dec": {
+"draft": {
+"best": [
+[
+87.1,
+"Took Jamaal Williams (RB, pick 13.01). Best of the next five: Kirk Cousins"
+],
+[
+44.4,
+"Took Leonard Fournette (RB, pick 2.10). Best of the next five: Nick Chubb"
+],
+[
+20.8,
+"Took Deebo Samuel Sr. (WR, pick 3.01). Best of the next five: Nick Chubb"
+]
+],
+"worst": [
+[
+-91.2,
+"Took Jonathan Taylor (RB, pick 1.01). Best of the next five: Austin Ekeler"
+],
+[
+-61.5,
+"Took Dalton Schultz (TE, pick 6.10). Best of the next five: Jalen Hurts"
+],
+[
+-23.7,
+"Took Chase Claypool (WR, pick 12.10). Best of the next five: Jamaal Williams"
+]
+]
+},
+"drops": {
+"best": [
+[
+19.2,
+"Cut Chase Claypool (WR) in week 1. He scored 100.1 in 13 games after"
+],
+[
+17.3,
+"Cut James Cook III (RB) in week 3. He scored 65.4 in 11 games after"
+],
+[
+15.3,
+"Cut Jahan Dotson (WR) in week 5. He scored 21.4 in 4 games after"
+]
+],
+"worst": [
+[
+-42.5,
+"Cut Christian Watson (WR) in week 3. He scored 115.9 in 8 games after"
+],
+[
+-18.4,
+"Cut AJ Dillon (RB) in week 10. He scored 48.5 in 4 games after"
+],
+[
+-17.8,
+"Cut Isiah Pacheco (RB) in week 9. He scored 62.9 in 6 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+14.2,
+"Week 10: started D'Andre Swift 8.2, Dalton Schultz 17.4 over Gerald Everett 4.3, Deebo Samuel Sr. 7.1"
+],
+[
+13.4,
+"Week 8: started DJ Moore 27.5 over Dameon Pierce 14.1"
+],
+[
+8.6,
+"Week 13: started Christian Watson 24.4, Dak Prescott 17.8 over Justin Fields 21.3, Deebo Samuel Sr. 12.3"
+]
+],
+"worst": [
+[
+-16.8,
+"Week 12: started Justin Fields 0.0 over Dak Prescott 16.8"
+],
+[
+-0.8,
+"Week 4: started DJ Moore 12.1 over Chris Godwin Jr. 12.9"
+]
+]
+},
+"trades": {
+"best": [
+[
+1.5,
+"Week 4: got D'Andre Swift, Keenan Allen for Kareem Hunt, Leonard Fournette"
+]
+],
+"worst": [
+[
+-18.7,
+"Week 7: got Dameon Pierce for Keenan Allen"
+]
+]
+},
+"waivers": {
+"best": [
+[
+31.2,
+"Added Justin Fields (QB) in week 9 over Kirk Cousins, kept 6 weeks"
+],
+[
+22.4,
+"Added Christian Watson (WR) in week 11 over Darius Slayton, kept 4 weeks"
+],
+[
+18.7,
+"Added Gerald Everett (TE) in week 3 over Irv Smith, kept 8 weeks"
+]
+],
+"worst": [
+[
+-12.9,
+"Added Isiah Pacheco (RB) in week 8 over Latavius Murray, kept 1 week"
+],
+[
+-12.3,
+"Added Carson Wentz (QB) in week 6 over Kirk Cousins, kept 1 week"
+],
+[
+-9.5,
+"Added Saints (DEF) in week 3 over Giants, kept 4 weeks"
+]
+]
+}
+},
 "draft": -45.19,
 "drops": 13.9,
 "g": 14,
@@ -206,11 +1904,156 @@
 "trades": 2,
 "waivers": 19
 },
+"ppw": 60.09,
 "team": "5 Hunnid K in the Bank",
 "trades": -17.19,
 "waivers": 61.58
 },
 "Kevin Krueger": {
+"dec": {
+"draft": {
+"best": [
+[
+96.0,
+"Took A.J. Brown (WR, pick 4.03). Best of the next five: Josh Allen"
+],
+[
+79.4,
+"Took Devin Singletary (RB, pick 11.08). Best of the next five: Zach Ertz"
+],
+[
+65.0,
+"Took Michael Carter (RB, pick 10.03). Best of the next five: T.J. Hockenson"
+]
+],
+"worst": [
+[
+-90.9,
+"Took Brandin Cooks (WR, pick 6.03). Best of the next five: Patrick Mahomes"
+],
+[
+-81.5,
+"Took Elijah Moore (WR, pick 9.08). Best of the next five: Tyler Lockett"
+],
+[
+-63.3,
+"Took Allen Robinson (WR, pick 5.08). Best of the next five: Amon-Ra St. Brown"
+]
+]
+},
+"drops": {
+"best": [
+[
+43.0,
+"Cut Nyheim Miller-Hines (RB) in week 4. He scored 32.2 in 10 games after"
+],
+[
+22.5,
+"Cut Steelers (DEF) in week 5. They scored 53.5 in 9 games after"
+],
+[
+22.3,
+"Cut Titans (DEF) in week 11. They scored 11.5 in 4 games after"
+]
+],
+"worst": [
+[
+-33.8,
+"Cut 49ers (DEF) in week 9. They scored 76.0 in 5 games after"
+],
+[
+-31.3,
+"Cut Khalil Herbert (RB) in week 1. He scored 106.5 in 10 games after"
+],
+[
+-26.6,
+"Cut Rachaad White (RB) in week 8. He scored 71.7 in 6 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+18.5,
+"Week 7: started Kareem Hunt 7.8, Travis Etienne Jr. 18.9 over James Robinson 0.0, Rashod Bateman 8.2"
+],
+[
+12.0,
+"Week 6: started Travis Etienne Jr. 12.8 over Melvin Gordon III 0.8"
+],
+[
+7.6,
+"Week 12: started Chris Olave 11.2, DeVonta Smith 9.0 over Tyler Boyd 3.6, Devin Singletary 9.0"
+]
+],
+"worst": [
+[
+-7.6,
+"Week 11: started Tyler Boyd 6.2 over DeVonta Smith 13.8"
+],
+[
+-1.8,
+"Week 10: started DeVonta Smith 13.9 over Devin Singletary 15.7"
+],
+[
+-1.3,
+"Week 3: started Allen Robinson 4.3 over Michael Carter 5.6"
+]
+]
+},
+"trades": {
+"best": [
+[
+84.8,
+"Week 4: got Breece Hall, Travis Etienne Jr., Stefon Diggs for Najee Harris, Alvin Kamara"
+],
+[
+16.6,
+"Week 10: got Miles Sanders, DeVonta Smith, Chris Olave for Curtis Samuel, Brandin Cooks, A.J. Brown"
+]
+],
+"worst": [
+[
+-2.9,
+"Week 7: got Curtis Samuel for Melvin Gordon III"
+],
+[
+-2.7,
+"Week 9: got Robert Tonyan for Joshua Palmer"
+]
+]
+},
+"waivers": {
+"best": [
+[
+38.5,
+"Added Isiah Pacheco (RB) in week 11 over Kenyan Drake, kept 4 weeks"
+],
+[
+26.5,
+"Added James Robinson (RB) in week 2 over Rex Burkhead, kept 8 weeks"
+],
+[
+20.3,
+"Added Donovan Peoples-Jones (WR) in week 13 over Nico Collins, kept 2 weeks"
+]
+],
+"worst": [
+[
+-24.5,
+"Added Antonio Gibson (RB) in week 9 over Jerick McKinnon, kept 6 weeks"
+],
+[
+-21.5,
+"Added Alec Pierce (WR) in week 6 over Tyler Boyd, kept 2 weeks"
+],
+[
+-19.3,
+"Added Rashod Bateman (WR) in week 7 over Rondale Moore, kept 2 weeks"
+]
+]
+}
+},
 "draft": -75.02,
 "drops": 70.17,
 "g": 14,
@@ -222,11 +2065,136 @@
 "trades": 5,
 "waivers": 35
 },
+"ppw": 60.09,
 "team": "Larryette",
 "trades": 95.83,
 "waivers": 52.46
 },
 "Nathan Wu": {
+"dec": {
+"draft": {
+"best": [
+[
+97.6,
+"Took Christian Kirk (WR, pick 9.10). Best of the next five: Tyler Lockett"
+],
+[
+62.3,
+"Took Amon-Ra St. Brown (WR, pick 5.10). Best of the next five: Joe Burrow"
+],
+[
+59.6,
+"Took Stefon Diggs (WR, pick 1.10). Best of the next five: Davante Adams"
+]
+],
+"worst": [
+[
+-67.6,
+"Took Rashaad Penny (RB, pick 8.01). Best of the next five: Tony Pollard"
+],
+[
+-41.9,
+"Took Matthew Stafford (QB, pick 12.01). Best of the next five: Zach Ertz"
+],
+[
+-15.7,
+"Took Breece Hall (RB, pick 6.01). Best of the next five: Joe Burrow"
+]
+]
+},
+"drops": {
+"best": [
+[
+26.1,
+"Cut Nyheim Miller-Hines (RB) in week 11. He scored 4.0 in 4 games after"
+],
+[
+20.6,
+"Cut Robert Tonyan (TE) in week 6. He scored 52.3 in 8 games after"
+],
+[
+17.5,
+"Cut Mark Ingram II (RB) in week 5. He scored 27.6 in 6 games after"
+]
+],
+"worst": [
+[
+-48.6,
+"Cut Trevor Lawrence (QB) in week 6. He scored 164.8 in 8 games after"
+],
+[
+-22.6,
+"Cut Evan Engram (TE) in week 10. He scored 59.0 in 4 games after"
+],
+[
+-14.3,
+"Cut Rondale Moore (WR) in week 7. He scored 60.2 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+2.5,
+"Week 12: started Tony Pollard 8.1 over Michael Carter 5.6"
+]
+],
+"worst": [
+[
+-6.1,
+"Week 7: started Najee Harris 11.0 over Christian Kirk 17.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+14.1,
+"Week 9: got Tony Pollard, Courtland Sutton for Najee Harris, Christian Kirk"
+],
+[
+12.1,
+"Week 10: got T.J. Hockenson for Rondale Moore"
+]
+],
+"worst": [
+[
+-84.8,
+"Week 4: got Najee Harris, Alvin Kamara for Breece Hall, Travis Etienne Jr., Stefon Diggs"
+]
+]
+},
+"waivers": {
+"best": [
+[
+33.2,
+"Added Samaje Perine (RB) in week 12 over Gus Edwards, kept 3 weeks"
+],
+[
+30.5,
+"Added Darius Slayton (WR) in week 12 over Darnell Mooney, kept 3 weeks"
+],
+[
+28.4,
+"Added Jeff Wilson Jr. (RB) in week 2 over Rex Burkhead, kept 5 weeks"
+]
+],
+"worst": [
+[
+-30.0,
+"Added Chase Claypool (WR) in week 7 over Rondale Moore, kept 5 weeks"
+],
+[
+-26.7,
+"Added Kyren Williams (RB) in week 6 over Deon Jackson, kept 5 weeks"
+],
+[
+-19.9,
+"Added Nyheim Miller-Hines (RB) in week 7 over Kenyan Drake, kept 3 weeks"
+]
+]
+}
+},
 "draft": 143.6,
 "drops": 53.98,
 "g": 14,
@@ -238,11 +2206,156 @@
 "trades": 3,
 "waivers": 32
 },
+"ppw": 60.09,
 "team": "Broncos Country",
 "trades": -58.66,
 "waivers": 50.08
 },
 "Niko Contreras": {
+"dec": {
+"draft": {
+"best": [
+[
+148.4,
+"Took Jalen Hurts (QB, pick 7.03). Best of the next five: Dameon Pierce"
+],
+[
+70.1,
+"Took Jaylen Waddle (WR, pick 5.03). Best of the next five: Justin Herbert"
+],
+[
+34.4,
+"Took CeeDee Lamb (WR, pick 2.08). Best of the next five: Tyreek Hill"
+]
+],
+"worst": [
+[
+-119.5,
+"Took Hunter Renfrow (WR, pick 8.08). Best of the next five: Rhamondre Stevenson"
+],
+[
+-114.5,
+"Took Elijah Mitchell (RB, pick 4.08). Best of the next five: Josh Jacobs"
+],
+[
+-98.5,
+"Took Javonte Williams (RB, pick 3.03). Best of the next five: Nick Chubb"
+]
+]
+},
+"drops": {
+"best": [
+[
+32.1,
+"Cut Nyheim Miller-Hines (RB) in week 6. He scored 28.1 in 8 games after"
+],
+[
+32.0,
+"Cut Kenny Gainwell (RB) in week 1. He scored 65.8 in 13 games after"
+],
+[
+18.1,
+"Cut Rams (DEF) in week 7. They scored 41.0 in 7 games after"
+]
+],
+"worst": [
+[
+-29.1,
+"Cut Dak Prescott (QB) in week 2. He scored 130.8 in 7 games after"
+],
+[
+-22.3,
+"Cut Nick Folk (K) in week 8. He scored 72.0 in 6 games after"
+],
+[
+-17.6,
+"Cut Commanders (DEF) in week 2. They scored 119.0 in 12 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+17.5,
+"Week 2: started Clyde Edwards-Helaire 15.8, Curtis Samuel 22.9 over David Montgomery 15.6, T.J. Hockenson 5.6"
+],
+[
+14.9,
+"Week 8: started Tyler Allgeier 17.5 over Robert Woods 2.6"
+],
+[
+4.5,
+"Week 5: started Curtis Samuel 12.2 over Robert Woods 7.7"
+]
+],
+"worst": [
+[
+-14.4,
+"Week 1: started David Montgomery 8.0 over Clyde Edwards-Helaire 22.4"
+],
+[
+-4.5,
+"Week 13: started Treylon Burks 9.5 over Jerick McKinnon 14.0"
+],
+[
+-1.8,
+"Week 3: started Curtis Samuel 13.1 over Clyde Edwards-Helaire 14.9"
+]
+]
+},
+"trades": {
+"best": [
+[
+115.5,
+"Week 1: got Allen Lazard, Travis Kelce for CeeDee Lamb, Alexander Mattison, Hunter Renfrow"
+],
+[
+2.9,
+"Week 7: got Melvin Gordon III for Curtis Samuel"
+],
+[
+2.4,
+"Week 10: got Leonard Fournette for Allen Lazard, Odell Beckham Jr."
+]
+],
+"worst": [
+[
+-12.1,
+"Week 10: got Rondale Moore for T.J. Hockenson"
+]
+]
+},
+"waivers": {
+"best": [
+[
+36.5,
+"Added 49ers (DEF) in week 10 over Steelers, kept 5 weeks"
+],
+[
+35.0,
+"Added Jerick McKinnon (RB) in week 12 over Gus Edwards, kept 3 weeks"
+],
+[
+26.5,
+"Added Treylon Burks (WR) in week 12 over Darnell Mooney, kept 3 weeks"
+]
+],
+"worst": [
+[
+-80.1,
+"Added Tua Tagovailoa (QB) in week 3 over Justin Fields, kept 12 weeks"
+],
+[
+-42.4,
+"Added Odell Beckham Jr. (WR) in week 7 over Rondale Moore, kept 3 weeks"
+],
+[
+-26.7,
+"Added Mike Boone (RB) in week 6 over Deon Jackson, kept 1 week"
+]
+]
+}
+},
 "draft": -207.17,
 "drops": 104.83,
 "g": 14,
@@ -254,11 +2367,110 @@
 "trades": 4,
 "waivers": 27
 },
+"ppw": 60.09,
 "team": "GODDID",
 "trades": 108.68,
 "waivers": -0.7
 },
 "Peter Modlin": {
+"dec": {
+"draft": {
+"best": [
+[
+144.8,
+"Took Tyler Lockett (WR, pick 10.02). Best of the next five: Michael Carter"
+],
+[
+138.8,
+"Took Raheem Mostert (RB, pick 15.09). Best of the next five: Odell Beckham Jr."
+],
+[
+64.5,
+"Took Davante Adams (WR, pick 2.02). Best of the next five: Travis Kelce"
+]
+],
+"worst": [
+[
+-67.4,
+"Took George Kittle (TE, pick 6.02). Best of the next five: Patrick Mahomes"
+]
+]
+},
+"drops": {
+"best": [
+[
+25.8,
+"Cut Bears (DEF) in week 10. They scored 8.0 in 4 games after"
+],
+[
+6.7,
+"Cut Brandon McManus (K) in week 8. He scored 43.0 in 6 games after"
+]
+],
+"worst": [
+[
+-20.5,
+"Cut Kirk Cousins (QB) in week 6. He scored 136.7 in 8 games after"
+],
+[
+-6.5,
+"Cut Cole Kmet (TE) in week 3. He scored 106.7 in 11 games after"
+],
+[
+-4.8,
+"Cut Daniel Jones (QB) in week 14. He scored 19.4 in 1 game after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+19.1,
+"Week 6: started George Kittle 16.3, Terry McLaurin 8.2 over Tyler Lockett 3.7, Tyler Higbee 1.7"
+]
+],
+"worst": [
+[
+-23.4,
+"Week 5: started George Kittle 7.7, Terry McLaurin 12.6 over Tyler Higbee 11.6, Gabe Davis 32.1"
+],
+[
+-19.5,
+"Week 11: started Gabe Davis 11.8 over Amari Cooper 31.3"
+],
+[
+-19.2,
+"Week 4: started George Kittle 4.4, Terry McLaurin 3.5 over Cordarrelle Patterson 9.8, Tyler Higbee 17.3"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+38.3,
+"Added Tyler Higbee (TE) in week 3 over Irv Smith, kept 12 weeks"
+],
+[
+16.0,
+"Added Daniel Jones (QB) in week 10 over Jared Goff, kept 4 weeks"
+],
+[
+6.2,
+"Added Kirk Cousins (QB) in week 14 over Ryan Tannehill, kept 1 week"
+]
+],
+"worst": [
+[
+-22.5,
+"Added Bears (DEF) in week 8 over Titans, kept 2 weeks"
+]
+]
+}
+},
 "draft": 510.24,
 "drops": 0.72,
 "g": 14,
@@ -270,11 +2482,156 @@
 "trades": 0,
 "waivers": 5
 },
+"ppw": 60.09,
 "team": "SAUCE TEAM",
 "trades": 0.0,
 "waivers": 42.04
 },
 "Shane Kaiper": {
+"dec": {
+"draft": {
+"best": [
+[
+98.3,
+"Took Josh Allen (QB, pick 4.06). Best of the next five: Josh Jacobs"
+],
+[
+90.2,
+"Took Austin Ekeler (RB, pick 1.05). Best of the next five: Stefon Diggs"
+],
+[
+68.6,
+"Took Dameon Pierce (RB, pick 7.05). Best of the next five: Adam Thielen"
+]
+],
+"worst": [
+[
+-104.7,
+"Took Kadarius Toney (WR, pick 10.06). Best of the next five: Miles Sanders"
+],
+[
+-89.1,
+"Took Rashod Bateman (WR, pick 8.06). Best of the next five: Rhamondre Stevenson"
+],
+[
+-29.6,
+"Took DJ Chark (WR, pick 14.06). Best of the next five: Raheem Mostert"
+]
+]
+},
+"drops": {
+"best": [
+[
+25.3,
+"Cut Chargers (DEF) in week 1. They scored 84.5 in 13 games after"
+],
+[
+21.5,
+"Cut Russell Gage Jr. (WR) in week 4. He scored 33.6 in 6 games after"
+],
+[
+17.0,
+"Cut Chargers (DEF) in week 5. They scored 59.0 in 9 games after"
+]
+],
+"worst": [
+[
+-29.4,
+"Cut Jerick McKinnon (RB) in week 12. He scored 52.0 in 3 games after"
+],
+[
+-20.7,
+"Cut Cowboys (DEF) in week 11. They scored 54.5 in 4 games after"
+],
+[
+-16.3,
+"Cut Cowboys (DEF) in week 9. They scored 58.5 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+16.6,
+"Week 13: started Rachaad White 16.9 over Jeff Wilson Jr. 0.3"
+],
+[
+12.0,
+"Week 6: started Kenneth Walker III 19.0 over Drake London 7.0"
+],
+[
+7.7,
+"Week 12: started Rachaad White 19.9 over Jeff Wilson Jr. 12.2"
+]
+],
+"worst": [
+[
+-12.3,
+"Week 10: started Jerry Jeudy 0.0 over Michael Pittman Jr. 12.3"
+],
+[
+-11.6,
+"Week 14: started Jeff Wilson Jr. 2.6 over Diontae Johnson 14.2"
+],
+[
+-9.8,
+"Week 8: started Diontae Johnson 8.5 over Jerry Jeudy 18.3"
+]
+]
+},
+"trades": {
+"best": [
+[
+18.7,
+"Week 7: got Keenan Allen for Dameon Pierce"
+],
+[
+2.7,
+"Week 9: got Joshua Palmer for Robert Tonyan"
+]
+],
+"worst": [
+[
+-108.0,
+"Week 4: got Leonard Fournette, Drake London for Rashod Bateman, Austin Ekeler"
+],
+[
+-2.4,
+"Week 10: got Allen Lazard, Odell Beckham Jr. for Leonard Fournette"
+]
+]
+},
+"waivers": {
+"best": [
+[
+145.3,
+"Added Kenneth Walker III (RB) in week 1 over Mike Davis, kept 14 weeks"
+],
+[
+31.5,
+"Added Jeff Wilson Jr. (RB) in week 10 over Nyheim Miller-Hines, kept 5 weeks"
+],
+[
+22.0,
+"Added Cowboys (DEF) in week 7 over Bengals, kept 2 weeks"
+]
+],
+"worst": [
+[
+-26.0,
+"Added Gerald Everett (TE) in week 12 over Evan Engram, kept 3 weeks"
+],
+[
+-20.1,
+"Added Odell Beckham Jr. (WR) in week 5 over Joshua Palmer, kept 2 weeks"
+],
+[
+-11.2,
+"Added Rachaad White (RB) in week 9 over Jerick McKinnon, kept 6 weeks"
+]
+]
+}
+},
 "draft": 47.58,
 "drops": 28.54,
 "g": 14,
@@ -286,11 +2643,139 @@
 "trades": 5,
 "waivers": 28
 },
+"ppw": 60.09,
 "team": "Stegostompem",
 "trades": -88.99,
 "waivers": 155.38
 },
 "Walter Bremer": {
+"dec": {
+"draft": {
+"best": [
+[
+61.7,
+"Took Joshua Palmer (WR, pick 14.04). Best of the next five: Khalil Herbert"
+],
+[
+32.2,
+"Took Travis Kelce (TE, pick 2.04). Best of the next five: Tyreek Hill"
+],
+[
+28.3,
+"Took Jakobi Meyers (WR, pick 13.07). Best of the next five: Kirk Cousins"
+]
+],
+"worst": [
+[
+-183.4,
+"Took Trey Lance (QB, pick 10.04). Best of the next five: Miles Sanders"
+],
+[
+-96.3,
+"Took Kyle Pitts Sr. (TE, pick 4.04). Best of the next five: Josh Jacobs"
+],
+[
+-63.9,
+"Took J.K. Dobbins (RB, pick 7.07). Best of the next five: Amari Cooper"
+]
+]
+},
+"drops": {
+"best": [
+[
+14.9,
+"Cut Eno Benjamin (RB) in week 12. He scored 0.1 in 2 games after"
+],
+[
+12.6,
+"Cut Titans (DEF) in week 8. They scored 46.5 in 7 games after"
+],
+[
+10.2,
+"Cut Jaguars (DEF) in week 9. They scored 32.0 in 5 games after"
+]
+],
+"worst": [
+[
+-37.2,
+"Cut Joshua Palmer (WR) in week 3. He scored 129.0 in 10 games after"
+],
+[
+-34.4,
+"Cut Jakobi Meyers (WR) in week 1. He scored 126.2 in 10 games after"
+],
+[
+-31.4,
+"Cut Cowboys (DEF) in week 6. They scored 99.0 in 8 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+12.2,
+"Week 11: started Wan'Dale Robinson 19.4 over Drake London 7.2"
+],
+[
+11.3,
+"Week 5: started DK Metcalf 17.8 over Hunter Renfrow 6.5"
+],
+[
+3.5,
+"Week 1: started DK Metcalf 8.6 over Hunter Renfrow 5.1"
+]
+],
+"worst": [
+[
+-14.1,
+"Week 8: started Josh Reynolds 3.4 over DK Metcalf 17.5"
+],
+[
+-3.4,
+"Week 7: started Aaron Rodgers 15.8 over Justin Herbert 19.1"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-115.5,
+"Week 1: got CeeDee Lamb, Alexander Mattison, Hunter Renfrow for Allen Lazard, Travis Kelce"
+]
+]
+},
+"waivers": {
+"best": [
+[
+48.1,
+"Added Zay Jones (WR) in week 9 over Allen Robinson, kept 6 weeks"
+],
+[
+38.2,
+"Added Eno Benjamin (RB) in week 3 over Kenny Gainwell, kept 9 weeks"
+],
+[
+28.5,
+"Added Cowboys (DEF) in week 3 over Giants, kept 3 weeks"
+]
+],
+"worst": [
+[
+-16.5,
+"Added Drake London (WR) in week 11 over Darius Slayton, kept 4 weeks"
+],
+[
+-14.0,
+"Added Steelers (DEF) in week 13 over Eagles, kept 2 weeks"
+],
+[
+-10.5,
+"Added Marquez Valdes-Scantling (WR) in week 11 over Darius Slayton, kept 2 weeks"
+]
+]
+}
+},
 "draft": -267.04,
 "drops": -101.21,
 "g": 14,
@@ -302,11 +2787,152 @@
 "trades": 1,
 "waivers": 22
 },
+"ppw": 60.09,
 "team": "DO BRONX",
 "trades": -115.48,
 "waivers": 132.7
 },
 "Wesley Alpert": {
+"dec": {
+"draft": {
+"best": [
+[
+115.7,
+"Took Tony Pollard (RB, pick 8.05). Best of the next five: Rhamondre Stevenson"
+],
+[
+84.1,
+"Took Joe Burrow (QB, pick 6.05). Best of the next five: Patrick Mahomes"
+],
+[
+46.1,
+"Took Zach Ertz (TE, pick 12.05). Best of the next five: Chase Claypool"
+]
+],
+"worst": [
+[
+-86.1,
+"Took Keenan Allen (WR, pick 3.06). Best of the next five: Terry McLaurin"
+],
+[
+-80.9,
+"Took D'Andre Swift (RB, pick 2.05). Best of the next five: Tyreek Hill"
+],
+[
+-67.6,
+"Took Cam Akers (RB, pick 5.06). Best of the next five: Amon-Ra St. Brown"
+]
+]
+},
+"drops": {
+"best": [
+[
+58.2,
+"Cut Taysom Hill (QB) in week 7. He scored 43.5 in 7 games after"
+],
+[
+51.6,
+"Cut Greg Dortch (WR) in week 4. He scored 31.0 in 9 games after"
+],
+[
+34.8,
+"Cut Rex Burkhead (RB) in week 2. He scored 47.9 in 11 games after"
+]
+],
+"worst": [
+[
+-39.6,
+"Cut Eagles (DEF) in week 1. They scored 149.5 in 13 games after"
+],
+[
+-31.1,
+"Cut Trevor Lawrence (QB) in week 11. He scored 74.7 in 3 games after"
+],
+[
+-29.1,
+"Cut Dak Prescott (QB) in week 4. He scored 130.8 in 7 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+12.9,
+"Week 7: started Brian Robinson 10.6, Tony Pollard 12.9 over Damien Harris 2.0, Brandin Cooks 8.6"
+],
+[
+5.3,
+"Week 14: started Garrett Wilson 13.8 over D'Onta Foreman 8.5"
+],
+[
+4.5,
+"Week 10: started D'Onta Foreman 19.0 over George Pickens 14.5"
+]
+],
+"worst": [
+[
+-17.1,
+"Week 11: started D'Onta Foreman 2.4, Parris Campbell 11.7 over Darnell Mooney 12.9, George Pickens 18.3"
+],
+[
+-11.9,
+"Week 9: started Deon Jackson 5.6 over Darnell Mooney 17.5"
+],
+[
+-6.5,
+"Week 3: started Pat Freiermuth 6.1, Tony Pollard 10.5 over Damien Harris 12.6, Zach Ertz 10.5"
+]
+]
+},
+"trades": {
+"best": [
+[
+108.0,
+"Week 4: got Rashod Bateman, Austin Ekeler for Leonard Fournette, Drake London"
+]
+],
+"worst": [
+[
+-14.1,
+"Week 9: got Najee Harris, Christian Kirk for Tony Pollard, Courtland Sutton"
+],
+[
+-1.5,
+"Week 4: got Kareem Hunt, Leonard Fournette for D'Andre Swift, Keenan Allen"
+]
+]
+},
+"waivers": {
+"best": [
+[
+57.0,
+"Added Garrett Wilson (WR) in week 9 over Allen Robinson, kept 6 weeks"
+],
+[
+46.0,
+"Added Patriots (DEF) in week 7 over Bengals, kept 6 weeks"
+],
+[
+42.0,
+"Added Tyler Bass (K) in week 8 over Graham Gano, kept 7 weeks"
+]
+],
+"worst": [
+[
+-13.0,
+"Added Wan'Dale Robinson (WR) in week 7 over Rondale Moore, kept 2 weeks"
+],
+[
+-12.0,
+"Added Taysom Hill (QB) in week 6 over Kirk Cousins, kept 1 week"
+],
+[
+-11.5,
+"Added Seahawks (DEF) in week 13 over Eagles, kept 2 weeks"
+]
+]
+}
+},
 "draft": -57.08,
 "drops": 45.3,
 "g": 14,
@@ -318,6 +2944,7 @@
 "trades": 5,
 "waivers": 41
 },
+"ppw": 60.09,
 "team": "SHIESTY SZN",
 "trades": 92.41,
 "waivers": 151.52
@@ -325,6 +2952,137 @@
 },
 "2023": {
 "Brian Berger": {
+"dec": {
+"draft": {
+"best": [
+[
+94.6,
+"Took David Njoku (TE, pick 14.01). Best of the next five: Rashee Rice"
+],
+[
+76.1,
+"Took A.J. Brown (WR, pick 2.01). Best of the next five: Amon-Ra St. Brown"
+],
+[
+72.8,
+"Took Gabe Davis (WR, pick 9.10). Best of the next five: AJ Dillon"
+]
+],
+"worst": [
+[
+-123.5,
+"Took J.K. Dobbins (RB, pick 6.01). Best of the next five: DJ Moore"
+],
+[
+-103.1,
+"Took Mike Williams (WR, pick 8.01). Best of the next five: James Cook III"
+],
+[
+-80.4,
+"Took Justin Fields (QB, pick 5.10). Best of the next five: DJ Moore"
+]
+]
+},
+"drops": {
+"best": [
+[
+58.5,
+"Cut Marvin Mims Jr. (WR) in week 2. He scored 56.7 in 12 games after"
+],
+[
+28.7,
+"Cut Justice Hill (RB) in week 6. He scored 33.5 in 8 games after"
+],
+[
+27.6,
+"Cut Damien Harris (RB) in week 1. He scored 19.0 in 6 games after"
+]
+],
+"worst": [
+[
+-49.2,
+"Cut David Njoku (TE) in week 2. He scored 136.6 in 12 games after"
+],
+[
+-25.2,
+"Cut Ezekiel Elliott (RB) in week 3. He scored 110.7 in 11 games after"
+],
+[
+-13.1,
+"Cut Matthew Stafford (QB) in week 9. He scored 81.7 in 4 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+7.1,
+"Week 3: started Hunter Henry 3.7, Mike Williams 25.1 over Kyle Pitts Sr. 8.7, Zay Flowers 13.0"
+],
+[
+6.1,
+"Week 14: started Breece Hall 26.6, Gabe Davis 0.0 over Najee Harris 7.8, Amari Cooper 12.7"
+]
+],
+"worst": [
+[
+-10.4,
+"Week 2: started Zay Flowers 10.8 over Gabe Davis 21.2"
+],
+[
+-6.3,
+"Week 10: started Zay Flowers 12.3 over Najee Harris 18.6"
+],
+[
+-4.2,
+"Week 12: started Luke Musgrave 0.0 over Kyle Pitts Sr. 4.2"
+]
+]
+},
+"trades": {
+"best": [
+[
+69.8,
+"Week 6: got Joshua Palmer, Breece Hall, Michael Pittman Jr. for Tony Pollard"
+],
+[
+17.3,
+"Week 6: got Rhamondre Stevenson for De'Von Achane"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+94.2,
+"Added Zack Moss (RB) in week 3 over Matt Breida, kept 12 weeks"
+],
+[
+72.8,
+"Added De'Von Achane (RB) in week 3 over Matt Breida, kept 3 weeks"
+],
+[
+26.0,
+"Added Saints (DEF) in week 4 over Browns, kept 2 weeks"
+]
+],
+"worst": [
+[
+-61.6,
+"Added Justice Hill (RB) in week 2 over Zack Moss, kept 4 weeks"
+],
+[
+-31.5,
+"Added Lions (DEF) in week 11 over Dolphins, kept 2 weeks"
+],
+[
+-28.6,
+"Added Luke Musgrave (TE) in week 11 over Pat Freiermuth, kept 4 weeks"
+]
+]
+}
+},
 "draft": -53.64,
 "drops": 109.64,
 "g": 14,
@@ -336,11 +3094,138 @@
 "trades": 2,
 "waivers": 23
 },
+"ppw": 56.09,
 "team": "Beyond the Abyss",
 "trades": 87.07,
 "waivers": 100.56
 },
 "Brian Burke": {
+"dec": {
+"draft": {
+"best": [
+[
+100.1,
+"Took Romeo Doubs (WR, pick 15.08). Best of the next five: Damien Harris"
+],
+[
+86.6,
+"Took DJ Moore (WR, pick 6.03). Best of the next five: George Kittle"
+],
+[
+71.1,
+"Took DeAndre Hopkins (WR, pick 5.08). Best of the next five: DJ Moore"
+]
+],
+"worst": [
+[
+-119.6,
+"Took Rashaad Penny (RB, pick 11.08). Best of the next five: Nico Collins"
+],
+[
+-92.5,
+"Took Dalvin Cook (RB, pick 7.08). Best of the next five: Mike Evans"
+],
+[
+-27.3,
+"Took Jaxon Smith-Njigba (WR, pick 10.03). Best of the next five: Raheem Mostert"
+]
+]
+},
+"drops": {
+"best": [
+[
+62.3,
+"Cut Commanders (DEF) in week 2. They scored 57.0 in 12 games after"
+],
+[
+59.2,
+"Cut Skyy Moore (WR) in week 5. He scored 27.2 in 9 games after"
+],
+[
+49.5,
+"Cut Dalvin Cook (RB) in week 5. He scored 20.4 in 9 games after"
+]
+],
+"worst": [
+[
+-75.9,
+"Cut Adam Thielen (WR) in week 2. He scored 191.1 in 12 games after"
+],
+[
+-41.0,
+"Cut Jake Ferguson (TE) in week 7. He scored 92.0 in 7 games after"
+],
+[
+-31.6,
+"Cut Devin Singletary (RB) in week 9. He scored 78.2 in 6 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+18.9,
+"Week 4: started DJ Moore 27.1 over Jerry Jeudy 8.2"
+],
+[
+11.9,
+"Week 3: started Jerick McKinnon 17.8 over Dalvin Cook 5.9"
+],
+[
+8.0,
+"Week 5: started Jets 21.0 over Dolphins 13.0"
+]
+],
+"worst": [
+[
+-8.8,
+"Week 6: started Javonte Williams 7.2 over Chuba Hubbard 16.0"
+],
+[
+-6.5,
+"Week 14: started Chuba Hubbard 11.6 over Javonte Williams 18.1"
+],
+[
+-2.0,
+"Week 13: started Romeo Doubs 11.2 over Jaxon Smith-Njigba 13.2"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+47.5,
+"Added Browns (DEF) in week 7 over Saints, kept 6 weeks"
+],
+[
+36.3,
+"Added Chuba Hubbard (RB) in week 5 over Samaje Perine, kept 10 weeks"
+],
+[
+17.5,
+"Added Dolphins (DEF) in week 12 over Titans, kept 3 weeks"
+]
+],
+"worst": [
+[
+-19.7,
+"Added Michael Mayer (TE) in week 7 over Jonnu Smith, kept 3 weeks"
+],
+[
+-15.7,
+"Added Skyy Moore (WR) in week 2 over Romeo Doubs, kept 3 weeks"
+],
+[
+-14.0,
+"Added Antonio Gibson (RB) in week 6 over Gus Edwards, kept 2 weeks"
+]
+]
+}
+},
 "draft": 185.98,
 "drops": 92.03,
 "g": 14,
@@ -352,11 +3237,151 @@
 "trades": 0,
 "waivers": 37
 },
+"ppw": 56.09,
 "team": "Poe's Palace",
 "trades": 0.0,
 "waivers": 80.22
 },
 "Jonathan Campbell": {
+"dec": {
+"draft": {
+"best": [
+[
+120.7,
+"Took Christian McCaffrey (RB, pick 1.01). Best of the next five: Tyreek Hill"
+],
+[
+94.6,
+"Took T.J. Hockenson (TE, pick 4.10). Best of the next five: Brandon Aiyuk"
+],
+[
+87.0,
+"Took Alvin Kamara (RB, pick 7.01). Best of the next five: Michael Pittman Jr."
+]
+],
+"worst": [
+[
+-82.6,
+"Took Skyy Moore (WR, pick 9.01). Best of the next five: Isiah Pacheco"
+],
+[
+-42.6,
+"Took Calvin Ridley (WR, pick 3.01). Best of the next five: Travis Etienne Jr."
+],
+[
+-34.7,
+"Took Justyn Ross (WR, pick 13.01). Best of the next five: Zay Jones"
+]
+]
+},
+"drops": {
+"best": [
+[
+66.0,
+"Cut Isaiah Hodgins (WR) in week 2. He scored 49.2 in 12 games after"
+],
+[
+61.9,
+"Cut Skyy Moore (WR) in week 2. He scored 53.3 in 12 games after"
+],
+[
+60.8,
+"Cut Justyn Ross (WR) in week 1. He scored 6.4 in 7 games after"
+]
+],
+"worst": [
+[
+-37.0,
+"Cut Courtland Sutton (WR) in week 4. He scored 133.0 in 10 games after"
+],
+[
+-36.5,
+"Cut Rashee Rice (WR) in week 4. He scored 132.5 in 10 games after"
+],
+[
+-34.8,
+"Cut Devin Singletary (RB) in week 10. He scored 73.6 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+18.5,
+"Week 11: started Brock Purdy 26.7, Tank Dell 28.9 over Jared Goff 16.7, DK Metcalf 20.4"
+],
+[
+10.0,
+"Week 3: started Tank Dell 25.5 over Jakobi Meyers 15.5"
+],
+[
+5.9,
+"Week 7: started Jordan Love 16.3 over Jared Goff 10.4"
+]
+],
+"worst": [
+[
+-18.3,
+"Week 12: started Brock Purdy 11.5, Dalton Kincaid 8.8 over Trevor Lawrence 25.6, Trey McBride 13.0"
+],
+[
+-16.9,
+"Week 9: started Darrell Henderson Jr. 5.5, Jordan Love 13.8 over Deshaun Watson 19.0, Alexander Mattison 17.3"
+],
+[
+-15.6,
+"Week 2: started Elijah Moore 7.1 over George Pickens 22.7"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-50.5,
+"Week 8: got Amon-Ra St. Brown, Alexander Mattison for Calvin Ridley, Alvin Kamara"
+],
+[
+-37.9,
+"Week 9: got DK Metcalf for T.J. Hockenson"
+],
+[
+-17.3,
+"Week 6: got De'Von Achane for Rhamondre Stevenson"
+]
+]
+},
+"waivers": {
+"best": [
+[
+104.8,
+"Added Tank Dell (WR) in week 3 over Kadarius Toney, kept 11 weeks"
+],
+[
+42.2,
+"Added Trevor Lawrence (QB) in week 12 over Joshua Dobbs, kept 2 weeks"
+],
+[
+38.7,
+"Added Trey McBride (TE) in week 10 over Hunter Henry, kept 5 weeks"
+]
+],
+"worst": [
+[
+-38.2,
+"Added Jared Goff (QB) in week 7 over Trevor Lawrence, kept 8 weeks"
+],
+[
+-27.0,
+"Added Anthony Richardson Sr. (QB) in week 5 over Trevor Lawrence, kept 2 weeks"
+],
+[
+-22.5,
+"Added Jordan Love (QB) in week 3 over Jared Goff, kept 5 weeks"
+]
+]
+}
+},
 "draft": 301.88,
 "drops": 404.79,
 "g": 14,
@@ -368,11 +3393,147 @@
 "trades": 4,
 "waivers": 67
 },
+"ppw": 56.09,
 "team": "Grimace",
 "trades": -105.73,
 "waivers": 106.74
 },
 "Kevin Krueger": {
+"dec": {
+"draft": {
+"best": [
+[
+119.7,
+"Took David Montgomery (RB, pick 9.07). Best of the next five: Gabe Davis"
+],
+[
+105.0,
+"Took Nico Collins (WR, pick 12.04). Best of the next five: Jaylen Warren"
+],
+[
+93.1,
+"Took Rachaad White (RB, pick 7.07). Best of the next five: Mike Evans"
+]
+],
+"worst": [
+[
+-170.0,
+"Took Nick Chubb (RB, pick 1.07). Best of the next five: A.J. Brown"
+],
+[
+-94.7,
+"Took Tee Higgins (WR, pick 3.07). Best of the next five: Josh Allen"
+],
+[
+-47.1,
+"Took Elijah Mitchell (RB, pick 13.07). Best of the next five: David Njoku"
+]
+]
+},
+"drops": {
+"best": [
+[
+49.8,
+"Cut Matt Breida (RB) in week 6. He scored 12.4 in 8 games after"
+],
+[
+44.4,
+"Cut Elijah Mitchell (RB) in week 3. He scored 17.8 in 8 games after"
+],
+[
+42.6,
+"Cut Commanders (DEF) in week 8. They scored 17.0 in 6 games after"
+]
+],
+"worst": [
+[
+-27.9,
+"Cut Cole Kmet (TE) in week 7. He scored 78.9 in 7 games after"
+],
+[
+-22.7,
+"Cut Ezekiel Elliott (RB) in week 7. He scored 77.1 in 7 games after"
+],
+[
+-16.8,
+"Cut Zach Charbonnet (RB) in week 10. He scored 55.6 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+11.2,
+"Week 14: started David Montgomery 11.5, Rashee Rice 18.2 over Tee Higgins 9.2, Calvin Ridley 9.3"
+],
+[
+10.3,
+"Week 3: started Alexander Mattison 17.5 over Rachaad White 7.2"
+],
+[
+2.4,
+"Week 8: started Calvin Ridley 14.3 over Tee Higgins 11.9"
+]
+],
+"worst": [
+[
+-8.9,
+"Week 2: started David Montgomery 12.4 over Rachaad White 21.3"
+],
+[
+-6.8,
+"Week 12: started Jake Ferguson 4.5 over Cole Kmet 11.3"
+],
+[
+-6.5,
+"Week 1: started Rachaad White 6.9 over David Montgomery 13.4"
+]
+]
+},
+"trades": {
+"best": [
+[
+50.5,
+"Week 8: got Calvin Ridley, Alvin Kamara for Amon-Ra St. Brown, Alexander Mattison"
+],
+[
+1.3,
+"Week 10: got Rashee Rice for Dalton Schultz"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+98.4,
+"Added Jerome Ford (RB) in week 3 over Matt Breida, kept 12 weeks"
+],
+[
+48.0,
+"Added Jake Ferguson (TE) in week 9 over Luke Musgrave, kept 6 weeks"
+],
+[
+40.0,
+"Added Brandon Aubrey (K) in week 8 over Riley Patterson, kept 7 weeks"
+]
+],
+"worst": [
+[
+-51.0,
+"Added Roschon Johnson (RB) in week 6 over Gus Edwards, kept 3 weeks"
+],
+[
+-40.3,
+"Added Kenny Gainwell (RB) in week 2 over Zack Moss, kept 3 weeks"
+],
+[
+-14.8,
+"Added Michael Wilson (WR) in week 5 over Josh Reynolds, kept 1 week"
+]
+]
+}
+},
 "draft": -86.01,
 "drops": 235.63,
 "g": 14,
@@ -384,11 +3545,134 @@
 "trades": 2,
 "waivers": 25
 },
+"ppw": 56.09,
 "team": "Hench",
 "trades": 51.86,
 "waivers": 190.54
 },
 "Nathan Wu": {
+"dec": {
+"draft": {
+"best": [
+[
+89.2,
+"Took Keenan Allen (WR, pick 4.08). Best of the next five: T.J. Hockenson"
+],
+[
+67.7,
+"Took Isiah Pacheco (RB, pick 9.03). Best of the next five: David Montgomery"
+],
+[
+64.6,
+"Took Evan Engram (TE, pick 7.03). Best of the next five: Rachaad White"
+]
+],
+"worst": [
+[
+-39.3,
+"Took Austin Ekeler (RB, pick 1.03). Best of the next five: Tyreek Hill"
+],
+[
+-25.4,
+"Took Van Jefferson (WR, pick 13.03). Best of the next five: Odell Beckham Jr."
+],
+[
+-22.4,
+"Took Justin Herbert (QB, pick 6.08). Best of the next five: Alvin Kamara"
+]
+]
+},
+"drops": {
+"best": [
+[
+90.8,
+"Cut Van Jefferson (WR) in week 2. He scored 24.4 in 12 games after"
+],
+[
+40.1,
+"Cut Treylon Burks (WR) in week 3. He scored 7.9 in 5 games after"
+],
+[
+38.3,
+"Cut Joshua Kelley (RB) in week 6. He scored 31.6 in 9 games after"
+]
+],
+"worst": [
+[
+-45.3,
+"Cut Gus Edwards (RB) in week 4. He scored 123.0 in 10 games after"
+],
+[
+-9.6,
+"Cut Antonio Gibson (RB) in week 3. He scored 87.3 in 10 games after"
+],
+[
+-7.1,
+"Cut Jets (DEF) in week 14. They scored 17.0 in 1 game after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+16.7,
+"Week 6: started Adam Thielen 28.5 over Jordan Addison 11.8"
+],
+[
+10.5,
+"Week 10: started Chris Olave 21.4 over Jordan Addison 10.9"
+],
+[
+9.4,
+"Week 4: started Tyler Lockett 9.4 over Jordan Addison 0.0"
+]
+],
+"worst": [
+[
+-8.7,
+"Week 12: started Adam Thielen 1.2 over Jordan Addison 9.9"
+],
+[
+-2.7,
+"Week 11: started Jordan Addison 7.4 over Isiah Pacheco 10.1"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+58.2,
+"Added Tyjae Spears (RB) in week 3 over Matt Breida, kept 12 weeks"
+],
+[
+50.6,
+"Added David Njoku (TE) in week 8 over Logan Thomas, kept 7 weeks"
+],
+[
+20.4,
+"Added Adam Thielen (WR) in week 4 over Brandin Cooks, kept 11 weeks"
+]
+],
+"worst": [
+[
+-25.9,
+"Added Gus Edwards (RB) in week 2 over Zack Moss, kept 2 weeks"
+],
+[
+-12.9,
+"Added Khalil Herbert (RB) in week 7 over Justice Hill, kept 7 weeks"
+],
+[
+-10.8,
+"Added Deuce Vaughn (RB) in week 3 over Matt Breida, kept 1 week"
+]
+]
+}
+},
 "draft": 179.08,
 "drops": 172.34,
 "g": 14,
@@ -400,11 +3684,143 @@
 "trades": 0,
 "waivers": 15
 },
+"ppw": 56.09,
 "team": "Broncos Country",
 "trades": 0.0,
 "waivers": 101.14
 },
 "Nick Gearing": {
+"dec": {
+"draft": {
+"best": [
+[
+129.5,
+"Took Tyreek Hill (WR, pick 1.06). Best of the next five: A.J. Brown"
+],
+[
+106.7,
+"Took Breece Hall (RB, pick 5.06). Best of the next five: DeAndre Hopkins"
+],
+[
+79.2,
+"Took Michael Pittman Jr. (WR, pick 7.06). Best of the next five: Rachaad White"
+]
+],
+"worst": [
+[
+-112.6,
+"Took Jamaal Williams (RB, pick 10.05). Best of the next five: Raheem Mostert"
+],
+[
+-50.3,
+"Took Zay Jones (WR, pick 13.06). Best of the next five: David Njoku"
+],
+[
+-19.3,
+"Took Quentin Johnston (WR, pick 12.05). Best of the next five: Jaylen Warren"
+]
+]
+},
+"drops": {
+"best": [
+[
+33.1,
+"Cut Jamaal Williams (RB) in week 3. He scored 21.3 in 7 games after"
+],
+[
+27.5,
+"Cut Keaontay Ingram (RB) in week 7. He scored 3.6 in 4 games after"
+],
+[
+23.6,
+"Cut Juwan Johnson (TE) in week 2. He scored 34.6 in 8 games after"
+]
+],
+"worst": [
+[
+-42.2,
+"Cut Courtland Sutton (WR) in week 6. He scored 119.0 in 8 games after"
+],
+[
+-37.2,
+"Cut Trey McBride (TE) in week 10. He scored 66.3 in 4 games after"
+],
+[
+-26.2,
+"Cut Dolphins (DEF) in week 11. They scored 66.0 in 4 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+20.7,
+"Week 5: started Breece Hall 28.4 over Kyren Williams 7.7"
+],
+[
+18.6,
+"Week 1: started Michael Pittman Jr. 23.7 over Terry McLaurin 5.1"
+]
+],
+"worst": [
+[
+-23.2,
+"Week 13: started Jaylen Warren 6.5 over Joe Mixon 29.7"
+],
+[
+-20.0,
+"Week 7: started Jeff Wilson Jr. 1.4 over Gus Edwards 21.4"
+],
+[
+-2.8,
+"Week 10: started DeMario Douglas 14.4 over D'Onta Foreman 17.2"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-69.8,
+"Week 6: got Tony Pollard for Joshua Palmer, Breece Hall, Michael Pittman Jr."
+],
+[
+-2.8,
+"Week 11: got Jaylen Warren for C.J. Stroud"
+]
+]
+},
+"waivers": {
+"best": [
+[
+78.7,
+"Added Gus Edwards (RB) in week 7 over Justice Hill, kept 6 weeks"
+],
+[
+30.5,
+"Added Raiders (DEF) in week 6 over Saints, kept 5 weeks"
+],
+[
+30.5,
+"Added Josh Downs (WR) in week 6 over Kendrick Bourne, kept 9 weeks"
+]
+],
+"worst": [
+[
+-13.3,
+"Added D'Onta Foreman (RB) in week 6 over Gus Edwards, kept 5 weeks"
+],
+[
+-13.0,
+"Added Tom Brady (QB) in week 6 over Geno Smith, kept 1 week"
+],
+[
+-12.9,
+"Added Nick Chubb (RB) in week 11 over Darrell Henderson, kept 1 week"
+]
+]
+}
+},
 "draft": 314.7,
 "drops": 77.71,
 "g": 14,
@@ -416,11 +3832,147 @@
 "trades": 3,
 "waivers": 29
 },
+"ppw": 56.09,
 "team": "Kabul Gearing Bombers",
 "trades": -72.55,
 "waivers": 122.76
 },
 "Niko Contreras": {
+"dec": {
+"draft": {
+"best": [
+[
+139.0,
+"Took Raheem Mostert (RB, pick 10.07). Best of the next five: Courtland Sutton"
+],
+[
+83.2,
+"Took CeeDee Lamb (WR, pick 2.07). Best of the next five: Travis Etienne Jr."
+],
+[
+80.9,
+"Took Brian Robinson (RB, pick 11.04). Best of the next five: Dak Prescott"
+]
+],
+"worst": [
+[
+-142.8,
+"Took Anthony Richardson Sr. (QB, pick 14.07). Best of the next five: Romeo Doubs"
+],
+[
+-60.2,
+"Took Miles Sanders (RB, pick 7.04). Best of the next five: Rachaad White"
+],
+[
+-59.0,
+"Took Lamar Jackson (QB, pick 4.07). Best of the next five: Keenan Allen"
+]
+]
+},
+"drops": {
+"best": [
+[
+15.5,
+"Cut Miles Sanders (RB) in week 10. He scored 23.3 in 5 games after"
+],
+[
+11.7,
+"Cut Cameron Dicker (K) in week 5. He scored 67.0 in 9 games after"
+],
+[
+9.7,
+"Cut Zay Jones (WR) in week 9. He scored 28.7 in 4 games after"
+]
+],
+"worst": [
+[
+-16.9,
+"Cut Brandin Cooks (WR) in week 2. He scored 122.5 in 11 games after"
+],
+[
+-7.0,
+"Cut Jason Sanders (K) in week 10. He scored 42.0 in 4 games after"
+],
+[
+-2.4,
+"Cut Pat Freiermuth (TE) in week 2. He scored 53.4 in 7 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+30.3,
+"Week 3: started Raheem Mostert 45.2 over Dameon Pierce 14.9"
+],
+[
+13.2,
+"Week 2: started Drake London 18.7 over Dameon Pierce 5.5"
+],
+[
+10.4,
+"Week 6: started D'Andre Swift 17.8 over Hollywood Brown 7.4"
+]
+],
+"worst": [
+[
+-16.5,
+"Week 11: started Hollywood Brown 3.2 over D'Andre Swift 19.7"
+],
+[
+-7.3,
+"Week 8: started Drake London 10.5 over Chris Godwin Jr. 17.8"
+],
+[
+-1.1,
+"Week 4: started Raheem Mostert 5.5 over James Conner 6.6"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-74.6,
+"Week 4: got James Conner, Deebo Samuel Sr., D'Andre Swift for CeeDee Lamb"
+],
+[
+-0.8,
+"Week 6: got Chris Godwin Jr. for Brian Robinson"
+]
+]
+},
+"waivers": {
+"best": [
+[
+31.1,
+"Added Sam LaPorta (TE) in week 2 over David Njoku, kept 13 weeks"
+],
+[
+16.0,
+"Added Packers (DEF) in week 9 over Patriots, kept 4 weeks"
+],
+[
+9.5,
+"Added Texans (DEF) in week 13 over Chiefs, kept 2 weeks"
+]
+],
+"worst": [
+[
+-48.2,
+"Added Zay Jones (WR) in week 6 over Kendrick Bourne, kept 3 weeks"
+],
+[
+-23.3,
+"Added Zay Jones (WR) in week 2 over Romeo Doubs, kept 2 weeks"
+],
+[
+-16.0,
+"Added Cameron Dicker (K) in week 10 over Dustin Hopkins, kept 5 weeks"
+]
+]
+}
+},
 "draft": 85.2,
 "drops": 37.17,
 "g": 14,
@@ -432,11 +3984,148 @@
 "trades": 2,
 "waivers": 9
 },
+"ppw": 56.09,
 "team": "MASHALLAH",
 "trades": -75.38,
 "waivers": -33.82
 },
 "Shane Kaiper": {
+"dec": {
+"draft": {
+"best": [
+[
+89.8,
+"Took Mike Evans (WR, pick 7.09). Best of the next five: James Cook III"
+],
+[
+83.6,
+"Took Rashee Rice (WR, pick 14.02). Best of the next five: C.J. Stroud"
+],
+[
+72.4,
+"Took James Cook III (RB, pick 8.02). Best of the next five: Javonte Williams"
+]
+],
+"worst": [
+[
+-240.9,
+"Took Aaron Rodgers (QB, pick 10.02). Best of the next five: Raheem Mostert"
+],
+[
+-107.8,
+"Took Tank Bigsby (RB, pick 12.02). Best of the next five: Nico Collins"
+],
+[
+-33.3,
+"Took Dallas Goedert (TE, pick 6.02). Best of the next five: DJ Moore"
+]
+]
+},
+"drops": {
+"best": [
+[
+58.1,
+"Cut Tank Bigsby (RB) in week 6. He scored 4.1 in 8 games after"
+],
+[
+38.2,
+"Cut Zach Evans (RB) in week 9. He scored 0.6 in 5 games after"
+],
+[
+29.9,
+"Cut Jameson Williams (WR) in week 7. He scored 37.3 in 7 games after"
+]
+],
+"worst": [
+[
+-34.2,
+"Cut Rashee Rice (WR) in week 1. He scored 159.0 in 13 games after"
+],
+[
+-28.2,
+"Cut Brock Purdy (QB) in week 10. He scored 113.9 in 5 games after"
+],
+[
+-6.2,
+"Cut Broncos (DEF) in week 2. They scored 125.5 in 12 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+15.4,
+"Week 10: started Courtland Sutton 17.3 over Michael Thomas 1.9"
+],
+[
+6.0,
+"Week 7: started James Cook III 19.2 over Michael Thomas 13.2"
+],
+[
+5.6,
+"Week 4: started James Cook III 14.7 over Jahmyr Gibbs 9.1"
+]
+],
+"worst": [
+[
+-13.1,
+"Week 12: started Rashid Shaheed 2.9 over James Cook III 16.0"
+],
+[
+-10.5,
+"Week 5: started Jahmyr Gibbs 0.0 over Michael Thomas 10.5"
+],
+[
+-7.3,
+"Week 2: started Jahmyr Gibbs 12.6 over James Cook III 19.9"
+]
+]
+},
+"trades": {
+"best": [
+[
+34.0,
+"Week 3: got Jaylen Waddle, Puka Nacua for Garrett Wilson, Christian Watson"
+]
+],
+"worst": [
+[
+-1.3,
+"Week 10: got Dalton Schultz for Rashee Rice"
+]
+]
+},
+"waivers": {
+"best": [
+[
+71.4,
+"Added Brock Purdy (QB) in week 4 over Daniel Jones, kept 6 weeks"
+],
+[
+37.6,
+"Added Devin Singletary (RB) in week 11 over Darrell Henderson, kept 4 weeks"
+],
+[
+33.8,
+"Added Courtland Sutton (WR) in week 7 over Elijah Moore, kept 8 weeks"
+]
+],
+"worst": [
+[
+-41.4,
+"Added Deshaun Watson (QB) in week 1 over Jared Goff, kept 5 weeks"
+],
+[
+-26.5,
+"Added Keaton Mitchell (RB) in week 10 over Devin Singletary, kept 3 weeks"
+],
+[
+-15.3,
+"Added Zach Evans (RB) in week 7 over Justice Hill, kept 2 weeks"
+]
+]
+}
+},
 "draft": -72.0,
 "drops": 97.15,
 "g": 14,
@@ -448,11 +4137,148 @@
 "trades": 4,
 "waivers": 17
 },
+"ppw": 56.09,
 "team": "Stegostompem",
 "trades": 32.64,
 "waivers": 131.16
 },
 "Walter Bremer": {
+"dec": {
+"draft": {
+"best": [
+[
+78.1,
+"Took Dak Prescott (QB, pick 11.05). Best of the next five: Zay Flowers"
+],
+[
+30.7,
+"Took Christian Kirk (WR, pick 9.05). Best of the next five: David Montgomery"
+],
+[
+23.5,
+"Took Travis Kelce (TE, pick 1.05). Best of the next five: Tyreek Hill"
+]
+],
+"worst": [
+[
+-107.3,
+"Took Aaron Jones Sr. (RB, pick 4.06). Best of the next five: Keenan Allen"
+],
+[
+-104.1,
+"Took Cam Akers (RB, pick 7.05). Best of the next five: Rachaad White"
+],
+[
+-94.8,
+"Took Joe Burrow (QB, pick 5.05). Best of the next five: Breece Hall"
+]
+]
+},
+"drops": {
+"best": [
+[
+40.5,
+"Cut JuJu Smith-Schuster (WR) in week 3. He scored 45.9 in 9 games after"
+],
+[
+39.1,
+"Cut Treylon Burks (WR) in week 2. He scored 18.5 in 6 games after"
+],
+[
+23.5,
+"Cut Josh Reynolds (WR) in week 5. He scored 62.9 in 9 games after"
+]
+],
+"worst": [
+[
+-37.4,
+"Cut Jaylen Warren (RB) in week 5. He scored 107.3 in 9 games after"
+],
+[
+-26.4,
+"Cut Colts (DEF) in week 8. They scored 86.0 in 6 games after"
+],
+[
+-6.1,
+"Cut Romeo Doubs (WR) in week 7. He scored 82.9 in 8 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+9.6,
+"Week 4: started Dak Prescott 14.3 over Joe Burrow 4.7"
+],
+[
+2.6,
+"Week 7: started Brian Robinson 8.3 over Christian Watson 5.7"
+],
+[
+1.4,
+"Week 8: started Dak Prescott 29.1 over Joe Burrow 27.6"
+]
+],
+"worst": [
+[
+-4.8,
+"Week 11: started Christian Kirk 7.8, Joe Burrow 8.7 over Dak Prescott 16.2, Tyler Boyd 5.2"
+],
+[
+-2.8,
+"Week 5: started Christian Watson 11.6 over Christian Kirk 14.4"
+],
+[
+-2.7,
+"Week 12: started Brian Robinson 8.4 over AJ Dillon 11.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+0.8,
+"Week 6: got Brian Robinson for Chris Godwin Jr."
+]
+],
+"worst": [
+[
+-34.0,
+"Week 3: got Garrett Wilson, Christian Watson for Jaylen Waddle, Puka Nacua"
+]
+]
+},
+"waivers": {
+"best": [
+[
+25.1,
+"Added Puka Nacua (WR) in week 2 over Romeo Doubs, kept 1 week"
+],
+[
+9.4,
+"Added Tyler Boyd (WR) in week 9 over Wan'Dale Robinson, kept 4 weeks"
+],
+[
+5.0,
+"Added Matt Gay (K) in week 13 over Riley Patterson, kept 1 week"
+]
+],
+"worst": [
+[
+-24.2,
+"Added Romeo Doubs (WR) in week 5 over Josh Reynolds, kept 2 weeks"
+],
+[
+-8.6,
+"Added Samaje Perine (RB) in week 13 over Antonio Gibson, kept 1 week"
+],
+[
+-6.4,
+"Added Samaje Perine (RB) in week 3 over Matt Breida, kept 1 week"
+]
+]
+}
+},
 "draft": -426.16,
 "drops": 63.08,
 "g": 14,
@@ -464,11 +4290,151 @@
 "trades": 2,
 "waivers": 16
 },
+"ppw": 56.09,
 "team": "Walter",
 "trades": -33.16,
 "waivers": -16.3
 },
 "Wesley Alpert": {
+"dec": {
+"draft": {
+"best": [
+[
+133.1,
+"Took Jaylen Warren (RB, pick 12.09). Best of the next five: Michael Gallup"
+],
+[
+78.2,
+"Took Travis Etienne Jr. (RB, pick 3.02). Best of the next five: Joe Mixon"
+],
+[
+64.5,
+"Took D'Andre Swift (RB, pick 8.09). Best of the next five: Isiah Pacheco"
+]
+],
+"worst": [
+[
+-89.5,
+"Took Justin Jefferson (WR, pick 1.02). Best of the next five: Tyreek Hill"
+],
+[
+-74.2,
+"Took Kirk Cousins (QB, pick 11.02). Best of the next five: Brian Robinson"
+],
+[
+-63.2,
+"Took Diontae Johnson (WR, pick 7.02). Best of the next five: Rachaad White"
+]
+]
+},
+"drops": {
+"best": [
+[
+64.7,
+"Cut Kadarius Toney (WR) in week 1. He scored 50.5 in 12 games after"
+],
+[
+38.0,
+"Cut Commanders (DEF) in week 6. They scored 41.5 in 8 games after"
+],
+[
+29.6,
+"Cut Derek Carr (QB) in week 10. He scored 39.0 in 4 games after"
+]
+],
+"worst": [
+[
+-49.1,
+"Cut Gus Edwards (RB) in week 6. He scored 111.3 in 8 games after"
+],
+[
+-46.4,
+"Cut David Njoku (TE) in week 8. He scored 97.4 in 7 games after"
+],
+[
+-46.4,
+"Cut Jaylen Warren (RB) in week 2. He scored 139.6 in 12 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+14.2,
+"Week 10: started Kyler Murray 18.3 over Trevor Lawrence 4.1"
+],
+[
+11.2,
+"Week 8: started DeVonta Smith 22.9 over DK Metcalf 11.7"
+],
+[
+10.4,
+"Week 12: started C.J. Stroud 30.9 over Kyler Murray 20.4"
+]
+],
+"worst": [
+[
+-15.8,
+"Week 9: started Puka Nacua 6.2 over Diontae Johnson 22.0"
+],
+[
+-10.8,
+"Week 3: started Dalton Kincaid 2.3 over Pat Freiermuth 13.1"
+],
+[
+-6.8,
+"Week 14: started Romeo Doubs 7.2 over Puka Nacua 14.0"
+]
+]
+},
+"trades": {
+"best": [
+[
+74.6,
+"Week 4: got CeeDee Lamb for James Conner, Deebo Samuel Sr., D'Andre Swift"
+],
+[
+37.9,
+"Week 9: got T.J. Hockenson for DK Metcalf"
+],
+[
+2.8,
+"Week 11: got C.J. Stroud for Jaylen Warren"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+32.5,
+"Added Zach Charbonnet (RB) in week 11 over Darrell Henderson, kept 4 weeks"
+],
+[
+20.4,
+"Added Ezekiel Elliott (RB) in week 14 over Alexander Mattison, kept 1 week"
+],
+[
+19.1,
+"Added Rashee Rice (WR) in week 4 over Brandin Cooks, kept 5 weeks"
+]
+],
+"worst": [
+[
+-67.9,
+"Added Kyler Murray (QB) in week 7 over Trevor Lawrence, kept 8 weeks"
+],
+[
+-57.0,
+"Added Kyler Murray (QB) in week 1 over Jared Goff, kept 3 weeks"
+],
+[
+-55.9,
+"Added Aaron Rodgers (QB) in week 10 over Baker Mayfield, kept 4 weeks"
+]
+]
+}
+},
 "draft": 45.32,
 "drops": -204.16,
 "g": 14,
@@ -480,6 +4446,7 @@
 "trades": 5,
 "waivers": 66
 },
+"ppw": 56.09,
 "team": "SNIPES",
 "trades": 115.25,
 "waivers": -225.18
@@ -487,6 +4454,133 @@
 },
 "2024": {
 "Brian Berger": {
+"dec": {
+"draft": {
+"best": [
+[
+101.6,
+"Took Tony Pollard (RB, pick 8.07). Best of the next five: Javonte Williams"
+],
+[
+83.1,
+"Took J.K. Dobbins (RB, pick 12.07). Best of the next five: Khalil Shakir"
+],
+[
+70.9,
+"Took Rachaad White (RB, pick 5.04). Best of the next five: Kenneth Walker III"
+]
+],
+"worst": [
+[
+-87.2,
+"Took Patrick Mahomes (QB, pick 4.07). Best of the next five: Alvin Kamara"
+],
+[
+-79.0,
+"Took Isiah Pacheco (RB, pick 2.07). Best of the next five: Drake London"
+],
+[
+-71.8,
+"Took Tyreek Hill (WR, pick 1.04). Best of the next five: Ja'Marr Chase"
+]
+]
+},
+"drops": {
+"best": [
+[
+50.8,
+"Cut Carson Steele (RB) in week 5. He scored 10.5 in 9 games after"
+],
+[
+17.4,
+"Cut Joey Slye (K) in week 1. He scored 94.0 in 13 games after"
+],
+[
+13.0,
+"Cut Ravens (DEF) in week 6. They scored 58.0 in 8 games after"
+]
+],
+"worst": [
+[
+-64.7,
+"Cut Jakobi Meyers (WR) in week 2. He scored 147.2 in 10 games after"
+],
+[
+-26.3,
+"Cut Zach Charbonnet (RB) in week 9. He scored 60.4 in 5 games after"
+],
+[
+-23.7,
+"Cut Zach Charbonnet (RB) in week 6. He scored 78.2 in 8 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+8.6,
+"Week 13: started Joey Slye 12.0, Jonnu Smith 21.3 over Tyler Bass 5.0, Jayden Reed 19.7"
+],
+[
+0.5,
+"Week 11: started DeMario Douglas 9.9 over Nico Collins 9.4"
+]
+],
+"worst": [
+[
+-28.7,
+"Week 4: started Carson Steele -0.4, J.K. Dobbins 9.2 over Rachaad White 10.4, Jayden Reed 27.1"
+],
+[
+-25.2,
+"Week 10: started Jonnu Smith 7.5, Patrick Mahomes 16.5 over Brock Purdy 23.8, Calvin Ridley 25.4"
+],
+[
+-25.1,
+"Week 1: started Calvin Ridley 8.0 over Jayden Reed 33.1"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-12.4,
+"Week 10: got Brian Robinson for Rachaad White"
+]
+]
+},
+"waivers": {
+"best": [
+[
+109.0,
+"Added Brock Purdy (QB) in week 6 over Justin Fields, kept 9 weeks"
+],
+[
+55.0,
+"Added Vikings (DEF) in week 5 over Raiders, kept 10 weeks"
+],
+[
+50.3,
+"Added Jonnu Smith (TE) in week 11 over Hunter Henry, kept 4 weeks"
+]
+],
+"worst": [
+[
+-32.0,
+"Added Bengals (DEF) in week 6 over Texans, kept 6 weeks"
+],
+[
+-21.9,
+"Added Dalton Schultz (TE) in week 9 over Mike Gesicki, kept 1 week"
+],
+[
+-21.0,
+"Added Tyler Bass (K) in week 1 over Cameron Dicker, kept 14 weeks"
+]
+]
+}
+},
 "draft": 250.14,
 "drops": -106.46,
 "g": 14,
@@ -498,11 +4592,140 @@
 "trades": 1,
 "waivers": 15
 },
+"ppw": 57.82,
 "team": "The Pharaoh's Disciples",
 "trades": -12.42,
 "waivers": 136.6
 },
 "Brian Burke": {
+"dec": {
+"draft": {
+"best": [
+[
+109.2,
+"Took Chase Brown (RB, pick 10.02). Best of the next five: Courtland Sutton"
+],
+[
+96.9,
+"Took Brock Bowers (TE, pick 11.09). Best of the next five: Rico Dowdle"
+],
+[
+82.2,
+"Took James Cook III (RB, pick 4.02). Best of the next five: DJ Moore"
+]
+],
+"worst": [
+[
+-133.5,
+"Took Dak Prescott (QB, pick 9.09). Best of the next five: Chase Brown"
+],
+[
+-110.1,
+"Took Rashee Rice (WR, pick 5.09). Best of the next five: James Conner"
+],
+[
+-32.7,
+"Took Jake Ferguson (TE, pick 12.02). Best of the next five: J.K. Dobbins"
+]
+]
+},
+"drops": {
+"best": [
+[
+39.6,
+"Cut Falcons (DEF) in week 2. They scored 67.0 in 12 games after"
+],
+[
+36.9,
+"Cut Raiders (DEF) in week 5. They scored 43.0 in 9 games after"
+],
+[
+27.8,
+"Cut Dontayvion Wicks (WR) in week 6. He scored 38.2 in 8 games after"
+]
+],
+"worst": [
+[
+-114.7,
+"Cut Chase Brown (RB) in week 2. He scored 196.4 in 12 games after"
+],
+[
+-27.2,
+"Cut Keenan Allen (WR) in week 7. He scored 84.9 in 7 games after"
+],
+[
+-27.0,
+"Cut Adam Thielen (WR) in week 10. He scored 51.8 in 3 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+10.7,
+"Week 5: started Brock Bowers 23.7 over Jake Ferguson 13.0"
+]
+],
+"worst": [
+[
+-18.7,
+"Week 7: started DeMario Douglas 3.4 over George Pickens 22.1"
+],
+[
+-13.4,
+"Week 6: started Darius Slayton 11.7, Ty Johnson 3.4 over Najee Harris 20.2, George Pickens 8.3"
+],
+[
+-1.5,
+"Week 2: started Jayden Daniels 13.4 over Dak Prescott 14.9"
+]
+]
+},
+"trades": {
+"best": [
+[
+57.7,
+"Week 9: got Jaylen Waddle, De'Von Achane for Najee Harris"
+]
+],
+"worst": [
+[
+-42.4,
+"Week 9: got Drake London, Chris Olave for Justin Jefferson, James Cook III"
+]
+]
+},
+"waivers": {
+"best": [
+[
+72.6,
+"Added Bucky Irving (RB) in week 2 over Alexander Mattison, kept 13 weeks"
+],
+[
+43.0,
+"Added Austin Seibert (K) in week 6 over Brayden Narveson, kept 4 weeks"
+],
+[
+25.2,
+"Added Rome Odunze (WR) in week 12 over Romeo Doubs, kept 3 weeks"
+]
+],
+"worst": [
+[
+-91.3,
+"Added Keaton Mitchell (RB) in week 2 over Alexander Mattison, kept 12 weeks"
+],
+[
+-19.8,
+"Added Caleb Williams (QB) in week 8 over Bo Nix, kept 1 week"
+],
+[
+-17.6,
+"Added Roschon Johnson (RB) in week 12 over Jaylen Warren, kept 2 weeks"
+]
+]
+}
+},
 "draft": 49.72,
 "drops": 57.68,
 "g": 14,
@@ -514,11 +4737,156 @@
 "trades": 2,
 "waivers": 35
 },
+"ppw": 57.82,
 "team": "Poe's Palace",
 "trades": 15.28,
 "waivers": -28.76
 },
 "Chris Cossu": {
+"dec": {
+"draft": {
+"best": [
+[
+123.0,
+"Took Saquon Barkley (RB, pick 2.01). Best of the next five: Derrick Henry"
+],
+[
+68.6,
+"Took D'Andre Swift (RB, pick 8.01). Best of the next five: Brian Thomas Jr."
+],
+[
+44.9,
+"Took Jordan Mason (RB, pick 13.10). Best of the next five: Josh Downs"
+]
+],
+"worst": [
+[
+-95.9,
+"Took Brandon Aiyuk (WR, pick 3.10). Best of the next five: James Cook III"
+],
+[
+-77.2,
+"Took Jordan Love (QB, pick 7.10). Best of the next five: D'Andre Swift"
+],
+[
+-61.8,
+"Took Michael Pittman Jr. (WR, pick 5.10). Best of the next five: James Conner"
+]
+]
+},
+"drops": {
+"best": [
+[
+43.4,
+"Cut Kenny Gainwell (RB) in week 1. He scored 45.1 in 13 games after"
+],
+[
+36.8,
+"Cut Colby Parkinson (TE) in week 7. He scored 24.2 in 8 games after"
+],
+[
+28.4,
+"Cut Titans (DEF) in week 5. They scored 51.5 in 9 games after"
+]
+],
+"worst": [
+[
+-37.2,
+"Cut Austin Ekeler (RB) in week 5. He scored 91.7 in 8 games after"
+],
+[
+-33.5,
+"Cut DeAndre Hopkins (WR) in week 3. He scored 124.3 in 11 games after"
+],
+[
+-18.1,
+"Cut Seahawks (DEF) in week 5. They scored 98.0 in 9 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+16.5,
+"Week 6: started D'Andre Swift 21.9 over Mike Evans 5.4"
+],
+[
+14.6,
+"Week 5: started Tee Higgins 29.3 over Michael Pittman Jr. 14.7"
+],
+[
+10.7,
+"Week 14: started Jaxon Smith-Njigba 19.6 over DK Metcalf 8.9"
+]
+],
+"worst": [
+[
+-17.4,
+"Week 1: started Brandon Aiyuk 4.8 over Jordan Mason 22.2"
+],
+[
+-9.1,
+"Week 9: started Jordan Love 11.9 over Sam Darnold 21.0"
+],
+[
+-7.9,
+"Week 8: started Jalen McMillan 9.2 over Courtland Sutton 17.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+64.3,
+"Week 8: got Bijan Robinson, Cole Kmet, Jaxon Smith-Njigba for Michael Pittman Jr., David Montgomery, Sam LaPorta, Brian Thomas Jr."
+],
+[
+11.9,
+"Week 4: got Tee Higgins, David Montgomery for Jahmyr Gibbs"
+]
+],
+"worst": [
+[
+-58.1,
+"Week 4: got Sam LaPorta, Brian Thomas Jr., DK Metcalf for Trey McBride, Brandon Aiyuk"
+],
+[
+-3.9,
+"Week 2: got Ladd McConkey for Jordan Mason"
+]
+]
+},
+"waivers": {
+"best": [
+[
+62.0,
+"Added Courtland Sutton (WR) in week 8 over Christian Watson, kept 7 weeks"
+],
+[
+52.0,
+"Added Chargers (DEF) in week 8 over Giants, kept 6 weeks"
+],
+[
+28.7,
+"Added Cade Otton (TE) in week 8 over Will Dissly, kept 7 weeks"
+]
+],
+"worst": [
+[
+-16.8,
+"Added Derek Carr (QB) in week 3 over Brock Purdy, kept 1 week"
+],
+[
+-15.1,
+"Added Taysom Hill (QB) in week 5 over Brock Purdy, kept 1 week"
+],
+[
+-10.0,
+"Added Jake Moody (K) in week 12 over Jake Elliott, kept 2 weeks"
+]
+]
+}
+},
 "draft": -44.75,
 "drops": 175.66,
 "g": 14,
@@ -530,11 +4898,140 @@
 "trades": 4,
 "waivers": 31
 },
+"ppw": 57.82,
 "team": "It's a Love Story",
 "trades": 14.19,
 "waivers": 165.38
 },
 "Dylan McMahon": {
+"dec": {
+"draft": {
+"best": [
+[
+106.5,
+"Took Jaxon Smith-Njigba (WR, pick 9.06). Best of the next five: Brian Robinson"
+],
+[
+99.3,
+"Took Josh Jacobs (RB, pick 3.06). Best of the next five: De'Von Achane"
+],
+[
+40.6,
+"Took Chris Godwin Jr. (WR, pick 8.05). Best of the next five: Tony Pollard"
+]
+],
+"worst": [
+[
+-63.6,
+"Took C.J. Stroud (QB, pick 5.06). Best of the next five: Trey McBride"
+],
+[
+-57.3,
+"Took Gus Edwards (RB, pick 11.06). Best of the next five: Brock Bowers"
+],
+[
+-57.0,
+"Took Tua Tagovailoa (QB, pick 14.05). Best of the next five: Jared Goff"
+]
+]
+},
+"drops": {
+"best": [
+[
+18.2,
+"Cut 49ers (DEF) in week 7. They scored 44.0 in 7 games after"
+],
+[
+15.9,
+"Cut 49ers (DEF) in week 9. They scored 28.5 in 5 games after"
+],
+[
+13.8,
+"Cut Jaguars (DEF) in week 8. They scored 39.5 in 6 games after"
+]
+],
+"worst": [
+[
+-62.4,
+"Cut Courtland Sutton (WR) in week 7. He scored 120.1 in 7 games after"
+],
+[
+-40.0,
+"Cut Joe Burrow (QB) in week 10. He scored 108.6 in 4 games after"
+],
+[
+-40.0,
+"Cut Joe Burrow (QB) in week 10. He scored 108.6 in 4 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+6.4,
+"Week 4: started Cole Kmet 6.4 over Kyle Pitts Sr. 0.0"
+],
+[
+5.9,
+"Week 11: started Brian Thomas Jr. 13.6, Kyle Pitts Sr. 1.9 over Amari Cooper 7.5, Jake Ferguson 2.1"
+],
+[
+5.1,
+"Week 10: started Kyle Pitts Sr. 9.5 over Jake Ferguson 4.4"
+]
+],
+"worst": [
+[
+-7.1,
+"Week 5: started Cole Kmet 8.7 over Kyle Pitts Sr. 15.8"
+]
+]
+},
+"trades": {
+"best": [
+[
+8.3,
+"Week 9: got Darnell Mooney, Kareem Hunt, Amari Cooper for Nick Chubb, Marvin Harrison Jr."
+]
+],
+"worst": [
+[
+-64.3,
+"Week 8: got Michael Pittman Jr., David Montgomery, Sam LaPorta, Brian Thomas Jr. for Bijan Robinson, Cole Kmet, Jaxon Smith-Njigba"
+]
+]
+},
+"waivers": {
+"best": [
+[
+95.7,
+"Added Tua Tagovailoa (QB) in week 10 over Daniel Jones, kept 5 weeks"
+],
+[
+62.8,
+"Added Austin Ekeler (RB) in week 6 over Tyjae Spears, kept 9 weeks"
+],
+[
+19.5,
+"Added Joe Burrow (QB) in week 10 over Daniel Jones, kept 1 week"
+]
+],
+"worst": [
+[
+-36.9,
+"Added Geno Smith (QB) in week 8 over Bo Nix, kept 7 weeks"
+],
+[
+-25.2,
+"Added Kyle Pitts Sr. (TE) in week 10 over Dalton Schultz, kept 5 weeks"
+],
+[
+-19.5,
+"Added Aaron Rodgers (QB) in week 3 over Brock Purdy, kept 5 weeks"
+]
+]
+}
+},
 "draft": 15.24,
 "drops": -91.43,
 "g": 14,
@@ -546,11 +5043,134 @@
 "trades": 5,
 "waivers": 21
 },
+"ppw": 57.82,
 "team": "DylansVillans",
 "trades": -55.94,
 "waivers": 79.82
 },
 "Kevin Krueger": {
+"dec": {
+"draft": {
+"best": [
+[
+103.6,
+"Took Alvin Kamara (RB, pick 5.02). Best of the next five: Joe Mixon"
+],
+[
+51.0,
+"Took Zay Flowers (WR, pick 7.02). Best of the next five: Rhamondre Stevenson"
+],
+[
+49.4,
+"Took Khalil Shakir (WR, pick 13.02). Best of the next five: Zach Charbonnet"
+]
+],
+"worst": [
+[
+-82.6,
+"Took Dalton Kincaid (TE, pick 6.09). Best of the next five: David Montgomery"
+],
+[
+-64.2,
+"Took Blake Corum (RB, pick 12.09). Best of the next five: Zach Charbonnet"
+],
+[
+-51.2,
+"Took Devin Singletary (RB, pick 9.02). Best of the next five: Jaxon Smith-Njigba"
+]
+]
+},
+"drops": {
+"best": [
+[
+72.3,
+"Cut Luke McCaffrey (WR) in week 2. He scored 26.7 in 12 games after"
+],
+[
+57.5,
+"Cut Ty Chandler (RB) in week 4. He scored 10.6 in 10 games after"
+],
+[
+52.4,
+"Cut Blake Corum (RB) in week 3. He scored 22.5 in 11 games after"
+]
+],
+"worst": [
+[
+-24.8,
+"Cut Tank Bigsby (RB) in week 3. He scored 92.9 in 10 games after"
+],
+[
+-20.1,
+"Cut Chris Boswell (K) in week 9. He scored 63.0 in 5 games after"
+],
+[
+-8.3,
+"Cut Michael Pittman Jr. (WR) in week 12. He scored 24.8 in 2 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+27.8,
+"Week 2: started Malik Nabers 28.7 over Christian Kirk 0.9"
+],
+[
+7.6,
+"Week 1: started Malik Nabers 11.6 over Christian Kirk 4.0"
+],
+[
+6.2,
+"Week 5: started Zay Flowers 19.0 over Christian Kirk 12.8"
+]
+],
+"worst": [
+[
+-5.9,
+"Week 13: started Taysom Hill 9.7 over Sam LaPorta 15.6"
+],
+[
+-2.5,
+"Week 14: started Cardinals 0.5 over Lions 3.0"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+148.0,
+"Added Chuba Hubbard (RB) in week 3 over Tyjae Spears, kept 12 weeks"
+],
+[
+24.0,
+"Added Packers (DEF) in week 5 over Raiders, kept 4 weeks"
+],
+[
+15.0,
+"Added Alexander Mattison (RB) in week 8 over Zack Moss, kept 4 weeks"
+]
+],
+"worst": [
+[
+-42.9,
+"Added Tank Bigsby (RB) in week 5 over Tyrone Tracy, kept 9 weeks"
+],
+[
+-16.6,
+"Added Michael Pittman Jr. (WR) in week 11 over Jerry Jeudy, kept 1 week"
+],
+[
+-14.1,
+"Added Xavier Legette (WR) in week 5 over Jordan Whittington, kept 1 week"
+]
+]
+}
+},
 "draft": -97.81,
 "drops": 293.14,
 "g": 14,
@@ -562,11 +5182,143 @@
 "trades": 0,
 "waivers": 30
 },
+"ppw": 57.82,
 "team": "Hench",
 "trades": 0.0,
 "waivers": 47.94
 },
 "Nathan Wu": {
+"dec": {
+"draft": {
+"best": [
+[
+121.6,
+"Took Kyren Williams (RB, pick 2.06). Best of the next five: Drake London"
+],
+[
+83.0,
+"Took Kenneth Walker III (RB, pick 5.05). Best of the next five: DK Metcalf"
+],
+[
+13.5,
+"Took Jared Goff (QB, pick 14.06). Best of the next five: Brock Purdy"
+]
+],
+"worst": [
+[
+-64.6,
+"Took Amari Cooper (WR, pick 6.06). Best of the next five: David Montgomery"
+],
+[
+-57.0,
+"Took Zamir White (RB, pick 8.06). Best of the next five: Tony Pollard"
+],
+[
+-44.0,
+"Took Deebo Samuel Sr. (WR, pick 4.06). Best of the next five: Lamar Jackson"
+]
+]
+},
+"drops": {
+"best": [
+[
+48.5,
+"Cut Jaylen Wright (RB) in week 3. He scored 26.4 in 11 games after"
+],
+[
+32.2,
+"Cut Colby Parkinson (TE) in week 5. He scored 36.4 in 9 games after"
+],
+[
+30.6,
+"Cut Blake Corum (RB) in week 8. He scored 17.1 in 7 games after"
+]
+],
+"worst": [
+[
+-118.4,
+"Cut Chase Brown (RB) in week 3. He scored 193.3 in 11 games after"
+],
+[
+-45.8,
+"Cut Cade Otton (TE) in week 6. He scored 106.8 in 8 games after"
+],
+[
+-43.2,
+"Cut Jauan Jennings (WR) in week 6. He scored 92.7 in 6 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+18.1,
+"Week 4: started Kenneth Walker III 33.6 over Jerome Ford 15.5"
+],
+[
+5.8,
+"Week 11: started Jared Goff 34.6 over Bo Nix 28.8"
+],
+[
+2.8,
+"Week 13: started Jared Goff 16.9 over Bo Nix 14.2"
+]
+],
+"worst": [
+[
+-12.6,
+"Week 6: started Kirk Cousins 12.5 over Jared Goff 25.1"
+],
+[
+-8.1,
+"Week 9: started Tank Dell 18.6 over Chase Brown 26.7"
+],
+[
+-3.0,
+"Week 10: started Taysom Hill 7.0 over Evan Engram 10.0"
+]
+]
+},
+"trades": {
+"best": [
+[
+38.6,
+"Week 6: got Chase Brown, Tank Dell for Kareem Hunt, Amari Cooper"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+100.8,
+"Added Tyrone Tracy Jr. (RB) in week 6 over Tyjae Spears, kept 9 weeks"
+],
+[
+38.9,
+"Added Jauan Jennings (WR) in week 3 over Demarcus Robinson, kept 3 weeks"
+],
+[
+31.6,
+"Added DeAndre Hopkins (WR) in week 8 over Christian Watson, kept 7 weeks"
+]
+],
+"worst": [
+[
+-23.7,
+"Added Taysom Hill (QB) in week 6 over Justin Fields, kept 2 weeks"
+],
+[
+-21.1,
+"Added Bo Nix (QB) in week 11 over Matthew Stafford, kept 4 weeks"
+],
+[
+-11.2,
+"Added Kirk Cousins (QB) in week 6 over Justin Fields, kept 1 week"
+]
+]
+}
+},
 "draft": -54.01,
 "drops": 88.81,
 "g": 14,
@@ -578,11 +5330,139 @@
 "trades": 1,
 "waivers": 33
 },
+"ppw": 57.82,
 "team": "U gotta BO-lieve",
 "trades": 38.61,
 "waivers": 224.62
 },
 "Nick Gearing": {
+"dec": {
+"draft": {
+"best": [
+[
+120.9,
+"Took Derrick Henry (RB, pick 2.03). Best of the next five: Kyren Williams"
+],
+[
+98.7,
+"Took Courtland Sutton (WR, pick 10.03). Best of the next five: Xavier Worthy"
+],
+[
+54.8,
+"Took Josh Downs (WR, pick 14.03). Best of the next five: Jared Goff"
+]
+],
+"worst": [
+[
+-127.8,
+"Took Anthony Richardson Sr. (QB, pick 7.08). Best of the next five: D'Andre Swift"
+],
+[
+-50.6,
+"Took Garrett Wilson (WR, pick 1.08). Best of the next five: Saquon Barkley"
+],
+[
+-44.6,
+"Took Caleb Williams (QB, pick 12.03). Best of the next five: J.K. Dobbins"
+]
+]
+},
+"drops": {
+"best": [
+[
+56.8,
+"Cut Tyler Johnson (WR) in week 4. He scored 25.7 in 10 games after"
+],
+[
+25.0,
+"Cut Sean Tucker (RB) in week 7. He scored 22.7 in 7 games after"
+],
+[
+22.1,
+"Cut Ricky Pearsall (WR) in week 7. He scored 35.6 in 7 games after"
+]
+],
+"worst": [
+[
+-111.7,
+"Cut Chuba Hubbard (RB) in week 1. He scored 200.2 in 13 games after"
+],
+[
+-69.4,
+"Cut Courtland Sutton (WR) in week 6. He scored 135.4 in 8 games after"
+],
+[
+-55.1,
+"Cut Josh Downs (WR) in week 1. He scored 137.6 in 10 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+18.6,
+"Week 8: started DeVonta Smith 20.5 over Tyler Lockett 1.9"
+],
+[
+9.0,
+"Week 14: started 49ers 15.5 over Chiefs 6.5"
+],
+[
+4.8,
+"Week 2: started Brian Robinson 14.6 over Aaron Jones Sr. 9.8"
+]
+],
+"worst": [
+[
+-29.1,
+"Week 3: started Brian Robinson 10.7, Jameson Williams 1.2 over Aaron Jones Sr. 25.8, DJ Moore 15.2"
+],
+[
+-3.6,
+"Week 11: started C.J. Stroud 11.9, Jameson Williams 22.6 over Justin Herbert 24.4, DJ Moore 13.7"
+]
+]
+},
+"trades": {
+"best": [
+[
+12.4,
+"Week 10: got Rachaad White for Brian Robinson"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+43.4,
+"Added Adam Thielen (WR) in week 12 over Romeo Doubs, kept 3 weeks"
+],
+[
+20.0,
+"Added Chargers (DEF) in week 1 over Buccaneers, kept 2 weeks"
+],
+[
+14.0,
+"Added Will Reichard (K) in week 7 over Greg Zuerlein, kept 1 week"
+]
+],
+"worst": [
+[
+-32.7,
+"Added Baker Mayfield (QB) in week 7 over Sam Darnold, kept 8 weeks"
+],
+[
+-19.7,
+"Added Justin Herbert (QB) in week 11 over Matthew Stafford, kept 4 weeks"
+],
+[
+-16.6,
+"Added Jauan Jennings (WR) in week 8 over Christian Watson, kept 2 weeks"
+]
+]
+}
+},
 "draft": 187.46,
 "drops": -227.81,
 "g": 14,
@@ -594,11 +5474,134 @@
 "trades": 1,
 "waivers": 36
 },
+"ppw": 57.82,
 "team": "Kabul Gearing Bombers",
 "trades": 12.42,
 "waivers": -31.38
 },
 "Niko Contreras": {
+"dec": {
+"draft": {
+"best": [
+[
+87.8,
+"Took Joe Mixon (RB, pick 5.03). Best of the next five: Rachaad White"
+],
+[
+82.6,
+"Took Rhamondre Stevenson (RB, pick 7.03). Best of the next five: Calvin Ridley"
+],
+[
+76.5,
+"Took Joe Burrow (QB, pick 11.03). Best of the next five: Jakobi Meyers"
+]
+],
+"worst": [
+[
+-108.3,
+"Took Jonathon Brooks (RB, pick 10.08). Best of the next five: Joe Burrow"
+],
+[
+-74.0,
+"Took Curtis Samuel (WR, pick 13.03). Best of the next five: Zach Charbonnet"
+],
+[
+-49.4,
+"Took Davante Adams (WR, pick 3.03). Best of the next five: De'Von Achane"
+]
+]
+},
+"drops": {
+"best": [
+[
+33.9,
+"Cut Curtis Samuel (WR) in week 4. He scored 40.4 in 9 games after"
+],
+[
+20.5,
+"Cut Cam Akers (RB) in week 7. He scored 34.0 in 8 games after"
+],
+[
+18.0,
+"Cut Chiefs (DEF) in week 6. They scored 53.0 in 8 games after"
+]
+],
+"worst": [
+[
+-65.6,
+"Cut Jerry Jeudy (WR) in week 10. He scored 98.6 in 4 games after"
+],
+[
+-62.1,
+"Cut David Njoku (TE) in week 6. He scored 123.1 in 8 games after"
+],
+[
+-12.9,
+"Cut Matthew Wright (K) in week 7. He scored 30.0 in 2 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+8.9,
+"Week 8: started Puka Nacua 18.1 over Javonte Williams 9.2"
+],
+[
+3.7,
+"Week 6: started Jalen Tolbert 8.3 over Javonte Williams 4.6"
+]
+],
+"worst": [
+[
+-13.2,
+"Week 4: started Joe Mixon 0.0 over Jerry Jeudy 13.2"
+],
+[
+-8.7,
+"Week 3: started Joe Mixon 0.0 over Jerry Jeudy 8.7"
+],
+[
+-2.5,
+"Week 13: started Seahawks 17.5 over Cowboys 20.0"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+94.4,
+"Added Joe Burrow (QB) in week 10 over Daniel Jones, kept 5 weeks"
+],
+[
+90.8,
+"Added David Njoku (TE) in week 7 over Colby Parkinson, kept 8 weeks"
+],
+[
+37.5,
+"Added Zach Charbonnet (RB) in week 14 over Ameer Abdullah, kept 1 week"
+]
+],
+"worst": [
+[
+-9.5,
+"Added Jerry Jeudy (WR) in week 3 over Demarcus Robinson, kept 7 weeks"
+],
+[
+-9.0,
+"Added Falcons (DEF) in week 10 over Cardinals, kept 1 week"
+],
+[
+-7.0,
+"Added Jalen Tolbert (WR) in week 6 over Courtland Sutton, kept 2 weeks"
+]
+]
+}
+},
 "draft": 26.24,
 "drops": 25.33,
 "g": 14,
@@ -610,11 +5613,139 @@
 "trades": 1,
 "waivers": 22
 },
+"ppw": 57.82,
 "team": "Free Diddy",
 "trades": 0.0,
 "waivers": 286.88
 },
 "Shane Kaiper": {
+"dec": {
+"draft": {
+"best": [
+[
+108.9,
+"Took De'Von Achane (RB, pick 3.07). Best of the next five: James Cook III"
+],
+[
+82.6,
+"Took Ja'Marr Chase (WR, pick 1.07). Best of the next five: Saquon Barkley"
+],
+[
+73.7,
+"Took Brian Thomas Jr. (WR, pick 8.04). Best of the next five: Tony Pollard"
+]
+],
+"worst": [
+[
+-137.7,
+"Took Hollywood Brown (WR, pick 11.07). Best of the next five: Brock Bowers"
+],
+[
+-36.2,
+"Took T.J. Hockenson (TE, pick 10.04). Best of the next five: Jordan Addison"
+],
+[
+-26.6,
+"Took Dontayvion Wicks (WR, pick 13.07). Best of the next five: Jayden Daniels"
+]
+]
+},
+"drops": {
+"best": [
+[
+52.2,
+"Cut Adonai Mitchell (WR) in week 2. He scored 46.8 in 12 games after"
+],
+[
+34.4,
+"Cut Elijah Higgins (TE) in week 7. He scored 18.9 in 7 games after"
+],
+[
+33.7,
+"Cut Jaguars (DEF) in week 3. They scored 64.0 in 11 games after"
+]
+],
+"worst": [
+[
+-23.1,
+"Cut Texans (DEF) in week 5. They scored 103.0 in 9 games after"
+],
+[
+-16.9,
+"Cut Wan'Dale Robinson (WR) in week 3. He scored 107.7 in 11 games after"
+],
+[
+-8.1,
+"Cut Broncos (DEF) in week 9. They scored 52.5 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [],
+"worst": [
+[
+-10.1,
+"Week 4: started Braelon Allen 5.6 over Rashid Shaheed 15.7"
+],
+[
+-8.5,
+"Week 14: started Jakobi Meyers 13.7 over James Conner 22.2"
+],
+[
+-2.9,
+"Week 10: started Najee Harris 11.3 over Josh Downs 14.2"
+]
+]
+},
+"trades": {
+"best": [
+[
+58.1,
+"Week 4: got Trey McBride, Brandon Aiyuk for Sam LaPorta, Brian Thomas Jr., DK Metcalf"
+],
+[
+35.3,
+"Week 9: got Jahmyr Gibbs for Jaylen Warren"
+]
+],
+"worst": [
+[
+-57.7,
+"Week 9: got Najee Harris for Jaylen Waddle, De'Von Achane"
+]
+]
+},
+"waivers": {
+"best": [
+[
+94.3,
+"Added Josh Downs (WR) in week 5 over Jordan Whittington, kept 10 weeks"
+],
+[
+64.0,
+"Added Jerry Jeudy (WR) in week 12 over Romeo Doubs, kept 3 weeks"
+],
+[
+42.5,
+"Added Broncos (DEF) in week 5 over Raiders, kept 4 weeks"
+]
+],
+"worst": [
+[
+-24.1,
+"Added Jakobi Meyers (WR) in week 7 over Courtland Sutton, kept 8 weeks"
+],
+[
+-20.5,
+"Added Russell Wilson (QB) in week 11 over Matthew Stafford, kept 1 week"
+],
+[
+-12.5,
+"Added Saints (DEF) in week 9 over Cardinals, kept 1 week"
+]
+]
+}
+},
 "draft": 186.75,
 "drops": 167.41,
 "g": 14,
@@ -626,11 +5757,156 @@
 "trades": 4,
 "waivers": 27
 },
+"ppw": 57.82,
 "team": "Stegostompem",
 "trades": 35.76,
 "waivers": 134.5
 },
 "Wesley Alpert": {
+"dec": {
+"draft": {
+"best": [
+[
+97.0,
+"Took David Montgomery (RB, pick 7.01). Best of the next five: Zay Flowers"
+],
+[
+44.5,
+"Took Ladd McConkey (WR, pick 10.10). Best of the next five: Joe Burrow"
+],
+[
+16.8,
+"Took Drake London (WR, pick 3.01). Best of the next five: Josh Jacobs"
+]
+],
+"worst": [
+[
+-151.9,
+"Took Christian McCaffrey (RB, pick 1.01). Best of the next five: Bijan Robinson"
+],
+[
+-93.6,
+"Took Chris Olave (WR, pick 2.10). Best of the next five: Drake London"
+],
+[
+-72.5,
+"Took Mark Andrews (TE, pick 4.10). Best of the next five: Alvin Kamara"
+]
+]
+},
+"drops": {
+"best": [
+[
+36.9,
+"Cut Trey Benson (RB) in week 1. He scored 44.8 in 12 games after"
+],
+[
+35.5,
+"Cut Ezekiel Elliott (RB) in week 4. He scored 25.8 in 9 games after"
+],
+[
+34.4,
+"Cut Trey Sermon (RB) in week 7. He scored 13.3 in 7 games after"
+]
+],
+"worst": [
+[
+-57.5,
+"Cut Kareem Hunt (RB) in week 3. He scored 125.6 in 10 games after"
+],
+[
+-46.5,
+"Cut Jakobi Meyers (WR) in week 7. He scored 96.0 in 6 games after"
+],
+[
+-41.9,
+"Cut Baker Mayfield (QB) in week 4. He scored 213.3 in 10 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+15.6,
+"Week 3: started David Montgomery 21.2, Tank Dell 11.2 over Cam Akers 9.9, Tee Higgins 6.9"
+],
+[
+14.0,
+"Week 7: started Kareem Hunt 22.3 over Wan'Dale Robinson 8.3"
+],
+[
+6.4,
+"Week 4: started Dalton Schultz 6.4 over Mark Andrews 0.0"
+]
+],
+"worst": [
+[
+-21.0,
+"Week 1: started Andrei Iosivas 5.6, Isaac Guerendo 0.0 over Ezekiel Elliott 12.9, Tyler Lockett 13.7"
+],
+[
+-3.5,
+"Week 2: started Keon Coleman 0.0 over Tyler Lockett 3.5"
+]
+]
+},
+"trades": {
+"best": [
+[
+42.4,
+"Week 9: got Justin Jefferson, James Cook III for Drake London, Chris Olave"
+],
+[
+3.9,
+"Week 2: got Jordan Mason for Ladd McConkey"
+]
+],
+"worst": [
+[
+-38.6,
+"Week 6: got Kareem Hunt, Amari Cooper for Chase Brown, Tank Dell"
+],
+[
+-35.3,
+"Week 9: got Jaylen Warren for Jahmyr Gibbs"
+],
+[
+-11.9,
+"Week 4: got Jahmyr Gibbs for Tee Higgins, David Montgomery"
+]
+]
+},
+"waivers": {
+"best": [
+[
+56.8,
+"Added Jauan Jennings (WR) in week 10 over Wan'Dale Robinson, kept 5 weeks"
+],
+[
+33.5,
+"Added Tucker Kraft (TE) in week 5 over Brenton Strange, kept 7 weeks"
+],
+[
+30.4,
+"Added Wan'Dale Robinson (WR) in week 5 over Jordan Whittington, kept 5 weeks"
+]
+],
+"worst": [
+[
+-35.2,
+"Added Keenan Allen (WR) in week 7 over Courtland Sutton, kept 8 weeks"
+],
+[
+-30.0,
+"Added Kirk Cousins (QB) in week 12 over Anthony Richardson, kept 2 weeks"
+],
+[
+-24.7,
+"Added Clyde Edwards-Helaire (RB) in week 3 over Tyjae Spears, kept 4 weeks"
+]
+]
+}
+},
 "draft": -318.3,
 "drops": 12.4,
 "g": 14,
@@ -642,6 +5918,7 @@
 "trades": 7,
 "waivers": 44
 },
+"ppw": 57.82,
 "team": "SNIPES",
 "trades": -47.9,
 "waivers": 23.44
@@ -649,6 +5926,132 @@
 },
 "2025": {
 "Brian Berger": {
+"dec": {
+"draft": {
+"best": [
+[
+137.1,
+"Took Jonathan Taylor (RB, pick 3.01). Best of the next five: Trey McBride"
+],
+[
+79.9,
+"Took Khalil Shakir (WR, pick 10.10). Best of the next five: Tucker Kraft"
+],
+[
+47.5,
+"Took Tucker Kraft (TE, pick 11.01). Best of the next five: Keon Coleman"
+]
+],
+"worst": [
+[
+-175.1,
+"Took Joe Burrow (QB, pick 4.10). Best of the next five: Tetairoa McMillan"
+],
+[
+-118.6,
+"Took Braelon Allen (RB, pick 8.10). Best of the next five: Travis Etienne Jr."
+],
+[
+-105.7,
+"Took Joe Mixon (RB, pick 13.01). Best of the next five: Javonte Williams"
+]
+]
+},
+"drops": {
+"best": [
+[
+63.1,
+"Cut Jake Tonges (TE) in week 7. He scored 7.2 in 7 games after"
+],
+[
+61.0,
+"Cut Taysom Hill (TE) in week 6. He scored 19.4 in 8 games after"
+],
+[
+59.4,
+"Cut Geno Smith (QB) in week 5. He scored 103.2 in 9 games after"
+]
+],
+"worst": [
+[
+-11.0,
+"Cut Chuba Hubbard (RB) in week 12. He scored 28.7 in 2 games after"
+],
+[
+-8.2,
+"Cut Jerry Jeudy (WR) in week 14. He scored 16.6 in 1 game after"
+],
+[
+-5.0,
+"Cut Kayshon Boutte (WR) in week 7. He scored 47.0 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+26.5,
+"Week 10: started Caleb Williams 25.1, Darius Slayton 12.9, Saints 15.0 over Daniel Jones 16.5, Patriots 4.5, Tre Tucker 5.5"
+],
+[
+6.3,
+"Week 8: started Khalil Shakir 20.8 over Rashid Shaheed 14.5"
+],
+[
+3.1,
+"Week 13: started Joe Burrow 19.2 over Daniel Jones 16.1"
+]
+],
+"worst": [
+[
+-17.5,
+"Week 4: started Caleb Williams 12.8, Jaylen Warren 0.0 over Brock Purdy 19.7, Tucker Kraft 10.6"
+],
+[
+-14.0,
+"Week 11: started Khalil Shakir 0.7 over Tre Tucker 14.7"
+],
+[
+-9.4,
+"Week 2: started Hollywood Brown 8.0 over Jaylen Warren 17.4"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+44.5,
+"Added Caleb Williams (QB) in week 6 over Sam Darnold, kept 9 weeks"
+],
+[
+27.6,
+"Added Rashid Shaheed (WR) in week 4 over Cooper Kupp, kept 9 weeks"
+],
+[
+18.3,
+"Added Daniel Jones (QB) in week 7 over Aaron Rodgers, kept 8 weeks"
+]
+],
+"worst": [
+[
+-28.1,
+"Added Isiah Pacheco (RB) in week 12 over Zonovan Knight, kept 3 weeks"
+],
+[
+-22.5,
+"Added Darius Slayton (WR) in week 10 over Alec Pierce, kept 5 weeks"
+],
+[
+-20.7,
+"Added Cooper Kupp (WR) in week 6 over Wan'Dale Robinson, kept 2 weeks"
+]
+]
+}
+},
 "draft": -191.36,
 "drops": 407.25,
 "g": 14,
@@ -660,11 +6063,144 @@
 "trades": 0,
 "waivers": 30
 },
+"ppw": 54.61,
 "team": "A Storm Is Coming",
 "trades": 0.0,
 "waivers": -41.22
 },
 "Brian Burke": {
+"dec": {
+"draft": {
+"best": [
+[
+125.8,
+"Took Davante Adams (WR, pick 4.07). Best of the next five: Tetairoa McMillan"
+],
+[
+102.9,
+"Took Javonte Williams (RB, pick 13.04). Best of the next five: Michael Pittman Jr."
+],
+[
+87.4,
+"Took Chris Olave (WR, pick 7.04). Best of the next five: DJ Moore"
+]
+],
+"worst": [
+[
+-106.6,
+"Took Kyler Murray (QB, pick 11.04). Best of the next five: Keon Coleman"
+],
+[
+-99.9,
+"Took George Kittle (TE, pick 3.04). Best of the next five: Jaxon Smith-Njigba"
+],
+[
+-31.3,
+"Took Saquon Barkley (RB, pick 1.04). Best of the next five: Christian McCaffrey"
+]
+]
+},
+"drops": {
+"best": [
+[
+50.5,
+"Cut Bengals (DEF) in week 1. They scored 69.0 in 13 games after"
+],
+[
+40.3,
+"Cut Jets (DEF) in week 2. They scored 70.0 in 12 games after"
+],
+[
+36.2,
+"Cut Aaron Rodgers (QB) in week 9. He scored 54.1 in 5 games after"
+]
+],
+"worst": [
+[
+-36.8,
+"Cut Texans (DEF) in week 5. They scored 119.5 in 9 games after"
+],
+[
+-17.6,
+"Cut Evan McPherson (K) in week 10. He scored 48.0 in 4 games after"
+],
+[
+-13.9,
+"Cut Rams (DEF) in week 8. They scored 69.0 in 6 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+6.0,
+"Week 9: started TreVeyon Henderson 12.7 over Tyrone Tracy Jr. 6.7"
+],
+[
+5.7,
+"Week 1: started Marvin Harrison Jr. 18.1 over Chris Olave 12.4"
+]
+],
+"worst": [
+[
+-20.3,
+"Week 2: started Marvin Harrison Jr. 4.7 over Javonte Williams 25.0"
+],
+[
+-10.3,
+"Week 4: started Keenan Allen 8.7, Kyler Murray 18.1 over Justin Fields 27.1, Chris Olave 10.0"
+],
+[
+-9.3,
+"Week 5: started Marvin Harrison Jr. 13.8 over Rachaad White 23.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+32.1,
+"Week 6: got TreVeyon Henderson, Jordan Addison, Matthew Golden, CeeDee Lamb for Davante Adams, Rachaad White, Bucky Irving, Jakobi Meyers"
+]
+],
+"worst": [
+[
+-80.8,
+"Week 5: got Bucky Irving, Rachaad White for Travis Etienne Jr., Keenan Allen, Chris Olave, Javonte Williams"
+]
+]
+},
+"waivers": {
+"best": [
+[
+42.3,
+"Added Tyrone Tracy Jr. (RB) in week 9 over Samaje Perine, kept 6 weeks"
+],
+[
+23.5,
+"Added Rams (DEF) in week 6 over Colts, kept 2 weeks"
+],
+[
+20.8,
+"Added Jacoby Brissett (QB) in week 14 over Tyrod Taylor, kept 1 week"
+]
+],
+"worst": [
+[
+-24.4,
+"Added Sean Tucker (RB) in week 12 over Zonovan Knight, kept 2 weeks"
+],
+[
+-20.9,
+"Added Brock Purdy (QB) in week 8 over Justin Fields, kept 1 week"
+],
+[
+-19.7,
+"Added Brenton Strange (TE) in week 14 over Harold Fannin, kept 1 week"
+]
+]
+}
+},
 "draft": 293.46,
 "drops": 246.92,
 "g": 14,
@@ -676,11 +6212,139 @@
 "trades": 2,
 "waivers": 33
 },
+"ppw": 54.61,
 "team": "Poe's Palace",
 "trades": -48.75,
 "waivers": -30.64
 },
 "Chris Cossu": {
+"dec": {
+"draft": {
+"best": [
+[
+19.7,
+"Took Jauan Jennings (WR, pick 9.08). Best of the next five: Patrick Mahomes"
+],
+[
+19.1,
+"Took Tyler Allgeier (RB, pick 12.03). Best of the next five: Keenan Allen"
+],
+[
+17.4,
+"Took D'Andre Swift (RB, pick 6.03). Best of the next five: George Pickens"
+]
+],
+"worst": [
+[
+-81.2,
+"Took Lamar Jackson (QB, pick 3.08). Best of the next five: Jaxon Smith-Njigba"
+],
+[
+-79.9,
+"Took Kaleb Johnson (RB, pick 10.03). Best of the next five: Rome Odunze"
+],
+[
+-64.6,
+"Took Tyreek Hill (WR, pick 4.03). Best of the next five: Davante Adams"
+]
+]
+},
+"drops": {
+"best": [
+[
+53.5,
+"Cut Kaleb Johnson (RB) in week 3. He scored 8.5 in 7 games after"
+],
+[
+42.0,
+"Cut Giants (DEF) in week 6. They scored 31.5 in 8 games after"
+],
+[
+30.2,
+"Cut Brian Robinson (RB) in week 6. He scored 40.6 in 8 games after"
+]
+],
+"worst": [
+[
+-44.2,
+"Cut Jason Myers (K) in week 6. He scored 105.0 in 8 games after"
+],
+[
+-32.5,
+"Cut Texans (DEF) in week 7. They scored 106.0 in 8 games after"
+],
+[
+-27.6,
+"Cut Jauan Jennings (WR) in week 9. He scored 69.6 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+26.3,
+"Week 6: started Cam Skattebo 31.0 over Kenneth Walker III 4.7"
+],
+[
+15.1,
+"Week 8: started D'Andre Swift 15.1 over Quentin Johnston 0.0"
+],
+[
+9.5,
+"Week 13: started D'Andre Swift 20.8 over Quentin Johnston 11.3"
+]
+],
+"worst": [
+[
+-18.6,
+"Week 12: started Browns 20.0, D'Andre Swift 1.9 over Packers 20.5, Kareem Hunt 20.0"
+],
+[
+-4.8,
+"Week 2: started Jerry Jeudy 9.1 over D'Andre Swift 13.9"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-22.0,
+"Week 5: got Kenneth Walker III, Emeka Egbuka for Jerry Jeudy, Ashton Jeanty"
+]
+]
+},
+"waivers": {
+"best": [
+[
+104.2,
+"Added Cam Skattebo (RB) in week 3 over James Conner, kept 6 weeks"
+],
+[
+70.1,
+"Added Kyle Monangai (RB) in week 9 over Samaje Perine, kept 6 weeks"
+],
+[
+53.0,
+"Added Kareem Hunt (RB) in week 9 over Samaje Perine, kept 6 weeks"
+]
+],
+"worst": [
+[
+-13.9,
+"Added Luke Musgrave (TE) in week 10 over Juwan Johnson, kept 1 week"
+],
+[
+-11.0,
+"Added Giants (DEF) in week 5 over Texans, kept 1 week"
+],
+[
+-10.0,
+"Added Emanuel Wilson (RB) in week 7 over Woody Marks, kept 1 week"
+]
+]
+}
+},
 "draft": -169.42,
 "drops": 206.71,
 "g": 14,
@@ -692,11 +6356,139 @@
 "trades": 1,
 "waivers": 28
 },
+"ppw": 54.61,
 "team": "It's a Love Story",
 "trades": -22.03,
 "waivers": 402.52
 },
 "Dylan McMahon": {
+"dec": {
+"draft": {
+"best": [
+[
+110.2,
+"Took Michael Pittman Jr. (WR, pick 13.07). Best of the next five: Quinshon Judkins"
+],
+[
+104.1,
+"Took James Cook III (RB, pick 3.07). Best of the next five: Jaxon Smith-Njigba"
+],
+[
+76.8,
+"Took Josh Allen (QB, pick 4.04). Best of the next five: Davante Adams"
+]
+],
+"worst": [
+[
+-91.5,
+"Took Tank Bigsby (RB, pick 12.04). Best of the next five: Keenan Allen"
+],
+[
+-44.7,
+"Took Aaron Jones Sr. (RB, pick 8.04). Best of the next five: Jaylen Waddle"
+],
+[
+-35.7,
+"Took Jacory Croskey-Merritt (RB, pick 9.07). Best of the next five: Patrick Mahomes"
+]
+]
+},
+"drops": {
+"best": [
+[
+70.8,
+"Cut Tank Bigsby (RB) in week 4. He scored 17.7 in 10 games after"
+],
+[
+32.9,
+"Cut Ollie Gordon II (RB) in week 6. He scored 37.9 in 8 games after"
+],
+[
+29.6,
+"Cut David Njoku (TE) in week 6. He scored 40.8 in 7 games after"
+]
+],
+"worst": [
+[
+-21.6,
+"Cut Jaguars (DEF) in week 10. They scored 67.5 in 5 games after"
+],
+[
+-10.6,
+"Cut Eagles (DEF) in week 9. They scored 56.5 in 5 games after"
+],
+[
+-7.2,
+"Cut Cam Little (K) in week 12. He scored 30.0 in 3 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+12.9,
+"Week 10: started Aaron Jones Sr. 15.9 over Jacory Croskey-Merritt 3.0"
+],
+[
+12.5,
+"Week 7: started DeVonta Smith 33.3 over Michael Pittman Jr. 20.8"
+],
+[
+9.3,
+"Week 14: started Michael Pittman Jr. 16.9 over Aaron Jones Sr. 7.6"
+]
+],
+"worst": [
+[
+-3.0,
+"Week 4: started David Njoku 3.1 over Zach Ertz 6.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+32.6,
+"Week 4: got Chase Brown for DJ Moore, TreVeyon Henderson"
+],
+[
+0.4,
+"Week 12: got Tyler Warren, Christian Watson, Kyren Williams for Chase Brown, Justin Jefferson"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+43.9,
+"Added Matthew Stafford (QB) in week 4 over Jordan Love, kept 11 weeks"
+],
+[
+25.5,
+"Added Jaguars (DEF) in week 11 over Vikings, kept 3 weeks"
+],
+[
+12.5,
+"Added Eagles (DEF) in week 14 over Ravens, kept 1 week"
+]
+],
+"worst": [
+[
+-47.5,
+"Added Travis Hunter (WR) in week 6 over Wan'Dale Robinson, kept 6 weeks"
+],
+[
+-30.6,
+"Added Ollie Gordon II (RB) in week 4 over Kenny Gainwell, kept 2 weeks"
+],
+[
+-16.5,
+"Added Colts (DEF) in week 10 over Jets, kept 1 week"
+]
+]
+}
+},
 "draft": 116.16,
 "drops": 113.16,
 "g": 14,
@@ -708,11 +6500,143 @@
 "trades": 2,
 "waivers": 12
 },
+"ppw": 54.61,
 "team": "DylansVillans",
 "trades": 32.99,
 "waivers": -22.1
 },
 "Kevin Krueger": {
+"dec": {
+"draft": {
+"best": [
+[
+182.2,
+"Took Jaxon Smith-Njigba (WR, pick 3.09). Best of the next five: Josh Allen"
+],
+[
+85.8,
+"Took Puka Nacua (WR, pick 2.02). Best of the next five: De'Von Achane"
+],
+[
+82.2,
+"Took Quinshon Judkins (RB, pick 14.02). Best of the next five: Jayden Higgins"
+]
+],
+"worst": [
+[
+-78.3,
+"Took Brian Thomas Jr. (WR, pick 1.09). Best of the next five: Puka Nacua"
+],
+[
+-64.6,
+"Took Jaydon Blue (RB, pick 11.09). Best of the next five: Rachaad White"
+],
+[
+-53.6,
+"Took Jayden Reed (WR, pick 12.02). Best of the next five: Keenan Allen"
+]
+]
+},
+"drops": {
+"best": [
+[
+32.3,
+"Cut Dylan Sampson (RB) in week 5. He scored 47.3 in 9 games after"
+],
+[
+27.4,
+"Cut Jaydon Blue (RB) in week 1. He scored 8.0 in 4 games after"
+],
+[
+24.6,
+"Cut Joshua Palmer (WR) in week 2. He scored 34.1 in 7 games after"
+]
+],
+"worst": [
+[
+-42.9,
+"Cut Seahawks (DEF) in week 8. They scored 98.0 in 6 games after"
+],
+[
+-14.9,
+"Cut Harold Fannin Jr. (TE) in week 12. He scored 45.1 in 3 games after"
+],
+[
+-12.9,
+"Cut Jaxson Dart (QB) in week 9. He scored 67.1 in 3 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+8.0,
+"Week 11: started Cowboys 12.5 over Seahawks 4.5"
+],
+[
+1.2,
+"Week 5: started Quinshon Judkins 13.8 over Jordan Mason 12.6"
+]
+],
+"worst": [
+[
+-4.3,
+"Week 8: started Jordan Mason 1.6 over Rhamondre Stevenson 5.9"
+],
+[
+-3.9,
+"Week 7: started Xavier Worthy 7.8 over Jordan Mason 11.7"
+],
+[
+-1.3,
+"Week 4: started Jake Ferguson 17.0 over Tyler Warren 18.3"
+]
+]
+},
+"trades": {
+"best": [
+[
+101.3,
+"Week 9: got Jahmyr Gibbs for Brian Thomas Jr., Quinshon Judkins, Tyler Warren"
+],
+[
+14.7,
+"Week 8: got Chris Olave for Jake Ferguson"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+63.0,
+"Added Seahawks (DEF) in week 9 over Colts, kept 6 weeks"
+],
+[
+35.5,
+"Added Jauan Jennings (WR) in week 9 over Darnell Mooney, kept 6 weeks"
+],
+[
+31.7,
+"Added Rhamondre Stevenson (RB) in week 6 over Hassan Haskins, kept 8 weeks"
+]
+],
+"worst": [
+[
+-29.7,
+"Added Harold Fannin Jr. (TE) in week 9 over Mark Andrews, kept 3 weeks"
+],
+[
+-19.4,
+"Added Bhayshul Tuten (RB) in week 12 over Zonovan Knight, kept 2 weeks"
+],
+[
+-18.2,
+"Added Jordan Love (QB) in week 9 over Sam Darnold, kept 1 week"
+]
+]
+}
+},
 "draft": 196.25,
 "drops": 104.0,
 "g": 14,
@@ -724,11 +6648,143 @@
 "trades": 2,
 "waivers": 27
 },
+"ppw": 54.61,
 "team": "Hench",
 "trades": 116.05,
 "waivers": 95.68
 },
 "Nathan Wu": {
+"dec": {
+"draft": {
+"best": [
+[
+106.1,
+"Took George Pickens (WR, pick 6.08). Best of the next five: Emeka Egbuka"
+],
+[
+70.0,
+"Took Stefon Diggs (WR, pick 8.08). Best of the next five: Jaylen Warren"
+],
+[
+61.5,
+"Took Drake Maye (QB, pick 12.08). Best of the next five: Hollywood Brown"
+]
+],
+"worst": [
+[
+-93.2,
+"Took James Conner (RB, pick 5.03). Best of the next five: DK Metcalf"
+],
+[
+-72.4,
+"Took Evan Engram (TE, pick 9.03). Best of the next five: Travis Etienne Jr."
+],
+[
+-65.6,
+"Took Austin Ekeler (RB, pick 10.08). Best of the next five: Khalil Shakir"
+]
+]
+},
+"drops": {
+"best": [
+[
+29.5,
+"Cut Nick Chubb (RB) in week 8. He scored 32.4 in 7 games after"
+],
+[
+22.9,
+"Cut Elic Ayomanor (WR) in week 5. He scored 44.2 in 8 games after"
+],
+[
+15.2,
+"Cut Hassan Haskins (RB) in week 7. He scored 2.5 in 2 games after"
+]
+],
+"worst": [
+[
+-43.6,
+"Cut Seahawks (DEF) in week 4. They scored 135.5 in 10 games after"
+],
+[
+-33.0,
+"Cut Rams (DEF) in week 6. They scored 106.5 in 8 games after"
+],
+[
+-18.8,
+"Cut Harold Fannin Jr. (TE) in week 6. He scored 99.2 in 8 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+17.5,
+"Week 11: started George Pickens 29.4 over A.J. Brown 11.9"
+],
+[
+12.6,
+"Week 7: started A.J. Brown 28.1, Alvin Kamara 5.9 over Kimani Vidal 7.5, Stefon Diggs 13.9"
+],
+[
+8.7,
+"Week 4: started Drake Maye 23.2 over Justin Herbert 14.5"
+]
+],
+"worst": [
+[
+-11.6,
+"Week 9: started Broncos 9.5, Evan Engram 0.0 over Hunter Henry 9.1, Texans 12.0"
+],
+[
+-7.6,
+"Week 2: started Evan Engram 2.2 over Harold Fannin Jr. 9.8"
+],
+[
+-7.0,
+"Week 3: started Drake Maye 20.2, George Pickens 17.8 over Justin Herbert 15.6, David Montgomery 29.4"
+]
+]
+},
+"trades": {
+"best": [
+[
+20.2,
+"Week 12: got Chase Brown for Stefon Diggs, Alvin Kamara"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+68.2,
+"Added Kimani Vidal (RB) in week 6 over Hassan Haskins, kept 6 weeks"
+],
+[
+23.6,
+"Added Tyjae Spears (RB) in week 9 over Samaje Perine, kept 4 weeks"
+],
+[
+22.5,
+"Added Texans (DEF) in week 9 over Colts, kept 3 weeks"
+]
+],
+"worst": [
+[
+-37.3,
+"Added Hunter Henry (TE) in week 4 over Dallas Goedert, kept 7 weeks"
+],
+[
+-11.8,
+"Added Kendre Miller (RB) in week 7 over Woody Marks, kept 1 week"
+],
+[
+-11.5,
+"Added Rams (DEF) in week 5 over Texans, kept 1 week"
+]
+]
+}
+},
 "draft": 135.89,
 "drops": -14.41,
 "g": 14,
@@ -740,11 +6796,151 @@
 "trades": 1,
 "waivers": 28
 },
+"ppw": 54.61,
 "team": "U gotta BO-lieve",
 "trades": 20.25,
 "waivers": 63.42
 },
 "Nick Gearing": {
+"dec": {
+"draft": {
+"best": [
+[
+158.5,
+"Took Jahmyr Gibbs (RB, pick 1.06). Best of the next five: Chase Brown"
+],
+[
+49.6,
+"Took Deebo Samuel Sr. (WR, pick 9.06). Best of the next five: Patrick Mahomes"
+],
+[
+49.4,
+"Took Jalen Hurts (QB, pick 4.05). Best of the next five: Davante Adams"
+]
+],
+"worst": [
+[
+-120.7,
+"Took Calvin Ridley (WR, pick 6.05). Best of the next five: George Pickens"
+],
+[
+-83.6,
+"Took Jerome Ford (RB, pick 12.05). Best of the next five: Keenan Allen"
+],
+[
+-57.0,
+"Took Garrett Wilson (WR, pick 5.06). Best of the next five: Breece Hall"
+]
+]
+},
+"drops": {
+"best": [
+[
+64.1,
+"Cut Jerome Ford (RB) in week 2. He scored 42.1 in 12 games after"
+],
+[
+63.1,
+"Cut Jake Tonges (TE) in week 7. He scored 7.2 in 7 games after"
+],
+[
+61.4,
+"Cut Jake Tonges (TE) in week 6. He scored 19.0 in 8 games after"
+]
+],
+"worst": [
+[
+-41.8,
+"Cut Christian Watson (WR) in week 8. He scored 100.5 in 7 games after"
+],
+[
+-37.7,
+"Cut Christian Watson (WR) in week 9. He scored 88.0 in 6 games after"
+],
+[
+-24.4,
+"Cut Rams (DEF) in week 3. They scored 125.5 in 11 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+13.9,
+"Week 12: started Michael Wilson 21.8 over Woody Marks 7.9"
+],
+[
+7.9,
+"Week 5: started Keon Coleman 10.3 over Woody Marks 2.4"
+],
+[
+0.2,
+"Week 14: started Woody Marks 15.6 over Devin Neal 15.4"
+]
+],
+"worst": [
+[
+-15.9,
+"Week 1: started Calvin Ridley 6.7 over Deebo Samuel Sr. 22.6"
+],
+[
+-13.8,
+"Week 13: started Brian Thomas Jr. 4.8, Justin Jefferson 2.4 over Deebo Samuel Sr. 11.1, Devin Neal 9.9"
+],
+[
+-13.2,
+"Week 7: started Luke McCaffrey 0.0 over Romeo Doubs 13.2"
+]
+]
+},
+"trades": {
+"best": [],
+"worst": [
+[
+-101.3,
+"Week 9: got Brian Thomas Jr., Quinshon Judkins, Tyler Warren for Jahmyr Gibbs"
+],
+[
+-20.2,
+"Week 12: got Stefon Diggs, Alvin Kamara for Chase Brown"
+],
+[
+-0.4,
+"Week 12: got Chase Brown, Justin Jefferson for Tyler Warren, Christian Watson, Kyren Williams"
+]
+]
+},
+"waivers": {
+"best": [
+[
+78.4,
+"Added Michael Wilson (WR) in week 11 over Mack Hollins, kept 4 weeks"
+],
+[
+46.0,
+"Added Jason Myers (K) in week 9 over Harrison Butker, kept 6 weeks"
+],
+[
+22.5,
+"Added Lions (DEF) in week 4 over Chargers, kept 2 weeks"
+]
+],
+"worst": [
+[
+-43.4,
+"Added Romeo Doubs (WR) in week 6 over Wan'Dale Robinson, kept 7 weeks"
+],
+[
+-35.9,
+"Added Christian Watson (WR) in week 6 over Wan'Dale Robinson, kept 2 weeks"
+],
+[
+-18.5,
+"Added Buccaneers (DEF) in week 10 over Jets, kept 1 week"
+]
+]
+}
+},
 "draft": 34.79,
 "drops": 393.96,
 "g": 14,
@@ -756,11 +6952,139 @@
 "trades": 3,
 "waivers": 41
 },
+"ppw": 54.61,
 "team": "Kabul Gearing Bombers",
 "trades": -121.98,
 "waivers": 79.34
 },
 "Niko Contreras": {
+"dec": {
+"draft": {
+"best": [
+[
+155.0,
+"Took Christian McCaffrey (RB, pick 1.05). Best of the next five: Jahmyr Gibbs"
+],
+[
+74.4,
+"Took Jaylen Waddle (WR, pick 8.06). Best of the next five: Stefon Diggs"
+],
+[
+58.0,
+"Took Rome Odunze (WR, pick 10.06). Best of the next five: Khalil Shakir"
+]
+],
+"worst": [
+[
+-169.4,
+"Took Malik Nabers (WR, pick 2.06). Best of the next five: Jonathan Taylor"
+],
+[
+-111.5,
+"Took Jayden Daniels (QB, pick 4.06). Best of the next five: Davante Adams"
+],
+[
+-74.4,
+"Took Terry McLaurin (WR, pick 5.05). Best of the next five: Breece Hall"
+]
+]
+},
+"drops": {
+"best": [
+[
+45.1,
+"Cut Demarcus Robinson (WR) in week 6. He scored 22.0 in 8 games after"
+],
+[
+14.1,
+"Cut Chiefs (DEF) in week 12. They scored 13.5 in 3 games after"
+],
+[
+8.4,
+"Cut Matthew Golden (WR) in week 12. He scored 0.0 in 1 game after"
+]
+],
+"worst": [
+[
+-27.1,
+"Cut Kenny Gainwell (RB) in week 9. He scored 80.2 in 6 games after"
+],
+[
+-4.6,
+"Cut Alec Pierce (WR) in week 14. He scored 13.0 in 1 game after"
+],
+[
+-2.0,
+"Cut Jacoby Brissett (QB) in week 14. He scored 20.0 in 1 game after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+8.4,
+"Week 10: started Rome Odunze 20.6 over Wan'Dale Robinson 12.2"
+],
+[
+6.2,
+"Week 13: started Jacoby Brissett 20.6 over Baker Mayfield 14.5"
+],
+[
+4.8,
+"Week 3: started Rome Odunze 15.2 over Terry McLaurin 10.4"
+]
+],
+"worst": [
+[
+-8.5,
+"Week 5: started Demarcus Robinson 6.9 over J.K. Dobbins 15.4"
+],
+[
+-8.4,
+"Week 14: started Jayden Daniels 3.7 over Baker Mayfield 12.1"
+]
+]
+},
+"trades": {
+"best": [
+[
+4.8,
+"Week 11: got Rico Dowdle for Rome Odunze"
+]
+],
+"worst": []
+},
+"waivers": {
+"best": [
+[
+63.0,
+"Added Wan'Dale Robinson (WR) in week 7 over Elic Ayomanor, kept 8 weeks"
+],
+[
+20.0,
+"Added Jake Bates (K) in week 9 over Harrison Butker, kept 6 weeks"
+],
+[
+14.1,
+"Added Xavier Worthy (WR) in week 12 over Josh Downs, kept 3 weeks"
+]
+],
+"worst": [
+[
+-17.8,
+"Added Juwan Johnson (TE) in week 12 over Harold Fannin, kept 3 weeks"
+],
+[
+-7.0,
+"Added Chiefs (DEF) in week 7 over Dolphins, kept 5 weeks"
+],
+[
+-4.2,
+"Added Demarcus Robinson (WR) in week 5 over Tre Tucker, kept 1 week"
+]
+]
+}
+},
 "draft": -168.49,
 "drops": 55.47,
 "g": 14,
@@ -772,11 +7096,148 @@
 "trades": 1,
 "waivers": 17
 },
+"ppw": 54.61,
 "team": "Bring back Gmo",
 "trades": 4.75,
 "waivers": 124.62
 },
 "Shane Kaiper": {
+"dec": {
+"draft": {
+"best": [
+[
+83.1,
+"Took Tetairoa McMillan (WR, pick 5.02). Best of the next five: TreVeyon Henderson"
+],
+[
+60.9,
+"Took Kenneth Walker III (RB, pick 4.09). Best of the next five: Tetairoa McMillan"
+],
+[
+50.8,
+"Took Emeka Egbuka (WR, pick 7.02). Best of the next five: Chris Olave"
+]
+],
+"worst": [
+[
+-135.8,
+"Took Brandon Aiyuk (WR, pick 13.02). Best of the next five: Javonte Williams"
+],
+[
+-84.4,
+"Took Justin Fields (QB, pick 14.09). Best of the next five: Jayden Higgins"
+],
+[
+-82.1,
+"Took CeeDee Lamb (WR, pick 1.02). Best of the next five: Christian McCaffrey"
+]
+]
+},
+"drops": {
+"best": [
+[
+47.8,
+"Cut Commanders (DEF) in week 2. They scored 62.5 in 12 games after"
+],
+[
+33.7,
+"Cut Nick Chubb (RB) in week 4. He scored 54.8 in 10 games after"
+],
+[
+28.7,
+"Cut 49ers (DEF) in week 5. They scored 54.0 in 9 games after"
+]
+],
+"worst": [
+[
+-62.9,
+"Cut Cam Skattebo (RB) in week 2. He scored 124.8 in 7 games after"
+],
+[
+-51.0,
+"Cut Wan'Dale Robinson (WR) in week 6. He scored 118.1 in 8 games after"
+],
+[
+-21.6,
+"Cut Jaguars (DEF) in week 10. They scored 67.5 in 5 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+4.6,
+"Week 13: started Kimani Vidal 20.7 over Bucky Irving 16.1"
+],
+[
+3.6,
+"Week 2: started Kenneth Walker III 18.8 over Nick Chubb 15.2"
+]
+],
+"worst": [
+[
+-21.7,
+"Week 1: started Dak Prescott 7.8 over Justin Fields 29.5"
+],
+[
+-12.2,
+"Week 12: started Ricky Pearsall 2.8 over Jakobi Meyers 15.0"
+],
+[
+-1.8,
+"Week 14: started Alec Pierce 13.0 over Jakobi Meyers 14.8"
+]
+]
+},
+"trades": {
+"best": [
+[
+22.0,
+"Week 5: got Jerry Jeudy, Ashton Jeanty for Kenneth Walker III, Emeka Egbuka"
+]
+],
+"worst": [
+[
+-32.1,
+"Week 6: got Davante Adams, Rachaad White, Bucky Irving, Jakobi Meyers for TreVeyon Henderson, Jordan Addison, Matthew Golden, CeeDee Lamb"
+],
+[
+-5.7,
+"Week 4: got Mike Evans, Matthew Golden, TreVeyon Henderson for Jameson Williams, Trey Benson"
+]
+]
+},
+"waivers": {
+"best": [
+[
+31.0,
+"Added Eddy Pineiro (K) in week 6 over Matt Prater, kept 6 weeks"
+],
+[
+20.8,
+"Added Troy Franklin (WR) in week 8 over Jerry Jeudy, kept 7 weeks"
+],
+[
+12.1,
+"Added Trey Benson (RB) in week 2 over Austin Ekeler, kept 2 weeks"
+]
+],
+"worst": [
+[
+-19.5,
+"Added 49ers (DEF) in week 2 over Texans, kept 3 weeks"
+],
+[
+-19.0,
+"Added Lions (DEF) in week 10 over Jets, kept 1 week"
+],
+[
+-14.8,
+"Added Kyle Monangai (RB) in week 8 over Tyjae Spears, kept 1 week"
+]
+]
+}
+},
 "draft": 53.32,
 "drops": 51.1,
 "g": 14,
@@ -788,11 +7249,160 @@
 "trades": 3,
 "waivers": 34
 },
+"ppw": 54.61,
 "team": "Stegostompem",
 "trades": -15.77,
 "waivers": 15.04
 },
 "Wesley Alpert": {
+"dec": {
+"draft": {
+"best": [
+[
+73.6,
+"Took Tee Higgins (WR, pick 3.10). Best of the next five: Josh Allen"
+],
+[
+68.9,
+"Took Patrick Mahomes (QB, pick 9.10). Best of the next five: Tyler Warren"
+],
+[
+64.6,
+"Took Rachaad White (RB, pick 11.10). Best of the next five: Tyler Allgeier"
+]
+],
+"worst": [
+[
+-98.5,
+"Took Bucky Irving (RB, pick 1.10). Best of the next five: Puka Nacua"
+],
+[
+-58.9,
+"Took Matthew Golden (WR, pick 8.01). Best of the next five: Jaylen Waddle"
+],
+[
+-50.7,
+"Took Mike Evans (WR, pick 4.01). Best of the next five: Josh Allen"
+]
+]
+},
+"drops": {
+"best": [
+[
+47.9,
+"Cut Tyquan Thornton (WR) in week 4. He scored 36.0 in 10 games after"
+],
+[
+31.0,
+"Cut Mason Taylor (TE) in week 6. He scored 49.4 in 8 games after"
+],
+[
+29.1,
+"Cut Isaiah Davis (RB) in week 8. He scored 24.0 in 6 games after"
+]
+],
+"worst": [
+[
+-50.8,
+"Cut Wan'Dale Robinson (WR) in week 5. He scored 126.3 in 9 games after"
+],
+[
+-46.8,
+"Cut Wan'Dale Robinson (WR) in week 4. He scored 130.7 in 10 games after"
+],
+[
+-35.8,
+"Cut Jake Ferguson (TE) in week 3. He scored 146.4 in 11 games after"
+]
+]
+},
+"lineups": {
+"best": [
+[
+9.0,
+"Week 14: started Travis Etienne Jr. 21.2 over Courtland Sutton 12.2"
+],
+[
+5.0,
+"Week 5: started Courtland Sutton 17.9 over Chris Olave 12.9"
+],
+[
+2.8,
+"Week 6: started Travis Etienne Jr. 9.5 over Keenan Allen 6.7"
+]
+],
+"worst": [
+[
+-23.9,
+"Week 10: started DJ Moore 0.0 over Jameson Williams 23.9"
+],
+[
+-18.3,
+"Week 2: started J.J. McCarthy 4.8 over Patrick Mahomes 23.1"
+],
+[
+-14.4,
+"Week 13: started Rome Odunze 2.8 over Courtland Sutton 17.2"
+]
+]
+},
+"trades": {
+"best": [
+[
+80.8,
+"Week 5: got Travis Etienne Jr., Keenan Allen, Chris Olave, Javonte Williams for Bucky Irving, Rachaad White"
+],
+[
+5.7,
+"Week 4: got Jameson Williams, Trey Benson for Mike Evans, Matthew Golden, TreVeyon Henderson"
+]
+],
+"worst": [
+[
+-32.6,
+"Week 4: got DJ Moore, TreVeyon Henderson for Chase Brown"
+],
+[
+-14.7,
+"Week 8: got Jake Ferguson for Chris Olave"
+],
+[
+-4.8,
+"Week 11: got Rome Odunze for Rico Dowdle"
+]
+]
+},
+"waivers": {
+"best": [
+[
+97.3,
+"Added Rico Dowdle (RB) in week 5 over Emari Demercado, kept 6 weeks"
+],
+[
+19.7,
+"Added Blake Corum (RB) in week 14 over Zonovan Knight, kept 1 week"
+],
+[
+19.0,
+"Added Buccaneers (DEF) in week 8 over Texans, kept 1 week"
+]
+],
+"worst": [
+[
+-20.3,
+"Added Justin Fields (QB) in week 3 over Marcus Mariota, kept 1 week"
+],
+[
+-19.0,
+"Added Bills (DEF) in week 10 over Jets, kept 1 week"
+],
+[
+-18.0,
+"Added J.J. McCarthy (QB) in week 2 over Daniel Jones, kept 1 week"
+]
+]
+}
+},
 "draft": 70.54,
 "drops": 106.73,
 "g": 14,
@@ -804,6 +7414,7 @@
 "trades": 5,
 "waivers": 44
 },
+"ppw": 54.61,
 "team": "SNIPES",
 "trades": 34.49,
 "waivers": 40.68

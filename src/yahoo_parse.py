@@ -47,10 +47,12 @@ def games(year):
             for t in items(m['0']['teams']):
                 f = flat(t['team'][0]); s = t['team'][1]
                 side.append((T[f['team_key']]['name'], float(s['team_points']['total']),
-                             float(s['team_projected_points']['total']) if 'team_projected_points' in s else None))
+                             float(s['team_projected_points']['total']) if 'team_projected_points' in s else None,
+                             float(s['win_probability']) if s.get('win_probability') is not None else None))
             out.append(dict(wk=int(m['week']), status=m['status'], playoffs=m.get('is_playoffs') == '1',
                             consolation=m.get('is_consolation') == '1',
-                            ta=side[0][0], aa=side[0][1], pa=side[0][2], tb=side[1][0], ab=side[1][1], pb=side[1][2]))
+                            ta=side[0][0], aa=side[0][1], pa=side[0][2], tb=side[1][0], ab=side[1][1], pb=side[1][2],
+                            wpa=side[0][3], wpb=side[1][3]))
     return out
 
 def rosters(year):

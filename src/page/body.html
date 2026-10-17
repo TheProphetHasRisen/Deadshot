@@ -193,7 +193,7 @@
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
 <main id="main" class="wrap">
-  <div class="fact-strip" id="factStrip" hidden aria-live="polite"><span class="fact-k">Did you know</span><span class="fact-t" id="factText"></span><button type="button" class="fact-next" id="factNext" aria-label="Next fact">&#8250;</button></div>
+  <div class="fact-strip" id="factStrip" hidden aria-live="polite"><span class="fact-k">Did you know</span><span class="fact-t" id="factText"></span><span class="fact-count" id="factCount"></span><button type="button" class="fact-next" id="factPrev" aria-label="Previous fact">&#8249;</button><button type="button" class="fact-next" id="factNext" aria-label="Next fact">&#8250;</button></div>
 
   <section id="champions">
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to open that season’s page<br>with the winner’s run traced</div></div>
@@ -439,7 +439,7 @@
     <div class="sec-head"><h2>Front Office</h2><div class="rule-note" id="foNote"></div></div>
     <p class="lede" id="foLede"></p>
     <div class="card"><div class="card-h"><h3>The managers</h3><span class="sub" id="foMgrSub"></span></div><div class="scroll"><table id="tFoMgr"></table></div></div>
-    <div class="card" id="gmCard"><div class="card-h"><h3>GM report card</h3><span class="sub" id="gmSub"></span><div class="right"><div class="pills" id="gmYr"></div></div></div><div class="scroll"><table id="tGm"></table></div><p class="lv-trnote" id="gmNote" style="margin:0;padding:8px 18px 14px"></p></div>
+    <div class="card" id="gmCard"><div class="card-h"><h3>GM report card</h3><span class="sub" id="gmSub"></span><div class="right"><div class="pills" id="gmYr"></div></div></div><div class="scroll"><table id="tGm"></table></div><p class="lv-trnote" id="gmNote" style="margin:0;padding:8px 18px 6px"></p><div class="card-b" id="gmDet"></div></div>
     <div class="card"><div class="card-h"><h3>Best and worst lineup calls</h3><span class="sub" id="foCallSub"></span></div><div class="scroll"><table id="tFoCalls" class="fo-stack"></table></div></div>
     <div class="card"><div class="card-h"><h3>Best pickups</h3><span class="gl" data-gl="val" tabindex="0">?</span><span class="sub">Value at his position, in the weeks he started · quarterbacks, backs, receivers, tight ends</span></div><div class="scroll"><table id="tFoPick"></table></div></div>
     <div class="card"><div class="card-h"><h3>Best pickups: kickers and defenses</h3><span class="sub">Kept apart: every team streams them, so value against replacement flatters them</span></div><div class="scroll"><table id="tFoPickKD"></table></div></div>
@@ -527,6 +527,7 @@
 </div></div>
 <div class="lv-view" id="lvView" hidden><div class="wrap">
   <div class="lv-view-h"><span></span><button type="button" class="xbtn" id="lvClose" aria-label="Back to the record book">&#10005;</button></div>
+  <div class="lv-jump" id="lvJump" aria-label="Jump to a box"></div>
   <section id="live">
     <div class="sec-head"><h2 id="lvH">2026 <span class="lv-tag">Live</span></h2><div class="rule-note" id="lvNote"></div></div>
     <p class="lede" id="lvLede">The season so far. Its games already count in head to head; it joins the career tables and the rest of the record book once the final is played.</p>

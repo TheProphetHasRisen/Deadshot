@@ -359,6 +359,10 @@ if S26:
             out['crowd'] = crowd.build()
             # manager net points (netpts.py) is off the page while it is reworked (USER, 16 Oct 2026)
         import forecast; out['forecast'] = forecast.build()         # the rest of the live season, played out
+        try:   # our game predictions beside Yahoo's, kept every week to score both at the end (predlog.py)
+            import predlog; L_ = predlog.update(out['forecast']); out['forecast']['predLog'] = dict(score=predlog.score(L_), weeks=len(L_))
+        except Exception as e:
+            print('  (prediction log not updated: %s)' % str(e)[:120], file=sys.stderr)
     except Exception as e:
         print('  (against the crowd left out: %s)' % str(e)[:120], file=sys.stderr)   # stderr: deploy.sh hides stdout
     # the latest Rotowire headline, with its time, for every player Yahoo lists as hurt (news.py); left out if ESPN is unreachable
@@ -378,6 +382,16 @@ if S26:
         import report; out['report'] = report.build()
     except Exception as e:
         print('  (report card left out: %s)' % str(e)[:120], file=sys.stderr)
+    # what USER's model page reads live (lab/lab.js fetches it from the site repo, so the page on his Mac is
+    # current after every automatic update, not only after a deploy from the Mac)
+    try:
+        import datetime
+        feed = dict(asOf=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%MZ'), forecast=out.get('forecast'),
+                    statusLog=json.load(open('status_log.json')) if os.path.exists('status_log.json') else None,
+                    predLog=json.load(open('pred_log.json')) if os.path.exists('pred_log.json') else None)
+        json.dump(feed, open('lab_feed.json', 'w'), separators=(',', ':'), default=lambda o: round(o, 4) if isinstance(o, float) else o)
+    except Exception as e:
+        print('  (model page feed left out: %s)' % str(e)[:120], file=sys.stderr)
     # the backtest (backtest.py) is read by the model lab, mklab.py, which is USER's own page and never on the site
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))

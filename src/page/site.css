@@ -1604,3 +1604,22 @@ tr.inj-news details{margin:2px 0}
 tr.inj-news summary{cursor:pointer;font-size:12px;color:var(--ink-3)}
 /* the news stays in view on a phone, where the table scrolls sideways under it */
 tr.inj-news .inj-nw{position:sticky;left:9px;max-width:min(720px,calc(100vw - 96px));padding-left:12px;border-left:2px solid var(--rule-2)}
+/* the GM report card's detail: one manager, the decisions behind each grade */
+#gmDet .gm-who .pills{flex-wrap:wrap}
+#gmDet .gm-head{margin:12px 0 10px;font-size:15px}
+#gmDet .gm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px 22px}
+#gmDet .gm-sk{border-top:1px solid var(--rule-2);padding-top:10px}
+#gmDet .gm-sk-h{font-weight:700;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#gmDet .gm-sk-w{font-size:12px;margin:2px 0 4px}
+#gmDet .gm-l{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+#gmDet ul{margin:2px 0 0;padding-left:16px}
+#gmDet li{font-size:13px;line-height:1.45;margin:3px 0}
+#tGm .gm-open{padding:3px 9px;font-size:11px}
+.fact-strip .fact-count{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);white-space:nowrap;margin-left:auto}
+/* the 2026 page's row of boxes, under the masthead (the record book's nav is hidden there) */
+.lv-jump{display:none}
+body.lv-pg .lv-jump{display:flex;flex-wrap:wrap;gap:2px 4px;margin:0 0 6px;padding:6px 0;border-bottom:1px solid var(--rule-2)}
+.lv-jump a{padding:7px 10px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.lv-jump a:hover{color:var(--brass);border-bottom-color:var(--brass)}
+#lvView .card{scroll-margin-top:64px}
+@media(max-width:560px){body.lv-pg .lv-jump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}}

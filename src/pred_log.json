@@ -1,0 +1,58 @@
+{
+"6": {
+"asOf": "2026-10-17T08:36Z",
+"games": [
+{
+"ours": 0.4604,
+"oursA": 127.12,
+"oursB": 133.39,
+"ta": "The Curse",
+"tb": "Hench",
+"yahoo": 0.28,
+"yahooA": 116.28,
+"yahooB": 137.78
+},
+{
+"ours": 0.4667,
+"oursA": 133.3,
+"oursB": 138.55,
+"ta": "DylansVillans",
+"tb": "Poe's Palace",
+"yahoo": 0.41,
+"yahooA": 124.35,
+"yahooB": 139.48
+},
+{
+"ours": 0.5216,
+"oursA": 126.91,
+"oursB": 123.56,
+"ta": "It's a Love Story",
+"tb": "Medellin",
+"yahoo": 0.54,
+"yahooA": 119.6,
+"yahooB": 114.6
+},
+{
+"ours": 0.5014,
+"oursA": 132.17,
+"oursB": 131.89,
+"ta": "SNIPES",
+"tb": "Kabul Gearing Bombers",
+"yahoo": 0.52,
+"yahooA": 129.11,
+"yahooB": 125.48
+},
+{
+"ours": 0.5038,
+"oursA": 131.9,
+"oursB": 131.32,
+"ta": "Stegostompem",
+"tb": "U gotta BO-lieve",
+"yahoo": 0.47,
+"yahooA": 124.78,
+"yahooB": 128.64
+}
+],
+"late": true
+}
+}
