@@ -210,7 +210,7 @@ TRADEPOS = {'Ashton Jeanty': 'RB',
  'Rome Odunze': 'WR',
  'Tyler Warren': 'TE'}
 # when Yahoo was read (Pacific time, where the league lives)
-ASOF = 'Oct 16, 2026, 5:50 pm PT'
+ASOF = 'Oct 16, 2026, 5:58 pm PT'
 # every player on every roster every week: (week, team, player, position, slot, points);
 # slot BN is the bench and IR injured reserve, anything else started
 ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),

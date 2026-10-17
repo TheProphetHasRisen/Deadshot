@@ -355,6 +355,6 @@ if S26:
         import crowd
         if os.path.exists('yahoo_raw/league_keys.json'): out['crowd'] = crowd.build()
     except Exception as e:
-        print('  (against the crowd left out: %s)' % str(e)[:120])
+        print('  (against the crowd left out: %s)' % str(e)[:120], file=sys.stderr)   # stderr: deploy.sh hides stdout
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))

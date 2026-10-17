@@ -26,6 +26,27 @@ import yahoo_parse as P
 import teamfile as TF
 
 CALL_GAP, GUTSY, GEM, SLEEPER, SPOT = 20, 40, 70, 25, 50
+# finished seasons never change, so their % rostered and % started live in the repo (crowd_hist.json, ~1 MB):
+# the scheduled job then reads Yahoo only for the live season. Fetching every season on a fresh machine (about
+# 1,400 calls, after the ~1,200 of the season pull) was cut off and the section silently left the site (16 Oct 2026).
+HIST = 'crowd_hist.json'
+_hist = None
+def hist():
+    global _hist
+    if _hist is None:
+        _hist = {int(y): {int(w): {k: tuple(v) for k, v in d.items()} for w, d in ws.items()}
+                 for y, ws in (json.load(open(HIST)).items() if os.path.exists(HIST) else [])}
+    return _hist
+
+def save_hist():
+    """write crowd_hist.json from the cached weekly files of every finished season"""
+    out = {}
+    for y in TF.YEARS:
+        if y == TF.LIVE: continue
+        fs = sorted(f for f in os.listdir('yahoo_raw/%d' % y) if f.startswith('pct_w'))
+        if fs: out[str(y)] = {f[5:-5]: json.load(open('yahoo_raw/%d/%s' % (y, f))) for f in fs}
+    json.dump(out, open(HIST, 'w'), separators=(',', ':'))
+    return {y: len(v) for y, v in out.items()}
 
 def _get(path):
     import yahoo_api as Y
@@ -46,6 +67,17 @@ def _pull(K, keys, what, wk):
     return out
 
 def fetch(y, refresh_from=None):
+    if y != TF.LIVE and y in hist(): return hist()[y]
+    try:
+        return _fetch(y, refresh_from)
+    except Exception as e:   # Yahoo unreachable or throttling: what was read before still counts
+        import sys; print('  (crowd: Yahoo read for %d failed, using the weeks already saved: %s)' % (y, str(e)[:100]), file=sys.stderr)
+        out = {}
+        for f in os.listdir('yahoo_raw/%d' % y):
+            if f.startswith('pct_w'): out[int(f[5:-5])] = {k: tuple(v) for k, v in json.load(open('yahoo_raw/%d/%s' % (y, f))).items()}
+        return out
+
+def _fetch(y, refresh_from=None):
     """% rostered and % started for every player on a Deadshot roster each regular-season week, and for
     every player added in the four weeks before (so a pickup's rise is visible after he is cut).
     Finished weeks are cached; refresh_from re-reads that week and later (the live season's current week)."""
@@ -166,14 +198,18 @@ def build():
     years = list(TF.YEARS)
     mg, calls, gutsy, gems, sleepers, spots, weeks = {}, [], [], [], [], [], {}
     for y in years:
-        # the live season re-reads its last finished week and the week being set (lineups change until kickoff)
-        last = max([g['wk'] for g in P.games(y) if g['status'] == 'postevent'] or [1]) if y == TF.LIVE else None
-        PCT = fetch(y, refresh_from=last)
-        if not PCT: continue
-        M, c, g, gm, sl, sp = season(y, PCT)
+        try:
+            # the live season re-reads its last finished week and the week being set (lineups change until kickoff)
+            last = max([g['wk'] for g in P.games(y) if g['status'] == 'postevent'] or [1]) if y == TF.LIVE else None
+            PCT = fetch(y, refresh_from=last)
+            if not PCT: continue
+            M, c, g, gm, sl, sp = season(y, PCT)
+        except Exception as e:   # one season failing never takes the others off the page
+            import sys; print('  (crowd: %d left out: %s)' % (y, str(e)[:120]), file=sys.stderr); continue
         for m, Z in M.items(): mg.setdefault(m, {})[y] = {k: round(v, 2) if isinstance(v, float) else v for k, v in Z.items()}
         calls += c; gutsy += g; gems += gm; sleepers += sl; spots += sp
         weeks[y] = len({c_['wk'] for c_ in c} | {x['wk'] for x in g})
+    years = [y for y in years if y in weeks]
     # each list keeps its top rows per season, so the page can show any one season or all of them
     def top(rows, key, n=15):
         out = []
