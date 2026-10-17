@@ -1546,6 +1546,7 @@ body.sy-pg #syView{padding-top:8px}
 .fold-bar button{padding:7px 14px;font-size:11.5px}
 .sec-head .sec-fold-btn{align-self:center;margin-left:12px;padding:5px 11px;font-size:11px;white-space:nowrap}
 .sec-head h2+.sec-fold-btn{margin-left:auto}
+.sec-head .sec-all-btn+.sec-fold-btn{margin-left:6px}
 #syView #live>.fold-bar{display:none}
 section.sec-shut{padding-top:26px}
 /* a Greek letter in an uppercased header stays itself: σ became Σ ("sum"), λ became Λ */
@@ -1554,7 +1555,7 @@ section.sec-shut{padding-top:26px}
 section.sec-shut>.sec-head{margin-bottom:0}
 /* on a phone the heading and its button share a line, and the small note drops beneath them */
 @media (max-width:560px){.sec-head{flex-wrap:wrap;row-gap:4px}.sec-head .sf-w{display:none}
-  .sec-head .sec-fold-btn{order:1;margin-left:auto}.sec-head .rule-note{order:2;flex-basis:100%;margin-left:0;text-align:left}}
+  .sec-head .sec-fold-btn{order:1;margin-left:auto}.sec-head .sec-all-btn+.sec-fold-btn{margin-left:6px}.sec-head .rule-note{order:2;flex-basis:100%;margin-left:0;text-align:left}}
 #lvView .fold-bar{margin-top:4px}
 /* the Front Office's trade tables on a phone: each deal stacks into a block (season and date, one side and its
    value, the other side and its value, the verdict) instead of seven squeezed columns */

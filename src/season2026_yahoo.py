@@ -25,11 +25,11 @@ W2026 = [(1, 'The Curse', 114.72, 108.83, 'SNIPES', 106.86, 123.06, ''),
  (5, "It's a Love Story", 116.4, 120.55, 'SNIPES', 149.34, 132.54, ''),
  (5, 'Hench', 125.34, 129.88, 'Medellin', 120.08, 126.5, ''),
  (5, 'Kabul Gearing Bombers', 148.5, 132.24, 'Stegostompem', 179.16, 123.15, '')]
-UPCOMING2026 = {6: [('The Curse', 116.3, 'Hench', 137.84, 5.2, 0.0, 'midevent'),
-     ('DylansVillans', 124.33, "Poe's Palace", 139.59, 25.4, 0.0, 'midevent'),
-     ("It's a Love Story", 119.76, 'Medellin', 114.07, 0.0, 0.0, 'midevent'),
-     ('SNIPES', 129.12, 'Kabul Gearing Bombers', 125.51, 7.0, 7.0, 'midevent'),
-     ('Stegostompem', 124.82, 'U gotta BO-lieve', 128.77, 0.0, 0.0, 'midevent')]}
+UPCOMING2026 = {6: [('The Curse', 116.3, 'Hench', 137.78, 5.2, 0.0, 'midevent'),
+     ('DylansVillans', 124.37, "Poe's Palace", 139.52, 25.4, 0.0, 'midevent'),
+     ("It's a Love Story", 119.58, 'Medellin', 113.92, 0.0, 0.0, 'midevent'),
+     ('SNIPES', 129.09, 'Kabul Gearing Bombers', 125.48, 7.0, 7.0, 'midevent'),
+     ('Stegostompem', 124.79, 'U gotta BO-lieve', 128.78, 0.0, 0.0, 'midevent')]}
 STANDINGS2026_WK5 = {'DylansVillans': (3, 3, 2, 0, 690.3, 606.7, 'L1', 7, 10),
  'Hench': (5, 3, 2, 0, 613.98, 698.02, 'W3', 5, 19),
  "It's a Love Story": (10, 1, 4, 0, 591.36, 662.32, 'L4', 10, 9),
@@ -210,7 +210,7 @@ TRADEPOS = {'Ashton Jeanty': 'RB',
  'Rome Odunze': 'WR',
  'Tyler Warren': 'TE'}
 # when Yahoo was read (Pacific time, where the league lives)
-ASOF = 'Oct 16, 2026, 6:02 pm PT'
+ASOF = 'Oct 16, 2026, 9:20 pm PT'
 # every player on every roster every week: (week, team, player, position, slot, points);
 # slot BN is the bench and IR injured reserve, anything else started
 ROSTERS2026 = [(1, 'DylansVillans', 'Breece Hall', 'RB', 'RB', 19.8),

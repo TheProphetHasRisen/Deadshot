@@ -17,8 +17,10 @@ What it measures, regular season only, like everything else on the site:
              have replaced, who outscored that starter.
   sleepers   a pickup who was on fewer than 25% of Yahoo rosters the week before he was added (the week of the add
              already counts everyone grabbing him), and started at least twice for the team that added him.
-  spot       a spot start (Brian's): a starter fewer than 50% of Yahoo started who scored at least twice his own
-             points a game up to that week (two or more games played before it).
+  spot       a spot start (Brian's): a starter fewer than 50% of Yahoo started who scored at least twice his
+             projection that week (projected 5 or more; Sleeper's projection, scored with the league's rules).
+  pcalls     every lineup call against the projections, crowd or not: he started a player projected at least 3
+             points below a benched one who could have filled the slot. Won if his man outscored the projected one.
   chalk      the average % started of a manager's starters: how closely his lineups follow the crowd.
 """
 import json, os
@@ -126,25 +128,15 @@ def season(y, PCT):
         for pos in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF'):
             xs = sorted(r['pts'] or 0 for (t, ww), rs in by.items() if ww == w for r in rs if r['started'] and (r['pos'] or '').split(',')[0] == pos)
             if xs: line[(w, pos)] = xs[len(xs) // 2] if len(xs) % 2 else (xs[len(xs) // 2 - 1] + xs[len(xs) // 2]) / 2
-    # every player's own scoring week by week (Sleeper, the league's rules), for spot starts
-    if y == TF.LIVE:
-        dp = json.load(open('draft_points.json')) if os.path.exists('draft_points.json') else {}
-        wkl = dp.get('wk%d' % y) or {}
-        line_of = lambda r: wkl.get(r['n'])
-    else:
-        import sleeper_season as SL
-        bk, _, _ = SL.weekly(y)
-        line_of = lambda r: SL.lookup(bk, r['n'], r['pos'], r['nfl'])[1]
-    def before(r):
-        ln = line_of(r)
-        if not ln: return None
-        xs = [v for v in ln[:r['wk'] - 1] if v is not None]
-        return sum(xs) / len(xs) if len(xs) >= 2 else None
-    M = {}; calls, gutsy, gems, spots = [], [], [], []
+    # every player's projection for the week (Sleeper's, scored with the league's rules)
+    import projections as PR
+    _pj = PR.lookup(y, live=(y == TF.LIVE))
+    pj = lambda r: _pj(r['n'], r['pos'], r['nfl'], r['wk'])
+    M = {}; calls, gutsy, gems, spots, pcalls = [], [], [], [], []
     for (team, w), rs in by.items():
         m = TF.mgr_of(y, team)
         if not m: continue
-        Z = M.setdefault(m, dict(starts=0, chalk=0.0, chalkN=0, cW=0, cL=0, cNet=0.0, gN=0, gHit=0, gPts=0.0, gNet=0.0, gemN=0, gemPts=0.0, slN=0, slPts=0.0, spN=0, spPts=0.0))
+        Z = M.setdefault(m, dict(starts=0, chalk=0.0, chalkN=0, cW=0, cL=0, cNet=0.0, gN=0, gHit=0, gPts=0.0, gNet=0.0, gemN=0, gemPts=0.0, slN=0, slPts=0.0, spN=0, spPts=0.0, pW=0, pL=0, pNet=0.0))
         start = [r for r in rs if r['started']]; bench = [r for r in rs if r['slot'] == 'BN']
         for s in start:
             Z['starts'] += 1; ps = S(s)
@@ -156,18 +148,27 @@ def season(y, PCT):
                 if S(b) - ps >= CALL_GAP:
                     d = (s['pts'] or 0) - (b['pts'] or 0)
                     Z['cW'] += d > 0; Z['cL'] += d < 0; Z['cNet'] += d
-                    calls.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], ps=ps, pts=s['pts'] or 0, over=b['n'], opos=b['pos'], pb=S(b), opts=b['pts'] or 0, d=round(d, 2)))
+                    calls.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], ps=ps, pts=s['pts'] or 0, pj=pj(s), over=b['n'], opos=b['pos'], pb=S(b), opts=b['pts'] or 0, opj=pj(b), d=round(d, 2)))
+            # against the projections, whatever the crowd did: the benched player projected highest at this slot
+            pa = [b for b in bench if TF.eligible(b['pos'], s['slot']) and pj(b) is not None]
+            if pj(s) is not None and pa:
+                b = max(pa, key=pj)
+                if pj(b) - pj(s) >= 3:
+                    d = (s['pts'] or 0) - (b['pts'] or 0)
+                    Z['pW'] += d > 0; Z['pL'] += d < 0; Z['pNet'] += d
+                    pcalls.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], pj=pj(s), pts=s['pts'] or 0, ps=ps,
+                                       over=b['n'], opos=b['pos'], opj=pj(b), opts=b['pts'] or 0, pb=S(b), d=round(d, 2)))
             if ps is not None and ps < SPOT:
-                avg = before(s)
-                if avg and avg > 0 and (s['pts'] or 0) >= 2 * avg:
-                    Z['spN'] += 1; Z['spPts'] += (s['pts'] or 0) - avg
-                    spots.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], ps=ps, pts=s['pts'] or 0, avg=round(avg, 2), x=round((s['pts'] or 0) / avg, 2)))
+                pr = pj(s)
+                if pr is not None and pr >= 5 and (s['pts'] or 0) >= 2 * pr:
+                    Z['spN'] += 1; Z['spPts'] += (s['pts'] or 0) - pr
+                    spots.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], ps=ps, pts=s['pts'] or 0, avg=round(pr, 2), x=round((s['pts'] or 0) / pr, 2)))
             if ps is not None and ps < GUTSY:
                 p0 = (s['pos'] or '').split(',')[0]; ln = line.get((w, p0))
                 if ln is not None:
                     Z['gN'] += 1; hit = (s['pts'] or 0) > ln; Z['gHit'] += hit; Z['gNet'] += (s['pts'] or 0) - ln
                     if hit: Z['gPts'] += (s['pts'] or 0) - ln
-                    gutsy.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], ps=ps, pts=s['pts'] or 0, line=round(ln, 2), hit=hit, over=round((s['pts'] or 0) - ln, 2)))
+                    gutsy.append(dict(y=y, wk=w, m=m, team=team, n=s['n'], pos=s['pos'], ps=ps, pts=s['pts'] or 0, pj=pj(s), line=round(ln, 2), hit=hit, over=round((s['pts'] or 0) - ln, 2)))
         for b in bench:
             pb = S(b)
             if pb is None or pb < GEM: continue
@@ -177,7 +178,7 @@ def season(y, PCT):
             if (b['pts'] or 0) > (s['pts'] or 0):
                 lost = (b['pts'] or 0) - (s['pts'] or 0)
                 Z['gemN'] += 1; Z['gemPts'] += lost
-                gems.append(dict(y=y, wk=w, m=m, team=team, n=b['n'], pos=b['pos'], pb=pb, pts=b['pts'] or 0, over=s['n'], ps=S(s), spts=s['pts'] or 0, lost=round(lost, 2)))
+                gems.append(dict(y=y, wk=w, m=m, team=team, n=b['n'], pos=b['pos'], pb=pb, pts=b['pts'] or 0, pj=pj(b), over=s['n'], ps=S(s), spts=s['pts'] or 0, spj=pj(s), lost=round(lost, 2)))
     # sleepers: pickups the crowd had barely noticed the week they were added
     sleepers = []
     M_, L = TF.season(y)
@@ -192,22 +193,22 @@ def season(y, PCT):
         if Z: Z['slN'] += 1; Z['slPts'] += p['pts']
         sleepers.append(dict(y=y, wk=p['wk'], d=p['d'], m=p['m'], team=p['team'], n=p['n'], pos=p['pos'], own=own, later=max(later) if later else None,
                              starts=p['starts'], pts=p['pts'], val=p['val']))
-    return M, calls, gutsy, gems, sleepers, spots
+    return M, calls, gutsy, gems, sleepers, spots, pcalls
 
 def build():
     years = list(TF.YEARS)
-    mg, calls, gutsy, gems, sleepers, spots, weeks = {}, [], [], [], [], [], {}
+    mg, calls, gutsy, gems, sleepers, spots, pcalls, weeks = {}, [], [], [], [], [], [], {}
     for y in years:
         try:
             # the live season re-reads its last finished week and the week being set (lineups change until kickoff)
             last = max([g['wk'] for g in P.games(y) if g['status'] == 'postevent'] or [1]) if y == TF.LIVE else None
             PCT = fetch(y, refresh_from=last)
             if not PCT: continue
-            M, c, g, gm, sl, sp = season(y, PCT)
+            M, c, g, gm, sl, sp, pc = season(y, PCT)
         except Exception as e:   # one season failing never takes the others off the page
             import sys; print('  (crowd: %d left out: %s)' % (y, str(e)[:120]), file=sys.stderr); continue
         for m, Z in M.items(): mg.setdefault(m, {})[y] = {k: round(v, 2) if isinstance(v, float) else v for k, v in Z.items()}
-        calls += c; gutsy += g; gems += gm; sleepers += sl; spots += sp
+        calls += c; gutsy += g; gems += gm; sleepers += sl; spots += sp; pcalls += pc
         weeks[y] = len({c_['wk'] for c_ in c} | {x['wk'] for x in g})
     years = [y for y in years if y in weeks]
     # each list keeps its top rows per season, so the page can show any one season or all of them
@@ -220,6 +221,7 @@ def build():
                 best=top([c for c in calls if c['d'] > 0], lambda x: -x['d']), worst=top([c for c in calls if c['d'] < 0], lambda x: x['d']),
                 gutsy=top([x for x in gutsy if x['hit']], lambda x: -x['over']),
                 spots=top(spots, lambda x: -(x['pts'] - x['avg'])),
+                pbest=top([c for c in pcalls if c['d'] > 0], lambda x: -x['d']), pworst=top([c for c in pcalls if c['d'] < 0], lambda x: x['d']),
                 gems=top(gems, lambda x: -x['lost']),
                 sleepers=top([x for x in sleepers if not kd(x)], lambda x: -(x['val'] or 0)),
                 sleepersKD=top([x for x in sleepers if kd(x)], lambda x: -(x['val'] or 0), 6),

@@ -328,8 +328,15 @@ if S26:
         if os.path.exists('yahoo_raw/2026/rank_QB_0.json'):
             import teamfile
             repl = teamfile.replacement(2026, int(dp['weeks']['2026']))
-        return wire2026.grade(S26, dp.get('wk2026') or {}, int(dp['weeks']['2026']), games,
-                              dp.get('allwk2026'), repl)
+        W = wire2026.grade(S26, dp.get('wk2026') or {}, int(dp['weeks']['2026']), games,
+                           dp.get('allwk2026'), repl)
+        # trade grading 2.0, side by side with the current way while Brian compares them (trade2.py)
+        try:
+            import trade2
+            for x, g in zip(W['trades'], trade2.grade(2026, W['trades'], W['played'])): x['v2'] = g
+        except Exception as e:
+            print('  (trade 2.0 left out: %s)' % str(e)[:120], file=sys.stderr)
+        return W
     up = [dict(wk=wk, ta=u[0], pa=u[1], tb=u[2], pb=u[3], aa=u[4] if len(u) > 4 else None, ab=u[5] if len(u) > 5 else None,
                status=u[6] if len(u) > 6 else 'preevent') for wk, lst in S26.UPCOMING2026.items() for u in lst]
     out['live'] = dict(year=2026, weeks=weeks, regWeeks=14, mgr=S26.MGR2026, games=games, standings=stand, upcoming=up,
