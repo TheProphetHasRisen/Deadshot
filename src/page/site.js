@@ -210,6 +210,9 @@ const GLOSS={
    `<b>The easy version.</b> This season an extra 65 points or so adds up to about one extra win. So a trade that gives one side 6.5 more points a week than the other is worth about <b>0.1 wins a week</b>, or about <b>1 win over 10 weeks</b>.<br><br>`+
    `<b>Where 65 comes from.</b> Weekly scores this season spread out by about 26 points either side of average (the standard deviation, σ). Near an average score, one more point raises the chance of beating a typical opponent by 0.399 ÷ σ, the height of a bell curve at its middle divided by its spread. Flip that over: σ ÷ 0.399 ≈ 26 ÷ 0.399 ≈ <b>65 points per win</b>. It updates every week as more scores come in.<br><br>`+
    `On a trade card the edge is the gap between the two sides in <b>value at position</b> a week since the deal: each player’s points in the weeks he started for his new team, over a replacement-level starter at his position. That is baseball’s WAR (wins above replacement) for a trade.`,
+ netpts:`<b>Manager net points</b><br>Every point a manager’s lineups scored came from a player he drafted, picked up or traded for. Each column is what that source gave him against the league’s average manager that season, so <b>draft + pickups + trades</b> squares with his scoring.<br><br>`+
+   `<b>Lineups</b> is his start/sit calls against the crowd’s: the same roster each week, every slot given to whoever Yahoo started most. It is judged with what was known that week, not hindsight.<br><br>`+
+   `All four are points, so the total adds them unweighted. The sliders weight them (0 leaves one out, 2 counts it double). <b>In wins</b> turns the total into wins at each season’s points per win. A trader who sends away his draft picks shows a lower draft and a higher trades figure; whether each deal helped is trade grading, not this.`,
  crowd:`<b>Against the crowd</b><br>Yahoo publishes, every week, the share of all its leagues that started each player (<b>% started</b>) and that had him rostered (<b>% rostered</b>).<br><br>`+
    `<b>Chalk</b>: the average % started of a manager’s starters. High means his lineups look like everyone else’s.<br><br>`+
    `<b>Call against the crowd</b>: he started a player over a benched one at the same slot whom Yahoo started at least 20 points more often. Won if his man outscored the crowd’s; <b>net</b> is the points the calls made or cost.<br><br>`+
@@ -222,10 +225,11 @@ const GLOSS={
  xwin:`<b>Wins against the pre-trade pace</b><br>How a team has done since a trade, against how it was playing before it.<br><br>`+
    `Its pace is its all-play rate before the deal: the share of the league it outscored each week. Over the games since, that pace expects <b>pace × games</b> wins; actual wins since minus that is the figure. <b>+1.4</b> means 1.4 wins better than the team was playing before.<br><br>`+
    `A pace from a week or two can be a fluke, so treat early figures loosely.`,
- model:`<b>Playoff odds</b><br>A model, rerun every week.<br><br>`+
-   `<b>Step 1, a regression.</b> For every team in every season Yahoo reaches, compare its points a game over the first weeks (as many as have been played this year) with its points a game over the rest of that regular season. The fitted line says how much of a hot or cold start carries on: a slope of 0.5 means half of it does, and the other half fades back toward the league average.<br><br>`+
-   `<b>Step 2, a simulation.</b> Each team gets the scoring level that line predicts. The rest of the real schedule is then played ${SIMRUNS} times, every team scoring around its level with the week-to-week swing history shows. The top six make the playoffs, the top two get byes, and the bracket is played out.<br><br>`+
-   `<b>Expected points a week</b> is that level. <b>Playoffs, bye, title</b> are the share of the ${SIMRUNS} runs it happened in.`,
+ model:`<b>The forecast</b><br>Rerun every time the site updates.<br><br>`+
+   `<b>Each team, each week left.</b> His expected score is the league average, plus part of how his projected best lineup that week compares with everyone else’s, plus part of how he has scored so far. The lineup is built from the players on his roster now, each with that week’s projection scored the league’s way, so a player out hurt, suspended or on a bye counts nothing until the week he is projected back, and an IR stash is in it once he is.<br><br>`+
+   `<b>How much of each.</b> Fitted on every season Yahoo reaches, with the same number of weeks played. In this league a week’s score is close to a coin flip around the average, so both are shrunk hard, and every score swings around its expected value by the spread history leaves.<br><br>`+
+   `<b>The season, played out.</b> The real schedule, ${SIMRUNS} times. Ties go on points for, as Yahoo has seeded every tie since 2021. The top six make it, the top two get byes, and the bracket re-seeds after the first round. Every figure is the share of the runs it happened in; <b>with a win / with a loss</b> splits those runs on this week’s result.`,
+ need:`<b>What each team needs</b><br>From the simulated seasons: of the runs in which he finished with a given number of wins, the share in which he made the playoffs. <b>Wins for 50%</b> is the fewest wins that got him in at least half the time; in brackets, how many of the games left that takes. Schedule left: his opponents’ expected scores against the league’s average, plus means harder.`,
  waa:`<b>Wins above average</b><br>The league’s nearest thing to baseball’s WAR for a manager.<br><br>`+
    `Each week a team’s score is set against all nine others (its all-play record). An average team beats half of them. Wins above average = (all-play rate − 0.500) × games. <b>+2.0</b> means his scoring earned two more wins than an average team’s would have, whatever the schedule did.`,
  eff:`<b>Lineup efficiency</b><br>Points his lineup scored, out of the most it could have.<br><br>`+
@@ -5210,6 +5214,74 @@ let openSeason=null;
     fillEmpty(el);};
   draw(); REDRAW.push(draw);
 })();
+/* ============ the forecast (forecast.py): the rest of the season played 100,000 times ============ */
+function drawForecast(FC,L){
+  const T=FC.teams, by={}; T.forEach(t=>{by[t.team]=t;});
+  const tm=t=>`<b>${esc(t.team)}</b> <span class="dim">${esc(t.mgr||'')}</span>`, wk=FC.next, left=FC.regWeeks-FC.played;
+  const ks=Object.keys(FC.history).map(Number).sort((a,b)=>a-b);
+  /* a small line of his playoff odds after each week played, re-run with what was known then */
+  const spark=t=>{const v=ks.map(k=>FC.history[k][t.team]?FC.history[k][t.team].po:null).filter(x=>x!=null); if(v.length<2)return '';
+    const W=70,H=18, xs=v.map((_,i)=>i*W/(v.length-1)), ys=v.map(x=>H-1-x*(H-2));
+    return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true" style="vertical-align:middle"><polyline fill="none" stroke="var(--brass)" stroke-width="1.6" points="${xs.map((x,i)=>x.toFixed(1)+','+ys[i].toFixed(1)).join(' ')}"/></svg>`;};
+  $('#lvOddsSub').textContent=`${FC.runs.toLocaleString()} simulated finishes of the ${nOf(left,'week')} left · rerun every update · the line is his odds after each week played`;
+  $('#tLiveOdds').innerHTML='<thead><tr><th>Team</th><th class="num">Record</th><th class="num">Projected wins</th><th class="num">Playoffs</th><th></th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
+    T.map(t=>`<tr><td>${tm(t)}</td><td class="num">${t.w}–${t.l}</td><td class="num">${f(t.wins,1)}</td><td class="num"><b>${pct(t.po)}</b></td><td>${spark(t)}</td><td class="num">${pct(t.bye)}</td><td class="num">${pct(t.title)}</td></tr>`).join('')+'</tbody>';
+  /* this week: each matchup, expected scores and the chance each way, and what it does to the odds */
+  const G=FC.games.filter(g=>g.wk===wk);
+  $('#lvFcWeekSub').textContent=`week ${wk} · expected scores from projected lineups and form, and what a win or a loss does to each side’s playoff odds`;
+  $('#lvFcWeekB').innerHTML=G.map(g=>{const a=by[g.ta], b=by[g.tb], pa=g.pA;
+    const side=(t,p,mu)=>`<div><div>${tm(t)}</div><div class="dim" style="font-size:12.5px;margin-top:2px">${t.w}–${t.l} · expected <b style="color:var(--ink)">${f(mu,1)}</b> · <b style="color:var(--ink)">${pct(p)}</b> to win</div><div class="dim" style="font-size:12.5px">playoffs: ${pct(t.ifWin)} with a win, ${pct(t.ifLose)} with a loss</div></div>`;
+    return `<div class="lv-trg" style="padding:12px 0;border-bottom:1px solid var(--rule-2)">${side(a,pa,g.muA)}${side(b,1-pa,g.muB)}</div>`;}).join('')+`<p class="lv-trnote">The biggest swing this week: ${(()=>{const s=T.slice().sort((x,y)=>(y.ifWin-y.ifLose)-(x.ifWin-x.ifLose))[0]; return `${esc(s.team)}, ${pct(s.ifLose)} to ${pct(s.ifWin)}`;})()}.</p>`;
+  /* what each team needs: the playoff odds at each final win total, and the total for 50%, 80% and 95% */
+  const maxW=FC.played+left;
+  $('#lvFcNeedSub').textContent=`playoff odds at each final win total, from the simulations · ${nOf(left,'game')} left`;
+  /* only the win totals where something is still decided: a column of 0% or 100% for everyone says nothing */
+  const pAt=(t,w)=>{const c=t.byWins[w]; return c&&c[0]>=50?c[1]/c[0]:null;};
+  const wsAll=[...new Set(T.flatMap(t=>Object.keys(t.byWins).map(Number)))].sort((a,b)=>a-b).filter(w=>w<=maxW&&T.some(t=>{const v=pAt(t,w); return v!=null&&v>0.01&&v<0.99;}));
+  const heat=v=>{const bg=mix(cssv('--surface'),cssv('--brass'),Math.pow(v,.8)*.85); return `background:${bg};color:${pickInk(bg)}`;};
+  $('#tFcNeed').innerHTML='<thead><tr><th>Team</th><th class="num">Now</th><th class="num">Wins for 50%</th><th class="num">80%</th><th class="num">95%</th><th class="num">Schedule left</th>'+wsAll.map(w=>`<th class="num">${w} W</th>`).join('')+'</tr></thead><tbody>'+
+    T.map(t=>{const nd=t.need||{}, cnt=w=>t.byWins[w]; const need=k=>{const w=nd[k]; return w==null?'<span class="dim">out of reach</span>':`${w} <span class="dim">(${Math.max(0,w-t.w)} of ${left})</span>`;};
+      return `<tr><td>${tm(t)}</td><td class="num">${t.w}–${t.l}</td><td class="num">${need('0.5')}</td><td class="num">${need('0.8')}</td><td class="num">${need('0.95')}</td><td class="num">${t.sos==null?'—':`<span class="${t.sos>0?'lv-bust':'lv-steal'}" title="His opponents’ expected scores against the league’s: plus is harder">${sg(t.sos,1)}</span>`}</td>`+
+        wsAll.map(w=>{const c=cnt(w); if(!c||c[0]<50)return '<td class="num dim">·</td>'; const v=c[1]/c[0]; return `<td class="num"><span style="${heat(v)};padding:2px 5px;border-radius:3px">${Math.round(v*100)}%</span></td>`;}).join('')+'</tr>';}).join('')+'</tbody>';
+  /* every seed */
+  $('#lvFcSeedSub').textContent='the share of the simulations in which he finished at each seed';
+  $('#tFcSeed').innerHTML='<thead><tr><th class="rw"></th>'+T.map((_,i)=>`<th class="v">${ord(i+1)}</th>`).join('')+'</tr></thead><tbody>'+
+    T.map(t=>`<tr><th class="rw">${tm(t)}</th>`+t.seed.map(v=>v<0.005?'<td><span></span></td>':`<td><span style="${heat(v)}">${Math.round(v*100)}</span></td>`).join('')+'</tr>').join('')+'</tbody>';
+  /* who is out */
+  const I=T.flatMap(t=>t.inj.map(x=>({...x,t})));
+  $('#lvFcInjSub').textContent=`Yahoo’s status now, his projection for week ${wk}, and the first week Sleeper projects him to play · the forecast plays every team with these`;
+  $('#tFcInj').innerHTML='<thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Slot</th><th class="num">Projected, week '+wk+'</th><th class="num">Back</th></tr></thead><tbody>'+
+    I.map(x=>`<tr><td>${tm(x.t)}</td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.status)}</td><td class="dim">${esc(x.slot)}</td><td class="num">${x.thisWeek==null?'—':f(x.thisWeek,1)}</td><td class="num">${x.back==null?'<span class="dim">not this season</span>':x.back===wk?'this week':'week '+x.back}</td></tr>`).join('')+'</tbody>';
+  ['#tFcNeed','#tFcInj'].forEach(k=>fillEmpty($(k)));
+}
+/* ============ manager net points (netpts.py): where every point came from, against the average manager ============ */
+(()=>{const NP=D.netpts, el=$('#tNet'); if(!el)return; if(!NP||!Object.keys(NP).length){el.closest('.card').remove(); return;}
+  const YRS=[...new Set(Object.values(NP).flatMap(v=>Object.keys(v).map(Number)))].sort((a,b)=>a-b), LY=D.live?D.live.year:null;
+  const K=[['draft','Draft'],['pickups','Pickups'],['trades','Trades'],['lineups','Lineups']], W={draft:1,pickups:1,trades:1,lineups:1};
+  let YS=0;
+  $('#npW').innerHTML=K.map(([k,l])=>`<label>${l} <input type="range" min="0" max="20" value="10" data-np="${k}" aria-label="Weight for ${l.toLowerCase()}"> <b id="npV_${k}">1.0×</b></label>`).join('')+'<button type="button" id="npReset">Reset</button>';
+  const draw=()=>{
+    $('#npYr').innerHTML=`<button data-ny="0" class="${YS?'':'on'}">Every season</button>`+YRS.map(y=>`<button data-ny="${y}" class="${YS===y?'on':''}">${y}${y===LY?' <span class="lv-tag" style="font-size:8px;padding:0 4px">so far</span>':''}</button>`).join('');
+    $$('#npYr button').forEach(b=>b.onclick=()=>{YS=+b.dataset.ny; draw();});
+    $('#npSub').textContent=`${YS||YRS[0]+'–'+YRS[YRS.length-1]} · regular season · points against the league’s average manager, by where they came from`;
+    const rows=Object.entries(NP).filter(([m])=>vis(m)).map(([m,ys])=>{const v=Object.entries(ys).filter(([y])=>!YS||+y===YS).map(([,z])=>z); if(!v.length)return null;
+      const S=k=>v.reduce((t,z)=>t+z[k],0), tot=v.reduce((t,z)=>t+K.reduce((u,[k])=>u+W[k]*z[k],0),0), wins=v.reduce((t,z)=>t+(z.ppw?K.reduce((u,[k])=>u+W[k]*z[k],0)/z.ppw:0),0);
+      return {m,n:v.length,draft:S('draft'),pickups:S('pickups'),trades:S('trades'),lineups:S('lineups'),tot,wins};}).filter(Boolean);
+    const cell=k=>r=>`<span class="${r[k]>=0?'lv-steal':'lv-bust'}">${sg(r[k],1)}</span>`;
+    table(el,[
+      {h:'Manager',f:r=>mlink(r.m),c:'nm',k:r=>r.m,asc:1},
+      {h:'Szns',f:r=>r.n,c:'num',k:r=>r.n},
+      {h:'Draft',f:cell('draft'),c:'num',k:r=>r.draft,t:'Points that counted from players he drafted, while he kept them, against the league’s average'},
+      {h:'Pickups',f:cell('pickups'),c:'num',k:r=>r.pickups,t:'Points that counted from players he picked up, against the league’s average'},
+      {h:'Trades',f:cell('trades'),c:'num',k:r=>r.trades,t:'Points that counted from players he traded for, against the league’s average'},
+      {h:'Lineups',f:cell('lineups'),c:'num',k:r=>r.lineups,t:'His start/sit calls against the crowd’s lineup from the same roster'},
+      {h:'Total',f:r=>`<b>${sg(r.tot,1)}</b>`,c:'num',k:r=>r.tot,t:'The four added, at the weights set above'},
+      {h:'In wins',f:r=>`<b class="${r.wins>=0?'lv-steal':'lv-bust'}">${sg(r.wins,2)}</b>`,c:'num',k:r=>r.wins,t:'The total in wins, at each season’s points per win'},
+    ],rows,{rank:1,sort:7});};
+  $$('#npW input').forEach(i=>i.oninput=()=>{W[i.dataset.np]=i.value/10; $('#npV_'+i.dataset.np).textContent=(i.value/10).toFixed(1)+'×'; draw();});
+  $('#npReset').onclick=()=>{$$('#npW input').forEach(i=>{i.value=10; W[i.dataset.np]=1; $('#npV_'+i.dataset.np).textContent='1.0×';}); draw();};
+  draw(); REDRAW.push(draw);
+})();
 /* ============ against the crowd: Deadshot's lineups and pickups against all of Yahoo (crowd.py) ============ */
 (()=>{const C=D.crowd, sec=$('#crowd'); if(!C||!C.years||!Object.keys(C.mgrs).length){if(sec)sec.remove(); const a=$('#nav a[data-id="crowd"]'); if(a)a.remove(); return;}
   const LY=D.live?D.live.year:null, last=n=>n.split(' ').slice(-1)[0];
@@ -5222,7 +5294,7 @@ let openSeason=null;
     const span=YS?String(YS):`${C.years[0]}–${C.years[C.years.length-1]}`;
     const rows=Object.entries(C.mgrs).filter(([m])=>vis(m)).map(([m,ys])=>{const v=Object.entries(ys).filter(([y])=>!YS||+y===YS).map(([,z])=>z);
       if(!v.length)return null; const S=k=>v.reduce((t,z)=>t+(z[k]||0),0);
-      return {m,n:v.length,chalk:S('chalkN')?S('chalk')/S('chalkN'):null,cW:S('cW'),cL:S('cL'),cNet:S('cNet'),gN:S('gN'),gHit:S('gHit'),gemN:S('gemN'),gemPts:S('gemPts'),slN:S('slN'),slPts:S('slPts'),spN:S('spN'),spPts:S('spPts'),starts:S('starts')};}).filter(Boolean);
+      return {m,n:v.length,chalk:S('chalkN')?S('chalk')/S('chalkN'):null,cW:S('cW'),cL:S('cL'),cNet:S('cNet'),gN:S('gN'),gHit:S('gHit'),gemN:S('gemN'),gemPts:S('gemPts'),slN:S('slN'),slPts:S('slPts'),spN:S('spN'),spPts:S('spPts'),starts:S('starts'),close:S('close'),ssW:S('ssW')};}).filter(Boolean);
     $('#cwSub').textContent=`${span} · regular season · the ? explains each measure`;
     table($('#tCwMgr'),[
       {h:'Manager',f:r=>mlink(r.m),c:'nm',k:r=>r.m,asc:1},
@@ -5235,6 +5307,7 @@ let openSeason=null;
       {h:'Spot starts',f:r=>r.spN,c:'num',k:r=>r.spN,t:'A starter fewer than half of Yahoo started who scored at least double his projection that week'},
       {h:'Gems benched',f:r=>r.gemN,c:'num',k:r=>r.gemN,asc:1,t:'Benched a player 70%+ of Yahoo started, who outscored the man he could have replaced'},
       {h:'Points left',f:r=>r.gemN?f(r.gemPts,1):'—',c:'num',k:r=>r.gemPts,asc:1,t:'What those benched gems outscored the men who played instead by, added up'},
+      {h:'Close calls',f:r=>r.ssW?f(r.close/r.ssW,1):'—',c:'num',k:r=>r.ssW?r.close/r.ssW:null,t:'A first try at how hard his lineup calls were: benched players a week projected within 3 points of a starter they could have replaced. A top-heavy roster has few; a deep, even one has many. Shown as context, not counted in any grade'},
       {h:'Sleepers spotted',f:r=>r.slN,c:'num',k:r=>r.slN,t:'Pickups on fewer than 25% of Yahoo rosters when added, who then started at least twice'},
       {h:'Their points',f:r=>r.slN?f(r.slPts,1):'—',c:'num',k:r=>r.slPts,t:'Points those sleepers scored for him in the weeks he started them'},
     ],rows,{rank:1,sort:4});
@@ -5582,7 +5655,11 @@ glossify();
     const gl=k=>`<span class="gl" data-gl="${k}" tabindex="0">?</span>`;
     const MD=TF.model, YRS=TF.years, PAST=YRS.filter(y=>y!==L.year&&!(D.live&&y===D.live.year));   /* his other finished seasons, never the one being played */
     $('#lvOddsCard').hidden=!MD;
-    if(MD){$('#lvOddsSub').textContent=`${MD.runs.toLocaleString()} simulated finishes of the ${nOf(MD.weeksLeft,'week')} left · rerun every week`;
+    /* the forecast (forecast.py) for the season being played: it draws the odds, and the cards under them */
+    const FC=!FINAL&&D.forecast&&D.forecast.year===L.year?D.forecast:null;
+    ['#lvFcHead','#lvFcWeek','#lvFcNeed','#lvFcSeed','#lvFcInj','#lvRestHead'].forEach(k=>{const e=$(k); if(e)e.hidden=!FC;});
+    if(FC){$('#lvOddsCard').hidden=false; drawForecast(FC,L);}
+    else if(MD){$('#lvOddsSub').textContent=`${MD.runs.toLocaleString()} simulated finishes of the ${nOf(MD.weeksLeft,'week')} left · rerun every week`;
     $('#tLiveOdds').innerHTML='<thead><tr><th>Team</th><th class="num">Expected points a week</th><th class="num">Projected wins</th><th class="num">Playoffs</th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
       MD.odds.map(o=>`<tr><td><b>${esc(o.team)}</b> <span class="dim">${esc(o.mgr)}</span></td><td class="num">${f(o.level,1)}</td><td class="num">${f(o.wins,1)}</td>
         <td class="num"><b>${pct(o.po)}</b></td><td class="num">${pct(o.bye)}</td><td class="num">${pct(o.title)}</td></tr>`).join('')+'</tbody>';}

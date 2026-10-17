@@ -360,7 +360,10 @@ if S26:
     # the first time each week is read, and is left out (not an error) if Yahoo cannot be reached
     try:
         import crowd
-        if os.path.exists('yahoo_raw/league_keys.json'): out['crowd'] = crowd.build()
+        if os.path.exists('yahoo_raw/league_keys.json'):
+            out['crowd'] = crowd.build()
+            import netpts; out['netpts'] = netpts.build(out['crowd'])   # manager net points (netpts.py)
+        import forecast; out['forecast'] = forecast.build()         # the rest of the live season, played out
     except Exception as e:
         print('  (against the crowd left out: %s)' % str(e)[:120], file=sys.stderr)   # stderr: deploy.sh hides stdout
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)

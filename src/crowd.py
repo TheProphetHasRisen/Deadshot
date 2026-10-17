@@ -136,8 +136,19 @@ def season(y, PCT):
     for (team, w), rs in by.items():
         m = TF.mgr_of(y, team)
         if not m: continue
-        Z = M.setdefault(m, dict(starts=0, chalk=0.0, chalkN=0, cW=0, cL=0, cNet=0.0, gN=0, gHit=0, gPts=0.0, gNet=0.0, gemN=0, gemPts=0.0, slN=0, slPts=0.0, spN=0, spPts=0.0, pW=0, pL=0, pNet=0.0))
+        Z = M.setdefault(m, dict(starts=0, chalk=0.0, chalkN=0, cW=0, cL=0, cNet=0.0, gN=0, gHit=0, gPts=0.0, gNet=0.0, gemN=0, gemPts=0.0, slN=0, slPts=0.0, spN=0, spPts=0.0, pW=0, pL=0, pNet=0.0, ssNet=0.0, ssW=0, close=0))
         start = [r for r in rs if r['started']]; bench = [r for r in rs if r['slot'] == 'BN']
+        # start/sit against the crowd's lineup: the same roster, each slot given to whoever Yahoo started most
+        used, crowdL = set(), 0.0
+        for slot in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF', 'W/R/T'):
+            for _ in range(slots.get(slot, 0)):
+                c = [r for r in rs if r['slot'] != 'IR' and id(r) not in used and TF.eligible(r['pos'], slot)]
+                if c:
+                    r = max(c, key=lambda r: (S(r) if S(r) is not None else -1, r['pts'] or 0)); used.add(id(r)); crowdL += r['pts'] or 0
+        Z['ssNet'] += sum(r['pts'] or 0 for r in start) - crowdL; Z['ssW'] += 1
+        # decision difficulty (Brian's top-heavy idea, tentative): benched players projected within 3 points of a
+        # starter they could have replaced. A top-heavy roster has few; a deep, even one has many
+        Z['close'] += sum(1 for b in bench if pj(b) is not None and any(TF.eligible(b['pos'], s_['slot']) and pj(s_) is not None and abs(pj(b) - pj(s_)) <= 3 for s_ in start))
         for s in start:
             Z['starts'] += 1; ps = S(s)
             if ps is not None: Z['chalk'] += ps; Z['chalkN'] += 1

@@ -5,7 +5,8 @@ For every week from the deal on (regular season, weeks played), for each side:
   actual          points that counted from the players it received (started that week, while on the team)
   counterfactual  the same lineup with the deal undone: every slot a received player started in goes to the
                   player the old roster would have had there, chosen by projection (what was known that week,
-                  not hindsight): his bench that week, plus the players he gave away
+                  not hindsight): his bench that week, plus the players he gave away; and a player he gave away
+                  goes back in wherever his projection beats the man who actually played there
   net added       actual minus counterfactual. Both sides can be positive: both won.
   potential       the same with each roster's best possible lineup (hindsight): did the deal raise his ceiling,
                   whatever he did with it
@@ -54,14 +55,25 @@ def grade(y, trades, played):
                 if not rows: continue
                 weeks += 1
                 inc = [r for r in rows if r['n'] in got and r['started']]
-                actual = sum(r['pts'] or 0 for r in inc)
+                start = [r for r in rows if r['started']]
                 pool = [r for r in rows if r['n'] not in got and not r['started'] and r['slot'] != 'IR'] + [row_of(n, w) for n in gave]
-                used, cf, fill = set(), 0.0, []
+                P_ = lambda c: proj(c) if proj(c) is not None else -1
+                # the lineup with the deal undone: his starters, each slot a received player filled given to the best
+                # projected player the old roster had there...
+                lineup = {id(r): r for r in start if r['n'] not in got}; slot_of = {id(r): r['slot'] for r in start}
+                used, fill = set(), []
                 for r in inc:
                     cand = [c for c in pool if id(c) not in used and TF.eligible(c['pos'], r['slot'])]
                     if not cand: fill.append((r['n'], None, 0)); continue
-                    c = max(cand, key=lambda c: (proj(c) if proj(c) is not None else -1, c['pts'] or 0))
-                    used.add(id(c)); cf += c['pts'] or 0; fill.append((r['n'], c['n'], c['pts'] or 0))
+                    c = max(cand, key=lambda c: (P_(c), c['pts'] or 0))
+                    used.add(id(c)); lineup[id(c)] = c; slot_of[id(c)] = r['slot']; fill.append((r['n'], c['n'], c['pts'] or 0))
+                # ...and a player he gave away back in wherever his projection beats the man who played there instead
+                for c in sorted([c for c in pool if id(c) not in used and c['n'] in gave], key=P_, reverse=True):
+                    beat = [k for k, r in lineup.items() if r['n'] not in gave and TF.eligible(c['pos'], slot_of[k]) and P_(r) < P_(c)]
+                    if not beat: continue
+                    k = min(beat, key=lambda k: P_(lineup[k])); old = lineup.pop(k)
+                    lineup[id(c)] = c; slot_of[id(c)] = slot_of[k]; used.add(id(c)); fill.append((old['n'] + ' (kept)', c['n'], (c['pts'] or 0) - (old['pts'] or 0)))
+                actual = sum(r['pts'] or 0 for r in start); cf = sum(r['pts'] or 0 for r in lineup.values())
                 net += actual - cf
                 cf_roster = [r for r in rows if r['n'] not in got] + [row_of(n, w) for n in gave]
                 pot += TF.optimal(rows, slots) - TF.optimal(cf_roster, slots)

@@ -283,6 +283,20 @@ Measures (thresholds at the top of crowd.py): chalk, calls against the crowd, gu
 (Brian's: under 50% started and at least twice his own average before that week), gems left on the bench,
 sleepers (ownership the week BEFORE the add). It is a first version: Brian asked for it to grow into a full
 manager grade (see PLANS.md).
+**Built 16 Oct 2026 from PLANS.md** (each module's docstring has the method):
+- `projections.py`: Sleeper's weekly projections for every week since 2021, scored the league's way;
+  finished seasons in `proj_hist.json` (repo). Spot starts are double the projection; every lineup call
+  shows both projections; "Best and worst lineup calls" (Front Office) are against the projections.
+- `trade2.py`: trade grading 2.0, shown beside the current way on the 2026 page ("Two ways to grade a
+  trade"). Not yet the site's verdict anywhere: Brian is comparing.
+- `netpts.py`: manager net points (Front Office): draft + pickups + trades as points that counted against
+  the average manager (adds up to his scoring), plus lineups against the crowd's; weight sliders on the page.
+- `forecast.py`: the forecast on the 2026 page (it draws the Playoff odds box too; teamfile.model is no
+  longer shown for the live season). Projected lineups from current rosters (injuries, returns, byes come
+  through the projections), fitted on 2021-2025, 100,000 runs, re-seeded bracket, odds history by re-running
+  each past week. Week-to-week scores here are close to a coin flip (team projections correlate ~0.15 with
+  results, Yahoo's own included), so the fit shrinks hard; do not "fix" that.
+- Close calls (crowd table): Brian's top-heavy idea, tentative, context only.
 `ROSTERS2026` (who started each week, Yahoo's official points) drives the trade cards'
 "Started" column and "Points that counted" tile. Yahoo reaches the league for 2021-2026 on
 Brian's account; 2015-2020 are not listed there.
