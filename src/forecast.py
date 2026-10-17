@@ -33,33 +33,50 @@ def _lineup(rows, wk, pj, slots):
     pr = [dict(r, slot='BN', pts=(pj(r['n'], r['pos'], r['nfl'], wk) or 0)) for r in rows]
     return TF.optimal(pr, slots)
 
-def fit(k):
-    """b1, b2 and the spread left, from every finished season: k weeks played, every later regular-season week"""
-    X, Y = [], []
-    for y in [y for y in TF.YEARS if y != TF.LIVE]:
+_FIT = {}
+def _season_fit_data(y):
+    """for one finished season: every team's score and projected best lineup, every regular-season week"""
+    if y not in _FIT:
         st = TF.settings(y); slots = st['slots']; pj = PR.lookup(y)
         R = P.rosters(y); G = [g for g in P.games(y) if g['status'] == 'postevent' and g['wk'] < st['po']]
         sc = {}
         for g in G: sc[(g['ta'], g['wk'])] = g['aa']; sc[(g['tb'], g['wk'])] = g['ab']
+        by = {}
+        for r in R: by.setdefault((r['team'], r['wk']), []).append(r)
+        pl = {(t, w): _lineup(by.get((t, w), []), w, pj, slots) for (t, w) in sc}
+        _FIT[y] = (sc, pl)
+    return _FIT[y]
+
+def fit(k, exclude=()):
+    """b1, b2 and the spread left, from every finished season (but those excluded): k weeks played, every later
+    regular-season week"""
+    X, Y = [], []
+    for y in [y for y in TF.YEARS if y != TF.LIVE and y not in exclude]:
+        sc, PL = _season_fit_data(y)
         teams = {t for t, _ in sc}; weeks = sorted({w for _, w in sc})
         if len(weeks) <= k: continue
         lg_k = sum(v for (t, w), v in sc.items() if w <= k) / sum(1 for (t, w) in sc if w <= k)
         lvl = {t: sum(sc[(t, w)] for w in range(1, k + 1) if (t, w) in sc) / k - lg_k for t in teams}
-        by = {}
-        for r in R: by.setdefault((r['team'], r['wk']), []).append(r)
         for w in weeks:
             if w <= k: continue
-            pl = {t: _lineup(by.get((t, w), []), w, pj, slots) for t in teams}
+            pl = {t: PL[(t, w)] for t in teams}
             pm = sum(pl.values()) / len(pl); am = sum(sc[(t, w)] for t in teams) / len(teams)
             for t in teams: X.append((pl[t] - pm, lvl[t])); Y.append(sc[(t, w)] - am)
     n = len(X)
+    if n < 30: return dict(b1=0.0, b2=0.0, sd=22.0, n=n)   # nothing to learn from at this point of the season
     sxx = sum(a * a for a, _ in X); syy = sum(b * b for _, b in X); sxy = sum(a * b for a, b in X)
     sxr = sum(a * r for (a, _), r in zip(X, Y)); syr = sum(b * r for (_, b), r in zip(X, Y))
     det = sxx * syy - sxy * sxy
     b1 = (sxr * syy - syr * sxy) / det; b2 = (syr * sxx - sxr * sxy) / det
     res = [r - b1 * a - b2 * b for (a, b), r in zip(X, Y)]
-    # the score spread around the expected score, plus the spread of the league average week to week
-    return dict(b1=b1, b2=b2, sd=math.sqrt(sum(e * e for e in res) / n), n=n)
+    # standard errors, two-sided p-values (normal approximation: n is in the hundreds) and R squared, for the model page
+    s2 = sum(e * e for e in res) / (n - 2)
+    se1, se2 = math.sqrt(s2 * syy / det), math.sqrt(s2 * sxx / det)
+    pv = lambda z: 2 * (1 - 0.5 * (1 + math.erf(abs(z) / math.sqrt(2))))
+    tot = sum(r * r for r in Y)
+    corr = sxy / math.sqrt(sxx * syy)
+    return dict(b1=b1, b2=b2, sd=math.sqrt(sum(e * e for e in res) / n), n=n, se1=se1, se2=se2, p1=pv(b1 / se1), p2=pv(b2 / se2),
+                r2=1 - sum(e * e for e in res) / tot, rawsd=math.sqrt(tot / n), corr=corr)
 
 def season_state(y, k):
     """the season as it stood after week k: records, points, form, rosters, schedule left"""
@@ -77,9 +94,9 @@ def season_state(y, k):
         if r['wk'] == rw: roster.setdefault(r['team'], []).append(r)
     return st, rec, roster, left, rw
 
-def run(y, k, n, rnd, F=None):
+def run(y, k, n, rnd, F=None, pj=None):
     st, rec, roster, left, rw = season_state(y, k)
-    teams = sorted(rec); slots = st['slots']; pj = PR.lookup(y, live=(y == TF.LIVE))
+    teams = sorted(rec); slots = st['slots']; pj = pj or PR.lookup(y, live=(y == TF.LIVE))
     F = F or fit(k)
     lg = sum(r[2] for r in rec.values()) / max(1, sum(len(r[3]) for r in rec.values()))
     lvl = {t: rec[t][2] / max(1, len(rec[t][3])) - lg for t in teams}
@@ -94,7 +111,7 @@ def run(y, k, n, rnd, F=None):
     finalW = {t: {} for t in teams}                      # final wins -> [seasons, made playoffs]
     swing = {t: [0, 0, 0, 0] for t in teams}             # won next week: [n, made it]; lost: [n, made it]
     mwin = {}
-    nspots = 6
+    nspots = st['nteams']; nbye = 2 if nspots == 6 else 0   # 2021 had four teams in, no byes
     for _ in range(n):
         W = {t: rec[t][0] for t in teams}; PF = {t: rec[t][2] for t in teams}; nx = {}
         for g in left:
@@ -113,12 +130,15 @@ def run(y, k, n, rnd, F=None):
                 if nx[t]: s[0] += 1; s[1] += t in made
                 else: s[2] += 1; s[3] += t in made
         for t in made: po[t] += 1
-        for t in order[:2]: bye[t] += 1
+        for t in order[:nbye]: bye[t] += 1
         s = order[:nspots]
         play = lambda x, z: x if rnd.gauss(lg + F['b2'] * lvl[x], sd) > rnd.gauss(lg + F['b2'] * lvl[z], sd) else z
-        q = [play(s[2], s[5]), play(s[3], s[4])]
-        q.sort(key=lambda t: s.index(t))                 # re-seed: the 1 seed meets the lowest seed left
-        f1, f2 = play(s[0], q[1]), play(s[1], q[0])
+        if nspots == 6:
+            q = [play(s[2], s[5]), play(s[3], s[4])]
+            q.sort(key=lambda t: s.index(t))             # re-seed: the 1 seed meets the lowest seed left
+            f1, f2 = play(s[0], q[1]), play(s[1], q[0])
+        else:
+            f1, f2 = play(s[0], s[3]), play(s[1], s[2])
         title[play(f1, f2)] += 1
     out = {}
     for t in teams:
@@ -132,7 +152,7 @@ def run(y, k, n, rnd, F=None):
                       ifWin=(s[1] / s[0]) if s[0] else None, ifLose=(s[3] / s[2]) if s[2] else None,
                       byWins={str(w): [c, m] for w, (c, m) in sorted(finalW[t].items())},
                       mu={str(w): round(mu[(t, w)], 2) for w in weeks}, proj={str(w): round(proj[(t, w)], 2) for w in weeks},
-                      w=rec[t][0], l=rec[t][1], pf=round(rec[t][2], 2), level=round(lg + F['b2'] * lvl[t], 2))
+                      w=rec[t][0], l=rec[t][1], pf=round(rec[t][2], 2), level=round(lg + F['b2'] * lvl[t], 2), form=round(lvl[t], 3))
     games = [dict(wk=g['wk'], ta=g['ta'], tb=g['tb'], muA=round(mu[(g['ta'], g['wk'])], 2), muB=round(mu[(g['tb'], g['wk'])], 2),
                   pA=round(mwin.get((g['ta'], g['tb']), 0) / n, 4) if g['wk'] == nxt else None) for g in left]
     return dict(teams=out, games=games, weeks=weeks, next=nxt, lg=round(lg, 2), fit=F, roster_week=rw, roster=roster, pj=pj)
@@ -169,7 +189,7 @@ def build(y=None):
     hist[played] = {t: dict(po=round(v['po'], 4), bye=round(v['bye'], 4), title=round(v['title'], 4)) for t, v in T.items()}
     mgr = {t: TF.mgr_of(y, t) for t in T}
     return dict(year=y, played=played, regWeeks=st['po'] - 1, runs=N, next=now['next'], lg=now['lg'],
-                fit={k: (round(v, 4) if isinstance(v, float) else v) for k, v in now['fit'].items()},
+                fit={k: (float('%.4g' % v) if isinstance(v, float) else v) for k, v in now['fit'].items()},
                 teams=[dict(team=t, mgr=mgr[t], **{k: (round(v, 4) if isinstance(v, float) else v) for k, v in T[t].items()}, sos=sos[t], inj=inj.get(t, []))
                        for t in sorted(T, key=lambda t: -T[t]['po'])],
                 games=now['games'], history=hist)
