@@ -140,16 +140,19 @@ const Ask=(()=>{
   /* Things that need the Yahoo data. While D has no data for one, a question about it is
      answered with what is coming, not with a guess. When the data lands, add its answerer
      below and the line here falls away on its own (the `has` test). */
+  /* Yahoo is connected (15 Oct 2026): drafts, missed games, pickups, lineups and trade grades are on the page
+     (team files, Front Office, season pages), so these questions are sent there by the site index below */
+  const YH=()=>!!(D.live&&D.live.files);
   const SOON=[
-    {re:/\b(draft|drafted|drafts|draft pick|draft picks|first round|adp|auction|keeper|keepers)\b/,has:()=>!!D.draft,
+    {re:/\b(draft|drafted|drafts|draft pick|draft picks|first round|adp|auction|keeper|keepers)\b/,has:()=>YH()||!!D.draft,
       say:'Draft results come with the Yahoo connection.'},
-    {re:/\b(injur\w*|injured reserve|on ir|ir slot|ir stint|hurt)\b/,has:()=>!!D.injuries,
+    {re:/\b(injur\w*|injured reserve|on ir|ir slot|ir stint|hurt)\b/,has:()=>YH()||!!D.injuries,
       say:'Injury and IR history comes with the Yahoo connection, so "who had the worst injury luck" will work then.'},
-    {re:/\b(waiver|waivers|waiver claim|waiver claims|free agent|free agents|pickup|pickups|picked up|faab)\b/,has:()=>!!D.waivers,
+    {re:/\b(waiver|waivers|waiver claim|waiver claims|free agent|free agents|pickup|pickups|picked up|faab)\b/,has:()=>YH()||!!D.waivers,
       say:'Waiver claims come with the Yahoo connection. Season totals of roster moves are here now: try "most roster moves".'},
-    {re:/\b(started|starter|starters|starting lineup|lineup|lineups|benched|bench points|start sit|start or sit)\b/,has:()=>!!D.lineups,
+    {re:/\b(started|starter|starters|starting lineup|lineup|lineups|benched|bench points|start sit|start or sit)\b/,has:()=>YH()||!!D.lineups,
       say:'Lineups (who started, who sat) come with the Yahoo connection.'},
-    {re:/\b(who won (?:the |that |this )?trades?|won (?:the |that )?trade|trade winners?|best trades?|worst trades?|lopsided trades?|fleeced|robbery)\b/,has:()=>!!D.playerStats,
+    {re:/\b(who won (?:the |that |this )?trades?|won (?:the |that )?trade|trade winners?|best trades?|worst trades?|lopsided trades?|fleeced|robbery)\b/,has:()=>YH()||!!D.playerStats,
       say:'Who won a trade (each player\u2019s points before and after it) comes with the Yahoo connection. The deals themselves are here now.'},
     {re:/\b(yards|touchdowns|tds|receptions|targets|carries|fantasy points)\b/,has:()=>!!D.playerStats,
       say:'Player stats come with the Yahoo connection.'},
@@ -975,7 +978,7 @@ const Ask=(()=>{
     out.sub=nOf(top.length,'trading partner')+' · '+inn+' players in, '+outp+' out'+(deals.length?' · by season: '+Object.entries(byY).map(([y,c])=>y+' '+c).join(', '):'');
     if(deals.length)out.body=tbl(['Partner','Deals'],top.slice(0,6).map(([o,c])=>[mlink(o),String(c)]))+
       tbl(['When','The deal'],deals.slice().sort((a,b)=>b.y-a.y).slice(0,8).map(x=>['<span style="white-space:nowrap">'+x.d+', '+x.y+'</span>',dealTxt(x)]));
-    if(!D.playerStats)out.notes.push('Who won each of these (every player’s points before and after) comes with the Yahoo connection.');
+    out.notes.push(YH()?'Who won each of these is graded in the Front Office (Every trade, graded) and on each season page.':'Who won each of these (every player’s points before and after) comes with the Yahoo connection.');
     out.acts=[secAct('trades-sec'),mgrAct(n)]; return out;}
 
   /* the layer under a career: best and worst seasons, biggest game, weekly highs, streaks,
@@ -1091,7 +1094,7 @@ const Ask=(()=>{
     if(ts.length)out.body=tbl(['When','The deal'],ts.map(x=>{const fromA=x.pa.includes(n), got=fromA?x.mb:x.ma, gave=fromA?x.ma:x.mb;
       return ['<span style="white-space:nowrap">'+x.d+', '+x.y+'</span>',
         '<b>'+mlink(got)+'</b> got '+esc((fromA?x.pa:x.pb).join(', '))+'<br><b>'+mlink(gave)+'</b> got '+esc((fromA?x.pb:x.pa).join(', '))];}));
-    if(!D.playerStats)out.notes.push('Who won each trade (every player\u2019s points before and after it), and his scoring, draft and injury history, come with the Yahoo connection.');
+    out.notes.push(YH()?'Every trade he was in is graded in the Front Office (Every trade, graded) and on its season page.':'Who won each trade (every player\u2019s points before and after it), and his scoring, draft and injury history, come with the Yahoo connection.');
     out.acts=[secAct('trades-sec')]; return out;
   }
 
@@ -1113,7 +1116,65 @@ const Ask=(()=>{
       ['Seasons and teams',['who won '+(LAST-2),'does the best team win','how often does the 1 seed win','every seed',`${a} team names`]],
       ['Players and trades',[pl?pl+' trade':null,`${c} trades`,`${a} and ${b} trades`].filter(Boolean)]];};
 
-  let LAST_OUT=null;
+  let LAST_OUT=null, LAST_PLACES=null;
+  /* ---- the site index (Brian, 16 Oct 2026): every section, box, heading, column and explained term, on the
+     record book, the 2026 page and the season pages, so a word finds every place it appears. Built from the
+     page itself the first time the box opens, so anything added to the page is found without touching this. */
+  let IDX=null;
+  const SKIPW=new Set(['where','wheres','is','are','the','a','an','of','show','me','find','see','what','whats','do','i','in','on','to','for','stat','stats','column','table','section','page','box','card','about','my','our']);
+  const nw=x=>String(x||'').toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9%+]+/g,' ').trim();
+  const clean=el=>{const c=el.cloneNode(true); c.querySelectorAll('.gl,.fold-btn,button,select,.pills,.lv-tag').forEach(x=>x.remove());
+    return c.textContent.replace(/\s+/g,' ').replace(/[▴▾↑↓⇅]/g,'').trim();};
+  function buildIdx(){
+    const out=[], seen=new Set();
+    const add=(kind,name,path,page,el,extra)=>{name=(name||'').trim(); if(!name||name.length>80||!/[a-z]/i.test(name))return;
+      const k=kind+'|'+name.toLowerCase()+'|'+path+'|'+page; if(seen.has(k))return; seen.add(k);
+      out.push({kind,name,path,page,el,extra:extra||'',n:nw(name),x:nw(extra)});};
+    const walk=(root,page)=>{if(!root)return;
+      const secName=el=>{const sc=el.closest('section'); if(!sc||sc.matches('#live,#season-page'))return ''; const h=sc.querySelector(':scope > .sec-head h2'); return h?clean(h):'';};
+      root.querySelectorAll('section').forEach(sc=>{if(sc.matches('#live,#season-page'))return; const h=sc.querySelector(':scope > .sec-head h2'); if(!h)return;
+        const rn=sc.querySelector(':scope > .sec-head .rule-note'), ld=sc.querySelector('.lede'); add('Section',clean(h),'',page,sc,(rn?rn.textContent:'')+' '+(ld?ld.textContent.slice(0,240):''));});
+      root.querySelectorAll('.card').forEach(c=>{
+        if(c.hidden||c.parentElement.closest('.card,[data-fold-sub]'))return;   /* a trade card is content, not a heading */
+        const h=c.querySelector(':scope > .card-h h3'); if(!h)return;
+        const cn=clean(h), path=secName(c), sub=c.querySelector(':scope > .card-h .sub');
+        add('Box',cn,path,page,c,sub?sub.textContent:'');
+        const where=(path?path+' › ':'')+cn;
+        c.querySelectorAll('.sub-h').forEach(x=>add('Heading',clean(x),where,page,x));
+        c.querySelectorAll('th').forEach(th=>{const t=clean(th); if(t.length<2||/^\d+$/.test(t))return; add('Column',t,where,page,th,th.dataset.thTip||th.getAttribute('title')||'');});
+        c.querySelectorAll('.tile > span').forEach(x=>{const t=clean(x); if(t.length>2&&t.length<50)add('Figure',t,where,page,x.parentElement);});});
+      root.querySelectorAll('section > .sub-h, section .sec-fold > .sub-h').forEach(x=>add('Heading',clean(x),secName(x),page,x));};
+    walk($('#main'),'book'); walk($('#live'),'live');
+    /* the explained terms: every ? on the page, by the title of its explanation */
+    if(typeof GLOSS==='object')Object.entries(GLOSS).forEach(([k,v])=>{const m=/<b>([^<]+)<\/b>/.exec(v); const el=document.querySelector('#main [data-gl="'+k+'"]')||document.querySelector('[data-gl="'+k+'"]');
+      if(m&&el)add('Explained',m[1],(el.closest('#live')?'':null)??(()=>{const sc=el.closest('section'); const h=sc&&sc.querySelector(':scope > .sec-head h2'); return h?clean(h):'';})(),el.closest('#live')?'live':'book',el,v.replace(/<[^>]+>/g,' '));});
+    return out;
+  }
+  function where(txt){
+    if(!IDX)IDX=buildIdx();
+    const has=(w,str)=>str.split(' ').some(t=>t.startsWith(w)||(w.length>=5&&t.length>=4&&dist(w,t.slice(0,w.length),1)<=1));
+    /* a word found nowhere on the page ("who", a player's name) is the question, not the place */
+    const ws=nw(txt).split(' ').filter(w=>w&&!SKIPW.has(w)&&IDX.some(e=>has(w,e.n+' '+e.x))); if(!ws.length)return [];
+    const RANK={Section:8,Box:6,Explained:5,Heading:4,Figure:2,Column:1};
+    const full=IDX.map(e=>{let sc=0;
+        if(e.n===ws.join(' '))sc=100+RANK[e.kind]; else if(ws.every(w=>has(w,e.n)))sc=60+RANK[e.kind]; else if(ws.every(w=>has(w,e.n+' '+e.x)))sc=20+RANK[e.kind];
+        return [sc,e];}).filter(x=>x[0]>0);
+    if(full.length||ws.length<2)return full.sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
+    /* nothing has every word ("worst injury luck"): the places with all but one of them in their name */
+    return IDX.map(e=>[ws.filter(w=>has(w,e.n)).length,e]).filter(x=>x[0]>=ws.length-1).sort((a,b)=>b[0]-a[0]||RANK[b[1].kind]-RANK[a[1].kind]).map(x=>x[1]);
+  }
+  const PAGE={book:'Record book',live:'2026 page · each season page'};
+  function goPlace(p){closeMgr();
+    const onView=document.body.classList.contains('sy-pg')||document.body.classList.contains('lv-pg');
+    if(p.page==='book'&&onView){const b=$('#lvSegBook'); if(b)b.click();}
+    if(p.page==='live'&&!onView){const b=$('#lvSegLive'); if(b)b.click();}
+    requestAnimationFrame(()=>{const el=p.el; if(!el||!el.isConnected)return;
+      if(typeof foldSweep==='function'){const r=foldRoot(el); if(r)foldSweep(r);}
+      reveal(el.matches('section,.card')?el:el.closest('.card')||el); reveal(el);
+      requestAnimationFrame(()=>{const t=el.matches('th,.tile')?el.closest('.card')||el:el;
+        scrollTo({top:t.getBoundingClientRect().top+scrollY-120,behavior:'smooth'});
+        el.classList.add('ask-flash'); setTimeout(()=>el.classList.remove('ask-flash'),2600);});});
+  }
   function render(){
     const inp=$('#askIn'), box=$('#askOut'); if(!inp||!box)return;
     const txt=inp.value.trim();
@@ -1124,6 +1185,17 @@ const Ask=(()=>{
     let out;
     try{out=answer(parse(txt));}catch(e){out={kind:'Sorry',title:'That one broke the reader',notes:[String(e.message||e)],acts:[],soon:[],missing:[],ignored:[]};}
     LAST_OUT=out;
+    const places=where(txt); LAST_PLACES=places;
+    const placesH=places.length?`<div class="ask-card ask-where"><div class="ask-k">On the site · ${nOf(places.length,'place')}</div>`+
+      places.slice(0,14).map((p,i)=>`<button type="button" class="ask-pl" data-place="${i}"><span class="ask-pk">${esc(p.kind)}</span> <b>${esc(p.name)}</b><span class="ask-pp">${esc(PAGE[p.page])}${p.path?' · '+esc(p.path):''}</span></button>`).join('')+
+      (places.length>14?`<p class="ask-note">and ${places.length-14} more: add a word to narrow it</p>`:'')+'</div>':'';
+    /* nothing to answer, but it is on the page: the places come first */
+    const noAns=!out.acts||!out.acts.length;
+    /* the word is the name of something on the page and the reader had to guess at it ("chalk"): the page first */
+    const exact=places.length&&places[0].n===nw(txt).split(' ').filter(w=>w&&!SKIPW.has(w)).join(' ');
+    if(exact&&out.readAs&&out.readAs.length){box.innerHTML=placesH; $$('[data-place]',box).forEach(b=>b.onclick=()=>goPlace(places[+b.dataset.place])); return;}
+    if(noAns&&places.length&&(out.kind==='Sorry'||out.kind==='Not yet'||out.empty||/not sure|can.t answer|no answer/i.test(out.title||''))){
+      box.innerHTML=placesH; $$('[data-place]',box).forEach(b=>b.onclick=()=>goPlace(places[+b.dataset.place])); return;}
     let h=`<div class="ask-card">`;
     if(out.readAs&&out.readAs.length)h+=`<div class="ask-read">Read ${out.readAs.map(([a,b])=>`<s>${esc(a)}</s> as <b>${esc(b)}</b>`).join(', ')}</div>`;
     h+=`<div class="ask-k">${esc(out.kind)}</div><div class="ask-h">${esc(out.title)}</div>`;
@@ -1139,8 +1211,8 @@ const Ask=(()=>{
     const pi=out.acts?out.acts.findIndex(x=>x.primary):-1, main=pi<0?0:pi;
     if(out.acts&&out.acts.length)h+=`<div class="ask-acts">${out.acts.map((a,i)=>`<button type="button" data-act="${i}"${i===main?' class="go"':''}>${esc(a.label)}</button>`).join('')}</div>`;
     if(out.empty)h+=`<div class="ask-ex" style="margin-top:12px">${EXAMPLES().slice(0,6).map(e=>`<button type="button" data-ask="${esc(e)}">${esc(e)}</button>`).join('')}</div>`;
-    box.innerHTML=h+'</div>';
-    box.innerHTML=tyMinus(box.innerHTML);
+    box.innerHTML=tyMinus(h+'</div>')+placesH;
+    $$('[data-place]',box).forEach(b=>b.onclick=()=>goPlace(places[+b.dataset.place]));
     $$('[data-act]',box).forEach(b=>b.onclick=()=>act(out.acts[+b.dataset.act]));
     $$('[data-ask]',box).forEach(b=>b.onclick=()=>{inp.value=b.dataset.ask; inp.focus(); render();});
     $$('[data-pick]',box).forEach(b=>b.onclick=()=>{
@@ -1159,7 +1231,7 @@ const Ask=(()=>{
     const inp=$('#askIn'); inp.value=pre||'';
     inp.addEventListener('input',()=>{clearTimeout(timer); timer=setTimeout(render,90);});
     inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); clearTimeout(timer); render();
-      const p=LAST_OUT&&(LAST_OUT.acts||[]).find(a=>a.primary)||LAST_OUT&&(LAST_OUT.acts||[])[0]; if(p)act(p);}});
+      const p=LAST_OUT&&(LAST_OUT.acts||[]).find(a=>a.primary)||LAST_OUT&&(LAST_OUT.acts||[])[0]; if(p)act(p); else if(LAST_PLACES&&LAST_PLACES.length)goPlace(LAST_PLACES[0]);}});
     render(); inp.focus();
   }
   /* the button in the filter bar, and two keys: "/" anywhere that is not a text box, and
@@ -1170,5 +1242,5 @@ const Ask=(()=>{
     if((e.metaKey||e.ctrlKey)&&!e.altKey&&(e.key==='k'||e.key==='K')){e.preventDefault(); if(ov.classList.contains('on')&&$('#askIn'))$('#askIn').focus(); else open(); return;}
     if(e.key==='/'&&!typing&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!ov.classList.contains('on')){e.preventDefault(); open();}
   });
-  return {parse,answer,open,render,ENT,MET,PL};
+  return {parse,answer,open,render,where,ENT,MET,PL};
 })();

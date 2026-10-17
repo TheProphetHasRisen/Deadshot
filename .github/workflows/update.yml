@@ -78,7 +78,14 @@ jobs:
             src/yahoo_raw/sleeper_team_2023.json
             src/yahoo_raw/sleeper_team_2024.json
             src/yahoo_raw/sleeper_team_2025.json
-          key: yahoo-past-v3
+          key: yahoo-past-v4
+      - name: The live season's % started and % rostered, week by week (a finished week never changes)
+        if: steps.key.outputs.ok == 'true'
+        uses: actions/cache@v4
+        with:
+          path: src/yahoo_raw/2026/pct_w*.json
+          key: crowd-2026-${{ github.run_id }}
+          restore-keys: crowd-2026-
       - name: Browsers for the checks
         if: steps.key.outputs.ok == 'true'
         uses: actions/cache@v4

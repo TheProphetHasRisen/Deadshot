@@ -117,13 +117,14 @@ const CASES = [
   ['Wu trades', (o, T) => o.big === T.tradeCount('Nathan Wu') + ' trades' || `${o.big} want ${T.tradeCount('Nathan Wu')}`],
   ['most weekly high scores', (o, T) => o.title === T.mostTops() || `${o.title} want ${T.mostTops()}`],
   ['bad beats', (o, T) => o.title === T.badBeats() || `${o.title} want ${T.badBeats()}`],
-  ['who won the Diggs trade', o => (o.soon || []).some(s => /Who won a trade/.test(s)) || JSON.stringify(o.soon)],
+  // Yahoo is connected: these point at where the site answers them, and never say "comes with the Yahoo connection"
+  ['who won the Diggs trade', o => !/Yahoo connection/.test(JSON.stringify(o)) && ((o.notes || []).some(s => /Front Office/.test(s)) || o.places.some(n => /trade, graded|fleece/i.test(n))) || JSON.stringify([o.notes, o.places])],
   ['Burke vs Kaiper', o => /Inside the matchup/.test(o.body) && /biggest win/.test(o.body) || 'no matchup detail'],
   ['Krueger', o => /Inside the numbers/.test(o.body) && /Longest winning streak/.test(o.body) || 'no career detail'],
   ['who won 2023', o => /Most weekly high scores/.test(o.body) || 'no season detail'],
   // ---- things it must not pretend to know
-  ['who drafted Justin Jefferson', o => (o.soon || []).some(s => /Draft/.test(s)) || JSON.stringify(o.soon)],
-  ['worst injury luck', o => (o.soon || []).some(s => /Injury/.test(s)) || JSON.stringify(o.soon)],
+  ['who drafted Justin Jefferson', o => !/Yahoo connection/.test(JSON.stringify(o)) && o.places.some(n => /draft/i.test(n)) || JSON.stringify(o.places)],
+  ['worst injury luck', o => !/Yahoo connection/.test(JSON.stringify(o)) && o.places.some(n => /injury luck/i.test(n)) || JSON.stringify(o.places)],
   ['2026', o => (o.missing || []).some(s => /not in the book yet/.test(s)) || JSON.stringify(o.missing)],
   ['2019', o => (o.missing || []).some(s => /2019/.test(s)) || JSON.stringify(o.missing)],
   ['brian', o => o.kind === 'Which one?' && o.choose && o.choose.options.length === 2 || o.kind],
@@ -197,6 +198,7 @@ const CASES = [
       if (err) return { q, ok: false, why: 'threw: ' + err };
       const plain = JSON.parse(JSON.stringify({ ...o, acts: (o.acts || []).map(a => a.label) }));
       plain.big = String(plain.big || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      plain.places = (Ask.where ? Ask.where(q) : []).map(x => x.name);
       let ok;
       try { ok = (0, eval)('(' + src + ')')(plain, T); } catch (e) { ok = 'check threw: ' + e.message; }
       return { q, ok: ok === true, why: ok === true ? '' : String(ok), kind: plain.kind, title: plain.title, big: plain.big };
@@ -221,6 +223,17 @@ const CASES = [
   if (!(await p.evaluate(() => /Read/.test(document.getElementById('askOut').innerText) && /Kevin Krueger/.test(document.getElementById('askOut').innerText)))) ui.push('Cmd/Ctrl+K or the typo note did not work');
   await p.keyboard.press('Enter'); await p.waitForTimeout(500);
   if (!(await p.evaluate(() => /Kevin Krueger/.test(document.getElementById('mTitle').textContent)))) ui.push('Enter on a manager did not open their page');
+  /* the site index: a word finds every place it sits on the page, and a place takes you there, opened */
+  await p.keyboard.press('Escape'); await p.waitForTimeout(150);
+  await p.evaluate(() => { if (document.getElementById('ov').classList.contains('on')) closeMgr(); document.getElementById('askBtn').click(); }); await p.waitForTimeout(150);
+  await p.fill('#askIn', 'luck'); await p.waitForTimeout(400);
+  const luckN = await p.evaluate(() => document.querySelectorAll('#askOut .ask-pl').length);
+  if (luckN < 5) ui.push('"luck" found only ' + luckN + ' places on the site');
+  await p.fill('#askIn', 'fleece'); await p.waitForTimeout(400);
+  const fl = await p.evaluate(() => { const b = [...document.querySelectorAll('#askOut .ask-pl')].find(x => /Biggest fleeces/.test(x.textContent)); if (b) b.click(); return !!b; });
+  await p.waitForTimeout(900);
+  const went = await p.evaluate(() => { const c = document.getElementById('tFoFleece').closest('.card'); return !document.getElementById('ov').classList.contains('on') && !c.querySelector(':scope > .fold-body').hidden && Math.abs(c.getBoundingClientRect().top) < 400; });
+  if (!fl || !went) ui.push('"fleece" did not find, open and go to Biggest fleeces of all time');
   await p.keyboard.press('Escape');
   await b.close();
 

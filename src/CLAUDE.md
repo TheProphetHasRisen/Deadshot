@@ -228,6 +228,12 @@ type, forgiving of typos and of how people actually talk. It is `page/ask.js`.
   lineups), and its `SOON` line stops showing on its own once `D.draft` / `D.injuries` /
   `D.waivers` / `D.lineups` / `D.playerStats` exists. Add the new questions to `test_ask.js`
   with independently computed answers.
+- **The site index ("On the site")** (Brian, 16 Oct 2026: "every header at minimum, every stat shows all
+  places it's located"). `buildIdx()` in ask.js walks the built page the first time the box opens: every
+  section, box (`.card` h3), `.sub-h`, table column, tile label and `?` explanation, on the record book and
+  the #live section (2026 and every season page). Nothing is listed by hand, so a new box is searchable
+  the day it lands. Words found nowhere on the page are dropped as the question; a place click closes the
+  box, switches page, opens the folds and flashes the target. test_ask.js checks "luck" and "fleece".
 - No Claude/API translator on purpose: it would need a paid API key in a page the whole
   league opens. That is Brian's call (it costs money), not a technical one.
 
@@ -269,6 +275,14 @@ week are both voided (`wire2026.undone`); a trade side is never worth less than 
 for the whole site (`sleeper_season.ranker`, weeks 1-17, never Yahoo's season totals, which count NFL
 week 18); Sleeper names are matched every spelling and every Yahoo position (`sleeper_season.lookup`);
 a shutout scores 10 (`scoring.pa_score`). `test_teamfile.py` brute-checks best lineups in every season.
+**Against the Crowd** (`crowd.py`, D.crowd, Brian 16 Oct 2026): Yahoo's % rostered and % started for every
+player on a Deadshot roster, every regular-season week since 2021 (Yahoo keeps the history: ask with
+`/percent_started;type=week;week=N`, 25 player keys a call, one stat a call). Cached as
+yahoo_raw/<year>/pct_w<week>.json; the live season re-reads its last finished week and the week being set.
+Measures (thresholds at the top of crowd.py): chalk, calls against the crowd, gutsy starts, spot starts
+(Brian's: under 50% started and at least twice his own average before that week), gems left on the bench,
+sleepers (ownership the week BEFORE the add). It is a first version: Brian asked for it to grow into a full
+manager grade (see PLANS.md).
 `ROSTERS2026` (who started each week, Yahoo's official points) drives the trade cards'
 "Started" column and "Points that counted" tile. Yahoo reaches the league for 2021-2026 on
 Brian's account; 2015-2020 are not listed there.

@@ -210,6 +210,13 @@ const GLOSS={
    `<b>The easy version.</b> This season an extra 65 points or so adds up to about one extra win. So a trade that gives one side 6.5 more points a week than the other is worth about <b>0.1 wins a week</b>, or about <b>1 win over 10 weeks</b>.<br><br>`+
    `<b>Where 65 comes from.</b> Weekly scores this season spread out by about 26 points either side of average (the standard deviation, σ). Near an average score, one more point raises the chance of beating a typical opponent by 0.399 ÷ σ, the height of a bell curve at its middle divided by its spread. Flip that over: σ ÷ 0.399 ≈ 26 ÷ 0.399 ≈ <b>65 points per win</b>. It updates every week as more scores come in.<br><br>`+
    `On a trade card the edge is the gap between the two sides in <b>value at position</b> a week since the deal: each player’s points in the weeks he started for his new team, over a replacement-level starter at his position. That is baseball’s WAR (wins above replacement) for a trade.`,
+ crowd:`<b>Against the crowd</b><br>Yahoo publishes, every week, the share of all its leagues that started each player (<b>% started</b>) and that had him rostered (<b>% rostered</b>).<br><br>`+
+   `<b>Chalk</b>: the average % started of a manager’s starters. High means his lineups look like everyone else’s.<br><br>`+
+   `<b>Call against the crowd</b>: he started a player over a benched one at the same slot whom Yahoo started at least 20 points more often. Won if his man outscored the crowd’s; <b>net</b> is the points the calls made or cost.<br><br>`+
+   `<b>Gutsy start</b>: a starter fewer than 40% of Yahoo started. A hit beat the median score of every starter at his position in this league that week.<br><br>`+
+   `<b>Spot start</b>: a starter fewer than half of Yahoo started who scored at least twice his own points a game up to that week.<br><br>`+
+   `<b>Gem left on the bench</b>: a benched player 70%+ of Yahoo started, and started more widely than the man he could have replaced, who outscored him.<br><br>`+
+   `<b>Sleeper spotted</b>: a pickup on fewer than 25% of Yahoo rosters the week before he was added, who then started at least twice.`,
  slotx:`<b>Expected, for a draft pick</b><br>What the player who finished at the slot he was drafted at actually scored.<br><br>`+
    `Taken as the 16th receiver? He is held to what this season’s 16th-best receiver has scored. <b>Above or below</b> is his points minus that. <b>Season pace</b> carries the gap so far out to a 17-game season: the gap ÷ weeks played × 17.`,
  xwin:`<b>Wins against the pre-trade pace</b><br>How a team has done since a trade, against how it was playing before it.<br><br>`+
@@ -303,7 +310,7 @@ $('#nextYr').textContent=LAST+1;
 /* nav */
 const SECS=[['champions','Champions'],['alltime','All-Time'],['power','Power Index'],
  ['shape','Season Shape'],['weekly','Week by Week'],['luck','Luck'],['advanced','Advanced'],
- ['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],['front','Front Office'],
+ ['seasons','Seasons'],['h2h','Head to Head'],['trades-sec','Trade Market'],['front','Front Office'],['crowd','The Crowd'],
  ['records','Records'],['method','Method']];
 $('#nav').innerHTML=SECS.map(([i,t])=>`<a href="#${i}" data-id="${i}">${t}</a>`).join('');
 /* the nav scrolls on every width; it just should not look like it does */
@@ -5195,6 +5202,60 @@ let openSeason=null;
           <td class="num">${rec(b)}</td><td class="num">${b.apps} of ${b.n}</td><td class="num">${b.titles?b.titles+(b.finals>b.titles?' <span class="dim">('+b.finals+' trips)</span>':''):(b.finals?'<span class="dim">'+b.finals+' trip'+(b.finals>1?'s':'')+'</span>':'—')}</td>
           <td class="dim" style="white-space:normal">${o.alike.join(', ')}</td><td class="dim">${esc(o.also)}</td></tr>`;}).join('')+'</tbody>';
     fillEmpty(el);};
+  draw(); REDRAW.push(draw);
+})();
+/* ============ against the crowd: Deadshot's lineups and pickups against all of Yahoo (crowd.py) ============ */
+(()=>{const C=D.crowd, sec=$('#crowd'); if(!C||!C.years||!Object.keys(C.mgrs).length){if(sec)sec.remove(); const a=$('#nav a[data-id="crowd"]'); if(a)a.remove(); return;}
+  const LY=D.live?D.live.year:null, last=n=>n.split(' ').slice(-1)[0];
+  let YS=0;   /* 0 = every season */
+  const yl=y=>y===LY?`${y} <span class="dim">so far</span>`:String(y), inY=r=>!YS||r.y===YS;
+  const pc=v=>v==null?'—':Math.round(v)+'%', pl=(n,p)=>`<b>${esc(n)}</b> <span class="lv-pos">${esc((p||'').split(',')[0])}</span>`;
+  const draw=()=>{
+    $('#cwYr').innerHTML=`<button data-cy="0" class="${YS?'':'on'}">Every season</button>`+C.years.map(y=>`<button data-cy="${y}" class="${YS===y?'on':''}">${y}${y===LY?' <span class="lv-tag" style="font-size:8px;padding:0 4px">live</span>':''}</button>`).join('');
+    $$('#cwYr button').forEach(b=>b.onclick=()=>{YS=+b.dataset.cy; draw();});
+    const span=YS?String(YS):`${C.years[0]}–${C.years[C.years.length-1]}`;
+    const rows=Object.entries(C.mgrs).filter(([m])=>vis(m)).map(([m,ys])=>{const v=Object.entries(ys).filter(([y])=>!YS||+y===YS).map(([,z])=>z);
+      if(!v.length)return null; const S=k=>v.reduce((t,z)=>t+(z[k]||0),0);
+      return {m,n:v.length,chalk:S('chalkN')?S('chalk')/S('chalkN'):null,cW:S('cW'),cL:S('cL'),cNet:S('cNet'),gN:S('gN'),gHit:S('gHit'),gemN:S('gemN'),gemPts:S('gemPts'),slN:S('slN'),slPts:S('slPts'),spN:S('spN'),spPts:S('spPts'),starts:S('starts')};}).filter(Boolean);
+    $('#cwSub').textContent=`${span} · regular season · the ? explains each measure`;
+    table($('#tCwMgr'),[
+      {h:'Manager',f:r=>mlink(r.m),c:'nm',k:r=>r.m,asc:1},
+      {h:'Szns',f:r=>r.n,c:'num',k:r=>r.n},
+      {h:'Chalk',f:r=>pc(r.chalk),c:'num',k:r=>r.chalk,t:'The average % started of his starters across Yahoo: how closely his lineups follow the crowd'},
+      {h:'Calls vs crowd',f:r=>r.cW+r.cL?`${r.cW}–${r.cL}`:'—',c:'num',k:r=>r.cW-r.cL,t:'Started his man over a benched one Yahoo started 20+ points more often: won if his man outscored the crowd’s'},
+      {h:'Calls, net',f:r=>r.cW+r.cL?`<b class="${r.cNet>=0?'lv-steal':'lv-bust'}">${sg(r.cNet,1)}</b>`:'—',c:'num',k:r=>r.cNet},
+      {h:'Gutsy starts',f:r=>r.gN?`${r.gHit} of ${r.gN}`:'—',c:'num',k:r=>r.gN?r.gHit/r.gN:null,t:'Starters fewer than 40% of Yahoo started; a hit beat the median starter at his position that week'},
+      {h:'Hit rate',f:r=>r.gN?pc(100*r.gHit/r.gN):'—',c:'num',k:r=>r.gN?r.gHit/r.gN:null},
+      {h:'Spot starts',f:r=>r.spN,c:'num',k:r=>r.spN,t:'Started a player fewer than half of Yahoo started, and he scored at least twice his own average up to that week'},
+      {h:'Gems benched',f:r=>r.gemN,c:'num',k:r=>r.gemN,asc:1,t:'Benched a player 70%+ of Yahoo started, who outscored the man he could have replaced'},
+      {h:'Points left',f:r=>r.gemN?f(r.gemPts,1):'—',c:'num',k:r=>r.gemPts,asc:1},
+      {h:'Sleepers spotted',f:r=>r.slN,c:'num',k:r=>r.slN,t:'Pickups on fewer than 25% of Yahoo rosters when added, who then started at least twice'},
+      {h:'Their points',f:r=>r.slN?f(r.slPts,1):'—',c:'num',k:r=>r.slPts},
+    ],rows,{rank:1,sort:4});
+    const callRow=c=>`<tr><td>${yl(c.y)} <span class="dim">wk ${c.wk}</span></td><td class="dim">${esc(last(c.m))}</td><td class="fo-w">Started ${pl(c.n,c.pos)} <span class="dim">(${pc(c.ps)} of Yahoo)</span>, <b>${f(c.pts,1)}</b></td><td class="num"></td><td class="fo-w">over ${pl(c.over,c.opos)} <span class="dim">(${pc(c.pb)})</span>, ${f(c.opts,1)}</td><td class="num"></td><td><b class="${c.d>=0?'lv-steal':'lv-bust'}">${sg(c.d,1)}</b></td></tr>`;
+    const B=C.best.filter(inY).filter(c=>vis(c.m)).sort((a,b)=>b.d-a.d).slice(0,10), W=C.worst.filter(inY).filter(c=>vis(c.m)).sort((a,b)=>a.d-b.d).slice(0,10);
+    $('#cwCallSub').textContent=`${span} · his starter against the benched player Yahoo would have started`;
+    $('#tCwCalls').innerHTML=`<thead><tr><th>When</th><th>Manager</th><th>His call</th><th></th><th>The crowd’s</th><th></th><th>Made</th></tr></thead><tbody><tr><td colspan="7" class="sub-h" style="padding-top:10px">Best</td></tr>${B.map(callRow).join('')}<tr><td colspan="7" class="sub-h" style="padding-top:14px">Worst</td></tr>${W.map(callRow).join('')}</tbody>`;
+    const G=C.gutsy.filter(inY).filter(c=>vis(c.m)).sort((a,b)=>b.over-a.over).slice(0,15);
+    $('#cwGutSub').textContent=`${span} · started by fewer than ${C.rules.gutsy}% of Yahoo, against the median starter at his position that week`;
+    $('#tCwGut').innerHTML='<thead><tr><th>When</th><th>Manager</th><th>Player</th><th class="num">Yahoo started</th><th class="num">Points</th><th class="num">Median starter</th><th class="num">Over</th></tr></thead><tbody>'+
+      G.map(g=>`<tr><td>${yl(g.y)} <span class="dim">wk ${g.wk}</span></td><td>${mlink(g.m)}</td><td>${pl(g.n,g.pos)}</td><td class="num">${pc(g.ps)}</td><td class="num"><b>${f(g.pts,1)}</b></td><td class="num dim">${f(g.line,1)}</td><td class="num"><b class="lv-steal">${sg(g.over,1)}</b></td></tr>`).join('')+'</tbody>';
+    const SP=(C.spots||[]).filter(inY).filter(c=>vis(c.m)).sort((a,b)=>(b.pts-b.avg)-(a.pts-a.avg)).slice(0,15);
+    $('#cwSpotSub').textContent=`${span} · started by fewer than ${C.rules.spot}% of Yahoo, and at least twice his own average up to that week`;
+    $('#tCwSpot').innerHTML='<thead><tr><th>When</th><th>Manager</th><th>Player</th><th class="num">Yahoo started</th><th class="num">His average before</th><th class="num">Scored</th><th class="num">Times his average</th></tr></thead><tbody>'+
+      SP.map(g=>`<tr><td>${yl(g.y)} <span class="dim">wk ${g.wk}</span></td><td>${mlink(g.m)}</td><td>${pl(g.n,g.pos)}</td><td class="num">${pc(g.ps)}</td><td class="num dim">${f(g.avg,1)}</td><td class="num"><b>${f(g.pts,1)}</b></td><td class="num"><b class="lv-steal">${f(g.x,1)}×</b></td></tr>`).join('')+'</tbody>';
+    const E=C.gems.filter(inY).filter(c=>vis(c.m)).sort((a,b)=>b.lost-a.lost).slice(0,15);
+    $('#cwGemSub').textContent=`${span} · benched while ${C.rules.gem}%+ of Yahoo started him, and he outscored the man who played instead`;
+    $('#tCwGem').innerHTML='<thead><tr><th>When</th><th>Manager</th><th>Benched</th><th class="num">Yahoo started</th><th class="num">Points</th><th>Started instead</th><th class="num">Points</th><th class="num">Left</th></tr></thead><tbody>'+
+      E.map(g=>`<tr><td>${yl(g.y)} <span class="dim">wk ${g.wk}</span></td><td>${mlink(g.m)}</td><td>${pl(g.n,g.pos)}</td><td class="num">${pc(g.pb)}</td><td class="num"><b>${f(g.pts,1)}</b></td><td>${esc(g.over)} <span class="dim">(${pc(g.ps)})</span></td><td class="num">${f(g.spts,1)}</td><td class="num"><b class="lv-bust">${sg(-g.lost,1)}</b></td></tr>`).join('')+'</tbody>';
+    const slRow=x=>`<tr><td>${yl(x.y)} <span class="dim">${esc(x.d)}</span></td><td>${mlink(x.m)}</td><td>${pl(x.n,x.pos)}</td><td class="num">${pc(x.own)}</td><td class="num">${x.later==null?'—':pc(x.later)}</td><td class="num">${x.starts}</td><td class="num">${f(x.pts,1)}</td><td class="num">${x.val==null?'—':`<b class="${x.val>=0?'lv-steal':'lv-bust'}">${sg(x.val,1)}</b>`}</td></tr>`;
+    const hd=t=>`<thead><tr><th>Added</th><th>Manager</th><th>${t}</th><th class="num">Yahoo rostered, week before</th><th class="num">Highest, next month</th><th class="num">Starts</th><th class="num">Points</th><th class="num">Value at position <span class="gl" data-gl="val" tabindex="0">?</span></th></tr></thead>`;
+    $('#cwSlSub').textContent=`${span} · on fewer than ${C.rules.sleeper}% of Yahoo rosters the week before he was added, then started at least twice`;
+    $('#tCwSl').innerHTML=hd('Player')+'<tbody>'+C.sleepers.filter(inY).filter(c=>vis(c.m)).sort((a,b)=>(b.val||0)-(a.val||0)).slice(0,15).map(slRow).join('')+'</tbody>';
+    $('#tCwSlKD').innerHTML=hd('Kicker or defense')+'<tbody>'+C.sleepersKD.filter(inY).filter(c=>vis(c.m)).sort((a,b)=>(b.val||0)-(a.val||0)).slice(0,8).map(slRow).join('')+'</tbody>';
+    ['#tCwCalls','#tCwGut','#tCwSpot','#tCwGem','#tCwSl','#tCwSlKD'].forEach(k=>fillEmpty($(k)));
+    glossify(sec);
+  };
   draw(); REDRAW.push(draw);
 })();
 /* the Advanced section's write-up of how 2026 is graded: the same words as the ? marks, with this

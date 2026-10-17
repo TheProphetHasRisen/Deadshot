@@ -80,7 +80,7 @@ def transactions(year):
         for p in items(t[1].get('players', {})) if len(t) > 1 and isinstance(t[1], dict) else []:
             p = p['player']; f = flat(p[0]); td = p[1]['transaction_data']
             td = td[0] if isinstance(td, list) else td
-            pl.append(dict(n=f['name']['full'], pos=f.get('display_position'), nfl=(f.get('editorial_team_abbr') or '').upper(),
+            pl.append(dict(n=f['name']['full'], key=f.get('player_key'), pos=f.get('display_position'), nfl=(f.get('editorial_team_abbr') or '').upper(),
                            move=td['type'], source=td.get('source_type'),
                            frm=T.get(td.get('source_team_key'), {}).get('name'), to=T.get(td.get('destination_team_key'), {}).get('name')))
         out.append(dict(kind=meta['type'], status=meta.get('status'), ts=int(meta['timestamp']),

@@ -94,7 +94,7 @@ module.exports = [
       sourceType: 'script',
       globals: {
         ...browser,
-        '$': 'readonly', '$$': 'readonly', 'D': 'readonly', 'LAST': 'readonly', 'M': 'readonly', 'MX': 'readonly', 'POG': 'readonly', 'REGG': 'readonly', 'ROWS': 'readonly', 'SEA': 'readonly', 'SEL': 'readonly', 'byName': 'readonly', 'bySeasons': 'readonly', 'closeMgr': 'readonly', 'drawWeekly': 'readonly', 'esc': 'readonly', 'jumpSeason': 'readonly', 'mlink': 'readonly', 'nOf': 'readonly', 'openMgr': 'readonly', 'ord': 'readonly', 'ov': 'readonly', 'pct': 'readonly', 'rowsOf': 'readonly', 'setSel': 'readonly', 'sg': 'readonly', 'tabTitle': 'readonly', 'tyMinus': 'readonly', 'yearList': 'readonly', 'LOGYRS': 'readonly', 'PASTWK': 'readonly', RETFOCUS: 'writable',
+        '$': 'readonly', '$$': 'readonly', 'D': 'readonly', 'LAST': 'readonly', 'M': 'readonly', 'MX': 'readonly', 'POG': 'readonly', 'REGG': 'readonly', 'ROWS': 'readonly', 'SEA': 'readonly', 'SEL': 'readonly', 'byName': 'readonly', 'bySeasons': 'readonly', 'closeMgr': 'readonly', 'drawWeekly': 'readonly', 'esc': 'readonly', 'jumpSeason': 'readonly', 'mlink': 'readonly', 'nOf': 'readonly', 'openMgr': 'readonly', 'ord': 'readonly', 'ov': 'readonly', 'pct': 'readonly', 'rowsOf': 'readonly', 'setSel': 'readonly', 'sg': 'readonly', 'tabTitle': 'readonly', 'tyMinus': 'readonly', 'yearList': 'readonly', 'LOGYRS': 'readonly', 'PASTWK': 'readonly', 'GLOSS': 'readonly', 'foldRoot': 'readonly', 'foldSweep': 'readonly', 'reveal': 'readonly', RETFOCUS: 'writable',
       },
     },
     linterOptions: { reportUnusedDisableDirectives: true },

@@ -349,5 +349,12 @@ if S26:
     # which NFL franchise each manager is, on his whole career against its last ten seasons (nflcomps.py)
     import nflcomps
     out['comps'] = nflcomps.comps(out['rows'], out['games'])
+    # against the crowd: every lineup and pickup graded against all of Yahoo (crowd.py); needs the Yahoo sign-in
+    # the first time each week is read, and is left out (not an error) if Yahoo cannot be reached
+    try:
+        import crowd
+        if os.path.exists('yahoo_raw/league_keys.json'): out['crowd'] = crowd.build()
+    except Exception as e:
+        print('  (against the crowd left out: %s)' % str(e)[:120])
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))
