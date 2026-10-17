@@ -14,6 +14,7 @@ from scoring import score
 import injuries
 
 HIST = 'proj_hist.json'
+_LIVE = {}
 OFF = ('QB', 'RB', 'WR', 'TE', 'K', 'DEF')
 
 def _pull(y):
@@ -31,13 +32,19 @@ def _pull(y):
             out.setdefault(pid, [None] * 18)[w - 1] = round(score(st, pos), 2)
     return out
 
-def table(y, live=False):
+def table(y, live=False, full=False):
+    """full: every NFL player (the free agents too), from the local cache when there is one; proj_hist.json keeps
+    only players ever on a Deadshot roster"""
+    if full and not live and os.path.exists('yahoo_raw/sleeper_proj_%d.json' % y):
+        return json.load(open('yahoo_raw/sleeper_proj_%d.json' % y))
     if not live and os.path.exists(HIST):
         h = json.load(open(HIST))
         if str(y) in h: return h[str(y)]
     f = 'yahoo_raw/sleeper_proj_%d.json' % y
     if os.path.exists(f) and not live: return json.load(open(f))
+    if live and y in _LIVE: return _LIVE[y]     # once per build: the forecast, the needs and the report card all read it
     t = _pull(y)
+    if live and t: _LIVE[y] = t
     if t: json.dump(t, open(f, 'w'))
     elif os.path.exists(f): t = json.load(open(f))
     return t

@@ -7,10 +7,12 @@ Each team's expected score for each week still to play:
     week, scored the league's way. A player out injured, suspended, on a bye or not yet back projects 0 for
     the weeks he will miss and his full value from the week he returns, so injuries, returns, suspensions and
     byes all come in through it. IR slots count: a player stashed there is back in the lineup when he is.
-  * b1 and b2 are fitted on every Deadshot season Yahoo reaches (2021-2025): the same number of weeks played,
-    each later week's score against the projected lineup and the form to date. In this league both are weak
-    (week to week, scores are close to a coin flip around the average), so the fit shrinks both hard and the
-    swing around the expected score is the week-to-week spread that is left.
+  * b1 and b2 are fitted on every Deadshot season Yahoo reaches (2021-2025), each frozen at the same number of
+    weeks played with the projections as they stood then (refit(); backtest.py): each later week's score against
+    the projected lineup and the form to date. In this league both are weak (week to week, scores are close to a
+    coin flip around the average), so the swing around the expected score is the week-to-week spread that is left.
+  * USER's pick after the backtest (17 Oct 2026; mixed()): playoff, bye and seed odds blend that model with the
+    standings alone, weight (8 - weeks played) / 6 on the model; title odds use the model alone.
 Then the real schedule is played out: wins, then points for (how Yahoo has seeded every tie since 2021); the
 top six make it, the top two get byes; the bracket re-seeds after the first round (the 1 seed meets the lowest
 seed left).
@@ -62,6 +64,11 @@ def fit(k, exclude=()):
             pl = {t: PL[(t, w)] for t in teams}
             pm = sum(pl.values()) / len(pl); am = sum(sc[(t, w)] for t in teams) / len(teams)
             for t in teams: X.append((pl[t] - pm, lvl[t])); Y.append(sc[(t, w)] - am)
+    return _ols(X, Y)
+
+def _ols(X, Y):
+    """least squares of Y on the two predictors (no intercept: both sides are measured against the league that
+    week), with standard errors, p-values and R squared for the model page"""
     n = len(X)
     if n < 30: return dict(b1=0.0, b2=0.0, sd=22.0, n=n)   # nothing to learn from at this point of the season
     sxx = sum(a * a for a, _ in X); syy = sum(b * b for _, b in X); sxy = sum(a * b for a, b in X)
@@ -69,7 +76,6 @@ def fit(k, exclude=()):
     det = sxx * syy - sxy * sxy
     b1 = (sxr * syy - syr * sxy) / det; b2 = (syr * sxx - sxr * sxy) / det
     res = [r - b1 * a - b2 * b for (a, b), r in zip(X, Y)]
-    # standard errors, two-sided p-values (normal approximation: n is in the hundreds) and R squared, for the model page
     s2 = sum(e * e for e in res) / (n - 2)
     se1, se2 = math.sqrt(s2 * syy / det), math.sqrt(s2 * sxx / det)
     pv = lambda z: 2 * (1 - 0.5 * (1 + math.erf(abs(z) / math.sqrt(2))))
@@ -77,6 +83,18 @@ def fit(k, exclude=()):
     corr = sxy / math.sqrt(sxx * syy)
     return dict(b1=b1, b2=b2, sd=math.sqrt(sum(e * e for e in res) / n), n=n, se1=se1, se2=se2, p1=pv(b1 / se1), p2=pv(b2 / se2),
                 r2=1 - sum(e * e for e in res) / tot, rawsd=math.sqrt(tot / n), corr=corr)
+
+def refit(k):
+    """the model as the live site uses it since 17 Oct 2026 (USER's pick after the backtest): fitted on projections
+    as they were known at the time (backtest.py), not on each week's own projection, which knew that week's injuries"""
+    import backtest as BT
+    R = [r for s in TF.YEARS if s != TF.LIVE for r in BT.asof_rows(s, k)]
+    return _ols([(a, b) for a, b, _ in R], [r for _, _, r in R])
+
+def blend_weight(k):
+    """the weight on the refitted model for playoff, bye and seed odds; the rest is the standings alone (every team
+    equal from here). Read off the backtest: the model is better early, the standings from week 6"""
+    return min(1.0, max(0.0, (8 - k) / 6))
 
 def season_state(y, k):
     """the season as it stood after week k: records, points, form, rosters, schedule left"""
@@ -142,28 +160,59 @@ def run(y, k, n, rnd, F=None, pj=None):
         title[play(f1, f2)] += 1
     out = {}
     for t in teams:
-        need = {}
-        for thr in (0.5, 0.8, 0.95):
-            ok = [w for w, (c, m) in sorted(finalW[t].items()) if c >= max(30, n // 2000) and m / c >= thr]
-            need[str(thr)] = ok[0] if ok else None
+        need = _need({w: (c / n, m / n) for w, (c, m) in finalW[t].items()}, n)
         s = swing[t]
         out[t] = dict(po=po[t] / n, bye=bye[t] / n, title=title[t] / n, wins=wins[t] / n, pts=pts[t] / n,
                       seed=[round(c / n, 4) for c in seed[t]], need=need,
-                      ifWin=(s[1] / s[0]) if s[0] else None, ifLose=(s[3] / s[2]) if s[2] else None,
-                      byWins={str(w): [c, m] for w, (c, m) in sorted(finalW[t].items())},
+                      ifWin=(s[1] / s[0]) if s[0] else None, ifLose=(s[3] / s[2]) if s[2] else None, _sw=[c / n for c in s],
+                      byWins={str(w): [c, m] for w, (c, m) in sorted(finalW[t].items())}, _fw={w: (c / n, m / n) for w, (c, m) in finalW[t].items()},
                       mu={str(w): round(mu[(t, w)], 2) for w in weeks}, proj={str(w): round(proj[(t, w)], 2) for w in weeks},
                       w=rec[t][0], l=rec[t][1], pf=round(rec[t][2], 2), level=round(lg + F['b2'] * lvl[t], 2), form=round(lvl[t], 3))
     games = [dict(wk=g['wk'], ta=g['ta'], tb=g['tb'], muA=round(mu[(g['ta'], g['wk'])], 2), muB=round(mu[(g['tb'], g['wk'])], 2),
-                  pA=round(mwin.get((g['ta'], g['tb']), 0) / n, 4) if g['wk'] == nxt else None) for g in left]
-    return dict(teams=out, games=games, weeks=weeks, next=nxt, lg=round(lg, 2), fit=F, roster_week=rw, roster=roster, pj=pj)
+                  pA=round(mwin.get((g['ta'], g['tb']), 0) / n, 6) if g['wk'] == nxt else None) for g in left]
+    done = [[g['wk'], g['ta'], g['tb'], g['aa'], g['ab']] for g in P.games(y) if g['status'] == 'postevent' and g['wk'] <= k and g['wk'] < st['po']]
+    return dict(teams=out, games=games, weeks=weeks, next=nxt, lg=round(lg, 2), fit=F, roster_week=rw, roster=roster, pj=pj,
+                scores={t: [round(v, 2) for v in rec[t][3]] for t in teams}, done=done)
+
+def _need(fw, n):
+    """the fewest final wins that get him in at 50%, 80% and 95%: fw {wins: (share of seasons, share made it)}"""
+    need = {}
+    for thr in (0.5, 0.8, 0.95):
+        ok = [w for w, (c, m) in sorted(fw.items()) if c * n >= max(30, n // 2000) and m / c >= thr]
+        need[str(thr)] = ok[0] if ok else None
+    return need
+
+def mixed(y, k, n, seed):
+    """the live forecast (USER's pick, 17 Oct 2026): playoff, bye and seed odds from the blend (the refitted model,
+    weighted down week by week toward the standings alone); title odds from the refitted model"""
+    F = refit(k); wt = blend_weight(k)
+    m = run(y, k, n, random.Random(seed), F=F)
+    if wt >= 1: r0 = m
+    else: r0 = run(y, k, n, random.Random(seed + 7), F=dict(F, b1=0.0, b2=0.0), pj=m['pj'])
+    mix = lambda a, b: wt * a + (1 - wt) * b
+    for t, v in m['teams'].items():
+        z = r0['teams'][t]
+        for key in ('po', 'bye', 'wins', 'pts'): v[key] = mix(v[key], z[key])
+        v['seed'] = [round(mix(a, b), 4) for a, b in zip(v['seed'], z['seed'])]
+        fw = {w: (mix(*(x.get(w, (0, 0))[0] for x in (v['_fw'], z['_fw']))), mix(*(x.get(w, (0, 0))[1] for x in (v['_fw'], z['_fw']))))
+              for w in set(v['_fw']) | set(z['_fw'])}
+        v['byWins'] = {str(w): [round(c * n), round(mm * n)] for w, (c, mm) in sorted(fw.items()) if c > 0}
+        v['need'] = _need(fw, n)
+        sw = [mix(a, b) for a, b in zip(v['_sw'], z['_sw'])]
+        v['ifWin'] = sw[1] / sw[0] if sw[0] else None; v['ifLose'] = sw[3] / sw[2] if sw[2] else None
+        v['title'] = min(v['title'], v['po'])      # the refitted model's title odds, never above his playoff odds
+        for key in ('_fw', '_sw'): v.pop(key, None)
+    for g, g0 in zip(m['games'], r0['games']):
+        if g['pA'] is not None: g['pA'] = round(mix(g['pA'], g0['pA']), 4)
+    m['model'] = dict(playoffs='blend', titles='refit', weight=round(wt, 3), week=k)
+    return m
 
 def build(y=None):
     y = y or TF.LIVE
     st = TF.settings(y)
     played = max([g['wk'] for g in P.games(y) if g['status'] == 'postevent' and g['wk'] < st['po']] or [0])
     if not played: return None
-    rnd = random.Random(y)
-    now = run(y, played, N, rnd)
+    now = mixed(y, played, N, y)
     T = now['teams']
     # injuries: his players listed out, doubtful or questionable this week, their projection, and the week they are back
     inj = {}; st = TF.settings(y)
@@ -174,29 +223,57 @@ def build(y=None):
             # what his absence costs: each week he is out, his team's projected best lineup with him (at the
             # projection he carries once back) against without him, added up
             healthy = now['pj'](r['n'], r['pos'], r['nfl'], back) if back else None
-            cost = 0.0
+            cost = 0.0; costW = {}
             if healthy:
                 for w in [w for w in now['weeks'] if w < back]:
                     rows = now['roster'][t]
                     fixed = lambda n, pos, nfl, wk, _n=r['n'], _h=healthy: _h if n == _n else now['pj'](n, pos, nfl, wk)
-                    cost += _lineup(rows, w, fixed, st['slots']) - _lineup(rows, w, now['pj'], st['slots'])
+                    c = _lineup(rows, w, fixed, st['slots']) - _lineup(rows, w, now['pj'], st['slots'])
+                    cost += c
+                    if c > 0.05: costW[str(w)] = round(c, 2)
+            # a player listed questionable or doubtful whom the projection still plays: what his team loses if he sits this week
+            sits = None
+            if back == now['next'] and r['status'] in ('Q', 'D') and now['next']:
+                rows = now['roster'][t]
+                sits = round(_lineup(rows, now['next'], now['pj'], st['slots']) - _lineup([x for x in rows if x['n'] != r['n']], now['next'], now['pj'], st['slots']), 2)
             inj.setdefault(t, []).append(dict(n=r['n'], pos=(r['pos'] or '').split(',')[0], status=r['status'], slot=r['slot'],
                                               thisWeek=now['pj'](r['n'], r['pos'], r['nfl'], now['next']) if now['next'] else None, back=back,
-                                              cost=round(cost, 1)))
+                                              cost=round(cost, 1), costW=costW, sits=sits))
     # what each team needs, by position: his projected starters at each slot over the weeks left, against the
-    # league's, and his depth (the next man up) there
+    # league's; the same after the best free agents are counted (a hole waivers can fill is not a need); and his
+    # depth, the next man up, over what waivers offer at that position (a backup quarterback is worth little
+    # when a free one scores nearly as much: posvalue.py)
+    import posvalue as PV
     slots = st['slots']; POS = [p for p in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF') if slots.get(p)]
+    allrows = [r for rows in now['roster'].values() for r in rows]
+    FAw = PV.free_agents(y, lambda w: allrows, now['weeks'], live=(y == TF.LIVE), top=3)
+    FAr = PV.rest_of_season(y, allrows, now['weeks'], live=(y == TF.LIVE))
+    repl = {p_: sum(sum(v for v, _, _ in FAw[p_].get(w, [])[:3]) / max(1, len(FAw[p_].get(w, [])[:3])) for w in now['weeks']) / max(1, len(now['weeks'])) for p_ in POS}
     need = {}
     for t, rows in now['roster'].items():
-        acc = {p: 0.0 for p in POS + ['FLEX']}; dep = {p: 0.0 for p in POS}; n = 0
+        acc = {p: 0.0 for p in POS + ['FLEX']}; dep = {p: 0.0 for p in POS}; eff = {p: 0.0 for p in POS}; over = {p: 0.0 for p in POS}; n = 0
+        weak = {p: 0.0 for p in POS}
         for w in now['weeks']:
             n += 1; left = []
             for p_ in POS:
                 xs = sorted([(now['pj'](r['n'], r['pos'], r['nfl'], w) or 0, r['n']) for r in rows if (r['pos'] or '').split(',')[0] == p_], reverse=True)
                 k = slots[p_]; acc[p_] += sum(v for v, _ in xs[:k]); dep[p_] += xs[k][0] if len(xs) > k else 0
+                weak[p_] += xs[k - 1][0] if len(xs) >= k else 0
+                fa = [v for v, _, _ in FAw[p_].get(w, [])[:k]]
+                eff[p_] += sum(sorted([v for v, _ in xs] + fa, reverse=True)[:k])
+                r_w = sum(fa) / len(fa) if fa else 0
+                over[p_] += max(0.0, (xs[k][0] if len(xs) > k else 0) - r_w)
                 if p_ in ('RB', 'WR', 'TE'): left += xs[k:]
             if slots.get('W/R/T'): acc['FLEX'] += max([v for v, _ in left] or [0])
-        need[t] = {p_: round(v / max(1, n), 2) for p_, v in acc.items()}; need[t]['_depth'] = {p_: round(v / max(1, n), 2) for p_, v in dep.items()}
+        m = max(1, n)
+        need[t] = {p_: round(v / m, 2) for p_, v in acc.items()}
+        need[t]['_depth'] = {p_: round(v / m, 2) for p_, v in dep.items()}
+        need[t]['_over'] = {p_: round(v / m, 2) for p_, v in over.items()}
+        need[t]['_eff'] = {p_: round(v / m, 2) for p_, v in eff.items()}
+        # the free agent who would help him most: the best one at the position where he beats his weakest starter by most
+        fix = [(FAr[p_][0][0] - weak[p_] / m, p_, FAr[p_][0][1]) for p_ in POS if FAr.get(p_)]
+        fix = max(fix) if fix else None
+        need[t]['_fix'] = [fix[1], fix[2], round(fix[0], 2)] if fix and fix[0] >= 1.0 else None
     lgpos = {p_: sum(v[p_] for v in need.values()) / len(need) for p_ in POS + ['FLEX']}
     lgdep = {p_: sum(v['_depth'][p_] for v in need.values()) / len(need) for p_ in POS}
     # schedule left: each opponent's expected score, against the league's
@@ -208,19 +285,21 @@ def build(y=None):
     hist = {}
     for k in range(1, played + 1):
         try:
-            r = run(y, k, N_PAST, random.Random(y * 100 + k))
+            r = mixed(y, k, N_PAST, y * 100 + k)
             hist[k] = {t: dict(po=round(v['po'], 4), bye=round(v['bye'], 4), title=round(v['title'], 4)) for t, v in r['teams'].items()}
         except Exception:
             pass
     hist[played] = {t: dict(po=round(v['po'], 4), bye=round(v['bye'], 4), title=round(v['title'], 4)) for t, v in T.items()}
     mgr = {t: TF.mgr_of(y, t) for t in T}
-    return dict(year=y, played=played, regWeeks=st['po'] - 1, runs=N, next=now['next'], lg=now['lg'],
+    return dict(year=y, played=played, regWeeks=st['po'] - 1, runs=N, next=now['next'], lg=now['lg'], model=now['model'],
                 fit={k: (float('%.4g' % v) if isinstance(v, float) else v) for k, v in now['fit'].items()},
                 teams=[dict(team=t, mgr=mgr[t], **{k: (round(v, 4) if isinstance(v, float) else v) for k, v in T[t].items()}, sos=sos[t], inj=inj.get(t, []))
                        for t in sorted(T, key=lambda t: -T[t]['po'])],
-                games=now['games'], history=hist,
+                games=now['games'], history=hist, scores=now['scores'], done=now['done'],
+                fitOld={k: (float('%.4g' % v) if isinstance(v, float) else v) for k, v in fit(played).items()},
                 needs=dict(pos=POS + (['FLEX'] if slots.get('W/R/T') else []), league={k: round(v, 2) for k, v in lgpos.items()},
-                           leagueDepth={k: round(v, 2) for k, v in lgdep.items()}, teams=need, slots={p_: slots.get(p_) for p_ in POS}))
+                           leagueDepth={k: round(v, 2) for k, v in lgdep.items()}, teams=need, repl={k: round(v, 2) for k, v in repl.items()},
+                           fa={p_: FAr.get(p_, [])[:3] for p_ in POS}, slots={p_: slots.get(p_) for p_ in POS}))
 
 if __name__ == '__main__':
     import time; t0 = time.time(); F = build()

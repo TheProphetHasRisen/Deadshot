@@ -1,0 +1,812 @@
+{
+"2021": {
+"Brian Berger": {
+"draft": -41.64,
+"drops": -0.82,
+"g": 15,
+"lineups": 5.2,
+"n": {
+"draft": 13,
+"drops": 23,
+"lineups": 15,
+"trades": 4,
+"waivers": 23
+},
+"team": "\u201cClose\u201d~~~ 0.33-0.42",
+"trades": 11.3,
+"waivers": 86.68
+},
+"Brian Burke": {
+"draft": -361.24,
+"drops": 276.68,
+"g": 15,
+"lineups": 5.7,
+"n": {
+"draft": 12,
+"drops": 24,
+"lineups": 15,
+"trades": 1,
+"waivers": 25
+},
+"team": "brian's Choice Team",
+"trades": -21.74,
+"waivers": -10.48
+},
+"Chris Cossu": {
+"draft": 431.04,
+"drops": -11.28,
+"g": 15,
+"lineups": 4.98,
+"n": {
+"draft": 14,
+"drops": 27,
+"lineups": 15,
+"trades": 6,
+"waivers": 27
+},
+"team": "Aaron it out",
+"trades": -29.46,
+"waivers": -64.96
+},
+"Jonathan Campbell": {
+"draft": -285.06,
+"drops": -205.96,
+"g": 15,
+"lineups": -55.82,
+"n": {
+"draft": 13,
+"drops": 50,
+"lineups": 15,
+"trades": 6,
+"waivers": 53
+},
+"team": "HunchoCamby\ud83e\udd78",
+"trades": 26.39,
+"waivers": -94.02
+},
+"Kevin Krueger": {
+"draft": 330.06,
+"drops": -24.46,
+"g": 15,
+"lineups": -96.06,
+"n": {
+"draft": 13,
+"drops": 17,
+"lineups": 15,
+"trades": 2,
+"waivers": 19
+},
+"team": "Kevin's Superb Optimal Team",
+"trades": -14.75,
+"waivers": -38.88
+},
+"Niko Contreras": {
+"draft": 41.81,
+"drops": 188.0,
+"g": 15,
+"lineups": -1.2,
+"n": {
+"draft": 13,
+"drops": 19,
+"lineups": 15,
+"trades": 0,
+"waivers": 20
+},
+"team": "VICTORY",
+"trades": 0.0,
+"waivers": 70.46
+},
+"Peter Modlin": {
+"draft": 189.01,
+"drops": 182.0,
+"g": 15,
+"lineups": -62.54,
+"n": {
+"draft": 13,
+"drops": 18,
+"lineups": 15,
+"trades": 2,
+"waivers": 18
+},
+"team": "SAUCE TEAM",
+"trades": -64.22,
+"waivers": 31.22
+},
+"Shane Kaiper": {
+"draft": -597.91,
+"drops": 275.4,
+"g": 15,
+"lineups": 18.3,
+"n": {
+"draft": 14,
+"drops": 52,
+"lineups": 15,
+"trades": 4,
+"waivers": 51
+},
+"team": "Stegostompem",
+"trades": -2.6,
+"waivers": 105.82
+},
+"Walter Bremer": {
+"draft": 156.9,
+"drops": 26.64,
+"g": 15,
+"lineups": -32.7,
+"n": {
+"draft": 13,
+"drops": 16,
+"lineups": 15,
+"trades": 1,
+"waivers": 16
+},
+"team": "Hail Chubby",
+"trades": 3.43,
+"waivers": 187.06
+},
+"Wesley Alpert": {
+"draft": 343.5,
+"drops": 171.62,
+"g": 15,
+"lineups": 18.94,
+"n": {
+"draft": 13,
+"drops": 35,
+"lineups": 15,
+"trades": 2,
+"waivers": 38
+},
+"team": "NAH G",
+"trades": 91.65,
+"waivers": 270.06
+}
+},
+"2022": {
+"Brian Berger": {
+"draft": 272.1,
+"drops": 317.73,
+"g": 14,
+"lineups": -64.0,
+"n": {
+"draft": 13,
+"drops": 21,
+"lineups": 14,
+"trades": 1,
+"waivers": 22
+},
+"team": "Hit by Gatsby's Bus",
+"trades": -16.6,
+"waivers": 155.94
+},
+"Brian Burke": {
+"draft": 285.01,
+"drops": 292.7,
+"g": 14,
+"lineups": -26.8,
+"n": {
+"draft": 13,
+"drops": 33,
+"lineups": 14,
+"trades": 0,
+"waivers": 33
+},
+"team": "Poe's Palace",
+"trades": 0.0,
+"waivers": 15.66
+},
+"Chris Cossu": {
+"draft": -45.19,
+"drops": 13.9,
+"g": 14,
+"lineups": 28.8,
+"n": {
+"draft": 13,
+"drops": 19,
+"lineups": 14,
+"trades": 2,
+"waivers": 19
+},
+"team": "5 Hunnid K in the Bank",
+"trades": -17.19,
+"waivers": 61.58
+},
+"Kevin Krueger": {
+"draft": -75.02,
+"drops": 70.17,
+"g": 14,
+"lineups": 31.6,
+"n": {
+"draft": 14,
+"drops": 35,
+"lineups": 14,
+"trades": 5,
+"waivers": 35
+},
+"team": "Larryette",
+"trades": 95.83,
+"waivers": 52.46
+},
+"Nathan Wu": {
+"draft": 143.6,
+"drops": 53.98,
+"g": 14,
+"lineups": -3.6,
+"n": {
+"draft": 12,
+"drops": 30,
+"lineups": 14,
+"trades": 3,
+"waivers": 32
+},
+"team": "Broncos Country",
+"trades": -58.66,
+"waivers": 50.08
+},
+"Niko Contreras": {
+"draft": -207.17,
+"drops": 104.83,
+"g": 14,
+"lineups": 16.2,
+"n": {
+"draft": 13,
+"drops": 24,
+"lineups": 14,
+"trades": 4,
+"waivers": 27
+},
+"team": "GODDID",
+"trades": 108.68,
+"waivers": -0.7
+},
+"Peter Modlin": {
+"draft": 510.24,
+"drops": 0.72,
+"g": 14,
+"lineups": -106.7,
+"n": {
+"draft": 13,
+"drops": 5,
+"lineups": 14,
+"trades": 0,
+"waivers": 5
+},
+"team": "SAUCE TEAM",
+"trades": 0.0,
+"waivers": 42.04
+},
+"Shane Kaiper": {
+"draft": 47.58,
+"drops": 28.54,
+"g": 14,
+"lineups": 8.4,
+"n": {
+"draft": 13,
+"drops": 28,
+"lineups": 14,
+"trades": 5,
+"waivers": 28
+},
+"team": "Stegostompem",
+"trades": -88.99,
+"waivers": 155.38
+},
+"Walter Bremer": {
+"draft": -267.04,
+"drops": -101.21,
+"g": 14,
+"lineups": 9.54,
+"n": {
+"draft": 13,
+"drops": 23,
+"lineups": 14,
+"trades": 1,
+"waivers": 22
+},
+"team": "DO BRONX",
+"trades": -115.48,
+"waivers": 132.7
+},
+"Wesley Alpert": {
+"draft": -57.08,
+"drops": 45.3,
+"g": 14,
+"lineups": -14.9,
+"n": {
+"draft": 13,
+"drops": 41,
+"lineups": 14,
+"trades": 5,
+"waivers": 41
+},
+"team": "SHIESTY SZN",
+"trades": 92.41,
+"waivers": 151.52
+}
+},
+"2023": {
+"Brian Berger": {
+"draft": -53.64,
+"drops": 109.64,
+"g": 14,
+"lineups": -14.2,
+"n": {
+"draft": 13,
+"drops": 24,
+"lineups": 14,
+"trades": 2,
+"waivers": 23
+},
+"team": "Beyond the Abyss",
+"trades": 87.07,
+"waivers": 100.56
+},
+"Brian Burke": {
+"draft": 185.98,
+"drops": 92.03,
+"g": 14,
+"lineups": 29.8,
+"n": {
+"draft": 13,
+"drops": 37,
+"lineups": 14,
+"trades": 0,
+"waivers": 37
+},
+"team": "Poe's Palace",
+"trades": 0.0,
+"waivers": 80.22
+},
+"Jonathan Campbell": {
+"draft": 301.88,
+"drops": 404.79,
+"g": 14,
+"lineups": -26.0,
+"n": {
+"draft": 13,
+"drops": 67,
+"lineups": 14,
+"trades": 4,
+"waivers": 67
+},
+"team": "Grimace",
+"trades": -105.73,
+"waivers": 106.74
+},
+"Kevin Krueger": {
+"draft": -86.01,
+"drops": 235.63,
+"g": 14,
+"lineups": -4.0,
+"n": {
+"draft": 13,
+"drops": 24,
+"lineups": 14,
+"trades": 2,
+"waivers": 25
+},
+"team": "Hench",
+"trades": 51.86,
+"waivers": 190.54
+},
+"Nathan Wu": {
+"draft": 179.08,
+"drops": 172.34,
+"g": 14,
+"lineups": 31.5,
+"n": {
+"draft": 13,
+"drops": 14,
+"lineups": 14,
+"trades": 0,
+"waivers": 15
+},
+"team": "Broncos Country",
+"trades": 0.0,
+"waivers": 101.14
+},
+"Nick Gearing": {
+"draft": 314.7,
+"drops": 77.71,
+"g": 14,
+"lineups": -6.7,
+"n": {
+"draft": 13,
+"drops": 27,
+"lineups": 14,
+"trades": 3,
+"waivers": 29
+},
+"team": "Kabul Gearing Bombers",
+"trades": -72.55,
+"waivers": 122.76
+},
+"Niko Contreras": {
+"draft": 85.2,
+"drops": 37.17,
+"g": 14,
+"lineups": 39.0,
+"n": {
+"draft": 13,
+"drops": 11,
+"lineups": 14,
+"trades": 2,
+"waivers": 9
+},
+"team": "MASHALLAH",
+"trades": -75.38,
+"waivers": -33.82
+},
+"Shane Kaiper": {
+"draft": -72.0,
+"drops": 97.15,
+"g": 14,
+"lineups": -11.2,
+"n": {
+"draft": 13,
+"drops": 17,
+"lineups": 14,
+"trades": 4,
+"waivers": 17
+},
+"team": "Stegostompem",
+"trades": 32.64,
+"waivers": 131.16
+},
+"Walter Bremer": {
+"draft": -426.16,
+"drops": 63.08,
+"g": 14,
+"lineups": 3.36,
+"n": {
+"draft": 13,
+"drops": 16,
+"lineups": 14,
+"trades": 2,
+"waivers": 16
+},
+"team": "Walter",
+"trades": -33.16,
+"waivers": -16.3
+},
+"Wesley Alpert": {
+"draft": 45.32,
+"drops": -204.16,
+"g": 14,
+"lineups": 21.38,
+"n": {
+"draft": 13,
+"drops": 63,
+"lineups": 14,
+"trades": 5,
+"waivers": 66
+},
+"team": "SNIPES",
+"trades": 115.25,
+"waivers": -225.18
+}
+},
+"2024": {
+"Brian Berger": {
+"draft": 250.14,
+"drops": -106.46,
+"g": 14,
+"lineups": -117.62,
+"n": {
+"draft": 13,
+"drops": 14,
+"lineups": 14,
+"trades": 1,
+"waivers": 15
+},
+"team": "The Pharaoh's Disciples",
+"trades": -12.42,
+"waivers": 136.6
+},
+"Brian Burke": {
+"draft": 49.72,
+"drops": 57.68,
+"g": 14,
+"lineups": -22.88,
+"n": {
+"draft": 13,
+"drops": 35,
+"lineups": 14,
+"trades": 2,
+"waivers": 35
+},
+"team": "Poe's Palace",
+"trades": 15.28,
+"waivers": -28.76
+},
+"Chris Cossu": {
+"draft": -44.75,
+"drops": 175.66,
+"g": 14,
+"lineups": -0.8,
+"n": {
+"draft": 14,
+"drops": 32,
+"lineups": 14,
+"trades": 4,
+"waivers": 31
+},
+"team": "It's a Love Story",
+"trades": 14.19,
+"waivers": 165.38
+},
+"Dylan McMahon": {
+"draft": 15.24,
+"drops": -91.43,
+"g": 14,
+"lineups": 16.56,
+"n": {
+"draft": 13,
+"drops": 22,
+"lineups": 14,
+"trades": 5,
+"waivers": 21
+},
+"team": "DylansVillans",
+"trades": -55.94,
+"waivers": 79.82
+},
+"Kevin Krueger": {
+"draft": -97.81,
+"drops": 293.14,
+"g": 14,
+"lineups": 33.2,
+"n": {
+"draft": 13,
+"drops": 30,
+"lineups": 14,
+"trades": 0,
+"waivers": 30
+},
+"team": "Hench",
+"trades": 0.0,
+"waivers": 47.94
+},
+"Nathan Wu": {
+"draft": -54.01,
+"drops": 88.81,
+"g": 14,
+"lineups": 2.98,
+"n": {
+"draft": 12,
+"drops": 32,
+"lineups": 14,
+"trades": 1,
+"waivers": 33
+},
+"team": "U gotta BO-lieve",
+"trades": 38.61,
+"waivers": 224.62
+},
+"Nick Gearing": {
+"draft": 187.46,
+"drops": -227.81,
+"g": 14,
+"lineups": 0.74,
+"n": {
+"draft": 13,
+"drops": 36,
+"lineups": 14,
+"trades": 1,
+"waivers": 36
+},
+"team": "Kabul Gearing Bombers",
+"trades": 12.42,
+"waivers": -31.38
+},
+"Niko Contreras": {
+"draft": 26.24,
+"drops": 25.33,
+"g": 14,
+"lineups": -11.8,
+"n": {
+"draft": 13,
+"drops": 22,
+"lineups": 14,
+"trades": 1,
+"waivers": 22
+},
+"team": "Free Diddy",
+"trades": 0.0,
+"waivers": 286.88
+},
+"Shane Kaiper": {
+"draft": 186.75,
+"drops": 167.41,
+"g": 14,
+"lineups": -23.1,
+"n": {
+"draft": 13,
+"drops": 25,
+"lineups": 14,
+"trades": 4,
+"waivers": 27
+},
+"team": "Stegostompem",
+"trades": 35.76,
+"waivers": 134.5
+},
+"Wesley Alpert": {
+"draft": -318.3,
+"drops": 12.4,
+"g": 14,
+"lineups": 15.0,
+"n": {
+"draft": 12,
+"drops": 42,
+"lineups": 14,
+"trades": 7,
+"waivers": 44
+},
+"team": "SNIPES",
+"trades": -47.9,
+"waivers": 23.44
+}
+},
+"2025": {
+"Brian Berger": {
+"draft": -191.36,
+"drops": 407.25,
+"g": 14,
+"lineups": -7.78,
+"n": {
+"draft": 14,
+"drops": 30,
+"lineups": 14,
+"trades": 0,
+"waivers": 30
+},
+"team": "A Storm Is Coming",
+"trades": 0.0,
+"waivers": -41.22
+},
+"Brian Burke": {
+"draft": 293.46,
+"drops": 246.92,
+"g": 14,
+"lineups": -33.04,
+"n": {
+"draft": 13,
+"drops": 31,
+"lineups": 14,
+"trades": 2,
+"waivers": 33
+},
+"team": "Poe's Palace",
+"trades": -48.75,
+"waivers": -30.64
+},
+"Chris Cossu": {
+"draft": -169.42,
+"drops": 206.71,
+"g": 14,
+"lineups": 39.2,
+"n": {
+"draft": 13,
+"drops": 28,
+"lineups": 14,
+"trades": 1,
+"waivers": 28
+},
+"team": "It's a Love Story",
+"trades": -22.03,
+"waivers": 402.52
+},
+"Dylan McMahon": {
+"draft": 116.16,
+"drops": 113.16,
+"g": 14,
+"lineups": 43.0,
+"n": {
+"draft": 13,
+"drops": 12,
+"lineups": 14,
+"trades": 2,
+"waivers": 12
+},
+"team": "DylansVillans",
+"trades": 32.99,
+"waivers": -22.1
+},
+"Kevin Krueger": {
+"draft": 196.25,
+"drops": 104.0,
+"g": 14,
+"lineups": -0.3,
+"n": {
+"draft": 13,
+"drops": 24,
+"lineups": 14,
+"trades": 2,
+"waivers": 27
+},
+"team": "Hench",
+"trades": 116.05,
+"waivers": 95.68
+},
+"Nathan Wu": {
+"draft": 135.89,
+"drops": -14.41,
+"g": 14,
+"lineups": 25.12,
+"n": {
+"draft": 13,
+"drops": 27,
+"lineups": 14,
+"trades": 1,
+"waivers": 28
+},
+"team": "U gotta BO-lieve",
+"trades": 20.25,
+"waivers": 63.42
+},
+"Nick Gearing": {
+"draft": 34.79,
+"drops": 393.96,
+"g": 14,
+"lineups": -36.3,
+"n": {
+"draft": 13,
+"drops": 41,
+"lineups": 14,
+"trades": 3,
+"waivers": 41
+},
+"team": "Kabul Gearing Bombers",
+"trades": -121.98,
+"waivers": 79.34
+},
+"Niko Contreras": {
+"draft": -168.49,
+"drops": 55.47,
+"g": 14,
+"lineups": 9.02,
+"n": {
+"draft": 13,
+"drops": 16,
+"lineups": 14,
+"trades": 1,
+"waivers": 17
+},
+"team": "Bring back Gmo",
+"trades": 4.75,
+"waivers": 124.62
+},
+"Shane Kaiper": {
+"draft": 53.32,
+"drops": 51.1,
+"g": 14,
+"lineups": -27.5,
+"n": {
+"draft": 14,
+"drops": 33,
+"lineups": 14,
+"trades": 3,
+"waivers": 34
+},
+"team": "Stegostompem",
+"trades": -15.77,
+"waivers": 15.04
+},
+"Wesley Alpert": {
+"draft": 70.54,
+"drops": 106.73,
+"g": 14,
+"lineups": -62.46,
+"n": {
+"draft": 13,
+"drops": 45,
+"lineups": 14,
+"trades": 5,
+"waivers": 44
+},
+"team": "SNIPES",
+"trades": 34.49,
+"waivers": 40.68
+}
+}
+}

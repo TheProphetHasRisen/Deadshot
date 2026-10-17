@@ -1,0 +1,242 @@
+{
+ "2021": {
+  "pos": {
+   "QB": {
+    "starter": 20.44,
+    "fa": 15.8,
+    "over": 4.64,
+    "worth": 0.227,
+    "share": 0.125
+   },
+   "RB": {
+    "starter": 14.84,
+    "fa": 8.4,
+    "over": 6.44,
+    "worth": 0.434,
+    "share": 0.384
+   },
+   "WR": {
+    "starter": 15.36,
+    "fa": 9.42,
+    "over": 5.93,
+    "worth": 0.386,
+    "share": 0.371
+   },
+   "TE": {
+    "starter": 12.11,
+    "fa": 8.94,
+    "over": 3.17,
+    "worth": 0.262,
+    "share": 0.085
+   },
+   "K": {
+    "starter": 8.59,
+    "fa": 9.02,
+    "over": -0.44,
+    "worth": -0.051,
+    "share": 0.0
+   },
+   "DEF": {
+    "starter": 10.28,
+    "fa": 9.0,
+    "over": 1.28,
+    "worth": 0.125,
+    "share": 0.034
+   }
+  },
+  "weeks": 15,
+  "live": false
+ },
+ "2022": {
+  "pos": {
+   "QB": {
+    "starter": 20.51,
+    "fa": 14.53,
+    "over": 5.98,
+    "worth": 0.291,
+    "share": 0.14
+   },
+   "RB": {
+    "starter": 14.82,
+    "fa": 7.52,
+    "over": 7.3,
+    "worth": 0.493,
+    "share": 0.39
+   },
+   "WR": {
+    "starter": 16.24,
+    "fa": 9.18,
+    "over": 7.06,
+    "worth": 0.435,
+    "share": 0.388
+   },
+   "TE": {
+    "starter": 10.2,
+    "fa": 9.11,
+    "over": 1.09,
+    "worth": 0.107,
+    "share": 0.026
+   },
+   "K": {
+    "starter": 8.61,
+    "fa": 8.29,
+    "over": 0.33,
+    "worth": 0.038,
+    "share": 0.008
+   },
+   "DEF": {
+    "starter": 10.47,
+    "fa": 8.45,
+    "over": 2.02,
+    "worth": 0.193,
+    "share": 0.048
+   }
+  },
+  "weeks": 14,
+  "live": false
+ },
+ "2023": {
+  "pos": {
+   "QB": {
+    "starter": 19.09,
+    "fa": 17.15,
+    "over": 1.94,
+    "worth": 0.102,
+    "share": 0.051
+   },
+   "RB": {
+    "starter": 14.27,
+    "fa": 7.77,
+    "over": 6.5,
+    "worth": 0.455,
+    "share": 0.368
+   },
+   "WR": {
+    "starter": 16.06,
+    "fa": 9.6,
+    "over": 6.47,
+    "worth": 0.403,
+    "share": 0.427
+   },
+   "TE": {
+    "starter": 11.6,
+    "fa": 7.28,
+    "over": 4.31,
+    "worth": 0.372,
+    "share": 0.112
+   },
+   "K": {
+    "starter": 8.25,
+    "fa": 8.74,
+    "over": -0.49,
+    "worth": -0.059,
+    "share": 0.0
+   },
+   "DEF": {
+    "starter": 11.54,
+    "fa": 9.94,
+    "over": 1.6,
+    "worth": 0.139,
+    "share": 0.042
+   }
+  },
+  "weeks": 14,
+  "live": false
+ },
+ "2024": {
+  "pos": {
+   "QB": {
+    "starter": 19.1,
+    "fa": 17.14,
+    "over": 1.96,
+    "worth": 0.102,
+    "share": 0.044
+   },
+   "RB": {
+    "starter": 16.01,
+    "fa": 6.81,
+    "over": 9.2,
+    "worth": 0.575,
+    "share": 0.438
+   },
+   "WR": {
+    "starter": 15.47,
+    "fa": 8.25,
+    "over": 7.22,
+    "worth": 0.466,
+    "share": 0.371
+   },
+   "TE": {
+    "starter": 11.46,
+    "fa": 7.62,
+    "over": 3.85,
+    "worth": 0.336,
+    "share": 0.086
+   },
+   "K": {
+    "starter": 9.53,
+    "fa": 8.57,
+    "over": 0.96,
+    "worth": 0.1,
+    "share": 0.021
+   },
+   "DEF": {
+    "starter": 10.75,
+    "fa": 8.88,
+    "over": 1.87,
+    "worth": 0.174,
+    "share": 0.041
+   }
+  },
+  "weeks": 14,
+  "live": false
+ },
+ "2025": {
+  "pos": {
+   "QB": {
+    "starter": 18.52,
+    "fa": 18.07,
+    "over": 0.45,
+    "worth": 0.024,
+    "share": 0.013
+   },
+   "RB": {
+    "starter": 15.96,
+    "fa": 8.85,
+    "over": 7.11,
+    "worth": 0.446,
+    "share": 0.435
+   },
+   "WR": {
+    "starter": 14.4,
+    "fa": 8.39,
+    "over": 6.02,
+    "worth": 0.418,
+    "share": 0.44
+   },
+   "TE": {
+    "starter": 10.7,
+    "fa": 10.05,
+    "over": 0.65,
+    "worth": 0.061,
+    "share": 0.025
+   },
+   "K": {
+    "starter": 9.16,
+    "fa": 7.6,
+    "over": 1.57,
+    "worth": 0.171,
+    "share": 0.045
+   },
+   "DEF": {
+    "starter": 10.65,
+    "fa": 9.19,
+    "over": 1.46,
+    "worth": 0.137,
+    "share": 0.042
+   }
+  },
+  "weeks": 14,
+  "live": false
+ }
+}

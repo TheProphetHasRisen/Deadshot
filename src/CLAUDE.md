@@ -455,3 +455,20 @@ worked Terminal says "Logged in as ...".
 
 Direct and concise. Say plainly when something is broken, lost, or was your own
 mistake. No flattery.
+
+## Added 17 Oct 2026 (owner is "USER" in all notes)
+
+- **The live forecast is two models** (USER's pick after the backtest): playoff, bye and seed odds = the blend
+  (`forecast.mixed`: the refitted model, weight `(8 - weeks played)/6`, mixed with the standings alone); title odds =
+  the refitted model (`forecast.refit`, fitted on projections as known at the time, via `backtest.asof_rows`). The old
+  hindsight fit is kept as `fitOld` for the model page only. Change either only when USER says so.
+- **`posvalue.py`**: what a point is worth by position (starters against the three best-projected free agents, every
+  week). Free agents need EVERY NFL player's projection (`projections.table(full=True)`, the local yahoo_raw cache);
+  `proj_hist.json` holds only rostered players. Finished seasons frozen in `posvalue_hist.json`.
+- **`report.py`**: the GM report card (draft, waivers, drops, trades, lineups, each against the alternative the
+  manager really had). Finished seasons frozen in `report_hist.json`; delete it to recompute.
+- **`news.py`**: latest Rotowire headlines (from ESPN's unofficial per-player feed) under Yahoo's injury report.
+  Headline, time and a link only: the full write-up is Rotowire's licensed text, so it is not copied onto the site.
+- **The needs table** counts free agents: "biggest need" is the gap left after the best free agents; "spare depth" is the
+  bench player over the free agents (a backup QB is no longer "depth").
+- **Did you know** is insights only (models, positional value, report card); USER called single-game trivia gimmicky.

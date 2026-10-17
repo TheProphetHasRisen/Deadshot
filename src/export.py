@@ -361,6 +361,23 @@ if S26:
         import forecast; out['forecast'] = forecast.build()         # the rest of the live season, played out
     except Exception as e:
         print('  (against the crowd left out: %s)' % str(e)[:120], file=sys.stderr)   # stderr: deploy.sh hides stdout
+    # the latest Rotowire headline, with its time, for every player Yahoo lists as hurt (news.py); left out if ESPN is unreachable
+    try:
+        F = (out['live'].get('files') or {}); inj = F.get('injNow') or []
+        if inj:
+            import news; out['live']['news'] = news.latest(sorted({(x['n'], x['pos']) for x in inj}))
+    except Exception as e:
+        print('  (news left out: %s)' % str(e)[:120], file=sys.stderr)
+    # what a point is worth at each position, every season since Yahoo (posvalue.py)
+    try:
+        import posvalue; out['posValue'] = posvalue.build()
+    except Exception as e:
+        print('  (positional value left out: %s)' % str(e)[:120], file=sys.stderr)
+    # the GM report card: every decision against the alternative he had (report.py)
+    try:
+        import report; out['report'] = report.build()
+    except Exception as e:
+        print('  (report card left out: %s)' % str(e)[:120], file=sys.stderr)
     # the backtest (backtest.py) is read by the model lab, mklab.py, which is USER's own page and never on the site
     json.dump(out, open('site_data.json', 'w'), indent=1, separators=(',', ': '), default=lambda o: round(o, 4) if isinstance(o, float) else o)
     print('live 2026: weeks', weeks, '| teams', len(stand))

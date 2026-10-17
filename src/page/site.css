@@ -1594,3 +1594,13 @@ section.sec-shut>.sec-head{margin-bottom:0}
 .fact-strip .fact-next{flex:none;padding:2px 10px;font-size:16px;line-height:1}
 @media (max-width:560px){.fact-strip{flex-wrap:wrap;gap:6px 10px}.fact-strip .fact-t{flex-basis:100%;order:3}}
 @media (prefers-reduced-motion:reduce){.fact-strip .fact-t{transition:none}}
+/* the latest news under each player in Yahoo's injury report: wraps, sits tight under its row */
+tr.inj-news td{white-space:normal;font-size:12.5px;line-height:1.45;padding-top:0;color:var(--ink-2)}
+tr.inj-news td div{margin:2px 0}
+tr.inj-news td a{font-size:12px}
+tr.inj-news .inj-when{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--brass);margin-right:4px;white-space:nowrap}
+tr:has(+tr.inj-news) td{border-bottom:0}
+tr.inj-news details{margin:2px 0}
+tr.inj-news summary{cursor:pointer;font-size:12px;color:var(--ink-3)}
+/* the news stays in view on a phone, where the table scrolls sideways under it */
+tr.inj-news .inj-nw{position:sticky;left:9px;max-width:min(720px,calc(100vw - 96px));padding-left:12px;border-left:2px solid var(--rule-2)}
