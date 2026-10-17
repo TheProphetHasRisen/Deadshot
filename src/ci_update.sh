@@ -38,12 +38,12 @@ python3 draft_points.py >/dev/null
 
 DEADSHOT_NO_REFRESH=1 ./deploy.sh          # build and every check; it stops the run on any failure
 
-cp index.html 404.html sw.js "$ROOT/"
+cp index.html 404.html sw.js lab_feed.json "$ROOT/"
 for f in og.png og-*.png; do [ -f "$f" ] && cp "$f" "$ROOT/$f"; done
 mkdir -p "$ROOT/t" && cp t/*.html "$ROOT/t/" 2>/dev/null || true
 
 cd "$ROOT"
-git add index.html 404.html sw.js og.png og-*.png t src/season2026_yahoo.py src/draft_points.json src/status_log.json src/pred_log.json src/lab_feed.json
+git add index.html 404.html sw.js lab_feed.json og.png og-*.png t src/season2026_yahoo.py src/draft_points.json src/status_log.json src/pred_log.json src/lab_feed.json
 if git diff --cached --quiet; then echo "The page came out the same: nothing to publish."; exit 0; fi
 git -c user.name="Deadshot updater" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
     commit -qm "Live update from Yahoo ($(TZ=America/Los_Angeles date '+%b %-d, %-I:%M %p PT'))"

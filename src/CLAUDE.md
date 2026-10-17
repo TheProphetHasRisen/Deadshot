@@ -472,3 +472,11 @@ mistake. No flattery.
 - **The needs table** counts free agents: "biggest need" is the gap left after the best free agents; "spare depth" is the
   bench player over the free agents (a backup QB is no longer "depth").
 - **Did you know** is insights only (models, positional value, report card); USER called single-game trivia gimmicky.
+
+- **Questionable players** (`qrates.py`): the chance a listed player plays, from nflverse's copy of the NFL's own
+  injury reports 2021-2025 (players who had played in one of the two weeks before), joined to Sleeper's games played.
+  Frozen in `qrates.json`; this season's report is read every update. The forecast sits each Q/D player in the rest of
+  the seasons (`forecast.run(qp=...)`, the week ahead only).
+- **Going private** (USER, 17 Oct 2026): the site repo TheProphetHasRisen/Deadshot is to be made private by USER. The
+  model page's live feed is served from the site (`/lab_feed.json`, CORS header in vercel.json), not GitHub, so it keeps
+  working. The update schedule was cut to hourly to fit GitHub's free private-repo minutes.

@@ -112,7 +112,7 @@ def season_state(y, k):
         if r['wk'] == rw: roster.setdefault(r['team'], []).append(r)
     return st, rec, roster, left, rw
 
-def run(y, k, n, rnd, F=None, pj=None):
+def run(y, k, n, rnd, F=None, pj=None, qp=None):
     st, rec, roster, left, rw = season_state(y, k)
     teams = sorted(rec); slots = st['slots']; pj = pj or PR.lookup(y, live=(y == TF.LIVE))
     F = F or fit(k)
@@ -124,6 +124,17 @@ def run(y, k, n, rnd, F=None, pj=None):
     mu = {(t, w): lg + F['b1'] * (proj[(t, w)] - pm[w]) + F['b2'] * lvl[t] for t in teams for w in weeks}
     sd = F['sd']
     nxt = weeks[0] if weeks else None
+    # questionable and doubtful players the projection still plays this week: each sits in the share of seasons the
+    # NFL's injury reports say such a player sits (qrates.py), costing his team what his lineup loses without him
+    QL = []
+    if qp and nxt:
+        for t in teams:
+            rows = roster.get(t, [])
+            for r in rows:
+                p = qp(r)
+                if p is None or p >= 1 or not (pj(r['n'], r['pos'], r['nfl'], nxt) or 0) > 0: continue
+                loss = _lineup(rows, nxt, pj, slots) - _lineup([x for x in rows if x is not r], nxt, pj, slots)
+                if loss > 0.05: QL.append((t, F['b1'] * loss, p))
     po = {t: 0 for t in teams}; bye = dict(po); title = dict(po); wins = {t: 0.0 for t in teams}; pts = dict(wins)
     seed = {t: [0] * len(teams) for t in teams}
     finalW = {t: {} for t in teams}                      # final wins -> [seasons, made playoffs]
@@ -132,9 +143,13 @@ def run(y, k, n, rnd, F=None, pj=None):
     nspots = st['nteams']; nbye = 2 if nspots == 6 else 0   # 2021 had four teams in, no byes
     for _ in range(n):
         W = {t: rec[t][0] for t in teams}; PF = {t: rec[t][2] for t in teams}; nx = {}
+        adj = {}
+        for t, c, p in QL:
+            if rnd.random() >= p: adj[t] = adj.get(t, 0.0) - c
         for g in left:
             a, b = g['ta'], g['tb']
             sa = rnd.gauss(mu[(a, g['wk'])], sd); sb = rnd.gauss(mu[(b, g['wk'])], sd)
+            if adj and g['wk'] == nxt: sa += adj.get(a, 0.0); sb += adj.get(b, 0.0)
             PF[a] += sa; PF[b] += sb; win = a if sa > sb else b; W[win] += 1
             if g['wk'] == nxt: nx[a] = win == a; nx[b] = win == b; mwin[(a, b)] = mwin.get((a, b), 0) + (win == a)
         order = sorted(teams, key=lambda t: (-W[t], -PF[t]))
@@ -182,11 +197,11 @@ def _need(fw, n):
         need[str(thr)] = ok[0] if ok else None
     return need
 
-def mixed(y, k, n, seed):
+def mixed(y, k, n, seed, qp=None):
     """the live forecast (USER's pick, 17 Oct 2026): playoff, bye and seed odds from the blend (the refitted model,
     weighted down week by week toward the standings alone); title odds from the refitted model"""
     F = refit(k); wt = blend_weight(k)
-    m = run(y, k, n, random.Random(seed), F=F)
+    m = run(y, k, n, random.Random(seed), F=F, qp=qp)
     if wt >= 1: r0 = m
     else: r0 = run(y, k, n, random.Random(seed + 7), F=dict(F, b1=0.0, b2=0.0), pj=m['pj'])
     mix = lambda a, b: wt * a + (1 - wt) * b
@@ -212,7 +227,15 @@ def build(y=None):
     st = TF.settings(y)
     played = max([g['wk'] for g in P.games(y) if g['status'] == 'postevent' and g['wk'] < st['po']] or [0])
     if not played: return None
-    now = mixed(y, played, N, y)
+    # how often a player on the injury report plays (qrates.py): this week's NFL report when it has him, else his
+    # Yahoo label; only the week ahead (the past weeks' re-runs have no reports saved)
+    try:
+        import qrates as QR
+        RQ = QR.rates(); cur = QR.current(y, played + 1)
+        qp = lambda r: QR.chance(RQ, r.get('status'), r['n'], r['pos'], cur)
+    except Exception:
+        qp = None
+    now = mixed(y, played, N, y, qp=qp)
     T = now['teams']
     # injuries: his players listed out, doubtful or questionable this week, their projection, and the week they are back
     inj = {}; st = TF.settings(y)
@@ -233,12 +256,13 @@ def build(y=None):
                     if c > 0.05: costW[str(w)] = round(c, 2)
             # a player listed questionable or doubtful whom the projection still plays: what his team loses if he sits this week
             sits = None
-            if back == now['next'] and r['status'] in ('Q', 'D') and now['next']:
+            if back == now['next'] and now['next'] and (r['status'] in ('Q', 'D') or (qp and (qp(r) or 1) < 1)):
                 rows = now['roster'][t]
                 sits = round(_lineup(rows, now['next'], now['pj'], st['slots']) - _lineup([x for x in rows if x['n'] != r['n']], now['next'], now['pj'], st['slots']), 2)
             inj.setdefault(t, []).append(dict(n=r['n'], pos=(r['pos'] or '').split(',')[0], status=r['status'], slot=r['slot'],
                                               thisWeek=now['pj'](r['n'], r['pos'], r['nfl'], now['next']) if now['next'] else None, back=back,
-                                              cost=round(cost, 1), costW=costW, sits=sits))
+                                              cost=round(cost, 1), costW=costW, sits=sits,
+                                              plays=(round(qp(r), 3) if qp and qp(r) is not None else None)))
     # what each team needs, by position: his projected starters at each slot over the weeks left, against the
     # league's; the same after the best free agents are counted (a hole waivers can fill is not a need); and his
     # depth, the next man up, over what waivers offer at that position (a backup quarterback is worth little

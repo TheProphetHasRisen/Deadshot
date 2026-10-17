@@ -229,6 +229,7 @@ const GLOSS={
    `<b>How much of each.</b> Fitted on every season Yahoo reaches, each frozen at the same number of weeks played, with the projections as they stood then. Both weights are small: in this league projections and form explain only a small part of a week’s score. Each simulated score is drawn around its expected value with the week-to-week spread seen in past seasons.<br><br>`+
    `<b>Two answers, blended.</b> Playoff, bye and seed odds mix that model with the standings alone (every team equal from here), moving toward the standings each week until week 8; title odds use the model alone. Both choices are what scored best when the forecast was rerun on every season since 2021.<br><br>`+
    `<b>The season, played out.</b> The real schedule, ${SIMRUNS} times. Ties go on points for, as Yahoo has seeded every tie since 2021. The top six make it, the top two get byes, and the bracket re-seeds after the first round. Every figure is the share of the runs it happened in; <b>with a win / with a loss</b> splits those runs on this week’s result.`,
+ plays:`<b>Plays</b><br>How often a player listed like him this week actually played, from every NFL injury report 2021 to 2025, for players who had been playing (all teams, not only Deadshot’s).<br><br>When the NFL’s Friday report has him, his practice that week decides it: questionable and practiced fully 84%, limited 73%, did not practice 48%. Otherwise his Yahoo label and position: questionable about 70% (quarterbacks 42%), doubtful 1%, out 0.<br><br>The simulation sits him in the rest of the seasons, and his team loses what its best lineup loses without him.`,
  needBig:`<b>Biggest need</b><br>The position where his starters fall furthest below the league average, after the best free agents are counted. If a free agent projects better than one of his starters, he could fix that hole today, so it is not counted as a need.<br><br>The figure is how far behind the league he still is there, in projected points a week.`,
  spare:`<b>Spare depth</b><br>His best bench player at each position against the best free agents at that position. The position shown is where his best bench player projects furthest above the free agents, in points a week. A bench player who projects no better than a free agent is not counted. <b>None</b> means no bench player beats the free agents by half a point.`,
  freePick:`<b>Best free pickup</b><br>The free agent who would add most to his lineup: the best one at the position where he projects furthest above that team’s weakest starter there, in points a week over the rest of the season. Shown only when the gain is at least a point a week.`,
@@ -5239,7 +5240,6 @@ let openSeason=null;
   const FC=D.forecast;
   if(FC){const fit=FC.fit, T=FC.teams||[], MD=FC.model;
     if(fit&&fit.b1!=null)add(`Every point a team’s projected lineup is above the league’s turns into about ${b(f(fit.b1,2))} real points that week, from ${fit.n} team-weeks since 2021.`);
-    if(fit&&fit.r2!=null)add(`Projections and form together explain ${b(Math.round(fit.r2*100)+'%')} of the week-to-week variation in team scores.`);
     if(fit&&fit.b2!=null)add(`Each point a game a team has scored above the league so far adds ${b(f(fit.b2,2))} points to its expected score, once the projected lineup is counted.`);
     if(MD&&MD.weight!=null&&MD.weight<1)add(`This week’s playoff odds are ${b(Math.round(MD.weight*100)+'%')} the model and ${b(Math.round((1-MD.weight)*100)+'%')} the standings alone. In past seasons, the standings alone were the better predictor from week 6 on.`);
     if(T.length){const top=T[0], low=T[T.length-1];
@@ -5275,6 +5275,14 @@ let openSeason=null;
   const show=()=>{i=(i+F.length)%F.length; at(); tx.classList.add('fade'); setTimeout(()=>{tx.innerHTML=F[i]; tx.classList.remove('fade');},300);};
   tx.innerHTML=F[0]; at(); host.hidden=false;
   const pv=$('#factPrev'); if(pv)pv.onclick=()=>{i--; show();};
+  /* it sits in the left margin on a wide screen; on anything narrower it waits behind a small tab in the corner
+     (USER, 17 Oct 2026: it took too much room at the top of the page) */
+  const tab=document.createElement('button'); tab.type='button'; tab.id='factTab'; tab.className='fact-tab'; tab.innerHTML='Did you know <b>&#8250;</b>';
+  tab.setAttribute('aria-expanded','false'); document.body.appendChild(tab);
+  document.body.appendChild(host);   /* out of the page's column, so it floats above the nav rather than under it */
+  const x=document.createElement('button'); x.type='button'; x.className='fact-next fact-x'; x.setAttribute('aria-label','Close'); x.innerHTML='&#10005;'; host.appendChild(x);
+  const setOpen=o=>{host.classList.toggle('open',o); tab.setAttribute('aria-expanded',o?'true':'false'); tab.hidden=o;};
+  tab.onclick=()=>setOpen(true); x.onclick=()=>setOpen(false);
   host.addEventListener('mouseenter',()=>{hold=true;}); host.addEventListener('mouseleave',()=>{hold=false;});
   $('#factNext').onclick=()=>{i++; show();};
   setInterval(()=>{if(hold||document.hidden)return; i++; show();},9000);
@@ -5318,15 +5326,15 @@ function drawForecast(FC,L){
     T.map(t=>`<tr><th class="rw">${tm(t)}</th>`+t.seed.map(v=>v<0.005?'<td><span></span></td>':`<td><span style="${heat(v)}">${Math.round(v*100)}</span></td>`).join('')+'</tr>').join('')+'</tbody>';
   /* who is out */
   const I=T.flatMap(t=>t.inj.map(x=>({...x,t})));
-  $('#lvFcInjSub').textContent=`Every player Yahoo lists as hurt, and how the simulation treats him. A player Sleeper projects to play counts at his full projection. For a player projected out, the cost is the points his team’s best lineup loses in each week he is out, summed over all of those weeks.`;
+  $('#lvFcInjSub').textContent=`Every player Yahoo lists as hurt, and how the simulation treats him. A player Sleeper projects to play still sits in the share of simulated seasons that players with his status sat in the NFL’s injury reports of 2021 to 2025 (Plays). For a player projected out, the cost is the points his team’s best lineup loses in each week he is out, summed over all of those weeks.`;
   const spot=s=>s==='IR'?'IR':s==='BN'?'Bench':'Starting';
   const costOf=x=>{const out=x.back==null?null:Math.max(0,x.back-wk);
-    if(x.back===wk)return [0,'<span class="dim">none: projected to play</span>'];
+    if(x.back===wk)return x.sits>0.05&&x.plays!=null&&x.plays<1?[x.sits*(1-x.plays),`<b class="lv-bust">${sg(-x.sits,1)}</b> <span class="dim">if he sits</span>`]:[0,'<span class="dim">none: projected to play</span>'];
     if(x.back==null)return [-1,'<span class="dim">out for the season</span>'];
     if(x.cost>0.05)return [x.cost,`<b class="lv-bust">${sg(-x.cost,1)}</b> <span class="dim">over ${nOf(out,'week')}</span>`];
     return [0,`<span class="dim">none: would not start (${nOf(out,'week')} out)</span>`];};
-  $('#tFcInj').innerHTML='<thead><tr><th>Team</th><th>Player</th><th class="num">Status</th><th>Lineup spot</th><th class="num">Projected, week '+wk+'</th><th class="num">Back</th><th class="num">Cost while out</th></tr></thead><tbody>'+
-    I.map(x=>({x,c:costOf(x)})).sort((a,b)=>b.c[0]-a.c[0]||(a.x.back===wk)-(b.x.back===wk)).map(({x,c})=>`<tr><td>${tm(x.t)}</td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td class="num">${esc(x.status)}</td><td class="dim">${spot(x.slot)}</td><td class="num">${x.thisWeek==null?'—':f(x.thisWeek,1)}</td><td class="num">${x.back==null?'<span class="dim">not this season</span>':x.back===wk?'this week':'week '+x.back}</td><td class="num">${c[1]}</td></tr>`).join('')+'</tbody>';
+  $('#tFcInj').innerHTML='<thead><tr><th>Team</th><th>Player</th><th class="num">Status</th><th>Lineup spot</th><th class="num">Projected, week '+wk+'</th><th class="num">Back</th><th class="num">Plays '+glq('plays')+'</th><th class="num">Cost while out</th></tr></thead><tbody>'+
+    I.map(x=>({x,c:costOf(x)})).sort((a,b)=>b.c[0]-a.c[0]||(a.x.back===wk)-(b.x.back===wk)).map(({x,c})=>`<tr><td>${tm(x.t)}</td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td class="num">${esc(x.status)}</td><td class="dim">${spot(x.slot)}</td><td class="num">${x.thisWeek==null?'—':f(x.thisWeek,1)}</td><td class="num">${x.back==null?'<span class="dim">not this season</span>':x.back===wk?'this week':'week '+x.back}</td><td class="num">${x.plays==null?'<span class="dim">—</span>':Math.round(x.plays*100)+'%'}</td><td class="num">${c[1]}</td></tr>`).join('')+'</tbody>';
   ['#tFcNeed','#tFcInj'].forEach(k=>fillEmpty($(k)));
   /* what each team needs, by position: his projected starters there over the weeks left, against the league's */
   const N=FC.needs; if(N){
@@ -5523,7 +5531,10 @@ glossify();
   const jump=()=>{const J=$('#lvJump'); if(!J)return;
     const cs=$$('#lvView .card').filter(c=>!c.hidden&&!c.parentElement.closest('[data-fold-sub],.card')&&c.querySelector(':scope > .card-h h3'));
     J.innerHTML=cs.map((c,i)=>`<a href="#" data-jump="${i}">${esc(c.querySelector(':scope > .card-h h3').textContent.trim())}</a>`).join('');
-    $$('[data-jump]',J).forEach(a=>a.onclick=e=>{e.preventDefault(); const c=cs[+a.dataset.jump]; if(c._fold)c._fold(true); c.scrollIntoView({behavior:'smooth',block:'start'});});};
+    $$('[data-jump]',J).forEach(a=>a.onclick=e=>{e.preventDefault(); const c=cs[+a.dataset.jump]; if(c._fold)c._fold(true); c.scrollIntoView({behavior:'smooth',block:'start'});
+      $$('[data-jump]',J).forEach(x=>x.classList.toggle('on',x===a));});
+    /* it sits under the ticker, whose height changes with the screen */
+    const sh=$('#lvStrip'); if(sh)document.documentElement.style.setProperty('--lv-strip-h',sh.offsetHeight+'px');};
   const show=mode=>{if(mode&&V.hidden){foldSweep(V); foldBar(V); foldAll(V,null);}   /* 2026 starts with every card shut, each time it opens */
     V.hidden=!mode; document.body.classList.toggle('lv-ov',mode==='ov'); document.body.classList.toggle('lv-pg',mode==='pg');
     seg(mode==='pg'); tabTitle(mode?L.year+' Live':'');

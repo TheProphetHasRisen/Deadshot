@@ -1,0 +1,80 @@
+{
+ "Doubtful": {
+  "Did Not Participate In Practice": {
+   "n": 83,
+   "p": 0.0
+  },
+  "all": {
+   "n": 110,
+   "p": 0.009
+  },
+  "pos:WR": {
+   "n": 35,
+   "p": 0.029
+  }
+ },
+ "Out": {
+  "Did Not Participate In Practice": {
+   "n": 531,
+   "p": 0.0
+  },
+  "all": {
+   "n": 553,
+   "p": 0.002
+  },
+  "pos:QB": {
+   "n": 53,
+   "p": 0.0
+  },
+  "pos:RB": {
+   "n": 106,
+   "p": 0.0
+  },
+  "pos:TE": {
+   "n": 121,
+   "p": 0.008
+  },
+  "pos:WR": {
+   "n": 244,
+   "p": 0.0
+  }
+ },
+ "Questionable": {
+  "Did Not Participate In Practice": {
+   "n": 173,
+   "p": 0.48
+  },
+  "Full Participation in Practice": {
+   "n": 99,
+   "p": 0.838
+  },
+  "Limited Participation in Practice": {
+   "n": 564,
+   "p": 0.732
+  },
+  "all": {
+   "n": 851,
+   "p": 0.693
+  },
+  "pos:K": {
+   "n": 36,
+   "p": 0.639
+  },
+  "pos:QB": {
+   "n": 66,
+   "p": 0.424
+  },
+  "pos:RB": {
+   "n": 201,
+   "p": 0.662
+  },
+  "pos:TE": {
+   "n": 156,
+   "p": 0.699
+  },
+  "pos:WR": {
+   "n": 392,
+   "p": 0.758
+  }
+ }
+}

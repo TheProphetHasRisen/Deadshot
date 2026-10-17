@@ -1616,10 +1616,33 @@ tr.inj-news .inj-nw{position:sticky;left:9px;max-width:min(720px,calc(100vw - 96
 #gmDet li{font-size:13px;line-height:1.45;margin:3px 0}
 #tGm .gm-open{padding:3px 9px;font-size:11px}
 .fact-strip .fact-count{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);white-space:nowrap;margin-left:auto}
-/* the 2026 page's row of boxes, under the masthead (the record book's nav is hidden there) */
+/* the 2026 page's row of boxes, under the ticker: the record book's own nav bar, one row that scrolls sideways,
+   and it stays at the top while you read (the record book's nav is hidden on this page) */
 .lv-jump{display:none}
-body.lv-pg .lv-jump{display:flex;flex-wrap:wrap;gap:2px 4px;margin:0 0 6px;padding:6px 0;border-bottom:1px solid var(--rule-2)}
-.lv-jump a{padding:7px 10px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
-.lv-jump a:hover{color:var(--brass);border-bottom-color:var(--brass)}
-#lvView .card{scroll-margin-top:64px}
-@media(max-width:560px){body.lv-pg .lv-jump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}}
+body.lv-pg .lv-jump{display:flex;flex-wrap:nowrap;gap:2px;overflow-x:auto;scrollbar-width:none;position:sticky;top:var(--lv-strip-h,49px);z-index:35;
+  margin:0 -22px;padding:0 14px;background:linear-gradient(var(--nav-bg),var(--nav-bg)),linear-gradient(var(--nav-bg),var(--nav-bg));
+  /* the bar's colour and its bottom line run the full width of the screen, like the ticker above it */
+  box-shadow:0 0 0 100vmax var(--surface),0 1px 0 100vmax var(--rule);clip-path:inset(0 -100vmax -1px)}
+.lv-jump a{flex:0 0 auto;padding:11px 12px;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+.lv-jump a:hover{color:var(--ink)}
+.lv-jump a.on{color:var(--brass);border-bottom-color:var(--brass)}
+body.lv-pg .lv-view{padding-top:0}
+body.lv-pg #live{padding-top:22px}
+#lvView .card{scroll-margin-top:110px}
+@media(pointer:coarse){.lv-jump a{padding-top:15px;padding-bottom:15px}}
+/* Did you know: in the left margin on a wide screen, behind a corner tab on anything narrower */
+.fact-tab{display:none}
+.fact-strip .fact-x{display:none}
+@media(min-width:1540px){
+  .fact-strip{position:fixed;left:18px;top:50%;transform:translateY(-50%);width:min(300px,calc((100vw - var(--max))/2 - 44px));margin:0;z-index:30;flex-wrap:wrap;gap:8px 10px;box-shadow:0 6px 20px -12px rgba(0,0,0,.35)}
+  .fact-strip .fact-t{flex-basis:100%;order:3;font-size:13.5px}
+}
+@media(max-width:1539px){
+  .fact-strip{position:fixed;left:12px;bottom:12px;width:min(380px,calc(100vw - 24px));margin:0;z-index:60;flex-wrap:wrap;gap:6px 10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);display:none}
+  .fact-strip.open{display:flex}
+  .fact-strip .fact-t{flex-basis:100%;order:3}
+  .fact-strip .fact-x{display:block}
+  body:not(.lv-pg):not(.ml-pg) .fact-tab{display:block;position:fixed;left:12px;bottom:12px;z-index:59;padding:7px 12px;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--surface);color:var(--brass);border:1px solid var(--rule);border-left:3px solid var(--brass);box-shadow:0 6px 18px -10px rgba(0,0,0,.4)}
+  .fact-tab[hidden]{display:none!important}
+}
+body.lv-pg .fact-strip{display:none!important}
