@@ -22,7 +22,7 @@ done
 trap 'rm -f "$ROOT/src/.yahoo_tokens.json"' EXIT
 
 # what Yahoo said last time (the read time aside), to skip a publish when nothing has moved
-sig(){ grep -v '^ASOF' season2026_yahoo.py 2>/dev/null | shasum | cut -c1-40; }
+sig(){ { grep -v '^ASOF' season2026_yahoo.py; cat status_log.json; } 2>/dev/null | shasum | cut -c1-40; }   # a status change counts too
 before="$(sig)"
 
 for y in 2021 2022 2023 2024 2025; do
@@ -30,6 +30,7 @@ for y in 2021 2022 2023 2024 2025; do
 done
 python3 yahoo_fetch.py 2026
 python3 yahoo_to_2026.py
+python3 statuslog.py >/dev/null || true      # every player's injury status, kept each week (statuslog.py)
 if [ "$before" = "$(sig)" ] && [ "${FORCE:-0}" != 1 ]; then
   echo "Nothing new on Yahoo since the last update: not publishing."; exit 0
 fi
@@ -42,7 +43,7 @@ for f in og.png og-*.png; do [ -f "$f" ] && cp "$f" "$ROOT/$f"; done
 mkdir -p "$ROOT/t" && cp t/*.html "$ROOT/t/" 2>/dev/null || true
 
 cd "$ROOT"
-git add index.html 404.html sw.js og.png og-*.png t src/season2026_yahoo.py src/draft_points.json
+git add index.html 404.html sw.js og.png og-*.png t src/season2026_yahoo.py src/draft_points.json src/status_log.json
 if git diff --cached --quiet; then echo "The page came out the same: nothing to publish."; exit 0; fi
 git -c user.name="Deadshot updater" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
     commit -qm "Live update from Yahoo ($(TZ=America/Los_Angeles date '+%b %-d, %-I:%M %p PT'))"

@@ -193,6 +193,7 @@
   </div><div class="fb-chips" id="fChips" hidden></div></div>
 </nav>
 <main id="main" class="wrap">
+  <div class="fact-strip" id="factStrip" hidden aria-live="polite"><span class="fact-k">Did you know</span><span class="fact-t" id="factText"></span><button type="button" class="fact-next" id="factNext" aria-label="Next fact">&#8250;</button></div>
 
   <section id="champions">
     <div class="sec-head"><h2>Champions</h2><div class="rule-note">Click a year to open that season’s page<br>with the winner’s run traced</div></div>
@@ -538,6 +539,7 @@
         <div class="sub-h" style="margin:22px 0 6px">Every seed, every team</div><p class="lv-trnote" id="lvFcSeedSub" style="margin:0 0 6px"></p><div class="scroll"><table class="mtx" id="tFcSeed"></table></div>
         <div class="sub-h" style="margin:22px 0 6px">The injury report it plays with</div><p class="lv-trnote" id="lvFcInjSub" style="margin:0 0 6px"></p><div class="scroll"><table id="tFcInj"></table></div>
       </div></div>
+    <div class="card" data-collapse id="lvNeedCard"><div class="card-h"><h3>What each team needs</h3><span class="sub" id="lvNeedSub"></span></div><div class="scroll"><table id="tNeedPos"></table></div><p class="lv-trnote" id="lvNeedNote" style="margin:0;padding:8px 18px 14px"></p></div>
     <div class="card" data-collapse id="lvFileCard"><div class="card-h"><h3>Team file</h3><span class="sub" id="lvFileSub"></span><div class="right"><div class="pills" id="lvFileMgr" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div></div></div><div class="card-b" id="lvFile"></div></div>
     <div class="card" data-collapse id="lvInjCard"><div class="card-h"><h3>Injuries and missed games</h3><span class="gl" data-gl="inj" tabindex="0">?</span><span class="sub" id="lvInjSub"></span></div><div class="card-b" id="lvInj"></div></div>
     <div class="card" data-collapse id="lvLeagueCard"><div class="card-h"><h3>How the league is moving</h3><span class="sub" id="lvLeagueSub"></span><div class="right"><div class="pills" id="lvLgMode"></div></div></div><div class="scroll"><table id="tLiveLeague"></table></div></div>
@@ -545,7 +547,6 @@
     <div class="card" data-collapse><div class="card-h"><h3>Results</h3><div class="pills" id="lvWk"></div></div><div class="card-b" id="tLiveWk"></div></div>
     <div class="card" data-collapse data-collapse-also="#tLiveTr"><div class="card-h"><h3>Trades</h3><span class="sub" id="lvTrSub"></span></div></div>
     <div id="tLiveTr" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,640px),1fr));gap:20px;margin-top:20px"></div>
-    <div class="card" data-collapse id="lvTr2Card"><div class="card-h"><h3>Two ways to grade a trade</h3><span class="sub" id="lvTr2Sub"></span></div><div class="card-b" id="lvTr2"></div></div>
     <div class="card" data-collapse><div class="card-h"><h3>Best pickups</h3><span class="sub" id="lvPkSub"></span></div><div class="scroll"><table id="tLivePk"></table></div></div>
     <div class="card" data-collapse><div class="card-h"><h3>The ones that got away</h3><span class="sub" id="lvGoSub"></span></div><div class="scroll"><table id="tLiveGo"></table></div></div>
     <div class="card" data-collapse><div class="card-h"><h3>The waiver wire</h3><span class="sub">Moves by team, and the claims more than one team put in for</span></div><div class="scroll"><table id="tLiveBusy"></table></div><div class="scroll"><table id="tLiveCl"></table></div></div>

@@ -5219,6 +5219,37 @@ let openSeason=null;
     fillEmpty(el);};
   draw(); REDRAW.push(draw);
 })();
+/* ============ did you know: a rolling strip of facts drawn from the data (USER, 16 Oct 2026) ============
+   Built from what the page already holds: moments from the archive, the forecast and its model, the crowd, the
+   trade market. Nothing is typed in, so every fact moves with the data. New order each visit, a new fact every 9s. */
+(()=>{const host=$('#factStrip'), tx=$('#factText'); if(!host||!tx)return;
+  const F=[], add=h=>{if(h)F.push(h);}, b=x=>`<b>${x}</b>`;
+  try{ (typeof archiveMoments==='function'?archiveMoments():[]).forEach(m=>add(m.html)); }catch(e){}
+  const FC=D.forecast;
+  if(FC){const fit=FC.fit, T=FC.teams||[];
+    if(fit&&fit.b1!=null)add(`Every point a team’s projected lineup is above the league’s turns into about ${b(f(fit.b1,2))} real points that week, from ${fit.n} team-weeks since 2021.`);
+    if(fit&&fit.r2!=null)add(`Week to week, this league is close to a coin flip: projections and form together explain only ${b(Math.round(fit.r2*100)+'%')} of how scores spread out.`);
+    if(T.length){const top=T[0], low=T[T.length-1];
+      add(`Across ${b(FC.runs.toLocaleString())} simulated seasons, ${esc(top.team)} makes the playoffs in ${b(pct(top.po))} of them.`);
+      add(`${esc(low.team)} still makes the playoffs in ${b(pct(low.po))} of a million simulated seasons.`);
+      const sw=T.slice().sort((x,y)=>(y.ifWin-y.ifLose)-(x.ifWin-x.ifLose))[0]; if(sw&&sw.ifWin!=null)add(`Biggest game this week: ${esc(sw.team)} goes from ${b(pct(sw.ifLose))} to ${b(pct(sw.ifWin))} playoff odds with a win.`);
+      const ti=T.slice().sort((x,y)=>y.title-x.title)[0]; add(`The title favorite right now: ${esc(ti.team)}, champion in ${b(pct(ti.title))} of the simulated seasons.`);}}
+  const C=D.crowd;
+  if(C&&C.mgrs){const all=Object.values(C.mgrs).flatMap(v=>Object.values(v)), ch=all.reduce((a,z)=>a+z.chalk,0)/Math.max(1,all.reduce((a,z)=>a+z.chalkN,0));
+    add(`Managers here start the players most of Yahoo starts: the average starter in this league is started in ${b(Math.round(ch)+'%')} of all Yahoo leagues.`);
+    const sp=(C.spots||[]).slice().sort((x,y)=>y.x-x.x)[0]; if(sp)add(`Best spot start on record: ${esc(sp.m)} started ${esc(sp.n)} (${sp.ps}% of Yahoo did) in ${sp.y}, and he scored ${b(f(sp.pts,1))}, ${b(f(sp.x,1)+'×')} his projection.`);
+    const gm=(C.gems||[]).slice().sort((x,y)=>y.lost-x.lost)[0]; if(gm)add(`Costliest bench call: ${esc(gm.m)} sat ${esc(gm.n)} (${gm.pb}% of Yahoo started him) in ${gm.y}, week ${gm.wk}, and lost ${b(f(gm.lost,1))} points to the man who played.`);
+    const sl=(C.sleepers||[]).slice().sort((x,y)=>(y.val||0)-(x.val||0))[0]; if(sl)add(`Best sleeper: ${esc(sl.m)} picked up ${esc(sl.n)} when only ${b(sl.own+'%')} of Yahoo had him.`);}
+  const TR=D.trade; if(TR&&TR.log)add(`${b(TR.log.length)} trades since ${TR.years[0]}, and the busiest dealer is ${esc(TR.mgr[0].name)} with ${b(TR.mgr[0].trades)}.`);
+  if(!F.length)return;
+  for(let i=F.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [F[i],F[j]]=[F[j],F[i]];}
+  let i=0, hold=false;
+  const show=()=>{tx.classList.add('fade'); setTimeout(()=>{tx.innerHTML=F[i%F.length]; tx.classList.remove('fade');},300);};
+  tx.innerHTML=F[0]; host.hidden=false;
+  host.addEventListener('mouseenter',()=>{hold=true;}); host.addEventListener('mouseleave',()=>{hold=false;});
+  $('#factNext').onclick=()=>{i++; show();};
+  setInterval(()=>{if(hold||document.hidden)return; i++; show();},9000);
+})();
 /* ============ the forecast (forecast.py): the rest of the season played 100,000 times ============ */
 function drawForecast(FC,L){
   const T=FC.teams, by={}; T.forEach(t=>{by[t.team]=t;});
@@ -5258,10 +5289,20 @@ function drawForecast(FC,L){
     T.map(t=>`<tr><th class="rw">${tm(t)}</th>`+t.seed.map(v=>v<0.005?'<td><span></span></td>':`<td><span style="${heat(v)}">${Math.round(v*100)}</span></td>`).join('')+'</tr>').join('')+'</tbody>';
   /* who is out */
   const I=T.flatMap(t=>t.inj.map(x=>({...x,t})));
-  $('#lvFcInjSub').textContent=`Every player listed out or questionable right now, his projection this week and the week he is projected back. This is what moves a team’s odds when someone gets hurt: the simulation plays each team without him until that week.`;
-  $('#tFcInj').innerHTML='<thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Slot</th><th class="num">Projected, week '+wk+'</th><th class="num">Back</th></tr></thead><tbody>'+
-    I.map(x=>`<tr><td>${tm(x.t)}</td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.status)}</td><td class="dim">${esc(x.slot)}</td><td class="num">${x.thisWeek==null?'—':f(x.thisWeek,1)}</td><td class="num">${x.back==null?'<span class="dim">not this season</span>':x.back===wk?'this week':'week '+x.back}</td></tr>`).join('')+'</tbody>';
+  $('#lvFcInjSub').textContent=`Every player listed out or questionable right now, and what his absence costs his team: the points his best lineup loses each week until he is projected back, added up. The simulation plays every team this way, which is why an injury moves the odds above.`;
+  $('#tFcInj').innerHTML='<thead><tr><th>Team</th><th>Player</th><th>Status</th><th>Slot</th><th class="num">Projected, week '+wk+'</th><th class="num">Back</th><th class="num">What it costs him</th></tr></thead><tbody>'+
+    I.slice().sort((a,b)=>(b.cost||0)-(a.cost||0)).map(x=>`<tr><td>${tm(x.t)}</td><td><b>${esc(x.n)}</b> <span class="lv-pos">${esc(x.pos)}</span></td><td>${esc(x.status)}</td><td class="dim">${esc(x.slot)}</td><td class="num">${x.thisWeek==null?'—':f(x.thisWeek,1)}</td><td class="num">${x.back==null?'<span class="dim">not this season</span>':x.back===wk?'this week':'week '+x.back}</td><td class="num">${x.cost>0.05?`<b class="lv-bust">${sg(-x.cost,1)}</b> <span class="dim">pts</span>`:'<span class="dim">nothing: he would sit anyway</span>'}</td></tr>`).join('')+'</tbody>';
   ['#tFcNeed','#tFcInj'].forEach(k=>fillEmpty($(k)));
+  /* what each team needs, by position: his projected starters there over the weeks left, against the league's */
+  const N=FC.needs; if(N){
+    const lab={QB:'QB',RB:'RB',WR:'WR',TE:'TE',K:'K',DEF:'DEF',FLEX:'Flex'};
+    const gap=(t,p)=>N.teams[t.team][p]-N.league[p];
+    const hole=t=>N.pos.slice().sort((a,b)=>gap(t,a)-gap(t,b))[0], spare=t=>{const d=N.teams[t.team]._depth; return Object.keys(d).sort((a,b)=>(d[b]-N.leagueDepth[b])-(d[a]-N.leagueDepth[a]))[0];};
+    const cellN=v=>{const t=Math.max(-1,Math.min(1,v/6)), bg=t<0?mix(cssv('--surface'),cssv('--neg'),Math.abs(t)*.7):mix(cssv('--surface'),cssv('--pos'),t*.7); return `<td class="num"><span style="background:${bg};color:${pickInk(bg)};padding:2px 6px;border-radius:3px">${sg(v,1)}</span></td>`;};
+    $('#lvNeedSub').textContent=`his projected starters at each position, a week over the ${nOf(left,'week')} left, against the league’s · injuries and byes included`;
+    $('#tNeedPos').innerHTML='<thead><tr><th>Team</th>'+N.pos.map(p=>`<th class="num">${lab[p]}</th>`).join('')+'<th>Biggest need</th><th>Most depth</th></tr></thead><tbody>'+
+      T.map(t=>`<tr><td>${tm(t)}</td>`+N.pos.map(p=>cellN(gap(t,p))).join('')+`<td><b>${lab[hole(t)]}</b> <span class="dim">${sg(gap(t,hole(t)),1)} a week</span></td><td>${lab[spare(t)]} <span class="dim">bench ${f(N.teams[t.team]._depth[spare(t)],1)}</span></td></tr>`).join('')+'</tbody>';
+    $('#lvNeedNote').textContent=`Each cell is his starters’ projected points a week at that position minus the league’s average starters there (${N.pos.map(p=>lab[p]+' '+f(N.league[p],1)).join(', ')}). Most depth: the position where his best bench player projects furthest above the league’s, his likeliest trade chip.`;}
 }
 /* ============ against the crowd: Deadshot's lineups and pickups against all of Yahoo (crowd.py) ============ */
 (()=>{const C=D.crowd, sec=$('#crowd'); if(!C||!C.years||!Object.keys(C.mgrs).length){if(sec)sec.remove(); const a=$('#nav a[data-id="crowd"]'); if(a)a.remove(); return;}
@@ -5493,34 +5534,6 @@ glossify();
       <p class="lv-trnote">Record · points a week · share of the league outscored. vs pace: wins since against what their form before the deal expected${x.fa.xw!=null?` (${f(x.fa.xw,1)} and ${f(x.fb.xw,1)})`:''}.</p>
     </div></div>`;}).join('');
     glossify($('#tLiveTr'));
-    /* trade grading 2.0 beside the current way (trade2.py), for the deals that have had games since */
-    {const T2=WR.trades.filter(x=>x.v2&&x.v2.a&&x.v2.a.weeks>0).slice().reverse(), host=$('#lvTr2');
-      $('#lvTr2Card').hidden=!T2.length;
-      if(T2.length){
-        $('#lvTr2Sub').textContent=`the ${nOf(T2.length,'deal')} with games since, graded the current way and the proposed new way`;
-        const v2=(x,side)=>x.v2[side];
-        const call2=x=>{const a=x.v2.a.net, b=x.v2.b.net;
-          if(a>0.5&&b>0.5)return `<b>Both sides came out ahead</b>: ${esc(x.ta)} ${sg(a,1)}, ${esc(x.tb)} ${sg(b,1)}`;
-          if(Math.abs(a-b)<0.5)return 'Even';
-          const W=a>b?x.ta:x.tb; return `<b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}won: ${sg(Math.max(a,b),1)} against ${sg(Math.min(a,b),1)}`;};
-        const call1=x=>{const n=x.weeksSince, av=x.aVal/n, bv=x.bVal/n; if(Math.abs(av-bv)<0.05)return 'Even at their positions';
-          const W=av>bv?x.ta:x.tb; return `<b>${esc(W)}</b> ${esc(mg(W))?'('+esc(mg(W))+') ':''}won: ${sg(Math.max(av,bv),1)} a week at their positions to ${sg(Math.min(av,bv),1)}`;};
-        const weeks=(x,side,team)=>v2(x,side).detail.map(d=>`<tr><td class="dim">wk ${d.wk}</td><td>${d.fill.length?d.fill.map(([inn,out,pts])=>`${esc(inn)} <span class="dim">for</span> ${out?esc(out)+' <span class="dim">('+f(pts,1)+')</span>':'<span class="dim">nobody</span>'}`).join('<br>'):'<span class="dim">started nobody he got</span>'}</td><td class="num">${f(d.actual,1)}</td><td class="num dim">${f(d.cf,1)}</td><td class="num"><b class="${d.actual-d.cf>=0?'lv-steal':'lv-bust'}">${sg(d.actual-d.cf,1)}</b></td></tr>`).join('');
-        host.innerHTML=T2.map(x=>`<div style="margin:0 0 26px">
-          <div class="sub-h" style="margin:0 0 8px">${esc(x.ta)} &harr; ${esc(x.tb)} <span class="dim" style="text-transform:none;letter-spacing:0">${esc(x.d)} · ${nOf(x.v2.a.weeks,'week')} since</span></div>
-          <div class="lv-trg">
-            <div><div class="sub-h" style="margin:0 0 6px">Now: value at position</div>
-              <div class="lv-verdict"><span class="lv-vlab">Verdict</span> ${call1(x)}</div>
-              <div class="tiles lv-trtiles"><div class="tile"><span>${esc(x.ta)}</span><b>${sg(x.aVal,1)}</b><div class="lv-tx">over replacement starters, in total</div></div><div class="tile"><span>${esc(x.tb)}</span><b>${sg(x.bVal,1)}</b><div class="lv-tx">over replacement starters, in total</div></div></div>
-              <p class="lv-trnote">Points in the weeks each player started for his new team, minus a replacement-level starter at his position over the same starts. One side wins, one loses.</p></div>
-            <div><div class="sub-h" style="margin:0 0 6px">2.0: net points added</div>
-              <div class="lv-verdict"><span class="lv-vlab">Verdict</span> ${call2(x)}</div>
-              <div class="tiles lv-trtiles"><div class="tile"><span>${esc(x.ta)}</span><b>${sg(x.v2.a.net,1)}</b><div class="lv-tx">best possible lineups ${sg(x.v2.a.pot,1)}</div></div><div class="tile"><span>${esc(x.tb)}</span><b>${sg(x.v2.b.net,1)}</b><div class="lv-tx">best possible lineups ${sg(x.v2.b.pot,1)}</div></div></div>
-              <p class="lv-trnote">Each week, points that counted from the players he got, against the same lineup with the deal undone: each slot they filled goes to whoever his old roster had there with the best projection that week, the players he gave away included. Both sides can win.</p></div>
-          </div>
-          <div class="lv-trg">${['a','b'].map(sd=>`<div><div class="sub-h" style="margin:4px 0 4px">&rarr; ${esc(sd==='a'?x.ta:x.tb)}</div><div class="scroll"><table class="lv-trt"><thead><tr><th>Week</th><th>Started, and who would have instead</th><th class="num">Got</th><th class="num">Instead</th><th class="num">Added</th></tr></thead><tbody>${weeks(x,sd)}</tbody></table></div></div>`).join('')}</div>
-        </div>`).join('');}
-    }
     const thru=`weeks 1–${WR.played}`;
     /* from Yahoo's lineups (teamfile.py): points in the weeks he started, ranked by value at his position,
        kickers and defenses apart; drops are players finishing the season as starters at their position */
@@ -5552,7 +5565,7 @@ glossify();
     /* Yahoo keeps no record of contested claims for a finished season: no table, rather than an empty one */
     $('#tLiveCl').closest('.scroll').hidden=FINAL&&!WR.claims.length;
   }else{
-    $('#lvTrSub').textContent=nOf(L.trades.length,'trade'); $('#lvTr2Card').hidden=true;
+    $('#lvTrSub').textContent=nOf(L.trades.length,'trade');
     ['#tLivePk','#tLiveGo','#tLiveBusy','#tLiveCl'].forEach(s=>{const t=$(s); if(t)t.innerHTML='';});   /* never another season's rows */
   }
   /* the draft: one column per team in draft order, one row per round */
@@ -5638,7 +5651,7 @@ glossify();
     $('#lvOddsCard').hidden=!MD;
     /* the forecast (forecast.py) for the season being played: it draws the odds, and the cards under them */
     const FC=!FINAL&&D.forecast&&D.forecast.year===L.year?D.forecast:null;
-    {const e=$('#lvFcCard'); if(e)e.hidden=!FC;}
+    {const e=$('#lvFcCard'); if(e)e.hidden=!FC; const n=$('#lvNeedCard'); if(n)n.hidden=!(FC&&FC.needs);}
     if(FC){$('#lvOddsCard').hidden=true; drawForecast(FC,L);}
     else if(MD){$('#lvOddsSub').textContent=`${MD.runs.toLocaleString()} simulated finishes of the ${nOf(MD.weeksLeft,'week')} left · rerun every week`;
     $('#tLiveOdds').innerHTML='<thead><tr><th>Team</th><th class="num">Expected points a week</th><th class="num">Projected wins</th><th class="num">Playoffs</th><th class="num">Bye</th><th class="num">Title</th></tr></thead><tbody>'+
@@ -5670,7 +5683,9 @@ glossify();
     const drawFile=()=>{
       $('#lvFileMgr').innerHTML=NAMES.map(n=>`<button data-tf="${esc(n)}" class="${n===who?'on':''}">${esc(n.split(' ').slice(-1)[0])}</button>`).join('');
       $$('#lvFileMgr button').forEach(b=>b.onclick=()=>{who=b.dataset.tf; drawFile();});
-      const F=TF.files[who], H=F.hist[L.year], st=L.standings.find(r=>r.mgr===who), od=MD?MD.odds.find(o=>o.mgr===who):null;
+      const F=TF.files[who], H=F.hist[L.year], st=L.standings.find(r=>r.mgr===who), od=(()=>{const FCs=!FINAL&&D.forecast&&D.forecast.year===L.year?D.forecast:null, t=FCs&&FCs.teams.find(x=>x.mgr===who);   /* one set of odds on the page: the forecast's */
+        if(t){const m=Object.values(t.mu||{}); return {po:t.po,bye:t.bye,title:t.title,wins:t.wins,level:m.length?m.reduce((a,b)=>a+b,0)/m.length:t.level};}
+        return MD?MD.odds.find(o=>o.mgr===who):null;})();
       const p1=v=>pct(v), n1=v=>f(v,1), n2=v=>f(v,2);
       $('#lvFileSub').textContent=`${F.team} · ${who} · against the league ${FINAL?'that season':'this year'} and his ${FINAL?'other seasons, ':'own '}${PAST.filter(y=>F.hist[y]).length?span(PAST.filter(y=>F.hist[y])):'history'}`;
       const best=(k,per,lo)=>{const ys=YRS.filter(y=>F.hist[y]&&F.hist[y][k]!=null&&F.hist[y].g); if(!ys.length)return '—';

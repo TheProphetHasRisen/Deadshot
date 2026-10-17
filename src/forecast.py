@@ -166,13 +166,39 @@ def build(y=None):
     now = run(y, played, N, rnd)
     T = now['teams']
     # injuries: his players listed out, doubtful or questionable this week, their projection, and the week they are back
-    inj = {}
+    inj = {}; st = TF.settings(y)
     for t, rows in now['roster'].items():
         for r in rows:
             if (r.get('status') or '') not in OUT: continue
             back = next((w for w in now['weeks'] if (now['pj'](r['n'], r['pos'], r['nfl'], w) or 0) > 0), None)
+            # what his absence costs: each week he is out, his team's projected best lineup with him (at the
+            # projection he carries once back) against without him, added up
+            healthy = now['pj'](r['n'], r['pos'], r['nfl'], back) if back else None
+            cost = 0.0
+            if healthy:
+                for w in [w for w in now['weeks'] if w < back]:
+                    rows = now['roster'][t]
+                    fixed = lambda n, pos, nfl, wk, _n=r['n'], _h=healthy: _h if n == _n else now['pj'](n, pos, nfl, wk)
+                    cost += _lineup(rows, w, fixed, st['slots']) - _lineup(rows, w, now['pj'], st['slots'])
             inj.setdefault(t, []).append(dict(n=r['n'], pos=(r['pos'] or '').split(',')[0], status=r['status'], slot=r['slot'],
-                                              thisWeek=now['pj'](r['n'], r['pos'], r['nfl'], now['next']) if now['next'] else None, back=back))
+                                              thisWeek=now['pj'](r['n'], r['pos'], r['nfl'], now['next']) if now['next'] else None, back=back,
+                                              cost=round(cost, 1)))
+    # what each team needs, by position: his projected starters at each slot over the weeks left, against the
+    # league's, and his depth (the next man up) there
+    slots = st['slots']; POS = [p for p in ('QB', 'RB', 'WR', 'TE', 'K', 'DEF') if slots.get(p)]
+    need = {}
+    for t, rows in now['roster'].items():
+        acc = {p: 0.0 for p in POS + ['FLEX']}; dep = {p: 0.0 for p in POS}; n = 0
+        for w in now['weeks']:
+            n += 1; left = []
+            for p_ in POS:
+                xs = sorted([(now['pj'](r['n'], r['pos'], r['nfl'], w) or 0, r['n']) for r in rows if (r['pos'] or '').split(',')[0] == p_], reverse=True)
+                k = slots[p_]; acc[p_] += sum(v for v, _ in xs[:k]); dep[p_] += xs[k][0] if len(xs) > k else 0
+                if p_ in ('RB', 'WR', 'TE'): left += xs[k:]
+            if slots.get('W/R/T'): acc['FLEX'] += max([v for v, _ in left] or [0])
+        need[t] = {p_: round(v / max(1, n), 2) for p_, v in acc.items()}; need[t]['_depth'] = {p_: round(v / max(1, n), 2) for p_, v in dep.items()}
+    lgpos = {p_: sum(v[p_] for v in need.values()) / len(need) for p_ in POS + ['FLEX']}
+    lgdep = {p_: sum(v['_depth'][p_] for v in need.values()) / len(need) for p_ in POS}
     # schedule left: each opponent's expected score, against the league's
     sos = {}
     for t in T:
@@ -192,7 +218,9 @@ def build(y=None):
                 fit={k: (float('%.4g' % v) if isinstance(v, float) else v) for k, v in now['fit'].items()},
                 teams=[dict(team=t, mgr=mgr[t], **{k: (round(v, 4) if isinstance(v, float) else v) for k, v in T[t].items()}, sos=sos[t], inj=inj.get(t, []))
                        for t in sorted(T, key=lambda t: -T[t]['po'])],
-                games=now['games'], history=hist)
+                games=now['games'], history=hist,
+                needs=dict(pos=POS + (['FLEX'] if slots.get('W/R/T') else []), league={k: round(v, 2) for k, v in lgpos.items()},
+                           leagueDepth={k: round(v, 2) for k, v in lgdep.items()}, teams=need, slots={p_: slots.get(p_) for p_ in POS}))
 
 if __name__ == '__main__':
     import time; t0 = time.time(); F = build()

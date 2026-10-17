@@ -15,7 +15,7 @@ say(){ printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
 if [ -f .yahoo_tokens.json ] && [ "${DEADSHOT_NO_REFRESH:-0}" != 1 ]; then
   say "read Yahoo"
-  python3 yahoo_fetch.py 2026 >/dev/null && python3 yahoo_to_2026.py && python3 draft_points.py >/dev/null \
+  python3 yahoo_fetch.py 2026 >/dev/null && python3 yahoo_to_2026.py && python3 draft_points.py >/dev/null && { python3 statuslog.py >/dev/null || true; } \
     || echo "  (Yahoo could not be read: building from the last copy)"
 fi
 
@@ -138,7 +138,7 @@ mkdir -p "$CLONE/src" "$CLONE/src/page"
 cp page/* "$CLONE/src/page/" 2>/dev/null || true
 for f in data.py export.py mksite.py mkfonts.py verify.py writer.py test.js test_writer.py \
          test_rules.js test_yahoo.py yahoo_api.py yahoo_check.py yahoo_auth.py \
-         test_numbers.py numbers.lock.json test_copy.py test_ask.js season2026.py check_2026.py draft_points.py draft_points.json wire2026.py test_wire.py yahoo_fetch.py yahoo_parse.py yahoo_to_2026.py season2026_yahoo.py teamfile.py test_teamfile.py nfl_teams.py nflcomps.py injuries.py seasonpage.py sleeper_season.py scoring.py crowd.py crowd_hist.json projections.py trade2.py proj_hist.json netpts.py forecast.py backtest.py backtest.json mkog.js ci_update.sh \
+         test_numbers.py numbers.lock.json test_copy.py test_ask.js season2026.py check_2026.py draft_points.py draft_points.json wire2026.py test_wire.py yahoo_fetch.py yahoo_parse.py yahoo_to_2026.py season2026_yahoo.py teamfile.py test_teamfile.py nfl_teams.py nflcomps.py injuries.py seasonpage.py sleeper_season.py scoring.py crowd.py crowd_hist.json projections.py trade2.py proj_hist.json netpts.py forecast.py backtest.py backtest.json statuslog.py status_log.json mkog.js ci_update.sh \
          eslint.config.js package.json package-lock.json \
          weekly.py weekly2021.py weekly2022.py weekly2023.py weekly2024.py deploy.sh \
          CLAUDE.md HANDOFF.md README.md AUDIT.md YAHOO_PLAN.md \

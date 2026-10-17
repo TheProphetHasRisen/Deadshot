@@ -330,12 +330,7 @@ if S26:
             repl = teamfile.replacement(2026, int(dp['weeks']['2026']))
         W = wire2026.grade(S26, dp.get('wk2026') or {}, int(dp['weeks']['2026']), games,
                            dp.get('allwk2026'), repl)
-        # trade grading 2.0, side by side with the current way while Brian compares them (trade2.py)
-        try:
-            import trade2
-            for x, g in zip(W['trades'], trade2.grade(2026, W['trades'], W['played'])): x['v2'] = g
-        except Exception as e:
-            print('  (trade 2.0 left out: %s)' % str(e)[:120], file=sys.stderr)
+        # trade grading 2.0 (trade2.py) is shelved (USER, 16 Oct 2026): not on the page
         return W
     up = [dict(wk=wk, ta=u[0], pa=u[1], tb=u[2], pb=u[3], aa=u[4] if len(u) > 4 else None, ab=u[5] if len(u) > 5 else None,
                status=u[6] if len(u) > 6 else 'preevent') for wk, lst in S26.UPCOMING2026.items() for u in lst]
