@@ -362,7 +362,7 @@ if S26:
         import crowd
         if os.path.exists('yahoo_raw/league_keys.json'):
             out['crowd'] = crowd.build()
-            import netpts; out['netpts'] = netpts.build(out['crowd'])   # manager net points (netpts.py)
+            # manager net points (netpts.py) is off the page while it is reworked (USER, 16 Oct 2026)
         import forecast; out['forecast'] = forecast.build()         # the rest of the live season, played out
     except Exception as e:
         print('  (against the crowd left out: %s)' % str(e)[:120], file=sys.stderr)   # stderr: deploy.sh hides stdout

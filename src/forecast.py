@@ -25,7 +25,7 @@ import yahoo_parse as P
 import teamfile as TF
 import projections as PR
 
-N, N_PAST = 100000, 20000
+N, N_PAST = 1000000, 20000   # a million seasons for the week ahead (USER, 16 Oct 2026); 20,000 for each past week's re-run
 OUT = ('O', 'IR', 'PUP-R', 'PUP-P', 'SUSP', 'NFI-R', 'NFI-A', 'D', 'Q', 'IR-R', 'COVID-19', 'NA')
 
 def _lineup(rows, wk, pj, slots):

@@ -462,6 +462,17 @@ def build():
             'pk_pts', 'pk_marg', 'pk_starts', 'patience', 'drafted_pts', 'trade_net', 'trade_w', 'trade_l', 'lineup_wins', 'pickup_wins', 'pk_val', 'inj_g', 'inj_val', 'inj_wins', 'inj_luck')
     LEAN = ('trades_list', 'draft_list', 'picks_list', 'gone_list', 'held')
     out = dict(years=YEARS, league={y: {k: v for k, v in H[y][1].items() if k not in LEAN} for y in YEARS}, model=model(H, played), files={})
+    # the league over the same weeks every season (weeks 1..n, n = weeks played this year), so 2026 so far is set
+    # against every other season at the same point, not against whole seasons; rebuilt with every update
+    def window(y, n):
+        M, L = H[y]; wk = [x for Z in M.values() for x in Z['weekly'] if x['wk'] <= n]
+        if not wk: return None
+        mu = sum(x['pts'] for x in wk) / len(wk); sd = math.sqrt(sum((x['pts'] - mu) ** 2 for x in wk) / len(wk))
+        opt = sum(x['opt'] for x in wk)
+        return dict(avg=mu, sd=sd, ppw=sd / 0.39894 if sd else None, eff=sum(x['pts'] for x in wk) / opt if opt else None, weeks=n,
+                    moves=sum(1 for Z in M.values() for p in Z['pickups'] if p['wk'] <= n) / max(1, len(M)),
+                    trades=sum(1 for t in L['trades_list'] if t['wk'] <= n))
+    out['leagueSame'] = {y: window(y, played) for y in YEARS}
     for m in H[LIVE][0]:
         hist = {y: {k: H[y][0][m][k] for k in keep} for y in YEARS if m in H[y][0]}
         Z = H[LIVE][0][m]
